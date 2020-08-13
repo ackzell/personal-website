@@ -1,0 +1,1142 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   sodipodi:docname="website.svg"
+   inkscape:version="1.0 (4035a4f, 2020-05-01)"
+   id="svg1961"
+   version="1.1"
+   viewBox="0 0 210 297"
+   height="297mm"
+   width="210mm">
+  <defs
+     id="defs1955">
+    <filter
+       inkscape:collect="always"
+       style="color-interpolation-filters:sRGB"
+       id="filter6128-6-2-8"
+       x="-0.018030269"
+       width="1.0360605"
+       y="-0.017969832"
+       height="1.0359397">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="7.2024362"
+         id="feGaussianBlur6130-4-7-6" />
+    </filter>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6481"
+       id="radialGradient5870-4-3-5"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.45358183,-0.42626139,0.73454892,0.78162861,1913.172,-1876.6275)"
+       cx="469.82834"
+       cy="569.71619"
+       fx="469.82834"
+       fy="569.71619"
+       r="479.35629" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient6481">
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0"
+         id="stop6483" />
+      <stop
+         id="stop6485"
+         offset="0.50260168"
+         style="stop-color:#ffffff;stop-opacity:1" />
+      <stop
+         id="stop6487"
+         offset="0.71564507"
+         style="stop-color:#ffffff;stop-opacity:1" />
+      <stop
+         style="stop-color:#eae9e9;stop-opacity:1"
+         offset="1"
+         id="stop6489" />
+    </linearGradient>
+    <radialGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5624"
+       id="radialGradient5872-0-5-0"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.45358183,-0.42626139,0.73454892,0.78162861,1913.172,-1876.6275)"
+       cx="469.82834"
+       cy="569.71619"
+       fx="469.82834"
+       fy="569.71619"
+       r="479.35629" />
+    <linearGradient
+       id="linearGradient5624"
+       inkscape:collect="always">
+      <stop
+         id="stop5626"
+         offset="0"
+         style="stop-color:#ffffff;stop-opacity:1" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0.50260168"
+         id="stop5634" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1"
+         offset="0.71564507"
+         id="stop5632" />
+      <stop
+         id="stop5628"
+         offset="1"
+         style="stop-color:#ececec;stop-opacity:1" />
+    </linearGradient>
+    <filter
+       height="1.0359397"
+       y="-0.017969832"
+       width="1.0360605"
+       x="-0.018030269"
+       id="filter6128-6-2-8-1"
+       style="color-interpolation-filters:sRGB"
+       inkscape:collect="always">
+      <feGaussianBlur
+         id="feGaussianBlur6130-4-7-6-5"
+         stdDeviation="7.2024362"
+         inkscape:collect="always" />
+    </filter>
+    <radialGradient
+       r="479.35629"
+       fy="569.71619"
+       fx="469.82834"
+       cy="569.71619"
+       cx="469.82834"
+       gradientTransform="matrix(0.45358183,-0.42626139,0.73454892,0.78162861,1913.172,-1876.6275)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient5870-4-3-5-5"
+       xlink:href="#linearGradient6481"
+       inkscape:collect="always" />
+    <radialGradient
+       r="479.35629"
+       fy="569.71619"
+       fx="469.82834"
+       cy="569.71619"
+       cx="469.82834"
+       gradientTransform="matrix(0.45358183,-0.42626139,0.73454892,0.78162861,1913.172,-1876.6275)"
+       gradientUnits="userSpaceOnUse"
+       id="radialGradient5872-0-5-0-9"
+       xlink:href="#linearGradient5624"
+       inkscape:collect="always" />
+  </defs>
+  <sodipodi:namedview
+     inkscape:snap-global="false"
+     inkscape:window-maximized="0"
+     inkscape:window-y="0"
+     inkscape:window-x="960"
+     inkscape:window-height="1058"
+     inkscape:window-width="960"
+     showgrid="false"
+     inkscape:document-rotation="0"
+     inkscape:current-layer="layer2"
+     inkscape:document-units="mm"
+     inkscape:cy="6423.7895"
+     inkscape:cx="-11886.892"
+     inkscape:zoom="0.29998554"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     borderopacity="1.0"
+     bordercolor="#666666"
+     pagecolor="#ffffff"
+     id="base" />
+  <metadata
+     id="metadata1958">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     id="layer1"
+     inkscape:groupmode="layer"
+     inkscape:label="Layer 1">
+    <g
+       transform="translate(-170.56366,-138.63385)"
+       id="g2543">
+      <rect
+         y="-24.190462"
+         x="-1512.6606"
+         height="52.916664"
+         width="73.327377"
+         id="rect2528"
+         style="fill:#212121;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+      <rect
+         style="fill:#5e5e5e;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+         id="rect2530"
+         width="73.327377"
+         height="52.916664"
+         x="-1439.3333"
+         y="-24.190462" />
+      <rect
+         y="-24.190462"
+         x="-1366.0059"
+         height="52.916664"
+         width="73.327377"
+         id="rect2532"
+         style="fill:#8f8f8f;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+      <rect
+         style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+         id="rect2534"
+         width="73.327377"
+         height="52.916664"
+         x="-1292.6785"
+         y="-24.190462" />
+      <rect
+         y="-24.190462"
+         x="-1219.3511"
+         height="52.916664"
+         width="73.327377"
+         id="rect2536"
+         style="fill:#fafafa;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    </g>
+    <rect
+       y="113.61487"
+       x="-2364.4692"
+       height="2168.3574"
+       width="1536.5889"
+       id="rect2524"
+       style="fill:#212121;fill-opacity:1;stroke-width:3.70789;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <g
+       id="g2929"
+       transform="translate(314.63505,-139.84685)">
+      <rect
+         style="fill:#0a0a0a;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+         id="rect2919"
+         width="73.327377"
+         height="52.916664"
+         x="-1512.6606"
+         y="-24.190462" />
+      <rect
+         y="-24.190462"
+         x="-1439.3333"
+         height="52.916664"
+         width="73.327377"
+         id="rect2921"
+         style="fill:#1da1f2;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+      <rect
+         style="fill:#181717;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+         id="rect2923"
+         width="73.327377"
+         height="52.916664"
+         x="-1366.0059"
+         y="-24.190462" />
+      <rect
+         y="-24.190462"
+         x="-1292.6785"
+         height="52.916664"
+         width="73.327377"
+         id="rect2925"
+         style="fill:#ff0000;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+      <rect
+         style="fill:#0077b5;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+         id="rect2927"
+         width="73.327377"
+         height="52.916664"
+         x="-1219.3511"
+         y="-24.190462" />
+    </g>
+    <rect
+       style="fill:#212121;fill-opacity:1;stroke-width:2.1597;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect2524-9"
+       width="454.33871"
+       height="2487.9385"
+       x="-3330.9878"
+       y="20.410715" />
+  </g>
+  <g
+     inkscape:label="Layer 2"
+     id="layer2"
+     inkscape:groupmode="layer">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5655px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.56414"
+       x="-1996.1703"
+       y="261.84329"
+       id="text2547"><tspan
+         y="261.84329"
+         x="-1996.1703"
+         id="tspan4400"
+         sodipodi:role="line">Axel Uriel Martínez Castillo</tspan><tspan
+         y="290.05017"
+         x="-1996.1703"
+         id="tspan4402"
+         sodipodi:role="line">(ackzell)</tspan></text>
+    <g
+       transform="matrix(0.32465317,0,0,0.32360282,-2610.8953,956.88943)"
+       id="g1258">
+      <path
+         transform="matrix(0.58510506,0,0,0.58510506,2227.7484,-1960.4829)"
+         inkscape:connector-curvature="0"
+         id="path5860-1-9-2"
+         style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter6128-6-2-8)"
+         d="M 476.2559,0 C 240.94488,1.4881891 45.708661,171.9567 5.8464566,396.17719 H 113.38583 C 151.83071,229.57088 301.0748,105.37796 479.33858,105.37796 c 178.26378,0 327.5433,124.19292 365.98819,290.79923 H 952.86613 C 912.79133,170.96458 716.03149,0 479.33858,0 478.31102,0 477.28346,0 476.2559,0 Z M 0,520.58271 c 20.125984,247.11026 227.05512,441.35436 479.33858,441.35436 252.31889,0 459.21259,-194.2441 479.37401,-441.35436 H 852.87401 c -19.77165,188.82285 -179.4685,335.9764 -373.53543,335.9764 -194.0315,0 -353.72834,-147.15355 -373.5,-335.9764 z" />
+      <path
+         transform="matrix(0.58510506,0,0,0.58510506,2227.7484,-1960.4829)"
+         inkscape:connector-curvature="0"
+         id="path5862-5-6-3"
+         style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter6128-6-2-8)"
+         d="M 496.52362,117.49607 235.06299,755.61029 c 36.14173,32.20866 78.69685,57.36614 125.50394,73.31103 l -14.98819,-79.97245 187.51181,-205.86616 63.28346,286.44097 c 34.19291,-11.48032 66.15354,-27.8504 95.0315,-48.25985 L 599.91732,469.70082 776.65747,275.70474 587.33858,426.86223 Z m -9.5315,216.88584 32.38583,146.69293 L 405.1063,572.315 Z" />
+      <path
+         d="m 2499.764,-1970.1629 c -137.6814,0.8709 -251.9152,100.6129 -275.2385,231.8054 h 62.9219 c 22.4941,-97.4824 109.8175,-170.148 214.1206,-170.148 104.303,0 191.6473,72.6656 214.1415,170.148 h 62.9218 c -23.4481,-131.773 -138.5732,-231.8054 -277.0633,-231.8054 -0.6013,0 -1.2026,0 -1.804,0 z m -278.6594,304.5954 c 11.776,144.5855 132.8512,258.2388 280.4634,258.2388 147.633,0 268.6874,-113.6533 280.4842,-258.2388 h -61.9269 c -11.5682,110.4815 -105.0079,196.5818 -218.5573,196.5818 -113.529,0 -206.9682,-86.1003 -218.5368,-196.5818 z"
+         style="fill:url(#radialGradient5870-4-3-5);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.86199"
+         id="path5866-0-0-6"
+         inkscape:connector-curvature="0" />
+      <path
+         d="m 2511.6231,-1901.4153 -152.9819,373.3639 c 21.1467,18.8454 46.0457,33.565 73.433,42.8944 l -8.7698,-46.7923 109.7141,-120.4531 37.0276,167.598 c 20.0062,-6.7172 38.7067,-16.2953 55.6033,-28.2369 l -53.5302,-182.2971 103.4117,-113.5081 -110.7715,88.443 z m -5.5771,126.9011 18.9492,85.8308 -66.8607,53.385 z"
+         style="fill:url(#radialGradient5872-0-5-0);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.86199"
+         id="path5868-8-4-5"
+         inkscape:connector-curvature="0" />
+    </g>
+    <g
+       transform="translate(-348.916,93.204155)"
+       id="g4459">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         x="-1221.8955"
+         y="92.186127"
+         id="text2547-1"><tspan
+           sodipodi:role="line"
+           id="tspan2545-0"
+           x="-1221.8955"
+           y="92.186127"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">About me</tspan></text>
+      <text
+         id="text2547-1-7"
+         y="92.200607"
+         x="-1131.7283"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.362204"
+           y="92.200607"
+           x="-1131.7283"
+           id="tspan2545-0-9"
+           sodipodi:role="line">Video series</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         x="-883.49011"
+         y="92.186127"
+         id="text2668"><tspan
+           y="92.186127"
+           x="-883.49011"
+           id="tspan4465"
+           sodipodi:role="line">Podcast</tspan></text>
+      <text
+         id="text4469"
+         y="92.186127"
+         x="-1007.5513"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         xml:space="preserve"><tspan
+           y="92.186127"
+           x="-1007.5513"
+           sodipodi:role="line"
+           id="tspan4467">Notes on Vue</tspan></text>
+    </g>
+    <g
+       style="fill:#adadad;fill-opacity:1"
+       transform="translate(-587.44045,1946.9794)"
+       id="g2941">
+      <g
+         style="fill:#adadad;fill-opacity:1"
+         id="g2857"
+         transform="matrix(1.5295656,0,0,1.5295656,-979.73469,233.80998)">
+        <path
+           id="path2846"
+           d="M 7.42,10.05 C 7.24,9.89 6.96,9.82 6.58,9.82 H 6 l 0.02,2.44 0.04,2.45 0.56,-0.02 c 0.41,0 0.63,-0.07 0.83,-0.26 0.24,-0.24 0.26,-0.36 0.26,-2.2 0,-1.91 -0.02,-1.96 -0.29,-2.18 z M 0,4.94 V 19.06 H 24 V 4.94 Z M 8.56,15.3 C 8.12,15.88 7.5,16.07 6.03,16.07 H 4.71 V 8.53 h 1.4 c 1.67,0 2.16,0.18 2.6,0.9 0.27,0.43 0.29,0.6 0.32,2.57 0.05,2.23 -0.02,2.73 -0.47,3.3 z m 5.09,-5.47 h -2.47 v 1.77 h 1.52 v 1.28 l -0.72,0.04 -0.75,0.03 v 1.77 l 1.22,0.03 1.2,0.04 v 1.28 h -1.6 c -1.53,0 -1.6,-0.01 -1.87,-0.3 l -0.3,-0.28 v -3.16 c 0,-3.02 0.01,-3.18 0.25,-3.48 0.23,-0.31 0.25,-0.31 1.88,-0.31 h 1.64 v 1.3 z m 4.68,5.45 c -0.17,0.43 -0.64,0.79 -1,0.79 -0.18,0 -0.45,-0.15 -0.67,-0.39 -0.32,-0.32 -0.45,-0.63 -0.82,-2.08 l -0.9,-3.39 -0.45,-1.67 h 0.76 c 0.4,0 0.75,0.02 0.75,0.05 0,0.06 1.16,4.54 1.26,4.83 0.04,0.15 0.32,-0.7 0.73,-2.3 L 18.65,8.6 19.39,8.56 c 0.4,-0.02 0.73,0 0.73,0.04 0,0.14 -1.67,6.38 -1.8,6.68 z"
+           style="fill:#adadad;fill-opacity:1" />
+      </g>
+      <g
+         style="fill:#adadad;fill-opacity:1"
+         id="g2872"
+         transform="matrix(0.86272952,0,0,0.86272952,-1071.77,241.81213)">
+        <path
+           id="path2861"
+           d="m 12,0.297 c -6.63,0 -12,5.373 -12,12 0,5.303 3.438,9.8 8.205,11.385 0.6,0.113 0.82,-0.258 0.82,-0.577 0,-0.285 -0.01,-1.04 -0.015,-2.04 C 5.672,21.789 4.968,19.455 4.968,19.455 4.422,18.07 3.633,17.7 3.633,17.7 2.546,16.956 3.717,16.971 3.717,16.971 c 1.205,0.084 1.838,1.236 1.838,1.236 1.07,1.835 2.809,1.305 3.495,0.998 C 9.158,18.429 9.467,17.9 9.81,17.6 7.145,17.3 4.344,16.268 4.344,11.67 4.344,10.36 4.809,9.29 5.579,8.45 5.444,8.147 5.039,6.927 5.684,5.274 c 0,0 1.005,-0.322 3.3,1.23 0.96,-0.267 1.98,-0.399 3,-0.405 1.02,0.006 2.04,0.138 3,0.405 2.28,-1.552 3.285,-1.23 3.285,-1.23 0.645,1.653 0.24,2.873 0.12,3.176 0.765,0.84 1.23,1.91 1.23,3.22 0,4.61 -2.805,5.625 -5.475,5.92 0.42,0.36 0.81,1.096 0.81,2.22 0,1.606 -0.015,2.896 -0.015,3.286 0,0.315 0.21,0.69 0.825,0.57 C 20.565,22.092 24,17.592 24,12.297 c 0,-6.627 -5.373,-12 -12,-12"
+           style="fill:#adadad;fill-opacity:1" />
+      </g>
+      <g
+         style="fill:#adadad;fill-opacity:1"
+         id="g2887"
+         transform="matrix(0.73349268,0,0,0.73349268,-919.21918,243.36286)">
+        <path
+           id="path2876"
+           d="m 20.447,20.452 h -3.554 v -5.569 c 0,-1.328 -0.027,-3.037 -1.852,-3.037 -1.853,0 -2.136,1.445 -2.136,2.939 v 5.667 H 9.351 V 9 h 3.414 v 1.561 h 0.046 c 0.477,-0.9 1.637,-1.85 3.37,-1.85 3.601,0 4.267,2.37 4.267,5.455 v 6.286 z M 5.337,7.433 c -1.144,0 -2.063,-0.926 -2.063,-2.065 0,-1.138 0.92,-2.063 2.063,-2.063 1.14,0 2.064,0.925 2.064,2.063 0,1.139 -0.925,2.065 -2.064,2.065 z M 7.119,20.452 H 3.555 V 9 H 7.119 Z M 22.225,0 H 1.771 C 0.792,0 0,0.774 0,1.729 V 22.271 C 0,23.227 0.792,24 1.771,24 H 22.222 C 23.2,24 24,23.227 24,22.271 V 1.729 C 24,0.774 23.2,0 22.222,0 Z"
+           style="fill:#adadad;fill-opacity:1" />
+      </g>
+      <g
+         style="fill:#adadad;fill-opacity:1"
+         id="g2902"
+         transform="matrix(0.98820087,0,0,0.98820087,-1027.2585,240.30685)">
+        <path
+           id="path2891"
+           d="M 23.954,4.569 C 23.069,4.958 22.124,5.223 21.129,5.344 22.143,4.733 22.923,3.77 23.292,2.621 22.341,3.176 21.287,3.58 20.165,3.805 19.269,2.846 17.992,2.246 16.574,2.246 c -2.717,0 -4.92,2.203 -4.92,4.917 0,0.39 0.045,0.765 0.127,1.124 C 7.691,8.094 4.066,6.13 1.64,3.161 1.213,3.883 0.974,4.722 0.974,5.636 c 0,1.71 0.87,3.213 2.188,4.096 C 2.355,9.706 1.596,9.484 0.934,9.116 v 0.061 c 0,2.385 1.693,4.374 3.946,4.827 -0.413,0.111 -0.849,0.171 -1.296,0.171 -0.314,0 -0.615,-0.03 -0.916,-0.086 0.631,1.953 2.445,3.377 4.604,3.417 -1.68,1.319 -3.809,2.105 -6.102,2.105 -0.39,0 -0.779,-0.023 -1.17,-0.067 2.189,1.394 4.768,2.209 7.557,2.209 9.054,0 13.999,-7.496 13.999,-13.986 0,-0.209 0,-0.42 -0.015,-0.63 0.961,-0.689 1.8,-1.56 2.46,-2.548 z"
+           style="fill:#adadad;fill-opacity:1" />
+      </g>
+      <g
+         style="fill:#adadad;fill-opacity:1"
+         id="g2917"
+         transform="matrix(0.84520327,0,0,0.84520327,-1115.8574,242.02276)">
+        <path
+           id="path2906"
+           d="M 23.495,6.205 A 3.007,3.007 0 0 0 21.407,4.117 c -1.87,-0.501 -9.396,-0.501 -9.396,-0.501 0,0 -7.507,-0.01 -9.396,0.501 a 3.007,3.007 0 0 0 -2.088,2.088 31.247,31.247 0 0 0 -0.522,5.805 31.247,31.247 0 0 0 0.522,5.783 3.007,3.007 0 0 0 2.088,2.088 c 1.868,0.502 9.396,0.502 9.396,0.502 0,0 7.506,0 9.396,-0.502 a 3.007,3.007 0 0 0 2.088,-2.088 31.247,31.247 0 0 0 0.5,-5.783 31.247,31.247 0 0 0 -0.5,-5.805 z M 9.609,15.601 V 8.408 l 6.264,3.602 z"
+           style="fill:#adadad;fill-opacity:1" />
+      </g>
+    </g>
+    <text
+       id="text2547-1-3"
+       y="195.45627"
+       x="-1218.2278"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       xml:space="preserve"
+       transform="matrix(0.86625816,0,0,0.86625816,-476.26272,110.60683)"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">I'm a software developer (engineer, artisan, </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">whatever you wanna call it, but never a ninja, </tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">rockstar or wizard, sorry) from Mexico who is </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">currently and happily employed to work on the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">Front End side of things for web apps.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">I'm also always trying to build or create </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">something to scratch an own itch, and that is </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">also aimed at sharing with others what I've </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">learned in the process.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">This is why I have a YouTube channel, a Vue.js </tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">notes website and the ocassional blog post.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">Feel free to reach out and thanks a lot for </tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">checking out the content in advance, I sure </tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">hope it will help you one way or another.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="503.32855"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="521.43868"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">Cheers!</tspan></tspan></text>
+    <text
+       id="text2547-1-7-3"
+       y="653.08563"
+       x="-1973.2622"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.740465"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.740465"
+         y="653.08563"
+         x="-1973.2622"
+         id="tspan2545-0-9-3"
+         sodipodi:role="line">&lt;video&gt; series</tspan></text>
+    <text
+       transform="matrix(0.86625816,0,0,0.86625816,-914.63943,523.17647)"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       x="-1218.2278"
+       y="195.45627"
+       id="text2547-1-3-4"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan>The idea behind the videos on YouTube is to </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan>present a series each time I work on </tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan>something. From desktop apps, to in-browser </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan>voice recording ones and documentation sites.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan>Video content is hard to consume, scrubbing </tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan>the video in search for what you want or need </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan>can be time consuming, so my main idea is to </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan>share with you via small videos how these apps </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan>are created piece by piece. So that you can </tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan>hopefully find what you need in the shorter </tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan>pieces.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan>I try to go straight to the point and trust </tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan>you will be able to figure out whatever you </tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan>need for the extra information regarding the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan>different topics.</tspan></tspan></text>
+    <g
+       id="g1258-9"
+       transform="matrix(0.32465317,0,0,0.32360283,-3918.1206,860.5022)">
+      <path
+         d="M 476.2559,0 C 240.94488,1.4881891 45.708661,171.9567 5.8464566,396.17719 H 113.38583 C 151.83071,229.57088 301.0748,105.37796 479.33858,105.37796 c 178.26378,0 327.5433,124.19292 365.98819,290.79923 H 952.86613 C 912.79133,170.96458 716.03149,0 479.33858,0 478.31102,0 477.28346,0 476.2559,0 Z M 0,520.58271 c 20.125984,247.11026 227.05512,441.35436 479.33858,441.35436 252.31889,0 459.21259,-194.2441 479.37401,-441.35436 H 852.87401 c -19.77165,188.82285 -179.4685,335.9764 -373.53543,335.9764 -194.0315,0 -353.72834,-147.15355 -373.5,-335.9764 z"
+         style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter6128-6-2-8-1)"
+         id="path5860-1-9-2-2"
+         inkscape:connector-curvature="0"
+         transform="matrix(0.58510506,0,0,0.58510506,2227.7484,-1960.4829)" />
+      <path
+         d="M 496.52362,117.49607 235.06299,755.61029 c 36.14173,32.20866 78.69685,57.36614 125.50394,73.31103 l -14.98819,-79.97245 187.51181,-205.86616 63.28346,286.44097 c 34.19291,-11.48032 66.15354,-27.8504 95.0315,-48.25985 L 599.91732,469.70082 776.65747,275.70474 587.33858,426.86223 Z m -9.5315,216.88584 32.38583,146.69293 L 405.1063,572.315 Z"
+         style="fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;filter:url(#filter6128-6-2-8-1)"
+         id="path5862-5-6-3-0"
+         inkscape:connector-curvature="0"
+         transform="matrix(0.58510506,0,0,0.58510506,2227.7484,-1960.4829)" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5866-0-0-6-9"
+         style="fill:url(#radialGradient5870-4-3-5-5);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.86199"
+         d="m 2499.764,-1970.1629 c -137.6814,0.8709 -251.9152,100.6129 -275.2385,231.8054 h 62.9219 c 22.4941,-97.4824 109.8175,-170.148 214.1206,-170.148 104.303,0 191.6473,72.6656 214.1415,170.148 h 62.9218 c -23.4481,-131.773 -138.5732,-231.8054 -277.0633,-231.8054 -0.6013,0 -1.2026,0 -1.804,0 z m -278.6594,304.5954 c 11.776,144.5855 132.8512,258.2388 280.4634,258.2388 147.633,0 268.6874,-113.6533 280.4842,-258.2388 h -61.9269 c -11.5682,110.4815 -105.0079,196.5818 -218.5573,196.5818 -113.529,0 -206.9682,-86.1003 -218.5368,-196.5818 z" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path5868-8-4-5-4"
+         style="fill:url(#radialGradient5872-0-5-0-9);fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:3.86199"
+         d="m 2511.6231,-1901.4153 -152.9819,373.3639 c 21.1467,18.8454 46.0457,33.565 73.433,42.8944 l -8.7698,-46.7923 109.7141,-120.4531 37.0276,167.598 c 20.0062,-6.7172 38.7067,-16.2953 55.6033,-28.2369 l -53.5302,-182.2971 103.4117,-113.5081 -110.7715,88.443 z m -5.5771,126.9011 18.9492,85.8308 -66.8607,53.385 z" />
+    </g>
+    <text
+       id="text2547-0"
+       y="70.223267"
+       x="-3092.6301"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5655px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.564139"
+       xml:space="preserve"><tspan
+         id="tspan2945-6"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5655px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#fafafa;fill-opacity:1;stroke-width:0.564139"
+         y="70.223267"
+         x="-3092.6301"
+         sodipodi:role="line">Axel Uriel Martínez Castillo </tspan><tspan
+         id="tspan2949-9"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:22.5655px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:center;text-anchor:middle;fill:#fafafa;fill-opacity:1;stroke-width:0.564139"
+         y="98.430145"
+         x="-3092.6301"
+         sodipodi:role="line">(ackzell)</tspan></text>
+    <text
+       transform="matrix(0.86625816,0,0,0.86625816,-2216.0822,322.28965)"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       x="-1218.2278"
+       y="195.45627"
+       id="text2547-1-3-3"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">I'm a software developer (engineer, artisan, </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">whatever you wanna call it, but never a ninja, </tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">rockstar or wizard, sorry) from Mexico who is </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">currently and happily employed to work on the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">Front End side of things for web apps.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">I'm also always trying to build or create </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">something to scratch an own itch, and that is </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">also aimed at sharing with others what I've </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">learned in the process.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">This is why I have a YouTube channel, a Vue.js </tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">notes website and the ocassional blog post.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">Feel free to reach out and thanks a lot for </tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">checking out the content in advance, I sure </tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">hope it will help you one way or another.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="503.32855"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="521.43868"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204">Cheers!</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.740466"
+       x="-3277.3877"
+       y="845.81445"
+       id="text2547-1-7-3-6"><tspan
+         sodipodi:role="line"
+         id="tspan2545-0-9-3-5"
+         x="-3277.3877"
+         y="845.81445"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.740466">&lt;video&gt; series</tspan></text>
+    <text
+       id="text2547-1-3-4-0"
+       y="195.45627"
+       x="-1218.2278"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.48809999999999931px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204;letter-spacing:0px"
+       xml:space="preserve"
+       transform="matrix(0.86625816,0,0,0.86625816,-2218.7649,715.90524)"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan
+           style="fill:#adadad;fill-opacity:1">The idea behind the videos on YouTube is to </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan
+           style="fill:#adadad;fill-opacity:1">present a series each time I work on </tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan
+           style="fill:#adadad;fill-opacity:1">something. From desktop apps, to in-browser </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan
+           style="fill:#adadad;fill-opacity:1">voice recording ones and documentation sites.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan
+           style="fill:#adadad;fill-opacity:1">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan
+           style="fill:#adadad;fill-opacity:1">Video content is hard to consume, scrubbing </tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan
+           style="fill:#adadad;fill-opacity:1">the video in search for what you want or need </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan
+           style="fill:#adadad;fill-opacity:1">can be time consuming, so my main idea is to </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan
+           style="fill:#adadad;fill-opacity:1">share with you via small videos how these apps </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan
+           style="fill:#adadad;fill-opacity:1">are created piece by piece. So that you can </tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan
+           style="fill:#adadad;fill-opacity:1">hopefully find what you need in the shorter </tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan
+           style="fill:#adadad;fill-opacity:1">pieces.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan
+           style="fill:#adadad;fill-opacity:1">
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan
+           style="fill:#adadad;fill-opacity:1">I try to go straight to the point and trust </tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan
+           style="fill:#adadad;fill-opacity:1">you will be able to figure out whatever you </tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan
+           style="fill:#adadad;fill-opacity:1">need for the extra information regarding the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan
+           style="fill:#adadad;fill-opacity:1">different topics.</tspan></tspan></text>
+    <g
+       id="g2941-5"
+       transform="translate(-2194.2728,-27.639371)"
+       style="fill:#adadad;fill-opacity:1">
+      <g
+         transform="matrix(1.0322839,0,0,1.0322839,-1115.9464,379.21564)"
+         id="g2857-2"
+         style="fill:#adadad;fill-opacity:1">
+        <path
+           style="fill:#adadad;fill-opacity:1"
+           d="M 7.42,10.05 C 7.24,9.89 6.96,9.82 6.58,9.82 H 6 l 0.02,2.44 0.04,2.45 0.56,-0.02 c 0.41,0 0.63,-0.07 0.83,-0.26 0.24,-0.24 0.26,-0.36 0.26,-2.2 0,-1.91 -0.02,-1.96 -0.29,-2.18 z M 0,4.94 V 19.06 H 24 V 4.94 Z M 8.56,15.3 C 8.12,15.88 7.5,16.07 6.03,16.07 H 4.71 V 8.53 h 1.4 c 1.67,0 2.16,0.18 2.6,0.9 0.27,0.43 0.29,0.6 0.32,2.57 0.05,2.23 -0.02,2.73 -0.47,3.3 z m 5.09,-5.47 h -2.47 v 1.77 h 1.52 v 1.28 l -0.72,0.04 -0.75,0.03 v 1.77 l 1.22,0.03 1.2,0.04 v 1.28 h -1.6 c -1.53,0 -1.6,-0.01 -1.87,-0.3 l -0.3,-0.28 v -3.16 c 0,-3.02 0.01,-3.18 0.25,-3.48 0.23,-0.31 0.25,-0.31 1.88,-0.31 h 1.64 v 1.3 z m 4.68,5.45 c -0.17,0.43 -0.64,0.79 -1,0.79 -0.18,0 -0.45,-0.15 -0.67,-0.39 -0.32,-0.32 -0.45,-0.63 -0.82,-2.08 l -0.9,-3.39 -0.45,-1.67 h 0.76 c 0.4,0 0.75,0.02 0.75,0.05 0,0.06 1.16,4.54 1.26,4.83 0.04,0.15 0.32,-0.7 0.73,-2.3 L 18.65,8.6 19.39,8.56 c 0.4,-0.02 0.73,0 0.73,0.04 0,0.14 -1.67,6.38 -1.8,6.68 z"
+           id="path2846-4" />
+      </g>
+      <g
+         transform="matrix(0.89731683,0,0,0.89731683,-1115.9464,286.05243)"
+         id="g2872-1"
+         style="fill:#adadad;fill-opacity:1">
+        <path
+           style="fill:#adadad;fill-opacity:1"
+           d="m 12,0.297 c -6.63,0 -12,5.373 -12,12 0,5.303 3.438,9.8 8.205,11.385 0.6,0.113 0.82,-0.258 0.82,-0.577 0,-0.285 -0.01,-1.04 -0.015,-2.04 C 5.672,21.789 4.968,19.455 4.968,19.455 4.422,18.07 3.633,17.7 3.633,17.7 2.546,16.956 3.717,16.971 3.717,16.971 c 1.205,0.084 1.838,1.236 1.838,1.236 1.07,1.835 2.809,1.305 3.495,0.998 C 9.158,18.429 9.467,17.9 9.81,17.6 7.145,17.3 4.344,16.268 4.344,11.67 4.344,10.36 4.809,9.29 5.579,8.45 5.444,8.147 5.039,6.927 5.684,5.274 c 0,0 1.005,-0.322 3.3,1.23 0.96,-0.267 1.98,-0.399 3,-0.405 1.02,0.006 2.04,0.138 3,0.405 2.28,-1.552 3.285,-1.23 3.285,-1.23 0.645,1.653 0.24,2.873 0.12,3.176 0.765,0.84 1.23,1.91 1.23,3.22 0,4.61 -2.805,5.625 -5.475,5.92 0.42,0.36 0.81,1.096 0.81,2.22 0,1.606 -0.015,2.896 -0.015,3.286 0,0.315 0.21,0.69 0.825,0.57 C 20.565,22.092 24,17.592 24,12.297 c 0,-6.627 -5.373,-12 -12,-12"
+           id="path2861-3" />
+      </g>
+      <g
+         transform="matrix(0.76289879,0,0,0.76289879,-1115.9464,429.33494)"
+         id="g2887-3"
+         style="fill:#adadad;fill-opacity:1">
+        <path
+           style="fill:#adadad;fill-opacity:1"
+           d="m 20.447,20.452 h -3.554 v -5.569 c 0,-1.328 -0.027,-3.037 -1.852,-3.037 -1.853,0 -2.136,1.445 -2.136,2.939 v 5.667 H 9.351 V 9 h 3.414 v 1.561 h 0.046 c 0.477,-0.9 1.637,-1.85 3.37,-1.85 3.601,0 4.267,2.37 4.267,5.455 v 6.286 z M 5.337,7.433 c -1.144,0 -2.063,-0.926 -2.063,-2.065 0,-1.138 0.92,-2.063 2.063,-2.063 1.14,0 2.064,0.925 2.064,2.063 0,1.139 -0.925,2.065 -2.064,2.065 z M 7.119,20.452 H 3.555 V 9 H 7.119 Z M 22.225,0 H 1.771 C 0.792,0 0,0.774 0,1.729 V 22.271 C 0,23.227 0.792,24 1.771,24 H 22.222 C 23.2,24 24,23.227 24,22.271 V 1.729 C 24,0.774 23.2,0 22.222,0 Z"
+           id="path2876-3" />
+      </g>
+      <g
+         transform="matrix(1.0278184,0,0,1.0278184,-1115.9464,331.51304)"
+         id="g2902-8"
+         style="fill:#adadad;fill-opacity:1">
+        <path
+           style="fill:#adadad;fill-opacity:1"
+           d="M 23.954,4.569 C 23.069,4.958 22.124,5.223 21.129,5.344 22.143,4.733 22.923,3.77 23.292,2.621 22.341,3.176 21.287,3.58 20.165,3.805 19.269,2.846 17.992,2.246 16.574,2.246 c -2.717,0 -4.92,2.203 -4.92,4.917 0,0.39 0.045,0.765 0.127,1.124 C 7.691,8.094 4.066,6.13 1.64,3.161 1.213,3.883 0.974,4.722 0.974,5.636 c 0,1.71 0.87,3.213 2.188,4.096 C 2.355,9.706 1.596,9.484 0.934,9.116 v 0.061 c 0,2.385 1.693,4.374 3.946,4.827 -0.413,0.111 -0.849,0.171 -1.296,0.171 -0.314,0 -0.615,-0.03 -0.916,-0.086 0.631,1.953 2.445,3.377 4.604,3.417 -1.68,1.319 -3.809,2.105 -6.102,2.105 -0.39,0 -0.779,-0.023 -1.17,-0.067 2.189,1.394 4.768,2.209 7.557,2.209 9.054,0 13.999,-7.496 13.999,-13.986 0,-0.209 0,-0.42 -0.015,-0.63 0.961,-0.689 1.8,-1.56 2.46,-2.548 z"
+           id="path2891-3" />
+      </g>
+      <g
+         transform="matrix(0.87908795,0,0,0.87908795,-1115.9506,241.90024)"
+         id="g2917-1"
+         style="fill:#adadad;fill-opacity:1">
+        <path
+           style="fill:#adadad;fill-opacity:1"
+           d="M 23.495,6.205 A 3.007,3.007 0 0 0 21.407,4.117 c -1.87,-0.501 -9.396,-0.501 -9.396,-0.501 0,0 -7.507,-0.01 -9.396,0.501 a 3.007,3.007 0 0 0 -2.088,2.088 31.247,31.247 0 0 0 -0.522,5.805 31.247,31.247 0 0 0 0.522,5.783 3.007,3.007 0 0 0 2.088,2.088 c 1.868,0.502 9.396,0.502 9.396,0.502 0,0 7.506,0 9.396,-0.502 a 3.007,3.007 0 0 0 2.088,-2.088 31.247,31.247 0 0 0 0.5,-5.783 31.247,31.247 0 0 0 -0.5,-5.805 z M 9.609,15.601 V 8.408 l 6.264,3.602 z"
+           id="path2906-1" />
+      </g>
+    </g>
+    <rect
+       y="1198.5674"
+       x="-3272.7148"
+       height="83.23954"
+       width="146.69939"
+       id="rect4421"
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <rect
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect4423"
+       width="146.69939"
+       height="83.23954"
+       x="-3089.7527"
+       y="1198.5674" />
+    <rect
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect4425"
+       width="146.69939"
+       height="83.23954"
+       x="-3272.7148"
+       y="1309.8281" />
+    <rect
+       y="1309.8281"
+       x="-3089.7527"
+       height="83.23954"
+       width="146.69939"
+       id="rect4427"
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <rect
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect4421-5"
+       width="146.6994"
+       height="83.23954"
+       x="-1519.4667"
+       y="687.25171" />
+    <rect
+       y="687.25171"
+       x="-1335.2203"
+       height="83.23954"
+       width="146.6994"
+       id="rect4423-9"
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <rect
+       y="806.4231"
+       x="-1519.4667"
+       height="83.23954"
+       width="146.6994"
+       id="rect4461"
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <rect
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.24;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect4463"
+       width="146.6994"
+       height="83.23954"
+       x="-1335.2203"
+       y="806.4231" />
+    <g
+       id="g4459-2"
+       transform="translate(-2081.5979,58.755746)">
+      <text
+         id="text2547-1-32"
+         y="92.186127"
+         x="-1221.8955"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         xml:space="preserve"><tspan
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke-width:0.362204"
+           y="92.186127"
+           x="-1221.8955"
+           id="tspan2545-0-93"
+           sodipodi:role="line">About me</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         x="-1131.7283"
+         y="92.200607"
+         id="text2547-1-7-8"><tspan
+           sodipodi:role="line"
+           id="tspan2545-0-9-38"
+           x="-1131.7283"
+           y="92.200607"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.362204">Video series</tspan></text>
+      <text
+         id="text2668-7"
+         y="92.186127"
+         x="-883.49011"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         xml:space="preserve"><tspan
+           sodipodi:role="line"
+           id="tspan4465-0"
+           x="-883.49011"
+           y="92.186127">Podcast</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+         x="-1007.5513"
+         y="92.186127"
+         id="text4469-8"><tspan
+           id="tspan4467-6"
+           sodipodi:role="line"
+           x="-1007.5513"
+           y="92.186127">Notes on Vue</tspan></text>
+    </g>
+    <text
+       id="text2547-1-7-3-6-8"
+       y="1480.2214"
+       x="-3283.2751"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.740466"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.740466"
+         y="1480.2214"
+         x="-3283.2751"
+         id="tspan2545-0-9-3-5-1"
+         sodipodi:role="line">Notes on Vue</tspan></text>
+    <text
+       transform="matrix(0.86625816,0,0,0.86625816,-2224.6525,1350.3125)"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       x="-1218.2278"
+       y="195.45627"
+       id="text2547-1-3-4-0-6"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan>I am in the path of becoming an instructor of </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan>sorts. I like sharing my knowledge and </tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan>learning new things, but I also like eating </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan>and providing to my family. So the idea for </tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan>this website is two folded:
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan>1) I want to organize my ideas and prepare </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan>some material I can use to be able to impart </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan>courses on Vue. At the same time other people </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan>can see what my understanding of the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan>technology is.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan>2) I wanted to learn VuePress and see what it </tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan>was all about.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan>This is a continuos Work In Progress and I </tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan>plan on finishing it sooner rather than later. </tspan></tspan><tspan
+         x="-1218.2278"
+         y="503.32855"><tspan>Maybe by the first couple months within 2021 I </tspan></tspan><tspan
+         x="-1218.2278"
+         y="521.43868"><tspan>will be done with it.</tspan></tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.740466"
+       x="-3279.9377"
+       y="1907.751"
+       id="text2547-1-7-3-6-8-7"><tspan
+         sodipodi:role="line"
+         id="tspan2545-0-9-3-5-1-7"
+         x="-3279.9377"
+         y="1907.751"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.740466">Podcast</tspan></text>
+    <text
+       id="text2547-1-3-4-0-6-5"
+       y="195.45627"
+       x="-1218.2278"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       xml:space="preserve"
+       transform="matrix(0.86625816,0,0,0.86625816,-2221.1063,1777.0963)"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan>This one is in Spanish. Sorry if you don't </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan>speak it.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan>I love experimenting new things and have been </tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan>drawned into content creation for a while now.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan>A friend of mine agreed to start a podcasting </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan>adventure and see where that takes us.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan>If you do speak Spanish, wanna learn or want </tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan>to practice your listening skills I would </tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan>recommend to give us a listen. We discuss the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan>life of a web developer, as well as explain </tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan>topics and have interviews to showcase the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan>Mexican talent.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan>Here is the latest episode:</tspan></tspan></text>
+    <text
+       id="text4908"
+       y="2154.1663"
+       x="-3160.8318"
+       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       xml:space="preserve"><tspan
+         style="stroke-width:0.264583"
+         y="2154.1663"
+         x="-3160.8318"
+         id="tspan4906"
+         sodipodi:role="line"></tspan><tspan
+         id="tspan4910"
+         style="stroke-width:0.264583"
+         y="2167.3953"
+         x="-3160.8318"
+         sodipodi:role="line" /><tspan
+         id="tspan4912"
+         style="stroke-width:0.264583"
+         y="2180.6245"
+         x="-3160.8318"
+         sodipodi:role="line" /></text>
+    <rect
+       y="2216.6423"
+       x="-3274.5952"
+       height="50.173882"
+       width="332.8468"
+       id="rect4425-2"
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.45012;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.740466"
+       x="-1523.9348"
+       y="1067.8191"
+       id="text2547-1-7-3-6-8-5"><tspan
+         sodipodi:role="line"
+         id="tspan2545-0-9-3-5-1-9"
+         x="-1523.9348"
+         y="1067.8191"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.740466">Notes on Vue</tspan></text>
+    <text
+       id="text2547-1-3-4-0-6-2"
+       y="195.45627"
+       x="-1218.2278"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       xml:space="preserve"
+       transform="matrix(0.86625816,0,0,0.86625816,-465.31216,937.91007)"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan>I am in the path of becoming an instructor of </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan>sorts. I like sharing my knowledge and </tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan>learning new things, but I also like eating </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan>and providing to my family.So the idea for </tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan>this website is two folded:
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan>1) I want to organize my ideas and prepare </tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan>some material I can use to be able to impart </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan>courses on Vue. At the same time other people </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan>can see what my understanding of the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan>technology is.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan>2) I wanted to learn VuePress and see what it </tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan>was all about.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="467.10827"><tspan>This is a continuos Work In Progress and I </tspan></tspan><tspan
+         x="-1218.2278"
+         y="485.21841"><tspan>plan on finishing it sooner rather than later. </tspan></tspan><tspan
+         x="-1218.2278"
+         y="503.32855"><tspan>Maybe by the first couple months within 2021 I </tspan></tspan><tspan
+         x="-1218.2278"
+         y="521.43868"><tspan>will be done with it.</tspan></tspan></text>
+    <rect
+       y="1046.2487"
+       x="-1968.0737"
+       height="342.42352"
+       width="334.62561"
+       id="rect4421-5-0"
+       style="fill:#adadad;fill-opacity:1;stroke-width:3.79843;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke" />
+    <text
+       id="text2547-1-7-3-6-8-7-9"
+       y="1523.8911"
+       x="-1963.531"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke:none;stroke-width:0.740466"
+       xml:space="preserve"><tspan
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:29.6185px;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#fafafa;fill-opacity:1;stroke-width:0.740466"
+         y="1523.8911"
+         x="-1963.531"
+         id="tspan2545-0-9-3-5-1-7-7"
+         sodipodi:role="line">Podcast</tspan></text>
+    <text
+       transform="matrix(0.86625816,0,0,0.86625816,-904.69946,1393.2366)"
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.4881px;line-height:1.25;font-family:'Source Code Pro';-inkscape-font-specification:'Source Code Pro, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;white-space:pre;inline-size:404.163;fill:#adadad;fill-opacity:1;stroke:none;stroke-width:0.362204"
+       x="-1218.2278"
+       y="195.45627"
+       id="text2547-1-3-4-0-6-5-3"><tspan
+         x="-1218.2278"
+         y="195.45627"><tspan>This one is in Spanish. Sorry if you don't </tspan></tspan><tspan
+         x="-1218.2278"
+         y="213.56639"><tspan>speak it.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="231.67651"><tspan>I love experimenting new things and have been </tspan></tspan><tspan
+         x="-1218.2278"
+         y="249.78663"><tspan>drawned into content creation for a while now.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="267.89675"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="286.00689"><tspan>A friend of mine agreed to start a podcasting </tspan></tspan><tspan
+         x="-1218.2278"
+         y="304.11703"><tspan>adventure and see where that takes us.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="322.22717"><tspan>If you do speak Spanish, wanna learn or want </tspan></tspan><tspan
+         x="-1218.2278"
+         y="340.3373"><tspan>to practice your listening skills I would </tspan></tspan><tspan
+         x="-1218.2278"
+         y="358.44744"><tspan>recommend to give us a listen. We discuss the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="376.55758"><tspan>life of a web developer, as well as explain </tspan></tspan><tspan
+         x="-1218.2278"
+         y="394.66772"><tspan>topics and have interviews to showcase the </tspan></tspan><tspan
+         x="-1218.2278"
+         y="412.77786"><tspan>Mexican talent.
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="430.88799"><tspan>
+</tspan></tspan><tspan
+         x="-1218.2278"
+         y="448.99813"><tspan>Here is the latest episode:</tspan></tspan></text>
+    <rect
+       style="fill:#adadad;fill-opacity:1;stroke-width:1.45012;stroke-linecap:round;stroke-linejoin:round;paint-order:markers fill stroke"
+       id="rect4425-2-6"
+       width="332.8468"
+       height="50.173885"
+       x="-1514.5284"
+       y="1632.8231" />
+  </g>
+</svg>

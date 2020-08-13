@@ -1,0 +1,15 @@
+@tailwind base;
+
+body {
+  @apply bg-darkest;
+  background: rgb(33, 33, 33);
+  background: rgb(14, 14, 14);
+  background: linear-gradient(
+    356deg,
+    rgba(14, 14, 14, 1) 44%,
+    rgba(33, 33, 33, 1) 100%
+  );
+}
+
+@tailwind components;
+@tailwind utilities;

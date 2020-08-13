@@ -1,0 +1,11 @@
+{
+    "editor.fontFamily": "'Source Code Pro'",
+    "editor.fontWeight": "400",
+    "tailwindCSS.includeLanguages": {
+        "vue": "html"
+    },
+    "editor.fontSize": 14,
+    "editor.formatOnSave": true,
+    "workbench.colorTheme": "City Lights",
+    "workbench.iconTheme": "field-lights-monochrome-minimalistic"
+}
