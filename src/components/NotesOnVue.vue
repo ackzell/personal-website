@@ -1,5 +1,5 @@
 <template>
-  <div id="notes-on-vue" class>
+  <div id="notes-on-vue" class="prose">
     <h2>Notes on Vue</h2>
 
     <p>I am in the path of becoming an instructor of sorts. I like sharing my knowledge and learning new things, but I also like eating and providing to my family the best life I can give them. So the idea for this website is two folded:</p>

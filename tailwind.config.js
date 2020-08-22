@@ -28,9 +28,6 @@ module.exports = {
           },
           a: {
             color: theme('colors.light'),
-            '&:hover': {
-              color: theme('colors.lightest'),
-            },
             // fontVariantCaps: 'all-petite-caps',
             textDecoration: 'none',
           },

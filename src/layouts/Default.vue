@@ -9,12 +9,18 @@
         <br />(ackzell)
       </h1>
       <header>
-        <nav class="flex justify-between xs:justify-around items-center mb-4 mx-2 sm:mx-0 xs:ml-5">
-          <g-link class="text-xs sm:text-base" to="/">About me</g-link>
-          <a class="text-xs sm:text-base" href="/#video-series">Video series</a>
-          <a class="text-xs sm:text-base" href="/#notes-on-vue">Notes on Vue</a>
-          <a class="text-xs sm:text-base" href="/#podcast">Podcast</a>
-        </nav>
+        <fixed-header :threshold="110">
+          <nav
+            class="flex justify-between xs:justify-around items-center mb-4 mx-2 sm:mx-0 xs:ml-5"
+            v-scroll-spy-active
+            v-scroll-spy-link
+          >
+            <g-link class="text-xs sm:text-base" to="/#about-me" :exact="false">About me</g-link>
+            <a class="text-xs sm:text-base" href="/#video-series">Video series</a>
+            <a class="text-xs sm:text-base" href="/#notes-on-vue">Notes on Vue</a>
+            <a class="text-xs sm:text-base" href="/#podcast">Podcast</a>
+          </nav>
+        </fixed-header>
       </header>
       <div class="pl-12 pr-3 md:px-0">
         <slot />
@@ -32,10 +38,13 @@ query {
 </static-query>
 
 <script>
+import FixedHeader from 'vue-fixed-header'
+
 import SocialBar from '~/components/SocialBar.vue'
 export default {
   components: {
     SocialBar,
+    FixedHeader,
   },
 }
 </script>
@@ -44,5 +53,22 @@ export default {
 .prose a {
   word-spacing: -4px;
   transition: all 0.4s ease-in-out;
+}
+
+.prose a.active {
+  color: #fafafa;
+  text-shadow: #fafafa 1px 0 4px;
+}
+
+nav.vue-fixed-header--isFixed {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  padding: 0 20px;
+  margin: 0;
+  background: #0e0e0e;
+  height: 3em;
+  z-index: 1; /* lists are doing funky business and need to make this go on top*/
 }
 </style>

@@ -1,22 +1,18 @@
 <template>
-  <div id="notes-on-vue" class>
-    <h2>Notes On Vue</h2>
+  <div id="podcast" class>
+    <h2>Podcast</h2>
 
-    <p>I am in the path of becoming an instructor of sorts. I like sharing my knowledge and learning new things, but I also like eating and providing to my family the best life I can give them. So the idea for this website is two folded:</p>
+    <p>A good friend and I recently started workingn on a podcast for Spanish speaking developers.</p>
 
-    <ul>
-      <li>I want to organize my ideas and prepare some material I can use to be able to impart courses on Vue. At the same time other people can see what my understanding of the technology is.</li>
+    <p>We are aiming it at being Web Development related, but it might have a couple other topics in there</p>
 
-      <li>I wanted to learn VuePress and see what it was all about. So that eventually I could also share my findings.</li>
-    </ul>
-
-    <p>This is a continuos Work In Progress and I plan on finishing it sooner rather than later. Maybe by the first couple months within 2021 I will be done with it. 🤞</p>
+    <p>If you speak Spanish, or want to learn and practice I encourage you to give us a listen! 😁</p>
   </div>
 </template>
 
 <script>
 export default {
-  name: 'NotesOnVue',
+  name: 'Podcast',
 }
 </script>
 
