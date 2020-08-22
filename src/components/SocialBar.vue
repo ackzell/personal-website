@@ -1,6 +1,11 @@
 <template>
   <div class="fixed flex flex-col md:flex-row justify-around pl-4">
-    <a class="mb-6" href="https://youtube.com/ackzell" target="_blank" rel="noopener noreferrer">
+    <a
+      class="you-tube mb-6"
+      href="https://youtube.com/ackzell"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <svg width="24" height="24" fill="#adadad">
         <title>YouTube</title>
         <path
@@ -8,7 +13,12 @@
         />
       </svg>
     </a>
-    <a class="mb-6" href="https://twitter.com/_ackzell" target="_blank" rel="noopener noreferrer">
+    <a
+      class="twitter mb-6"
+      href="https://twitter.com/_ackzell"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <svg width="24" height="24" fill="#adadad">
         <title>Twitter</title>
         <path
@@ -17,7 +27,12 @@
         />
       </svg>
     </a>
-    <a class="mb-6" href="https://github.com/ackzell" target="_blank" rel="noopener noreferrer">
+    <a
+      class="git-hub mb-6"
+      href="https://github.com/ackzell"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <svg width="24" height="24" fill="#adadad">
         <title>GitHub</title>
         <path
@@ -25,7 +40,7 @@
         />
       </svg>
     </a>
-    <a class="mb-6" href="https://dev.to/ackzell" target="_blank" rel="noopener noreferrer">
+    <a class="dev-to mb-6" href="https://dev.to/ackzell" target="_blank" rel="noopener noreferrer">
       <svg width="24" height="24" fill="#adadad">
         <title>Dev.to</title>
         <path
@@ -35,7 +50,7 @@
       </svg>
     </a>
     <a
-      class="mb-6"
+      class="linked-in mb-6"
       href="https://linkedin.com/in/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -54,3 +69,29 @@
 <script>
 export default {}
 </script>
+
+<style>
+a.you-tube:hover > svg {
+  fill: #ff0000;
+}
+
+a.twitter:hover > svg {
+  fill: #1da1f2;
+}
+
+a.git-hub:hover > svg {
+  fill: #ffffff;
+}
+
+a.dev-to:hover > svg {
+  fill: #eef0f1;
+}
+
+a.linked-in:hover > svg {
+  fill: #0077b5;
+}
+
+a > svg {
+  transition: fill 0.4s ease-in-out;
+}
+</style>

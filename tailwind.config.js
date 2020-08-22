@@ -9,6 +9,9 @@ module.exports = {
         light: '#adadad',
         lightest: '#fafafa',
       },
+      screens: {
+        xs: '568px',
+      },
     },
     typography: theme => ({
       default: {

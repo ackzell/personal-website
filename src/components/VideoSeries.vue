@@ -1,6 +1,6 @@
 <template>
   <div id="video-series" class>
-    <h2>&lt;video&gt; series</h2>
+    <h2>Video series</h2>
 
     <p>The idea behind the videos on YouTube is to present a series each time I work on something. From desktop apps, to in-browser voice recording ones and documentation sites.</p>
 
