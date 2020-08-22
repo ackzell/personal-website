@@ -3,7 +3,7 @@
     <Logo />
 
     <div class="pl-2">
-      <p>I'm a software artisan (Engineer, developer, whatever you wanna call it; just never a ninja, rockstar or wizard... 😅) from Mexico who is currently and happily employed to work on the Front End side of things for web apps.</p>
+      <p>I'm a software artisan (engineer, developer, whatever you wanna call it; just never a ninja, rockstar or wizard... 😅) from Mexico who is currently and happily employed to work on the Front End side of things for web apps.</p>
 
       <p>I'm also always trying to build or create something to scratch an own itch, and that is also aimed at sharing with others what I've learned in the process.</p>
 
