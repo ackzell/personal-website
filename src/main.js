@@ -5,10 +5,14 @@ import DefaultLayout from '~/layouts/Default.vue'
 import './css/main.css'
 require('typeface-source-code-pro')
 
-import ScrollSpy from 'vue2-scrollspy'
+if (process.isClient) {
+  var ScrollSpy = require('vue2-scrollspy')
+}
 
 export default function(Vue, { router, head, isClient }) {
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
-  Vue.use(ScrollSpy)
+  if (process.isClient) {
+    Vue.use(ScrollSpy)
+  }
 }
