@@ -21,7 +21,10 @@
 
     <p>Here is a peek into what it looks like:</p>
 
-    <g-image src="~/assets/notesOnVue.gif" />
+    <g-image
+      src="~/assets/notesOnVue.gif"
+      alt="Quick demo of how the site looks like when interacting with it"
+    />
   </div>
 </template>
 

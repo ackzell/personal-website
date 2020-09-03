@@ -1,5 +1,5 @@
 <template>
-  <div id="podcast" class>
+  <div id="podcast">
     <h2>Podcast</h2>
 
     <p>A good friend and I recently started working on a podcast for Spanish speaking developers.</p>
@@ -16,20 +16,16 @@
     </p>
 
     <div id="buzzsprout-large-player-1190693"></div>
+    <script
+      type="application/javascript"
+      src="https://www.buzzsprout.com/1190693.js?container_id=buzzsprout-large-player-1190693&player=large"
+    ></script>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Podcast',
-  metaInfo: {
-    script: [
-      {
-        src:
-          'https://www.buzzsprout.com/1190693.js?container_id=buzzsprout-large-player-1190693&player=large',
-      },
-    ],
-  },
 }
 </script>
 
