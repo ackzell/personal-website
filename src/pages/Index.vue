@@ -30,9 +30,6 @@ export default {
     NotesOnVue,
     Podcast,
   },
-  metaInfo: {
-    title: 'Welcome to my personal site!',
-  },
 }
 </script>
 
