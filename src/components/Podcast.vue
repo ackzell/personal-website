@@ -2,7 +2,7 @@
   <div id="podcast" class>
     <h2>Podcast</h2>
 
-    <p>A good friend and I recently started workingn on a podcast for Spanish speaking developers.</p>
+    <p>A good friend and I recently started working on a podcast for Spanish speaking developers.</p>
 
     <p>We are aiming it at being Web Development related, but it might have a couple other topics in there</p>
 

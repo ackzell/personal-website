@@ -27,7 +27,7 @@ export default {
     Podcast,
   },
   metaInfo: {
-    title: 'Hello, world!',
+    title: 'Welcome to my personal site!',
   },
 }
 </script>

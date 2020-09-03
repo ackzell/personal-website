@@ -1,7 +1,10 @@
 <template>
-  <div class="fixed flex flex-col md:flex-row justify-around pl-4">
+  <!-- <div class="flex flex-row md:flex-row justify-evenly"> -->
+  <div
+    class="fixed flex flex-col lg:flex-row justify-around lg:w-1/5 lg:bottom-0 lg:justify-center"
+  >
     <a
-      class="you-tube mb-6"
+      class="you-tube mb-6 mx-3"
       href="https://youtube.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -14,7 +17,7 @@
       </svg>
     </a>
     <a
-      class="twitter mb-6"
+      class="twitter mb-6 mx-3"
       href="https://twitter.com/_ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -28,7 +31,7 @@
       </svg>
     </a>
     <a
-      class="git-hub mb-6"
+      class="git-hub mb-6 mx-3"
       href="https://github.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -40,7 +43,12 @@
         />
       </svg>
     </a>
-    <a class="dev-to mb-6" href="https://dev.to/ackzell" target="_blank" rel="noopener noreferrer">
+    <a
+      class="dev-to mb-6 mx-3"
+      href="https://dev.to/ackzell"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
       <svg width="24" height="24" fill="#adadad">
         <title>Dev.to</title>
         <path
@@ -50,7 +58,7 @@
       </svg>
     </a>
     <a
-      class="linked-in mb-6"
+      class="linked-in mb-6 mx-3"
       href="https://linkedin.com/in/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -92,6 +100,6 @@ a.linked-in:hover > svg {
 }
 
 a > svg {
-  transition: fill 0.4s ease-in-out;
+  transition: fill 0.25s ease-in-out;
 }
 </style>

@@ -5,7 +5,10 @@
 // To restart press CTRL + C in terminal and run `gridsome develop`
 
 module.exports = {
-  siteName: 'Gridsome',
+  siteName: 'ackzell',
+  icon: {
+    favicon: './src/favicon-32x32.png',
+  },
   plugins: [
     {
       use: 'gridsome-plugin-tailwindcss',

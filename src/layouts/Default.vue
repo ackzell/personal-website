@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="absolute flex flex-col justify-center h-full md:pt-12">
-      <SocialBar class="md:invisible" />
+      <SocialBar />
     </div>
     <div class="prose prose-xs lg:prose-lg xl:prose-xl mx-auto mt-3">
       <h1 class="text-center prose-sm mb-0">
