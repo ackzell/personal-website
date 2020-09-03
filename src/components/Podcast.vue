@@ -4,15 +4,32 @@
 
     <p>A good friend and I recently started working on a podcast for Spanish speaking developers.</p>
 
-    <p>We are aiming it at being Web Development related, but it might have a couple other topics in there</p>
+    <p>We are aiming it at being Web Development related, but it might have a couple other topics in there.</p>
 
-    <p>If you speak Spanish, or want to learn and practice I encourage you to give us a listen! 😁</p>
+    <p>
+      If you speak Spanish, or want to learn and practice I encourage you to
+      <a
+        href="https://mytypeofradio.buzzsprout.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >give us a listen</a>! 😁
+    </p>
+
+    <div id="buzzsprout-large-player-1190693"></div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'Podcast',
+  metaInfo: {
+    script: [
+      {
+        src:
+          'https://www.buzzsprout.com/1190693.js?container_id=buzzsprout-large-player-1190693&player=large',
+      },
+    ],
+  },
 }
 </script>
 

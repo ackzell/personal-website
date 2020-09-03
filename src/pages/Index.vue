@@ -7,6 +7,10 @@
       <VideoSeries />
       <NotesOnVue />
       <Podcast />
+
+      <p>Thanks for checking out this website! You can get a hold of me via email too, if you wanna do that: ackzell [at] gmail [dot] com.</p>
+
+      <p>The links on the left is where you can reach me on social media if you prefer.</p>
     </div>
   </Layout>
 </template>

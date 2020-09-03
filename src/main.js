@@ -5,6 +5,9 @@ import DefaultLayout from '~/layouts/Default.vue'
 import './css/main.css'
 require('typeface-source-code-pro')
 
+import 'vue-lazy-youtube-video/dist/style.css'
+import LazyYoutubeVideo from 'vue-lazy-youtube-video'
+
 if (process.isClient) {
   var ScrollSpy = require('vue2-scrollspy')
 }
@@ -12,6 +15,7 @@ if (process.isClient) {
 export default function(Vue, { router, head, isClient }) {
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
+  Vue.component('LazyYoutubeVideo', LazyYoutubeVideo)
   if (process.isClient) {
     Vue.use(ScrollSpy)
   }

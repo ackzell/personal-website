@@ -23,6 +23,10 @@
         rel="noopener noreferrer"
       >YouTube playlists</a> to see what I am talking about.
     </p>
+    <p>This is the very first playlist I created, and it took me quite a while:</p>
+    <LazyYoutubeVideo src="https://www.youtube.com/embed/dWGekDUJG1g" />
+    <p>And this one is more recent, can you spot the difference in the audio quality?</p>
+    <LazyYoutubeVideo src="https://www.youtube.com/embed/iU_kVbCt3aI" />
   </div>
 </template>
 
@@ -35,5 +39,9 @@ export default {
 <style>
 .prose a {
   color: #fafafa;
+}
+
+.prose img {
+  margin: 0;
 }
 </style>
