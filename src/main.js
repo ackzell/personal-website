@@ -19,4 +19,9 @@ export default function(Vue, { router, head, isClient }) {
   if (process.isClient) {
     Vue.use(ScrollSpy)
   }
+
+  head.link.push({
+    rel: 'stylesheet',
+    href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro',
+  })
 }
