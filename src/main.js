@@ -3,7 +3,7 @@
 
 import DefaultLayout from '~/layouts/Default.vue'
 import './css/main.css'
-require('typeface-source-code-pro')
+import 'fontsource-source-code-pro'
 
 import 'vue-lazy-youtube-video/dist/style.css'
 import LazyYoutubeVideo from 'vue-lazy-youtube-video'
@@ -20,8 +20,8 @@ export default function(Vue, { router, head, isClient }) {
     Vue.use(ScrollSpy)
   }
 
-  head.link.push({
-    rel: 'stylesheet',
-    href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro',
-  })
+  //   head.link.push({
+  //     rel: 'stylesheet',
+  //     href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro',
+  //   })
 }
