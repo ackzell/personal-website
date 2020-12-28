@@ -16,7 +16,7 @@ module.exports = {
     typography: theme => ({
       default: {
         css: {
-          fontFamily: 'Source Code Pro',
+          fontFamily: "'Source Code Pro', monospace",
           color: theme('colors.light'),
           h1: {
             color: theme('colors.lightest'),
