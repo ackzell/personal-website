@@ -7,8 +7,8 @@
         "explore": "gridsome explore"
     },
     "dependencies": {
-        "gridsome": "^0.7.20",
-        "vue-fixed-header": "^3.2.14",
+        "gridsome": "^0.7.23",
+        "vue-fixed-header": "^3.2.15",
         "vue2-scrollspy": "^2.3.1"
     },
     "devDependencies": {
@@ -16,6 +16,6 @@
         "gridsome-plugin-manifest": "^0.3.5",
         "gridsome-plugin-tailwindcss": "^3.0.1",
         "tailwindcss-typography": "^3.1.0",
-        "vue-lazy-youtube-video": "^2.1.0"
+        "vue-lazy-youtube-video": "^2.3.0"
     }
 }

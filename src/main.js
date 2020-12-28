@@ -23,6 +23,7 @@ export default function(Vue, { router, head, isClient }) {
     rel: 'preload',
     as: 'font',
     href: 'https://fonts.googleapis.com/css2?family=Source+Code+Pro',
+    type: 'font/woff2',
     crossorigin: 'anonymous',
   })
 }
