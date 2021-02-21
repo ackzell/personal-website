@@ -15,9 +15,15 @@
             v-scroll-spy-active
             v-scroll-spy-link
           >
-            <g-link class="text-xs sm:text-base" to="/#about-me" :exact="false">About me</g-link>
-            <a class="text-xs sm:text-base" href="/#video-series">Video series</a>
-            <a class="text-xs sm:text-base" href="/#notes-on-vue">Notes on Vue</a>
+            <g-link class="text-xs sm:text-base" to="/#about-me" :exact="false"
+              >About me</g-link
+            >
+            <a class="text-xs sm:text-base" href="/#video-series"
+              >Video series</a
+            >
+            <a class="text-xs sm:text-base" href="/#notes-on-vue"
+              >Notes on Vue</a
+            >
             <a class="text-xs sm:text-base" href="/#podcast">Podcast</a>
           </nav>
         </fixed-header>

@@ -6,6 +6,6 @@
   },
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
-  "workbench.colorTheme": "Monochrome Dark Subtle",
+  "workbench.colorTheme": "Monochrome Dark",
   "workbench.iconTheme": "field-lights-monochrome-minimalistic"
 }
