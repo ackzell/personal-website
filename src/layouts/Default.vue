@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div class="absolute flex flex-col justify-center h-full md:pt-12">
+    <aside class="absolute flex flex-col justify-center h-full md:pt-12">
       <SocialBar />
-    </div>
-    <div class="prose prose-xs lg:prose-lg xl:prose-xl mx-auto mt-3">
+    </aside>
+    <main class="prose prose-xs lg:prose-lg xl:prose-xl mx-auto mt-3">
       <h1 class="text-center prose-sm mb-0">
         Axel Martínez
         <br />(ackzell)
@@ -31,7 +31,7 @@
       <div class="pl-12 pr-3 md:px-0">
         <slot />
       </div>
-    </div>
+    </main>
   </div>
 </template>
 

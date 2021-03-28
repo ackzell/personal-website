@@ -1,5 +1,5 @@
 <template>
-  <div id="notes-on-vue">
+  <section id="notes-on-vue">
     <h2>Notes on Vue</h2>
 
     <p>
@@ -40,7 +40,7 @@
       src="@/assets/notesOnVue.gif"
       alt="Quick demo of how the site looks like when interacting with it"
     />
-  </div>
+  </section>
 </template>
 
 <script>

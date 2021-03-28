@@ -1,6 +1,7 @@
 <template>
   <!-- <div class="flex flex-row md:flex-row justify-evenly"> -->
-  <div
+  <section
+    id="social-media-links"
     class="max-w-xs fixed flex flex-col xl:flex-row ml-3 xl:ml-0 h-64 xl:h-auto xl:w-1/5 xl:bottom-0 xl:mb-6 xl:justify-center"
   >
     <a
@@ -99,7 +100,7 @@
         />
       </svg>
     </a>
-  </div>
+  </section>
 </template>
 
 <script>

@@ -1,10 +1,16 @@
 <template>
-  <div id="podcast">
+  <section id="podcast">
     <h2>Podcast</h2>
 
-    <p>A good friend and I recently started working on a podcast for Spanish speaking developers.</p>
+    <p>
+      A good friend and I recently started working on a podcast for Spanish
+      speaking developers.
+    </p>
 
-    <p>We are aiming it at being Web Development related, but it might have a couple other topics in there.</p>
+    <p>
+      We are aiming it at being Web Development related, but it might have a
+      couple other topics in there.
+    </p>
 
     <p>
       If you speak Spanish, or want to learn and practice I encourage you to
@@ -12,7 +18,8 @@
         href="https://mytypeofradio.buzzsprout.com"
         target="_blank"
         rel="noopener noreferrer"
-      >give us a listen</a>! 😁
+        >give us a listen</a
+      >! 😁
     </p>
 
     <div id="buzzsprout-large-player-1190693"></div>
@@ -20,7 +27,7 @@
       type="application/javascript"
       src="https://www.buzzsprout.com/1190693.js?container_id=buzzsprout-large-player-1190693&player=large"
     ></script>
-  </div>
+  </section>
 </template>
 
 <script>
