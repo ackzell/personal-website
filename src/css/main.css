@@ -1,14 +1,35 @@
 @tailwind base;
 
-body {
-  @apply bg-darkest;
-  background: rgb(33, 33, 33);
-  background: rgb(14, 14, 14);
-  background: linear-gradient(
-    356deg,
-    rgba(14, 14, 14, 1) 44%,
-    rgba(33, 33, 33, 1) 100%
-  );
+@media (prefers-color-scheme: dark) {
+  html {
+    @apply bg-darkest;
+    background: rgb(33, 33, 33);
+    background: rgb(14, 14, 14);
+    background: linear-gradient(
+      356deg,
+      rgba(14, 14, 14, 1) 44%,
+      rgba(33, 33, 33, 1) 100%
+    );
+  }
+  body {
+    background-image: url("data:image/svg+xml,%3Csvg width='84' height='48' viewBox='0 0 84 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z' fill='%23212121' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    @apply bg-lightest;
+    background: rgb(250, 250, 250);
+    background: rgb(173, 173, 173);
+    background: linear-gradient(
+      356deg,
+      rgba(173, 173, 173, 0.2) 44%,
+      rgba(250, 250, 250, 1) 100%
+    );
+  }
+  body {
+    background-image: url("data:image/svg+xml,%3Csvg width='84' height='48' viewBox='0 0 84 48' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h12v6H0V0zm28 8h12v6H28V8zm14-8h12v6H42V0zm14 0h12v6H56V0zm0 8h12v6H56V8zM42 8h12v6H42V8zm0 16h12v6H42v-6zm14-8h12v6H56v-6zm14 0h12v6H70v-6zm0-16h12v6H70V0zM28 32h12v6H28v-6zM14 16h12v6H14v-6zM0 24h12v6H0v-6zm0 8h12v6H0v-6zm14 0h12v6H14v-6zm14 8h12v6H28v-6zm-14 0h12v6H14v-6zm28 0h12v6H42v-6zm14-8h12v6H56v-6zm0-8h12v6H56v-6zm14 8h12v6H70v-6zm0 8h12v6H70v-6zM14 24h12v6H14v-6zm14-8h12v6H28v-6zM14 8h12v6H14V8zM0 8h12v6H0V8z' fill='%23fafafa' fill-opacity='0.15' fill-rule='evenodd'/%3E%3C/svg%3E");
+  }
 }
 
 @tailwind components;

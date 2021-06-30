@@ -56,11 +56,19 @@ export default {
 </script>
 
 <style>
-.prose a {
-  color: #fafafa;
-}
+  @media (prefers-color-scheme: dark) {
+    .prose a {
+      color: #fafafa;
+    }
+  }
 
-.prose img {
-  margin: 0;
-}
+  @media (prefers-color-scheme: light) {
+    .prose a {
+      color: #212121;
+    }
+  }
+
+  .prose img {
+    margin: 0;
+  }
 </style>

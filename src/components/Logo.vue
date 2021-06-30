@@ -46,6 +46,7 @@
                 transform="translate(-2508.222290,1686.086304)"
               >
                 <path
+                  class="change-me"
                   id="ei841lw6n1wf5"
                   d="M476.255900,0C240.944880,1.488189,45.708661,171.956700,5.846457,396.177190L113.385830,396.177190C151.830710,229.570880,301.074800,105.377960,479.338580,105.377960C657.602360,105.377960,806.881880,229.570880,845.326770,396.177190L952.866130,396.177190C912.791330,170.964580,716.031490,0,479.338580,0C478.311020,0,477.283460,0,476.255900,0ZM0,520.582710C20.125984,767.692970,227.055120,961.937070,479.338580,961.937070C731.657470,961.937070,938.551170,767.692970,958.712590,520.582710L852.874010,520.582710C833.102360,709.405560,673.405510,856.559110,479.338580,856.559110C285.307080,856.559110,125.610240,709.405560,105.838580,520.582710Z"
                   transform="matrix(0.58510500000000 0 0 0.58510500000000 2227.75000000000000 -1960.48000000000002)"
@@ -80,6 +81,7 @@
                 stroke-width="3.861990"
               />
               <path
+                class="change-me"
                 id="ei841lw6n1wf9"
                 d="M496.523620,117.496070L235.062990,755.610290C271.204720,787.818950,313.759840,812.976430,360.566930,828.921320L345.578740,748.948870L533.090550,543.082710L596.374010,829.523680C630.566920,818.043360,662.527550,801.673280,691.405510,781.263830L599.917320,469.700820L776.657470,275.704740L587.338580,426.862230ZM486.992120,334.381910L519.377950,481.074840L405.106300,572.315000Z"
                 transform="matrix(0.58510500000000 0 0 0.58510500000000 2227.75000000000000 -1960.48000000000002)"
@@ -102,58 +104,70 @@ export default {
 }
 </script>
 <style scoped>
-svg {
-  width: 30%;
-}
+  @media (prefers-color-scheme: dark) {
+    svg path.change-me {
+      fill: #fafafa;
+    }
+  }
 
-#ei841lw6n1wf4_tr {
-  animation: ei841lw6n1wf4_tr__tr 3000ms linear 1 normal forwards;
-}
-@keyframes ei841lw6n1wf4_tr__tr {
-  0% {
-    transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
+  @media (prefers-color-scheme: light) {
+    svg path.change-me {
+      fill: #212121;
+    }
   }
-  60% {
-    transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
+
+  svg {
+    width: 30%;
   }
-  90% {
-    transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
+
+  #ei841lw6n1wf4_tr {
+    animation: ei841lw6n1wf4_tr__tr 3000ms linear 1 normal forwards;
   }
-  100% {
-    transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
+  @keyframes ei841lw6n1wf4_tr__tr {
+    0% {
+      transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
+    }
+    60% {
+      transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
+    }
+    90% {
+      transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
+    }
+    100% {
+      transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
+    }
   }
-}
-#ei841lw6n1wf4_ts {
-  animation: ei841lw6n1wf4_ts__ts 3000ms linear 1 normal forwards;
-}
-@keyframes ei841lw6n1wf4_ts__ts {
-  0% {
-    transform: scale(0, 0);
-    animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
+  #ei841lw6n1wf4_ts {
+    animation: ei841lw6n1wf4_ts__ts 3000ms linear 1 normal forwards;
   }
-  60% {
-    transform: scale(1, 1);
+  @keyframes ei841lw6n1wf4_ts__ts {
+    0% {
+      transform: scale(0, 0);
+      animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
+    }
+    60% {
+      transform: scale(1, 1);
+    }
+    100% {
+      transform: scale(1, 1);
+    }
   }
-  100% {
-    transform: scale(1, 1);
+  #ei841lw6n1wf7_ts {
+    animation: ei841lw6n1wf7_ts__ts 3000ms linear 1 normal forwards;
   }
-}
-#ei841lw6n1wf7_ts {
-  animation: ei841lw6n1wf7_ts__ts 3000ms linear 1 normal forwards;
-}
-@keyframes ei841lw6n1wf7_ts__ts {
-  0% {
-    transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
+  @keyframes ei841lw6n1wf7_ts__ts {
+    0% {
+      transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
+    }
+    62% {
+      transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
+      animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
+    }
+    98.666667% {
+      transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
+    }
+    100% {
+      transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
+    }
   }
-  62% {
-    transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
-    animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
-  }
-  98.666667% {
-    transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
-  }
-  100% {
-    transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
-  }
-}
 </style>

@@ -3,7 +3,16 @@
     <aside class="absolute flex flex-col justify-center h-full md:pt-12">
       <SocialBar />
     </aside>
-    <main class="prose prose-xs lg:prose-lg xl:prose-xl mx-auto mt-3">
+    <main
+      class="
+        dark:prose-dark
+        prose prose-xs
+        lg:prose-lg
+        xl:prose-xl
+        mx-auto
+        mt-3
+      "
+    >
       <h1 class="text-center prose-sm mb-0">
         Axel Martínez
         <br />(ackzell)
@@ -11,7 +20,16 @@
       <header>
         <fixed-header :threshold="110">
           <nav
-            class="flex justify-between xs:justify-around items-center mb-4 mx-2 sm:mx-0 xs:ml-5"
+            class="
+              flex
+              justify-between
+              xs:justify-around
+              items-center
+              mb-4
+              mx-2
+              sm:mx-0
+              xs:ml-5
+            "
             v-scroll-spy-active
             v-scroll-spy-link
           >
@@ -56,25 +74,48 @@ export default {
 </script>
 
 <style>
-.prose a {
-  word-spacing: -4px;
-  transition: all 0.4s ease-in-out;
-}
+  .prose a {
+    word-spacing: -4px;
+    transition: all 0.4s ease-in-out;
+  }
 
-.prose a.active {
-  color: #fafafa;
-  text-shadow: #fafafa 1px 0 4px;
-}
+  @media (prefers-color-scheme: dark) {
+    .prose a.active {
+      color: #fafafa;
+      text-shadow: #fafafa 1px 0 4px;
+    }
 
-nav.vue-fixed-header--isFixed {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  padding: 0 20px;
-  margin: 0;
-  background: #0e0e0e;
-  height: 3em;
-  z-index: 1; /* lists are doing funky business and need to make this go on top*/
-}
+    nav.vue-fixed-header--isFixed {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      padding: 0 20px;
+      margin: 0;
+      background: #0e0e0e;
+      height: 3em;
+      z-index: 1; /* lists are doing funky business and need to make this go on top*/
+      box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    .prose a.active {
+      color: #212121;
+      text-shadow: #8f8f8f 1px 0 4px;
+    }
+
+    nav.vue-fixed-header--isFixed {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      padding: 0 20px;
+      margin: 0;
+      background: #fafafa;
+      height: 3em;
+      z-index: 1; /* lists are doing funky business and need to make this go on top*/
+      box-shadow: 0px 10px 13px -7px #adadad, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+    }
+  }
 </style>

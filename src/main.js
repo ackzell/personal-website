@@ -9,6 +9,15 @@ import LazyYoutubeVideo from 'vue-lazy-youtube-video'
 
 if (process.isClient) {
   var ScrollSpy = require('vue2-scrollspy')
+
+  console.log(
+    `%c                                                                                                                  
+        Hi there! I see you're curious too!                                                                       
+                                                                                                                  
+        Feel free to take a look at the source code on GitHub: https://github.com/ackzell/personal-website        
+                                                                                                                  `,
+    "background-color: #212121; color: whitesmoke; font-family:'Source Code Pro'; font-size: 1.5em",
+  )
 }
 
 export default function(Vue, { router, head, isClient }) {
