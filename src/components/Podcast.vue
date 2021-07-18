@@ -22,11 +22,11 @@
       >! 😁
     </p>
 
-    <div id="buzzsprout-large-player-1190693"></div>
+    <!-- <div id="buzzsprout-large-player-1190693"></div>
     <script
       type="application/javascript"
       src="https://www.buzzsprout.com/1190693.js?container_id=buzzsprout-large-player-1190693&player=large"
-    ></script>
+    ></script> -->
   </section>
 </template>
 

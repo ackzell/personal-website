@@ -1,5 +1,9 @@
 <template>
   <div>
+    <aside class="absolute flex flex-col justify-center h-full md:pt-12">
+      <SocialBar />
+    </aside>
+
     <main
       class="
         dark:prose-dark
@@ -43,13 +47,10 @@
           </nav>
         </fixed-header>
       </header>
-      <template class="pl-12 pr-3 md:px-0">
+      <div class="pl-12 pr-3 md:px-0">
         <slot />
-      </template>
+      </div>
     </main>
-    <aside class="absolute flex flex-col justify-center h-full md:pt-12">
-      <SocialBar />
-    </aside>
   </div>
 </template>
 
