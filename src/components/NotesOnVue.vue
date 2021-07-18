@@ -1,6 +1,6 @@
 <template>
   <section id="notes-on-vue">
-    <h2>Notes on Vue</h2>
+    <h3>Notes on Vue</h3>
 
     <p>
       I am in the path of becoming an instructor of sorts. I like sharing my
@@ -36,16 +36,35 @@
 
     <p>Here is a peek into what it looks like:</p>
 
-    <img
-      src="@/assets/notesOnVue.gif"
-      alt="Quick demo of how the site looks like when interacting with it"
-    />
+    <template v-if="isDarkModePreferred">
+      <video src="@/assets/notes-on-vue-dark.mp4" autoplay muted loop />
+    </template>
+
+    <template v-else>
+      <video
+        width="100%"
+        src="@/assets/notes-on-vue-light.mp4"
+        autoplay
+        muted
+        loop
+      />
+    </template>
   </section>
 </template>
 
 <script>
 export default {
   name: 'NotesOnVue',
+  data() {
+    return {
+      isDarkModePreferred: null,
+    }
+  },
+  created() {
+    this.isDarkModePreferred =
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+  },
 }
 </script>
 

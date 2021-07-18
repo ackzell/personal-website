@@ -1,6 +1,6 @@
 <template>
   <section id="video-series" class>
-    <h2>Video series</h2>
+    <h3>Video series</h3>
 
     <p>
       The idea behind the videos on

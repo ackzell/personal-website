@@ -46,9 +46,9 @@
           </nav>
         </fixed-header>
       </header>
-      <div class="pl-12 pr-3 md:px-0">
+      <template class="pl-12 pr-3 md:px-0">
         <slot />
-      </div>
+      </template>
     </main>
   </div>
 </template>
@@ -75,8 +75,15 @@ export default {
 
 <style>
   .prose a {
+    transform: translateY(0px);
     word-spacing: -4px;
-    transition: all 0.4s ease-in-out;
+    transition: all 0.25s ease-in-out;
+  }
+
+  .prose a:hover {
+    display: inline-block;
+    transform: translateY(-2px);
+    text-shadow: 3px 4px 2px rgba(0, 0, 0, 0.15);
   }
 
   @media (prefers-color-scheme: dark) {

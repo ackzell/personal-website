@@ -1,5 +1,6 @@
 <template>
   <section id="about-me">
+    <h3>About me</h3>
     <p>
       Hi there! My name is Axel Uriel Martínez Castillo and I'm a software
       artisan (engineer, developer, whatever you wanna call it; just never a

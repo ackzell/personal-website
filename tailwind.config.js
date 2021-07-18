@@ -26,6 +26,10 @@ module.exports = {
             color: theme('colors.darkest'),
             fontWeight: '500',
           },
+          h3: {
+            color: theme('colors.darkest'),
+            fontWeight: '500',
+          },
           a: {
             fontWeight: '600',
             color: theme('colors.darkest'),
@@ -58,6 +62,10 @@ module.exports = {
               fontWeight: '500',
             },
             h2: {
+              color: theme('colors.lightest'),
+              fontWeight: '500',
+            },
+            h3: {
               color: theme('colors.lightest'),
               fontWeight: '500',
             },

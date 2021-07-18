@@ -2,10 +2,24 @@
   <!-- <div class="flex flex-row md:flex-row justify-evenly"> -->
   <section
     id="social-media-links"
-    class="max-w-xs fixed flex flex-col xl:flex-row ml-3 xl:ml-0 h-64 xl:h-auto xl:w-1/5 xl:bottom-0 xl:mb-6 xl:justify-center"
+    class="
+      max-w-xs
+      fixed
+      flex flex-col
+      xl:flex-row
+      ml-3
+      xl:ml-0
+      h-64
+      xl:h-auto
+      xl:w-1/5
+      xl:bottom-0
+      xl:mb-6
+      xl:justify-center
+    "
   >
     <a
       class="you-tube flex-1"
+      :class="{ dark: isDarkModePreferred }"
       href="https://youtube.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -19,6 +33,7 @@
     </a>
     <a
       class="twitter flex-1"
+      :class="{ dark: isDarkModePreferred }"
       href="https://twitter.com/_ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -33,6 +48,7 @@
     </a>
     <a
       class="git-hub flex-1"
+      :class="{ dark: isDarkModePreferred }"
       href="https://github.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -46,6 +62,7 @@
     </a>
     <a
       class="dev-to flex-1"
+      :class="{ dark: isDarkModePreferred }"
       href="https://dev.to/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -60,6 +77,7 @@
     </a>
     <a
       class="linked-in flex-1"
+      :class="{ dark: isDarkModePreferred }"
       href="https://linkedin.com/in/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -77,6 +95,7 @@
       target="_blank"
       rel="noopener noreferrer"
       class="buy-me-a-coffee flex-1"
+      :class="{ dark: isDarkModePreferred }"
     >
       <svg
         width="24"
@@ -104,36 +123,76 @@
 </template>
 
 <script>
-export default {}
+export default {
+  data() {
+    return {
+      isDarkModePreferred: null,
+    }
+  },
+  created() {
+    this.isDarkModePreferred =
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+  },
+}
 </script>
 
 <style>
-a.you-tube:hover > svg {
-  fill: #ff0000;
-}
+  a.dark.you-tube:hover > svg {
+    fill: #ff0000;
+  }
 
-a.twitter:hover > svg {
-  fill: #1da1f2;
-}
+  a.dark.twitter:hover > svg {
+    fill: #1da1f2;
+  }
 
-a.git-hub:hover > svg {
-  fill: #ffffff;
-}
+  a.dark.git-hub:hover > svg {
+    fill: #ffffff;
+  }
 
-a.dev-to:hover > svg {
-  fill: #eef0f1;
-}
+  a.dark.dev-to:hover > svg {
+    fill: #eef0f1;
+  }
 
-a.linked-in:hover > svg {
-  fill: #0077b5;
-}
+  a.dark.linked-in:hover > svg {
+    fill: #0077b5;
+  }
 
-a.buy-me-a-coffee:hover > svg {
-  fill: #ffdd00;
-}
+  a.dark.buy-me-a-coffee:hover > svg {
+    fill: #ffdd00;
+  }
 
-a > svg {
-  transition: fill 0.25s ease-in-out;
-  margin: 0 auto;
-}
+  a:not(.dark).you-tube:hover > svg {
+    fill: #ff0000;
+  }
+
+  a:not(.dark).twitter:hover > svg {
+    fill: #1da1f2;
+  }
+
+  a:not(.dark).git-hub:hover > svg {
+    fill: #000000;
+  }
+
+  a:not(.dark).dev-to:hover > svg {
+    fill: #000000;
+  }
+
+  a:not(.dark).linked-in:hover > svg {
+    fill: #0077b5;
+  }
+
+  a:not(.dark).buy-me-a-coffee:hover > svg {
+    fill: #212121;
+  }
+
+  a > svg:hover {
+    transform: translateY(-3px);
+    filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
+  }
+
+  a > svg {
+    transition: all 0.25s ease-in-out;
+    margin: 0 auto;
+  }
 </style>

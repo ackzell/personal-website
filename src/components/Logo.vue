@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center">
+  <div class="logo flex justify-center">
     <svg
       id="ei841lw6n1wf1"
       xmlns="http://www.w3.org/2000/svg"
