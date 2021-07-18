@@ -68,9 +68,11 @@ export default {
     }
   },
   created() {
-    this.isDarkModePreferred =
-      window.matchMedia &&
-      window.matchMedia('(prefers-color-scheme: dark)').matches
+    if (process.isClient) {
+      this.isDarkModePreferred =
+        window.matchMedia &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches
+    }
   },
 }
 </script>
