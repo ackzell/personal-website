@@ -135,7 +135,7 @@ export default {
       isDarkModePreferred: null,
     }
   },
-  created() {
+  mounted() {
     if (process.isClient) {
       this.isDarkModePreferred =
         window.matchMedia &&

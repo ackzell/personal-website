@@ -15,9 +15,10 @@
     <p>
       If you speak Spanish, or want to learn and practice I encourage you to
       <a
-        href="https://mytypeofradio.buzzsprout.com"
+        href="https://mytypeof.dev"
         target="_blank"
         rel="noopener noreferrer"
+        aria-label="My typeof Radio website link"
         >give us a listen</a
       >! 😁
     </p>

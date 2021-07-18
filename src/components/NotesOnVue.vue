@@ -36,26 +36,24 @@
 
     <p>Here is a peek into what it looks like:</p>
 
-    <template v-if="isDarkModePreferred">
-      <video
-        aria-label="A short video that showcases the Notes On Vue website experience."
-        src="@/assets/notes-on-vue-dark.mp4"
-        autoplay
-        muted
-        loop
-      />
-    </template>
+    <video
+      v-if="isDarkModePreferred"
+      aria-label="A short video that showcases the Notes On Vue website experience."
+      src="https://res.cloudinary.com/ackzell/video/upload/v1626636944/ackzell.dev/notes-on-vue-dark.mp4"
+      autoplay
+      muted
+      loop
+    />
 
-    <template v-else>
-      <video
-        aria-label="A short video that showcases the Notes On Vue website experience."
-        width="100%"
-        src="@/assets/notes-on-vue-light.mp4"
-        autoplay
-        muted
-        loop
-      />
-    </template>
+    <video
+      v-else
+      aria-label="A short video that showcases the Notes On Vue website experience."
+      width="100%"
+      src="https://res.cloudinary.com/ackzell/video/upload/v1626636941/ackzell.dev/notes-on-vue-light.mp4"
+      autoplay
+      muted
+      loop
+    />
   </section>
 </template>
 
@@ -67,12 +65,11 @@ export default {
       isDarkModePreferred: null,
     }
   },
-  created() {
-    if (process.isClient) {
-      this.isDarkModePreferred =
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-    }
+  mounted() {
+    this.isDarkModePreferred =
+      window &&
+      window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches
   },
 }
 </script>
