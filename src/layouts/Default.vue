@@ -1,8 +1,5 @@
 <template>
   <div>
-    <aside class="absolute flex flex-col justify-center h-full md:pt-12">
-      <SocialBar />
-    </aside>
     <main
       class="
         dark:prose-dark
@@ -50,6 +47,9 @@
         <slot />
       </template>
     </main>
+    <aside class="absolute flex flex-col justify-center h-full md:pt-12">
+      <SocialBar />
+    </aside>
   </div>
 </template>
 
@@ -66,6 +66,9 @@ import FixedHeader from 'vue-fixed-header'
 
 import SocialBar from '~/components/SocialBar.vue'
 export default {
+  metaInfo: {
+    title: 'Axel Martínez',
+  },
   components: {
     SocialBar,
     FixedHeader,

@@ -1,6 +1,6 @@
 <template>
   <section id="podcast">
-    <h3>Podcast</h3>
+    <h2>Podcast</h2>
 
     <p>
       A good friend and I recently started working on a podcast for Spanish

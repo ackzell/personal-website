@@ -15,6 +15,8 @@ if (process.isClient) {
         Hi there! I see you're curious too!                                                                       
                                                                                                                   
         Feel free to take a look at the source code on GitHub: https://github.com/ackzell/personal-website        
+                                                                                                                  
+        And also make sure to visit this site  in both dark and light modes ;)                                    
                                                                                                                   `,
     "background-color: #212121; color: whitesmoke; font-family:'Source Code Pro'; font-size: 1.5em",
   )
@@ -27,6 +29,8 @@ export default function(Vue, { router, head, isClient }) {
   if (process.isClient) {
     Vue.use(ScrollSpy)
   }
+
+  head.htmlAttrs = { lang: 'en' }
 
   head.link.push({
     rel: 'preconnect',

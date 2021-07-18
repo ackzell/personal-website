@@ -1,6 +1,6 @@
 <template>
   <section id="notes-on-vue">
-    <h3>Notes on Vue</h3>
+    <h2>Notes on Vue</h2>
 
     <p>
       I am in the path of becoming an instructor of sorts. I like sharing my
@@ -37,11 +37,18 @@
     <p>Here is a peek into what it looks like:</p>
 
     <template v-if="isDarkModePreferred">
-      <video src="@/assets/notes-on-vue-dark.mp4" autoplay muted loop />
+      <video
+        aria-label="A short video that showcases the Notes On Vue website experience."
+        src="@/assets/notes-on-vue-dark.mp4"
+        autoplay
+        muted
+        loop
+      />
     </template>
 
     <template v-else>
       <video
+        aria-label="A short video that showcases the Notes On Vue website experience."
         width="100%"
         src="@/assets/notes-on-vue-light.mp4"
         autoplay

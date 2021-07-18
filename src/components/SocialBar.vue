@@ -18,6 +18,7 @@
     "
   >
     <a
+      aria-label="Link to YouTube channel"
       class="you-tube flex-1"
       :class="{ dark: isDarkModePreferred }"
       href="https://youtube.com/ackzell"
@@ -32,6 +33,7 @@
       </svg>
     </a>
     <a
+      aria-label="Link to Twitter profile"
       class="twitter flex-1"
       :class="{ dark: isDarkModePreferred }"
       href="https://twitter.com/_ackzell"
@@ -47,6 +49,7 @@
       </svg>
     </a>
     <a
+      aria-label="Link to GitHub profile"
       class="git-hub flex-1"
       :class="{ dark: isDarkModePreferred }"
       href="https://github.com/ackzell"
@@ -61,6 +64,7 @@
       </svg>
     </a>
     <a
+      aria-label="Link to Dev.to profile"
       class="dev-to flex-1"
       :class="{ dark: isDarkModePreferred }"
       href="https://dev.to/ackzell"
@@ -76,6 +80,7 @@
       </svg>
     </a>
     <a
+      aria-label="Link to LinkedIn profile"
       class="linked-in flex-1"
       :class="{ dark: isDarkModePreferred }"
       href="https://linkedin.com/in/ackzell"
@@ -91,6 +96,7 @@
       </svg>
     </a>
     <a
+      aria-label="Link to Buy me a coffee page"
       href="https://www.buymeacoffee.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
