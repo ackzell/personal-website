@@ -1,5 +1,5 @@
 <template>
-  <div class="logo flex justify-center">
+  <div class="flex justify-center">
     <svg
       id="ei841lw6n1wf1"
       xmlns="http://www.w3.org/2000/svg"
@@ -104,70 +104,70 @@ export default {
 }
 </script>
 <style scoped>
-  @media (prefers-color-scheme: dark) {
-    svg path.change-me {
-      fill: #fafafa;
-    }
+@media (prefers-color-scheme: dark) {
+  svg path.change-me {
+    fill: #fafafa;
   }
+}
 
-  @media (prefers-color-scheme: light) {
-    svg path.change-me {
-      fill: #212121;
-    }
+@media (prefers-color-scheme: light) {
+  svg path.change-me {
+    fill: #212121;
   }
+}
 
-  svg {
-    width: 30%;
-  }
+svg {
+  width: 30%;
+}
 
-  #ei841lw6n1wf4_tr {
-    animation: ei841lw6n1wf4_tr__tr 3000ms linear 1 normal forwards;
+#ei841lw6n1wf4_tr {
+  animation: ei841lw6n1wf4_tr__tr 3000ms linear 1 normal forwards;
+}
+@keyframes ei841lw6n1wf4_tr__tr {
+  0% {
+    transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
   }
-  @keyframes ei841lw6n1wf4_tr__tr {
-    0% {
-      transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
-    }
-    60% {
-      transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
-    }
-    90% {
-      transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
-    }
-    100% {
-      transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
-    }
+  60% {
+    transform: translate(2508.22229px, -1686.086304px) rotate(0deg);
   }
-  #ei841lw6n1wf4_ts {
-    animation: ei841lw6n1wf4_ts__ts 3000ms linear 1 normal forwards;
+  90% {
+    transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
   }
-  @keyframes ei841lw6n1wf4_ts__ts {
-    0% {
-      transform: scale(0, 0);
-      animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
-    }
-    60% {
-      transform: scale(1, 1);
-    }
-    100% {
-      transform: scale(1, 1);
-    }
+  100% {
+    transform: translate(2508.22229px, -1686.086304px) rotate(180deg);
   }
-  #ei841lw6n1wf7_ts {
-    animation: ei841lw6n1wf7_ts__ts 3000ms linear 1 normal forwards;
+}
+#ei841lw6n1wf4_ts {
+  animation: ei841lw6n1wf4_ts__ts 3000ms linear 1 normal forwards;
+}
+@keyframes ei841lw6n1wf4_ts__ts {
+  0% {
+    transform: scale(0, 0);
+    animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
   }
-  @keyframes ei841lw6n1wf7_ts__ts {
-    0% {
-      transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
-    }
-    62% {
-      transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
-      animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
-    }
-    98.666667% {
-      transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
-    }
-    100% {
-      transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
-    }
+  60% {
+    transform: scale(1, 1);
   }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+#ei841lw6n1wf7_ts {
+  animation: ei841lw6n1wf7_ts__ts 3000ms linear 1 normal forwards;
+}
+@keyframes ei841lw6n1wf7_ts__ts {
+  0% {
+    transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
+  }
+  62% {
+    transform: translate(2520.408691px, -1704.148038px) scale(0, 0);
+    animation-timing-function: cubic-bezier(0.42, 0, 1, 1);
+  }
+  98.666667% {
+    transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
+  }
+  100% {
+    transform: translate(2520.408691px, -1704.148038px) scale(1, 1);
+  }
+}
 </style>
