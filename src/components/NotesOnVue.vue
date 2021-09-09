@@ -39,7 +39,7 @@
     <video
       v-if="isDarkModePreferred"
       aria-label="A short video that showcases the Notes On Vue website experience."
-      src="https://res.cloudinary.com/ackzell/video/upload/v1626636944/ackzell.dev/notes-on-vue-dark.mp4"
+      src="https://res.cloudinary.com/ackzell/video/upload/ac_none,q_60/v1626636944/ackzell.dev/notes-on-vue-dark.mp4"
       autoplay
       muted
       loop
@@ -74,5 +74,4 @@ export default {
 }
 </script>
 
-<style>
-</style>
+<style></style>

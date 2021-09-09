@@ -146,61 +146,62 @@ export default {
 </script>
 
 <style>
-  a.dark.you-tube:hover > svg {
-    fill: #ff0000;
-  }
+a.dark.you-tube:hover > svg {
+  fill: #ff0000;
+}
 
-  a.dark.twitter:hover > svg {
-    fill: #1da1f2;
-  }
+a.dark.twitter:hover > svg {
+  fill: #1da1f2;
+}
 
-  a.dark.git-hub:hover > svg {
-    fill: #ffffff;
-  }
+a.dark.git-hub:hover > svg {
+  fill: #ffffff;
+}
 
-  a.dark.dev-to:hover > svg {
-    fill: #eef0f1;
-  }
+a.dark.dev-to:hover > svg {
+  fill: #eef0f1;
+}
 
-  a.dark.linked-in:hover > svg {
-    fill: #0077b5;
-  }
+a.dark.linked-in:hover > svg {
+  fill: #0077b5;
+}
 
-  a.dark.buy-me-a-coffee:hover > svg {
-    fill: #ffdd00;
-  }
+a.dark.buy-me-a-coffee:hover > svg {
+  fill: #ffdd00;
+}
 
-  a:not(.dark).you-tube:hover > svg {
-    fill: #ff0000;
-  }
+a:not(.dark).you-tube:hover > svg {
+  fill: #ff0000;
+}
 
-  a:not(.dark).twitter:hover > svg {
-    fill: #1da1f2;
-  }
+a:not(.dark).twitter:hover > svg {
+  fill: #1da1f2;
+}
 
-  a:not(.dark).git-hub:hover > svg {
-    fill: #000000;
-  }
+a:not(.dark).git-hub:hover > svg {
+  fill: #000000;
+}
 
-  a:not(.dark).dev-to:hover > svg {
-    fill: #000000;
-  }
+a:not(.dark).dev-to:hover > svg {
+  fill: #000000;
+}
 
-  a:not(.dark).linked-in:hover > svg {
-    fill: #0077b5;
-  }
+a:not(.dark).linked-in:hover > svg {
+  fill: #0077b5;
+}
 
-  a:not(.dark).buy-me-a-coffee:hover > svg {
-    fill: #212121;
-  }
+a:not(.dark).buy-me-a-coffee:hover > svg {
+  fill: #212121;
+}
 
-  a > svg:hover {
-    transform: translateY(-3px);
-    filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
-  }
+a > svg:hover {
+  will-change: transform;
+  transform: translateY(-3px);
+  filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
+}
 
-  a > svg {
-    transition: all 0.25s ease-in-out;
-    margin: 0 auto;
-  }
+a > svg {
+  transition: all 0.25s ease-in-out;
+  margin: 0 auto;
+}
 </style>
