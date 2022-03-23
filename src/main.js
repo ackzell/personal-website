@@ -22,7 +22,7 @@ if (process.isClient) {
   )
 }
 
-export default function(Vue, { router, head, isClient }) {
+export default function (Vue, { router, head, isClient }) {
   // Set default layout as a global component
   Vue.component('Layout', DefaultLayout)
   Vue.component('LazyYoutubeVideo', LazyYoutubeVideo)
@@ -45,4 +45,16 @@ export default function(Vue, { router, head, isClient }) {
     type: 'font/woff2',
     crossorigin: 'anonymous',
   })
+
+
+  if (process.env.NODE_ENV == 'production') {
+    // Only send hits on production builds
+    head.script.push({
+      defer: true,
+      body: true,
+      src: 'https://static.cloudflareinsights.com/beacon.min.js',
+      'data-cf-beacon': JSON.stringify({ token: 'ae131d0e5b8a417183ed3a3c8b971fb9' })
+    })
+  }
+
 }
