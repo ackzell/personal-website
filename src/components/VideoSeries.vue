@@ -40,17 +40,21 @@
     <p>
       This is the very first playlist I created, and it took me quite a while:
     </p>
+    <!-- somehow the aspect-ratio on 4:3 is fixing a layout issue with the preview image -->
     <LazyYoutubeVideo
       preview-image-size="sddefault"
       src="https://www.youtube.com/embed/dWGekDUJG1g"
+      aspect-ratio="4:3"
     />
     <p>
       And this one is more recent, can you spot the difference in the audio
       quality?
     </p>
+    <!-- somehow the aspect-ratio on 4:3 is fixing a layout issue with the preview image -->
     <LazyYoutubeVideo
       preview-image-size="sddefault"
       src="https://www.youtube.com/embed/iU_kVbCt3aI"
+      aspect-ratio="4:3"
     />
   </section>
 </template>
@@ -62,21 +66,21 @@ export default {
 </script>
 
 <style>
-@media (prefers-color-scheme: dark) {
-  .prose a {
-    color: #fafafa;
+  @media (prefers-color-scheme: dark) {
+    .prose a {
+      color: #fafafa;
+    }
   }
-}
 
-@media (prefers-color-scheme: light) {
-  .prose a {
-    color: #212121;
+  @media (prefers-color-scheme: light) {
+    .prose a {
+      color: #212121;
+    }
   }
-}
 
-.prose img {
-  margin: 0;
-  width: 100%;
-  height: auto;
-}
+  .prose img {
+    margin: 0;
+    width: 100%;
+    height: auto;
+  }
 </style>

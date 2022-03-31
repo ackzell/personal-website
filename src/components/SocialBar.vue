@@ -10,17 +10,15 @@
       ml-3
       xl:ml-0
       h-64
-      xl:h-auto
-      xl:w-1/5
-      xl:bottom-0
-      xl:mb-6
-      xl:justify-center
+      xl:h-auto xl:w-1/5 xl:bottom-0 xl:mb-6 xl:justify-center
     "
   >
     <a
+      @touch-start.prevent="hoverEffect = !hoverEffect"
+      @touch-end.prevent="hoverEffect = !hoverEffect"
       aria-label="Link to YouTube channel"
       class="you-tube flex-1"
-      :class="{ dark: isDarkModePreferred }"
+      :class="{ dark: isDarkModePreferred, 'hover-effect': hoverEffect }"
       href="https://youtube.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -33,9 +31,11 @@
       </svg>
     </a>
     <a
+      @touch-start.prevent="hoverEffect = !hoverEffect"
+      @touch-end.prevent="hoverEffect = !hoverEffect"
       aria-label="Link to Twitter profile"
       class="twitter flex-1"
-      :class="{ dark: isDarkModePreferred }"
+      :class="{ dark: isDarkModePreferred, 'hover-effect': hoverEffect }"
       href="https://twitter.com/_ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -49,9 +49,11 @@
       </svg>
     </a>
     <a
+      @touch-start.prevent="hoverEffect = !hoverEffect"
+      @touch-end.prevent="hoverEffect = !hoverEffect"
       aria-label="Link to GitHub profile"
       class="git-hub flex-1"
-      :class="{ dark: isDarkModePreferred }"
+      :class="{ dark: isDarkModePreferred, 'hover-effect': hoverEffect }"
       href="https://github.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -64,9 +66,11 @@
       </svg>
     </a>
     <a
+      @touch-start.prevent="hoverEffect = !hoverEffect"
+      @touch-end.prevent="hoverEffect = !hoverEffect"
       aria-label="Link to Dev.to profile"
       class="dev-to flex-1"
-      :class="{ dark: isDarkModePreferred }"
+      :class="{ dark: isDarkModePreferred, 'hover-effect': hoverEffect }"
       href="https://dev.to/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -80,9 +84,11 @@
       </svg>
     </a>
     <a
+      @touch-start.prevent="hoverEffect = !hoverEffect"
+      @touch-end.prevent="hoverEffect = !hoverEffect"
       aria-label="Link to LinkedIn profile"
       class="linked-in flex-1"
-      :class="{ dark: isDarkModePreferred }"
+      :class="{ dark: isDarkModePreferred, 'hover-effect': hoverEffect }"
       href="https://linkedin.com/in/ackzell"
       target="_blank"
       rel="noopener noreferrer"
@@ -96,12 +102,14 @@
       </svg>
     </a>
     <a
+      @touch-start.prevent="hoverEffect = !hoverEffect"
+      @touch-end.prevent="hoverEffect = !hoverEffect"
       aria-label="Link to Buy me a coffee page"
       href="https://www.buymeacoffee.com/ackzell"
       target="_blank"
       rel="noopener noreferrer"
       class="buy-me-a-coffee flex-1"
-      :class="{ dark: isDarkModePreferred }"
+      :class="{ dark: isDarkModePreferred, 'hover-effect': hoverEffect }"
     >
       <svg
         width="24"
@@ -132,6 +140,7 @@
 export default {
   data() {
     return {
+      hoverEffect: false,
       isDarkModePreferred: null,
     }
   },
@@ -146,62 +155,64 @@ export default {
 </script>
 
 <style>
-a.dark.you-tube:hover > svg {
-  fill: #ff0000;
-}
+  a.dark.you-tube:hover > svg {
+    fill: #ff0000;
+  }
 
-a.dark.twitter:hover > svg {
-  fill: #1da1f2;
-}
+  a.dark.twitter:hover > svg {
+    fill: #1da1f2;
+  }
 
-a.dark.git-hub:hover > svg {
-  fill: #ffffff;
-}
+  a.dark.git-hub:hover > svg {
+    fill: #ffffff;
+  }
 
-a.dark.dev-to:hover > svg {
-  fill: #eef0f1;
-}
+  a.dark.dev-to:hover > svg {
+    fill: #eef0f1;
+  }
 
-a.dark.linked-in:hover > svg {
-  fill: #0077b5;
-}
+  a.dark.linked-in:hover > svg {
+    fill: #0077b5;
+  }
 
-a.dark.buy-me-a-coffee:hover > svg {
-  fill: #ffdd00;
-}
+  a.dark.buy-me-a-coffee:hover > svg {
+    fill: #ffdd00;
+  }
 
-a:not(.dark).you-tube:hover > svg {
-  fill: #ff0000;
-}
+  a:not(.dark).you-tube:hover > svg {
+    fill: #ff0000;
+  }
 
-a:not(.dark).twitter:hover > svg {
-  fill: #1da1f2;
-}
+  a:not(.dark).twitter:hover > svg {
+    fill: #1da1f2;
+  }
 
-a:not(.dark).git-hub:hover > svg {
-  fill: #000000;
-}
+  a:not(.dark).git-hub:hover > svg {
+    fill: #000000;
+  }
 
-a:not(.dark).dev-to:hover > svg {
-  fill: #000000;
-}
+  a:not(.dark).dev-to:hover > svg {
+    fill: #000000;
+  }
 
-a:not(.dark).linked-in:hover > svg {
-  fill: #0077b5;
-}
+  a:not(.dark).linked-in:hover > svg {
+    fill: #0077b5;
+  }
 
-a:not(.dark).buy-me-a-coffee:hover > svg {
-  fill: #212121;
-}
+  a:not(.dark).buy-me-a-coffee:hover > svg {
+    fill: #212121;
+  }
 
-a > svg:hover {
-  will-change: transform;
-  transform: translateY(-3px);
-  filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
-}
+  @media (hover: hover) and (pointer: fine) {
+    a > svg:hover {
+      will-change: transform;
+      transform: translateY(-3px);
+      filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.2));
+    }
+  }
 
-a > svg {
-  transition: all 0.25s ease-in-out;
-  margin: 0 auto;
-}
+  a > svg {
+    transition: all 0.25s ease-in-out;
+    margin: 0 auto;
+  }
 </style>

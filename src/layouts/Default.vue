@@ -78,56 +78,64 @@ export default {
 </script>
 
 <style>
-.prose a {
-  will-change: transform;
-  transform: translateY(0px);
-  word-spacing: -4px;
-  transition: all 0.25s ease-in-out;
-}
-
-.prose a:hover {
-  display: inline-block;
-  transform: translateY(-2px);
-  text-shadow: 3px 4px 2px rgba(0, 0, 0, 0.15);
-}
-
-@media (prefers-color-scheme: dark) {
-  .prose a.active {
-    color: #fafafa;
-    text-shadow: #fafafa 1px 0 4px;
+  .prose a {
+    will-change: transform;
+    transform: translateY(0px);
+    word-spacing: -4px;
+    transition: all 0.25s ease-in-out;
   }
 
-  nav.vue-fixed-header--isFixed {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    padding: 0 20px;
-    margin: 0;
-    background: #0e0e0e;
-    height: 3em;
-    z-index: 1; /* lists are doing funky business and need to make this go on top*/
-    box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  .prose a.active {
-    color: #212121;
-    text-shadow: #8f8f8f 1px 0 4px;
+  .prose a:hover {
+    display: inline-block;
+    transform: translateY(-4px);
+    text-shadow: 0px 7px 2px rgba(0, 0, 0, 0.25);
   }
 
-  nav.vue-fixed-header--isFixed {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100vw;
-    padding: 0 20px;
-    margin: 0;
-    background: #fafafa;
-    height: 3em;
-    z-index: 1; /* lists are doing funky business and need to make this go on top*/
-    box-shadow: 0px 10px 13px -7px #adadad, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+  @media (prefers-color-scheme: dark) {
+    .prose a.active {
+      color: #fafafa;
+      text-shadow: #fafafa 1px 0 4px;
+    }
+
+    .prose a:hover {
+      display: inline-block;
+      transform: translateY(-4px);
+      text-shadow: 0px 7px 2px rgba(0, 0, 0, 1);
+    }
+
+    nav.vue-fixed-header--isFixed {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      padding: 0 20px;
+      margin: 0;
+      background: rgba(14, 14, 14, 0.9);
+      height: 3em;
+      z-index: 1; /* lists are doing funky business and need to make this go on top*/
+      box-shadow: 0px 10px 13px -7px #000000, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+      backdrop-filter: blur(2px);
+    }
   }
-}
+
+  @media (prefers-color-scheme: light) {
+    .prose a.active {
+      color: #212121;
+      text-shadow: #8f8f8f 1px 0 4px;
+    }
+
+    nav.vue-fixed-header--isFixed {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      padding: 0 20px;
+      margin: 0;
+      background: rgba(250, 250, 250, 0.9);
+      height: 3em;
+      z-index: 1; /* lists are doing funky business and need to make this go on top*/
+      box-shadow: 0px 10px 13px -7px #adadad, 5px 5px 15px 5px rgba(0, 0, 0, 0);
+      backdrop-filter: blur(2px);
+    }
+  }
 </style>

@@ -26,9 +26,9 @@
         href="https://notes-on-vue.netlify.app"
         target="_blank"
         rel="noopener noreferrer"
-        >Vue.js notes website</a
+        >Notes On Vue</a
       >
-      and the ocassional
+      website and the ocassional
       <a href="https://dev.to/ackzell" target="_blank" rel="noopener noreferrer"
         >blog post</a
       >.
