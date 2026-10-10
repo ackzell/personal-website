@@ -6,7 +6,14 @@
   },
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
-  "workbench.colorTheme": "Monochrome Dark",
-  "workbench.iconTheme": "field-lights-monochrome-minimalistic",
-  "editor.renderWhitespace": "all"
+  "workbench.iconTheme": "gruvbox-material-icon-theme",
+  "editor.renderWhitespace": "all",
+  "window.autoDetectColorScheme": true,
+  "workbench.preferredLightColorTheme": "Tlapalli l-00: Obsidian Light",
+  "workbench.preferredDarkColorTheme": "Tlapalli 00: Obsidian",
+  "editor.experimentalGpuAcceleration": "on",
+  "i18n-ally.localesPaths": [
+    "i18n",
+    "i18n/locales"
+  ]
 }
