@@ -1,0 +1,7 @@
+pronunciation: TODO
+status: active
+order: 4
+repos:
+  - ackzell/yehyecoa-vue
+stack: [vue, monaco, partykit, pinia]
+related: [amoxtli]

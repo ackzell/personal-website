@@ -1,24 +1,24 @@
 {
-  "name": "my-gridsome-site",
+  "name": "ackzell-dev",
   "private": true,
+  "type": "module",
   "scripts": {
-    "build": "gridsome build",
-    "develop": "gridsome develop",
-    "explore": "gridsome explore"
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "typecheck": "nuxt typecheck",
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "gridsome": "^0.7.23",
-    "vue-fixed-header": "^3.2.15",
-    "vue2-scrollspy": "^2.3.1"
+    "@nuxt/content": "^3.16.1",
+    "@nuxtjs/i18n": "^10.6.0",
+    "nuxt": "^4.6.0",
+    "vue": "^3.5.43",
+    "vue-router": "^5.4.0"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.2.0",
-    "autoprefixer": "^9.8.6",
-    "gridsome-plugin-manifest": "^0.3.5",
-    "gridsome-plugin-tailwindcss": "^4.1.1",
-    "postcss": "^7.0.36",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.2.4",
-    "tailwindcss-typography": "^3.1.0",
-    "vue-lazy-youtube-video": "^2.3.0"
+    "typescript": "^5.9.3",
+    "vue-tsc": "^3.3.12"
   }
 }

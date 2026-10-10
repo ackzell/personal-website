@@ -1,0 +1,49 @@
+{
+  "site": {
+    "name": "ackzell",
+    "skipToContent": "Skip to content",
+    "language": "Language"
+  },
+  "nav": {
+    "label": "Main",
+    "menu": "Menu",
+    "home": "Home",
+    "projects": "Projects",
+    "videos": "Videos",
+    "podcast": "Podcast",
+    "about": "About"
+  },
+  "home": {
+    "title": "Axel Martínez",
+    "intro": "Mexican software engineer working on the front end. I build tools to scratch my own itches, and I share what I learn along the way.",
+    "featured": "Currently working on",
+    "projects": "Projects",
+    "allProjects": "All projects"
+  },
+  "projects": {
+    "title": "Projects",
+    "intro": "Tools I've built, mostly for myself first. Each one is named after a word in Nahuatl.",
+    "pronunciation": "Pronunciation",
+    "meaning": "Meaning",
+    "previous": "Previous project",
+    "next": "Next project",
+    "related": "Related projects",
+    "status": {
+      "shipped": "Shipped",
+      "active": "Active",
+      "experiment": "Experiment"
+    }
+  },
+  "videos": {
+    "title": "Videos",
+    "intro": "Video series on YouTube, where I build things piece by piece."
+  },
+  "podcast": {
+    "title": "Podcast",
+    "intro": "My typeof Radio is a Spanish-language podcast about web development."
+  },
+  "about": {
+    "title": "About"
+  },
+  "placeholder": "Coming soon."
+}

@@ -1,0 +1,10 @@
+pronunciation: ah-MOX-tlee
+status: active
+featured: true
+order: 1
+repos:
+  - ackzell/amoxtli-vue-2
+  - ackzell/amoxtli-vue
+stack: [nuxt, vue, tutorialkit, webcontainers]
+related: [yehyecoa]
+# TODO: livestreams playlist id, and previewAccess (mailto or form) — never the preview URL

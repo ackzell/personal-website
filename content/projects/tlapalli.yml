@@ -1,0 +1,12 @@
+pronunciation: TODO
+status: shipped
+order: 2
+repos:
+  - ackzell/tlapalli-vscode-theme
+  - ackzell/tlapalli-zed-theme
+  - ackzell/tlapalli-website
+links:
+  site: https://tlapalli.ackzell.dev
+  # TODO: marketplace, openvsx
+stack: [vscode, zed, typescript, vue]
+related: [tlachialoni]

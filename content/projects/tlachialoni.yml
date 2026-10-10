@@ -1,0 +1,9 @@
+pronunciation: TODO
+status: shipped
+order: 3
+repos:
+  - ackzell/tlachialoni
+links:
+  video: https://youtu.be/3mEV4Aqni_s
+stack: [electron, typescript, vite]
+related: [tlapalli]

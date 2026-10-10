@@ -1,0 +1,49 @@
+{
+  "site": {
+    "name": "ackzell",
+    "skipToContent": "Saltar al contenido",
+    "language": "Idioma"
+  },
+  "nav": {
+    "label": "Principal",
+    "menu": "Menú",
+    "home": "Inicio",
+    "projects": "Proyectos",
+    "videos": "Videos",
+    "podcast": "Podcast",
+    "about": "Acerca de"
+  },
+  "home": {
+    "title": "Axel Martínez",
+    "intro": "Ingeniero de software mexicano enfocado en el front end. Construyo herramientas para resolver mis propias necesidades y comparto lo que aprendo en el camino.",
+    "featured": "En lo que estoy trabajando",
+    "projects": "Proyectos",
+    "allProjects": "Todos los proyectos"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "intro": "Herramientas que he creado, casi siempre primero para mí. Cada una lleva el nombre de una palabra en náhuatl.",
+    "pronunciation": "Pronunciación",
+    "meaning": "Significado",
+    "previous": "Proyecto anterior",
+    "next": "Proyecto siguiente",
+    "related": "Proyectos relacionados",
+    "status": {
+      "shipped": "Publicado",
+      "active": "En desarrollo",
+      "experiment": "Experimento"
+    }
+  },
+  "videos": {
+    "title": "Videos",
+    "intro": "Series de videos en YouTube donde construyo cosas paso a paso."
+  },
+  "podcast": {
+    "title": "Podcast",
+    "intro": "My typeof Radio es un podcast en español sobre desarrollo web."
+  },
+  "about": {
+    "title": "Acerca de"
+  },
+  "placeholder": "Próximamente."
+}
