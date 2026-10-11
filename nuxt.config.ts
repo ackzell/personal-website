@@ -6,6 +6,12 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  experimental: {
+    // Route changes run as view transitions (skipped under reduced motion).
+    // Styles in main.css, direction tagging in plugins/section-transition.client.ts.
+    viewTransition: true,
+  },
+
   app: {
     head: {
       link: [

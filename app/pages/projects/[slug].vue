@@ -28,7 +28,7 @@ useSeoMeta({
 
 <template>
   <article v-if="project" class="page project">
-    <nav aria-label="Breadcrumb">
+    <nav aria-label="Breadcrumb" track="wide">
       <ol flex gap="tight" p="0" list="none" text="sm">
         <li><NuxtLinkLocale to="/projects">{{ t('projects.title') }}</NuxtLinkLocale></li>
         <li flex gap="tight">
@@ -38,7 +38,7 @@ useSeoMeta({
       </ol>
     </nav>
 
-    <WordHeading :word="project.word" :pronunciation="project.pronunciation" :meaning="project.meaning" />
+    <WordHeading :slug="project.slug" :word="project.word" :pronunciation="project.pronunciation" :meaning="project.meaning" />
 
     <p class="project__title">{{ project.title }}</p>
     <p class="project__description">{{ project.description }}</p>

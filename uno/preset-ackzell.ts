@@ -83,7 +83,15 @@ export const presetAckzell = definePreset(() => ({
       line: 'var(--line)',
     },
   },
-  rules: [spaceRule, trackRule, trackPaddingRule, typeRule],
+  rules: [
+    spaceRule,
+    trackRule,
+    trackPaddingRule,
+    typeRule,
+    // Project words (lexicon headwords, project headings). Set via class on
+    // links: `text` as an attribute breaks <a> (see uno.config.ts).
+    ['text-headword', { 'font-size': 'var(--headword-size)', 'line-height': '1' }],
+  ],
   variants: [
     // current:… styles the link for the current page or section. Covers
     // aria-current="page" and "true" alike, but not an explicit "false".

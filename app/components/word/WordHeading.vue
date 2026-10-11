@@ -1,5 +1,6 @@
 <script setup lang="ts">
 defineProps<{
+  slug: string
   word: string
   pronunciation: string
   meaning: string
@@ -7,8 +8,10 @@ defineProps<{
 </script>
 
 <template>
-  <header grid gap="tight">
-    <h1 text="[2.5rem]" lang="nah">{{ word }}</h1>
+  <header grid gap="tight" track="wide">
+    <h1 class="text-headword" lang="nah">
+      <span :style="wordTransition(slug)">{{ word }}</span>
+    </h1>
     <dl flex="~ wrap" gap="y-1 x-8" text="muted">
       <div flex gap="tight">
         <dt class="after:content-[':']">{{ $t('projects.pronunciation') }}</dt>
