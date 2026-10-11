@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
 
-  modules: ['@nuxt/content', '@nuxtjs/i18n'],
+  modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts'],
 
   css: ['~/assets/css/main.css'],
 
@@ -13,6 +13,30 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
       ],
+    },
+  },
+
+  // Self-hosted at build time. Type system notes live in main.css.
+  fonts: {
+    defaults: {
+      subsets: ['latin-ext', 'latin'],
+      styles: ['normal'],
+    },
+    families: [
+      {
+        name: 'Recursive',
+        provider: 'google',
+        // Covers code (320) through headings (520) and a bold step.
+        weights: ['300 700'],
+      },
+      { name: 'Commit Mono', provider: 'fontsource', weights: [400, 700] },
+    ],
+    google: {
+      experimental: {
+        // Pin MONO so Google serves a smaller instance; keep CASL variable.
+        // (0.14 reads axes here; the per-family `variableAxis` is unreleased.)
+        variableAxis: { Recursive: { MONO: ['1'], CASL: [['0', '1']] } },
+      },
     },
   },
 

@@ -28,9 +28,24 @@
   --deeper-glow-red: #b84c4c;
 
   --gutter: 16px;
-  --measure: 46rem;
-  font-family: system-ui, sans-serif;
-  line-height: 1.6;
+  --measure: 64ch;
+
+  /*
+   * Type: two monospace families, three roles.
+   * Recursive is self-hosted pinned to MONO 1 (see nuxt.config.ts), so only
+   * CASL and wght vary. Code reuses it with the casual axis off.
+   */
+  --font-heading: 'Recursive', ui-monospace, monospace;
+  --font-body: 'Commit Mono', ui-monospace, monospace;
+  --font-code: 'Recursive', ui-monospace, monospace;
+  --heading-weight: 520;
+  --heading-casual: 0.65;
+  --code-weight: 320;
+  --code-casual: 0;
+
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.65;
 }
 
 /* Per-section inputs. About is also the default when no section is set. */
@@ -72,6 +87,32 @@
     --fg: var(--deeper-paper);
     --accent: var(--dark-accent);
   }
+}
+
+h1,
+h2,
+h3,
+h4,
+.site-header__name {
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  font-variation-settings: 'CASL' var(--heading-casual);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* <code> carries its own UA `font-family: monospace`; set every code element
+   explicitly so none falls back to the system mono. */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-code);
+  font-weight: var(--code-weight);
+  font-variation-settings: 'CASL' var(--code-casual);
+}
+pre code {
+  font: inherit;
 }
 
 body {
@@ -132,7 +173,6 @@ main:focus {
 }
 
 .site-header__name {
-  font-weight: 700;
   color: var(--fg);
   text-decoration: none;
 }
