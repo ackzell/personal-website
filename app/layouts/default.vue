@@ -2,6 +2,8 @@
 const section = useSection()
 
 useHead({ htmlAttrs: { 'data-section': section } })
+
+const isDev = import.meta.dev
 </script>
 
 <template>
@@ -12,5 +14,6 @@ useHead({ htmlAttrs: { 'data-section': section } })
       <slot />
     </main>
     <SiteFooter />
+    <DevGridOverlay v-if="isDev" />
   </div>
 </template>

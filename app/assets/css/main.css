@@ -27,8 +27,33 @@
   --deeper-glow-green: #4a9273;
   --deeper-glow-red: #b84c4c;
 
-  --gutter: 16px;
-  --measure: 64ch;
+  /*
+   * Space: raw steps on a 4px base, then semantic roles. Components use the
+   * roles; the steps exist so the roles stay on one scale.
+   */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  --gap-tight: var(--space-2); /* label ↔ value, word ↔ pronunciation */
+  --gap-group: var(--space-4); /* items inside one group */
+  --gap-block: var(--space-8); /* between blocks of a section */
+  --gap-section: clamp(var(--space-12), 8vw, var(--space-24)); /* between sections */
+
+  /*
+   * Layout: named tracks, full | wide | content | wide | full.
+   * Page children sit in `content` by default and opt out with .wide / .full.
+   */
+  --gutter: clamp(var(--space-4), 4vw, var(--space-8));
+  --content-width: 64ch;
+  --wide-width: 72rem;
 
   /*
    * Type: two monospace families, three roles.
@@ -89,6 +114,11 @@
   }
 }
 
+/* Spacing comes from the flow rules below, not UA margins. */
+:where(h1, h2, h3, h4, p, ul, ol, dl, dd, pre, figure, blockquote) {
+  margin-block: 0;
+}
+
 h1,
 h2,
 h3,
@@ -141,9 +171,19 @@ a {
 }
 
 .site {
-  max-width: var(--measure);
-  margin: 0 auto;
-  padding: 0 var(--gutter);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1;
+}
+
+/* Header and footer span the wide track without being grid children. */
+.site-header,
+.site-footer {
+  padding-inline: max(var(--gutter), (100% - var(--wide-width)) / 2);
 }
 
 .skip-link {
@@ -154,11 +194,55 @@ a {
   left: var(--gutter);
   top: var(--gutter);
   background: var(--bg);
-  padding: 0.5rem 1rem;
+  padding: var(--space-2) var(--space-4);
 }
 
 main:focus {
   outline: none;
+}
+
+/* Layout grid */
+
+.page {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [wide-start] minmax(0, calc((var(--wide-width) - var(--content-width)) / 2))
+    [content-start] min(var(--content-width), 100% - var(--gutter) * 2)
+    [content-end] minmax(0, calc((var(--wide-width) - var(--content-width)) / 2))
+    [wide-end] minmax(var(--gutter), 1fr) [full-end];
+  align-content: start;
+  padding-block: var(--gap-block) var(--gap-section);
+}
+
+.page > * {
+  grid-column: content;
+}
+.page > .wide {
+  grid-column: wide;
+}
+.page > .full {
+  grid-column: full;
+}
+
+/* Flow: tight inside groups, generous between sections, and more space above
+   a heading than below it. Grid items don't collapse margins, so these add up
+   predictably. */
+.page > * + * {
+  margin-top: var(--gap-group);
+}
+.page > section,
+.page > .prose {
+  margin-top: var(--gap-section);
+}
+:where(section, .prose) > * + * {
+  margin-top: var(--gap-group);
+}
+:where(section, .prose) > :is(h2, h3) + * {
+  margin-top: var(--gap-tight);
+}
+.prose > :is(h2, h3) {
+  margin-top: var(--gap-block);
 }
 
 /* Header and nav */
@@ -167,8 +251,8 @@ main:focus {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 1.5rem;
-  padding: 1.25rem 0;
+  gap: var(--gap-tight) var(--space-6);
+  padding-block: var(--space-5);
   border-bottom: 1px solid var(--line);
 }
 
@@ -183,8 +267,7 @@ main:focus {
 
 .site-nav__list {
   display: flex;
-  gap: 1.25rem;
-  margin: 0;
+  gap: var(--space-5);
   padding: 0;
   list-style: none;
 }
@@ -208,7 +291,7 @@ main:focus {
 
 .locale-switch {
   display: flex;
-  gap: 0.75rem;
+  gap: var(--space-3);
   font-size: 0.875rem;
 }
 
@@ -219,8 +302,8 @@ main:focus {
   .site-nav__list {
     display: none;
     flex-direction: column;
-    gap: 0.5rem;
-    padding-top: 0.75rem;
+    gap: var(--gap-tight);
+    padding-top: var(--space-3);
   }
   .site-nav__list[data-open='true'] {
     display: flex;
@@ -230,82 +313,85 @@ main:focus {
 /* Footer */
 
 .site-footer {
-  margin-top: 4rem;
-  padding: 1.5rem 0;
+  padding-block: var(--space-6);
   border-top: 1px solid var(--line);
 }
 
 .site-footer__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 1.25rem;
-  margin: 0;
+  gap: var(--gap-tight) var(--space-5);
   padding: 0;
   list-style: none;
 }
 
 /* Content */
 
-.page {
-  padding: 2rem 0;
-}
-
 .breadcrumb ol {
   display: flex;
-  gap: 0.5rem;
-  margin: 0;
+  gap: var(--gap-tight);
   padding: 0;
   list-style: none;
   font-size: 0.875rem;
 }
 .breadcrumb li + li::before {
   content: '/';
-  margin-right: 0.5rem;
+  margin-right: var(--gap-tight);
   color: var(--muted);
 }
 
+.word-heading {
+  display: grid;
+  gap: var(--gap-tight);
+}
+
 .word-heading__word {
-  margin-bottom: 0.25rem;
   font-size: 2.5rem;
 }
 
 .word-heading__details {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem 2rem;
-  margin: 0 0 1.5rem;
+  gap: var(--space-1) var(--space-8);
   color: var(--muted);
 }
 .word-heading__details div {
   display: flex;
-  gap: 0.5rem;
+  gap: var(--gap-tight);
 }
 .word-heading__details dt::after {
   content: ':';
 }
 .word-heading__details dd {
-  margin: 0;
   color: var(--fg);
 }
 
 .project-card {
-  padding: 1rem 0;
+  display: grid;
+  justify-items: start;
+  gap: var(--space-1);
+  padding-block: var(--gap-group);
   border-bottom: 1px solid var(--line);
+}
+
+/* Stacked cards already separate themselves with padding and a rule. */
+.project-card + .project-card {
+  margin-top: 0;
 }
 
 .project-status {
   display: inline-block;
-  padding: 0.1rem 0.5rem;
+  padding: 0.1rem var(--gap-tight);
   border: 1px solid var(--line);
   border-radius: 999px;
   font-size: 0.8rem;
 }
 
-.project__pager {
+.page > .project__pager {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  margin-top: 3rem;
+  gap: var(--gap-group);
+  margin-top: var(--gap-section);
 }
 .project__pager [rel='next'] {
   margin-left: auto;
