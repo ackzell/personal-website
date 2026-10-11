@@ -16,6 +16,8 @@ const previous = computed(() => projects.value?.[index.value - 1])
 const next = computed(() => projects.value?.[index.value + 1])
 const related = computed(() =>
   (project.value?.related ?? [])
+    // Never the project itself: its word is already named by the heading.
+    .filter((relatedSlug) => relatedSlug !== slug.value)
     .map((relatedSlug) => projects.value?.find((p) => p.slug === relatedSlug))
     .filter((p) => p !== undefined),
 )
@@ -54,15 +56,17 @@ useSeoMeta({
 
     <section v-if="related.length" aria-labelledby="related-heading">
       <h2 id="related-heading">{{ t('projects.related') }}</h2>
-      <ProjectCard v-for="item in related" :key="item.slug" :project="item" :heading-level="3" />
+      <ProjectLexicon :projects="related" />
     </section>
 
     <nav flex justify="between" gap="group" mt="section" :aria-label="t('projects.title')">
       <NuxtLinkLocale v-if="previous" :to="`/projects/${previous.slug}`" rel="prev">
-        ← {{ t('projects.previous') }}: <span lang="nah">{{ previous.word }}</span>
+        ← {{ t('projects.previous') }}:
+        <span lang="nah">{{ previous.word }}</span>
       </NuxtLinkLocale>
       <NuxtLinkLocale v-if="next" :to="`/projects/${next.slug}`" rel="next" ml="auto">
-        {{ t('projects.next') }}: <span lang="nah">{{ next.word }}</span> →
+        {{ t('projects.next') }}:
+        <span lang="nah">{{ next.word }}</span> →
       </NuxtLinkLocale>
     </nav>
   </article>

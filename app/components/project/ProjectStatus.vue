@@ -3,12 +3,5 @@ defineProps<{ status: ProjectStatus }>()
 </script>
 
 <template>
-  <span
-    inline-block
-    p="x-tight y-[0.1rem]"
-    border="~ solid line"
-    rounded="full"
-    text="[0.8rem]"
-    :data-status="status"
-  >{{ $t(`projects.status.${status}`) }}</span>
+  <span text="[0.8rem]" uppercase tracking="[0.08em]" :data-status="status">{{ $t(`projects.status.${status}`) }}</span>
 </template>

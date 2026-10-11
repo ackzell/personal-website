@@ -7,8 +7,8 @@ useSeoMeta({ title: () => t('projects.title'), description: () => t('projects.in
 
 <template>
   <div class="page">
-    <h1>{{ $t('projects.title') }}</h1>
-    <p>{{ $t('projects.intro') }}</p>
-    <ProjectCard v-for="project in projects" :key="project.slug" :project="project" />
+    <h1 track="wide">{{ $t('projects.title') }}</h1>
+    <p track="wide" max-w="[var(--content-width)]">{{ $t('projects.intro') }}</p>
+    <ProjectLexicon v-if="projects" :projects="projects" track="wide" mt="block" />
   </div>
 </template>
