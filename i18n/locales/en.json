@@ -7,18 +7,16 @@
   "nav": {
     "label": "Main",
     "menu": "Menu",
-    "home": "Home",
-    "projects": "Projects",
-    "videos": "Videos",
-    "podcast": "Podcast",
-    "about": "About"
+    "about": "About",
+    "work": "Work",
+    "media": "Media"
   },
   "home": {
     "title": "Axel Martínez",
     "intro": "Mexican software engineer working on the front end. I build tools to scratch my own itches, and I share what I learn along the way.",
     "featured": "Currently working on",
-    "projects": "Projects",
-    "allProjects": "All projects"
+    "allProjects": "All projects",
+    "timeline": "Experience"
   },
   "projects": {
     "title": "Projects",
@@ -34,6 +32,9 @@
       "experiment": "Experiment"
     }
   },
+  "media": {
+    "title": "Media"
+  },
   "videos": {
     "title": "Videos",
     "intro": "Video series on YouTube, where I build things piece by piece."
@@ -41,9 +42,6 @@
   "podcast": {
     "title": "Podcast",
     "intro": "My typeof Radio is a Spanish-language podcast about web development."
-  },
-  "about": {
-    "title": "About"
   },
   "placeholder": "Coming soon."
 }

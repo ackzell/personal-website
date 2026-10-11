@@ -1,9 +1,8 @@
 /** Main navigation. Labels come from `nav.<key>` in i18n/locales. */
 export const mainNav = [
-  { key: 'projects', to: '/projects' },
-  { key: 'videos', to: '/videos' },
-  { key: 'podcast', to: '/podcast' },
-  { key: 'about', to: '/about' },
+  { key: 'about', to: '/', section: 'about' },
+  { key: 'work', to: '/projects', section: 'work' },
+  { key: 'media', to: '/media', section: 'media' },
 ] as const
 
 export const socialLinks = [

@@ -3,9 +3,9 @@ export type Section = 'about' | 'work' | 'media'
 // Route base names (locale suffix stripped) mapped to the section they belong to.
 const sectionByRoute: Record<string, Section> = {
   index: 'about',
-  about: 'about',
   projects: 'work',
   'projects-slug': 'work',
+  media: 'media',
   videos: 'media',
   podcast: 'media',
 }

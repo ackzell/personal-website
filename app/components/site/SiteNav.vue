@@ -3,18 +3,20 @@ import { mainNav } from '~/config/nav'
 
 const route = useRoute()
 const localePath = useLocalePath()
+const section = useSection()
 const open = ref(false)
 
 watch(() => route.fullPath, () => (open.value = false))
 
 const stripSlash = (path: string) => (path.length > 1 ? path.replace(/\/$/, '') : path)
 
-/** "page" on the item's own page, "true" anywhere below it (e.g. a project detail page). */
-function ariaCurrent(to: string) {
-  const target = stripSlash(localePath(to))
-  const current = stripSlash(route.path)
-  if (current === target) return 'page'
-  if (current.startsWith(`${target}/`)) return 'true'
+/**
+ * "page" on the item's own page, "true" anywhere else in its section
+ * (e.g. a project detail page, or /videos under Media).
+ */
+function ariaCurrent(item: (typeof mainNav)[number]) {
+  if (stripSlash(route.path) === stripSlash(localePath(item.to))) return 'page'
+  if (section.value === item.section) return 'true'
   return undefined
 }
 </script>
@@ -32,7 +34,7 @@ function ariaCurrent(to: string) {
     </button>
     <ul id="site-nav-list" class="site-nav__list" :data-open="open">
       <li v-for="item in mainNav" :key="item.key">
-        <NuxtLinkLocale :to="item.to" :aria-current="ariaCurrent(item.to)">
+        <NuxtLinkLocale :to="item.to" :aria-current="ariaCurrent(item)">
           {{ $t(`nav.${item.key}`) }}
         </NuxtLinkLocale>
       </li>

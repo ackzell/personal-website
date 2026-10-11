@@ -7,18 +7,16 @@
   "nav": {
     "label": "Principal",
     "menu": "Menú",
-    "home": "Inicio",
-    "projects": "Proyectos",
-    "videos": "Videos",
-    "podcast": "Podcast",
-    "about": "Acerca de"
+    "about": "Acerca de",
+    "work": "Trabajo",
+    "media": "Medios"
   },
   "home": {
     "title": "Axel Martínez",
     "intro": "Ingeniero de software mexicano enfocado en el front end. Construyo herramientas para resolver mis propias necesidades y comparto lo que aprendo en el camino.",
     "featured": "En lo que estoy trabajando",
-    "projects": "Proyectos",
-    "allProjects": "Todos los proyectos"
+    "allProjects": "Todos los proyectos",
+    "timeline": "Trayectoria"
   },
   "projects": {
     "title": "Proyectos",
@@ -34,6 +32,9 @@
       "experiment": "Experimento"
     }
   },
+  "media": {
+    "title": "Medios"
+  },
   "videos": {
     "title": "Videos",
     "intro": "Series de videos en YouTube donde construyo cosas paso a paso."
@@ -41,9 +42,6 @@
   "podcast": {
     "title": "Podcast",
     "intro": "My typeof Radio es un podcast en español sobre desarrollo web."
-  },
-  "about": {
-    "title": "Acerca de"
   },
   "placeholder": "Próximamente."
 }
