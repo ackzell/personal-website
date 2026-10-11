@@ -1,3 +1,4 @@
+// @unocss-include — icon classes below are read by UnoCSS from this file.
 /** Main navigation. Labels come from `nav.<key>` in i18n/locales. */
 export const mainNav = [
   { key: 'about', to: '/', section: 'about' },
@@ -6,10 +7,10 @@ export const mainNav = [
 ] as const
 
 export const socialLinks = [
-  { label: 'GitHub', href: 'https://github.com/ackzell' },
-  { label: 'YouTube', href: 'https://youtube.com/@ackzell' },
-  { label: 'Bluesky', href: 'https://bsky.app/profile/ackzell.dev' },
-  { label: 'LinkedIn', href: 'https://www.linkedin.com/in/ackzell' },
-  { label: 'dev.to', href: 'https://dev.to/ackzell' },
-  { label: 'X', href: 'https://x.com/_ackzell' },
+  { label: 'GitHub', icon: 'i-simple-icons-github', href: 'https://github.com/ackzell' },
+  { label: 'YouTube', icon: 'i-simple-icons-youtube', href: 'https://youtube.com/@ackzell' },
+  { label: 'Bluesky', icon: 'i-simple-icons-bluesky', href: 'https://bsky.app/profile/ackzell.dev' },
+  { label: 'LinkedIn', icon: 'i-simple-icons-linkedin', href: 'https://www.linkedin.com/in/ackzell' },
+  { label: 'dev.to', icon: 'i-simple-icons-devdotto', href: 'https://dev.to/ackzell' },
+  { label: 'X', icon: 'i-simple-icons-x', href: 'https://x.com/_ackzell' },
 ] as const

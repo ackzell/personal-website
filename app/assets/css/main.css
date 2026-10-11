@@ -49,7 +49,8 @@
 
   /*
    * Layout: named tracks, full | wide | content | wide | full.
-   * Page children sit in `content` by default and opt out with .wide / .full.
+   * Page children sit in `content` by default and opt out with the
+   * track-wide / track-full utilities (uno/preset-ackzell.ts).
    */
   --gutter: clamp(var(--space-4), 4vw, var(--space-8));
   --content-width: 64ch;
@@ -215,24 +216,18 @@ main:focus {
   padding-block: var(--gap-block) var(--gap-section);
 }
 
-.page > * {
+/* Defaults use :where() so any utility overrides them without a fight. */
+:where(.page) > * {
   grid-column: content;
-}
-.page > .wide {
-  grid-column: wide;
-}
-.page > .full {
-  grid-column: full;
 }
 
 /* Flow: tight inside groups, generous between sections, and more space above
    a heading than below it. Grid items don't collapse margins, so these add up
    predictably. */
-.page > * + * {
+:where(.page) > * + * {
   margin-top: var(--gap-group);
 }
-.page > section,
-.page > .prose {
+:where(.page) > :is(section, .prose) {
   margin-top: var(--gap-section);
 }
 :where(section, .prose) > * + * {
@@ -315,14 +310,6 @@ main:focus {
 .site-footer {
   padding-block: var(--space-6);
   border-top: 1px solid var(--line);
-}
-
-.site-footer__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-tight) var(--space-5);
-  padding: 0;
-  list-style: none;
 }
 
 /* Content */

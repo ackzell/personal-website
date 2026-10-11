@@ -1,0 +1,91 @@
+import { definePreset } from 'unocss'
+import type { Rule } from 'unocss'
+
+/**
+ * The site's design system as UnoCSS utilities.
+ *
+ * CSS custom properties in app/assets/css/main.css stay the source of truth;
+ * everything here only points at them, so a token changes in one place.
+ */
+
+const sections = ['about', 'work', 'media'] as const
+const spaceRoles = ['tight', 'group', 'block', 'section'] as const
+
+// Spacing roles: gap-group, gap-x-tight, mt-section, px-block, …
+const spaceProps: Record<string, string[]> = {
+  'gap': ['gap'],
+  'gap-x': ['column-gap'],
+  'gap-y': ['row-gap'],
+  'm': ['margin'],
+  'mx': ['margin-inline'],
+  'my': ['margin-block'],
+  'mt': ['margin-top'],
+  'mb': ['margin-bottom'],
+  'p': ['padding'],
+  'px': ['padding-inline'],
+  'py': ['padding-block'],
+  'pt': ['padding-top'],
+  'pb': ['padding-bottom'],
+}
+
+const spaceRule: Rule = [
+  new RegExp(`^(${Object.keys(spaceProps).join('|')})-(${spaceRoles.join('|')})$`),
+  ([, prop, role]) => Object.fromEntries(spaceProps[prop!]!.map((p) => [p, `var(--gap-${role})`])),
+  { autocomplete: `(${Object.keys(spaceProps).join('|')})-(${spaceRoles.join('|')})` },
+]
+
+// Layout tracks on .page: track-content (default), track-wide, track-full.
+const trackRule: Rule = [
+  /^track-(content|wide|full)$/,
+  ([, track]) => ({ 'grid-column': track }),
+  { autocomplete: 'track-(content|wide|full)' },
+]
+
+// Type roles bundle family, weight and Recursive's casual axis together, so a
+// role can't be half-applied. Named `typeset`, not `type`: as an attribute,
+// `type` already means something on <button> and <input>.
+const typeRoles = {
+  heading: { family: '--font-heading', weight: '--heading-weight', casual: '--heading-casual' },
+  code: { family: '--font-code', weight: '--code-weight', casual: '--code-casual' },
+} as const
+
+const typeRule: Rule = [
+  /^typeset-(heading|body|code)$/,
+  ([, role]) => {
+    if (role === 'body') return { 'font-family': 'var(--font-body)', 'font-weight': '400', 'font-variation-settings': 'normal' }
+    const r = typeRoles[role as keyof typeof typeRoles]
+    return {
+      'font-family': `var(${r.family})`,
+      'font-weight': `var(${r.weight})`,
+      'font-variation-settings': `'CASL' var(${r.casual})`,
+    }
+  },
+  { autocomplete: 'typeset-(heading|body|code)' },
+]
+
+export const presetAckzell = definePreset(() => ({
+  name: 'preset-ackzell',
+  theme: {
+    // Semantic colors resolve per section and scheme in main.css, so
+    // `text-accent` follows the page without the template knowing which.
+    colors: {
+      bg: 'var(--bg)',
+      fg: 'var(--fg)',
+      accent: 'var(--accent)',
+      muted: 'var(--muted)',
+      line: 'var(--line)',
+    },
+  },
+  rules: [spaceRule, trackRule, typeRule],
+  variants: [
+    // section-media:… applies only while the page is in that section.
+    (matcher) => {
+      const match = matcher.match(new RegExp(`^section-(${sections.join('|')}):`))
+      if (!match) return matcher
+      return {
+        matcher: matcher.slice(match[0].length),
+        selector: (s) => `:root[data-section="${match[1]}"] ${s}`,
+      }
+    },
+  ],
+}))
