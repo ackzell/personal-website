@@ -43,7 +43,7 @@ function ariaCurrent(item: (typeof mainNav)[number]) {
         <NuxtLinkLocale
           :to="item.to"
           :aria-current="ariaCurrent(item)"
-          text="muted current:fg"
+          class="text-muted current:text-fg"
           decoration="none current:underline"
           underline-offset="[0.3em]"
         >

@@ -12,7 +12,7 @@ const switchLocalePath = useSwitchLocalePath()
       :lang="item.language"
       :hreflang="item.language"
       :aria-current="item.code === locale ? 'true' : undefined"
-      text="muted current:fg"
+      class="text-muted current:text-fg"
       decoration="none current:underline"
       underline-offset="[0.3em]"
     >

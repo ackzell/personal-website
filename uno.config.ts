@@ -11,6 +11,8 @@ export default defineConfig({
       extraProperties: { 'display': 'inline-block', 'vertical-align': '-0.125em' },
     }),
     // Utilities as attributes: <ul flex gap="y-tight x-group">.
+    // Never `text="…"` on a link (<a>, NuxtLink): HTMLAnchorElement.text is
+    // textContent, so a client-side mount replaces the label. Use class.
     presetAttributify(),
     presetAckzell(),
   ],
