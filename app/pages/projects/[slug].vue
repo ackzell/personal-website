@@ -28,10 +28,13 @@ useSeoMeta({
 
 <template>
   <article v-if="project" class="page project">
-    <nav aria-label="Breadcrumb" class="breadcrumb">
-      <ol>
+    <nav aria-label="Breadcrumb">
+      <ol flex gap="tight" p="0" list="none" text="sm">
         <li><NuxtLinkLocale to="/projects">{{ t('projects.title') }}</NuxtLinkLocale></li>
-        <li><span aria-current="page" lang="nah">{{ project.word }}</span></li>
+        <li flex gap="tight">
+          <span aria-hidden="true" text="muted">/</span>
+          <span aria-current="page" lang="nah">{{ project.word }}</span>
+        </li>
       </ol>
     </nav>
 
@@ -54,11 +57,11 @@ useSeoMeta({
       <ProjectCard v-for="item in related" :key="item.slug" :project="item" :heading-level="3" />
     </section>
 
-    <nav class="project__pager" :aria-label="t('projects.title')">
+    <nav flex justify="between" gap="group" mt="section" :aria-label="t('projects.title')">
       <NuxtLinkLocale v-if="previous" :to="`/projects/${previous.slug}`" rel="prev">
         ← {{ t('projects.previous') }}: <span lang="nah">{{ previous.word }}</span>
       </NuxtLinkLocale>
-      <NuxtLinkLocale v-if="next" :to="`/projects/${next.slug}`" rel="next">
+      <NuxtLinkLocale v-if="next" :to="`/projects/${next.slug}`" rel="next" ml="auto">
         {{ t('projects.next') }}: <span lang="nah">{{ next.word }}</span> →
       </NuxtLinkLocale>
     </nav>

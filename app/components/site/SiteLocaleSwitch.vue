@@ -4,7 +4,7 @@ const switchLocalePath = useSwitchLocalePath()
 </script>
 
 <template>
-  <div class="locale-switch" role="group" :aria-label="$t('site.language')">
+  <div flex gap="3" text="sm" role="group" :aria-label="$t('site.language')">
     <NuxtLink
       v-for="item in locales"
       :key="item.code"
@@ -12,6 +12,9 @@ const switchLocalePath = useSwitchLocalePath()
       :lang="item.language"
       :hreflang="item.language"
       :aria-current="item.code === locale ? 'true' : undefined"
+      text="muted current:fg"
+      decoration="none current:underline"
+      underline-offset="[0.3em]"
     >
       {{ item.name }}
     </NuxtLink>

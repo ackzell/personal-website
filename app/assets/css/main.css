@@ -123,8 +123,7 @@
 h1,
 h2,
 h3,
-h4,
-.site-header__name {
+h4 {
   font-family: var(--font-heading);
   font-weight: var(--heading-weight);
   font-variation-settings: 'CASL' var(--heading-casual);
@@ -181,12 +180,6 @@ main {
   flex: 1;
 }
 
-/* Header and footer span the wide track without being grid children. */
-.site-header,
-.site-footer {
-  padding-inline: max(var(--gutter), (100% - var(--wide-width)) / 2);
-}
-
 .skip-link {
   position: absolute;
   left: -9999px;
@@ -238,148 +231,4 @@ main:focus {
 }
 .prose > :is(h2, h3) {
   margin-top: var(--gap-block);
-}
-
-/* Header and nav */
-
-.site-header {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--gap-tight) var(--space-6);
-  padding-block: var(--space-5);
-  border-bottom: 1px solid var(--line);
-}
-
-.site-header__name {
-  color: var(--fg);
-  text-decoration: none;
-}
-
-.site-nav {
-  margin-left: auto;
-}
-
-.site-nav__list {
-  display: flex;
-  gap: var(--space-5);
-  padding: 0;
-  list-style: none;
-}
-
-.site-nav a,
-.locale-switch a {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.site-nav a[aria-current],
-.locale-switch a[aria-current] {
-  color: var(--fg);
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
-}
-
-.site-nav__toggle {
-  display: none;
-}
-
-.locale-switch {
-  display: flex;
-  gap: var(--space-3);
-  font-size: 0.875rem;
-}
-
-@media (max-width: 40rem) {
-  .site-nav__toggle {
-    display: block;
-  }
-  .site-nav__list {
-    display: none;
-    flex-direction: column;
-    gap: var(--gap-tight);
-    padding-top: var(--space-3);
-  }
-  .site-nav__list[data-open='true'] {
-    display: flex;
-  }
-}
-
-/* Footer */
-
-.site-footer {
-  padding-block: var(--space-6);
-  border-top: 1px solid var(--line);
-}
-
-/* Content */
-
-.breadcrumb ol {
-  display: flex;
-  gap: var(--gap-tight);
-  padding: 0;
-  list-style: none;
-  font-size: 0.875rem;
-}
-.breadcrumb li + li::before {
-  content: '/';
-  margin-right: var(--gap-tight);
-  color: var(--muted);
-}
-
-.word-heading {
-  display: grid;
-  gap: var(--gap-tight);
-}
-
-.word-heading__word {
-  font-size: 2.5rem;
-}
-
-.word-heading__details {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-8);
-  color: var(--muted);
-}
-.word-heading__details div {
-  display: flex;
-  gap: var(--gap-tight);
-}
-.word-heading__details dt::after {
-  content: ':';
-}
-.word-heading__details dd {
-  color: var(--fg);
-}
-
-.project-card {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-1);
-  padding-block: var(--gap-group);
-  border-bottom: 1px solid var(--line);
-}
-
-/* Stacked cards already separate themselves with padding and a rule. */
-.project-card + .project-card {
-  margin-top: 0;
-}
-
-.project-status {
-  display: inline-block;
-  padding: 0.1rem var(--gap-tight);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-size: 0.8rem;
-}
-
-.page > .project__pager {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--gap-group);
-  margin-top: var(--gap-section);
-}
-.project__pager [rel='next'] {
-  margin-left: auto;
 }

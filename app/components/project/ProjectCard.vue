@@ -3,7 +3,7 @@ withDefaults(defineProps<{ project: Project; headingLevel?: 2 | 3 }>(), { headin
 </script>
 
 <template>
-  <article class="project-card">
+  <article grid justify-items="start" gap="1" mt="0" py="group" border="b solid line">
     <component :is="`h${headingLevel}`" class="project-card__word">
       <NuxtLinkLocale :to="`/projects/${project.slug}`" lang="nah">{{ project.word }}</NuxtLinkLocale>
     </component>

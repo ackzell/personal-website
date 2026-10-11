@@ -41,6 +41,13 @@ const trackRule: Rule = [
   { autocomplete: 'track-(content|wide|full)' },
 ]
 
+// Header and footer aren't grid children; px-track-wide pads them so their
+// content lines up with the wide track anyway.
+const trackPaddingRule: Rule = [
+  'px-track-wide',
+  { 'padding-inline': 'max(var(--gutter), (100% - var(--wide-width)) / 2)' },
+]
+
 // Type roles bundle family, weight and Recursive's casual axis together, so a
 // role can't be half-applied. Named `typeset`, not `type`: as an attribute,
 // `type` already means something on <button> and <input>.
@@ -76,8 +83,17 @@ export const presetAckzell = definePreset(() => ({
       line: 'var(--line)',
     },
   },
-  rules: [spaceRule, trackRule, typeRule],
+  rules: [spaceRule, trackRule, trackPaddingRule, typeRule],
   variants: [
+    // current:… styles the link for the current page or section. Covers
+    // aria-current="page" and "true" alike, but not an explicit "false".
+    (matcher) => {
+      if (!matcher.startsWith('current:')) return matcher
+      return {
+        matcher: matcher.slice('current:'.length),
+        selector: (s) => `${s}[aria-current]:not([aria-current="false"])`,
+      }
+    },
     // section-media:… applies only while the page is in that section.
     (matcher) => {
       const match = matcher.match(new RegExp(`^section-(${sections.join('|')}):`))

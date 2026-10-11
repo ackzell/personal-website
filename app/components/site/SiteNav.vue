@@ -22,19 +22,31 @@ function ariaCurrent(item: (typeof mainNav)[number]) {
 </script>
 
 <template>
-  <nav class="site-nav" :aria-label="$t('nav.label')">
+  <nav ml="auto" :aria-label="$t('nav.label')">
     <button
       type="button"
-      class="site-nav__toggle"
+      class="hidden" max-sm="block"
       aria-controls="site-nav-list"
       :aria-expanded="open"
       @click="open = !open"
     >
       {{ $t('nav.menu') }}
     </button>
-    <ul id="site-nav-list" class="site-nav__list" :data-open="open">
+    <ul
+      id="site-nav-list"
+      flex gap="5" p="0" list="none"
+      max-sm="hidden flex-col gap-tight pt-3"
+      class="max-sm:data-[open=true]:flex"
+      :data-open="open"
+    >
       <li v-for="item in mainNav" :key="item.key">
-        <NuxtLinkLocale :to="item.to" :aria-current="ariaCurrent(item)">
+        <NuxtLinkLocale
+          :to="item.to"
+          :aria-current="ariaCurrent(item)"
+          text="muted current:fg"
+          decoration="none current:underline"
+          underline-offset="[0.3em]"
+        >
           {{ $t(`nav.${item.key}`) }}
         </NuxtLinkLocale>
       </li>

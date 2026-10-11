@@ -7,16 +7,16 @@ defineProps<{
 </script>
 
 <template>
-  <header class="word-heading">
-    <h1 class="word-heading__word" lang="nah">{{ word }}</h1>
-    <dl class="word-heading__details">
-      <div>
-        <dt>{{ $t('projects.pronunciation') }}</dt>
-        <dd>/{{ pronunciation }}/</dd>
+  <header grid gap="tight">
+    <h1 text="[2.5rem]" lang="nah">{{ word }}</h1>
+    <dl flex="~ wrap" gap="y-1 x-8" text="muted">
+      <div flex gap="tight">
+        <dt class="after:content-[':']">{{ $t('projects.pronunciation') }}</dt>
+        <dd text="fg">/{{ pronunciation }}/</dd>
       </div>
-      <div>
-        <dt>{{ $t('projects.meaning') }}</dt>
-        <dd>{{ meaning }}</dd>
+      <div flex gap="tight">
+        <dt class="after:content-[':']">{{ $t('projects.meaning') }}</dt>
+        <dd text="fg">{{ meaning }}</dd>
       </div>
     </dl>
   </header>
