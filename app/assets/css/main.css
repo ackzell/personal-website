@@ -1,25 +1,76 @@
 /* Deliberately minimal: structure first, design later. */
 
+/*
+ * Color tokens, in two layers:
+ * 1. Raw palette: named after the color. Nothing outside this block uses them.
+ * 2. Semantic: --bg, --fg, --accent, --muted, --line. They resolve per
+ *    section (data-section on <html>, set by the layout) and per scheme.
+ *
+ * Sections follow the flag: about (green) · work (white) · media (red).
+ * Light = "Soft flag", the whole page takes the section color.
+ * Dark = "Deeper", near-black tinted toward the section color.
+ */
 :root {
   color-scheme: light dark;
-  --bg: #fdfdfc;
-  --fg: #1b1b1a;
-  --muted: #6b6b66;
-  --line: #e2e2de;
-  --accent: #2f5d50;
+
+  /* Soft flag (light) */
+  --softflag-green: #00573c;
+  --softflag-paper: #f6f2ea;
+  --softflag-red: #a51e2c;
+  --softflag-ink: #141312;
+
+  /* Deeper (dark) */
+  --deeper-green: #0a2a20;
+  --deeper-paper: #e4dcca;
+  --deeper-red: #3f1216;
+  --deeper-night: #0c0b0a;
+  --deeper-glow-green: #4a9273;
+  --deeper-glow-red: #b84c4c;
+
   --gutter: 16px;
   --measure: 46rem;
   font-family: system-ui, sans-serif;
   line-height: 1.6;
 }
 
+/* Per-section inputs. About is also the default when no section is set. */
+:root,
+:root[data-section='about'] {
+  --light-fill: var(--softflag-green);
+  --light-text: var(--softflag-paper);
+  --dark-fill: var(--deeper-green);
+  --dark-accent: var(--deeper-glow-green);
+}
+
+:root[data-section='work'] {
+  --light-fill: var(--softflag-paper);
+  --light-text: var(--softflag-ink);
+  /* Neutral section: tinting night toward night leaves it plain black. */
+  --dark-fill: var(--deeper-night);
+  --dark-accent: var(--deeper-paper);
+}
+
+:root[data-section='media'] {
+  --light-fill: var(--softflag-red);
+  --light-text: var(--softflag-paper);
+  --dark-fill: var(--deeper-red);
+  --dark-accent: var(--deeper-glow-red);
+}
+
+/* Semantic tokens. */
+:root {
+  --bg: var(--light-fill);
+  --fg: var(--light-text);
+  --accent: var(--fg);
+  --muted: color-mix(in srgb, var(--fg) 70%, var(--bg));
+  --line: color-mix(in srgb, var(--fg) 20%, var(--bg));
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #141413;
-    --fg: #ececea;
-    --muted: #9a9a94;
-    --line: #2c2c2a;
-    --accent: #8cc5b3;
+    --bg: color-mix(in srgb, var(--dark-fill) 35%, var(--deeper-night));
+    --fg: var(--deeper-paper);
+    --accent: var(--dark-accent);
   }
 }
 
@@ -27,6 +78,16 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
+  /* Section changes fade the whole stage. */
+  transition:
+    background-color 600ms cubic-bezier(0.22, 1, 0.36, 1),
+    color 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body {
+    transition: none;
+  }
 }
 
 a {
