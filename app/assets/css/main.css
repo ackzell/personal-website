@@ -167,10 +167,21 @@ pre code {
   font: inherit;
 }
 
+html {
+  /* Anchored scrolls stop below the sticky header (SiteHeader). */
+  scroll-padding-top: var(--header-height, 0);
+}
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
+}
+
+/* The sticky header carries its own copy of the stage color, so it fades
+   with the body. */
+body,
+.site-header {
   /* Fallback where view transitions don't run: fade the whole stage. */
   transition:
     background-color 600ms var(--ease-out),
@@ -179,7 +190,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   /* No movement, but the section change still reads: a short color fade. */
-  body {
+  body,
+  .site-header {
     transition-duration: 200ms;
   }
 }
@@ -216,7 +228,7 @@ main {
 }
 
 /* The wipe is the color change; the body fade would only muddy it. */
-:root:active-view-transition body {
+:root:active-view-transition :is(body, .site-header) {
   transition: none;
 }
 
