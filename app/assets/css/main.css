@@ -101,6 +101,25 @@
   --dark-accent: var(--deeper-glow-red);
 }
 
+/*
+ * Flag band fields (SiteFlagNav): one per section, whatever the stage.
+ * Light shows the soft flag itself. Dark uses each section's glow, since the
+ * deeper fills would all read as near-black against the night stage.
+ */
+:root {
+  --field-about: var(--softflag-green);
+  --field-work: var(--softflag-paper);
+  --field-media: var(--softflag-red);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --field-about: var(--deeper-glow-green);
+    --field-work: var(--deeper-paper);
+    --field-media: var(--deeper-glow-red);
+  }
+}
+
 /* Semantic tokens. */
 :root {
   --bg: var(--light-fill);
@@ -177,6 +196,13 @@ body {
  * - word (*.word, see utils/viewTransition.ts): a project's Nahuatl word
  *   travels between headword and heading. Both render at --headword-size, so
  *   the move is a pure translation with no raster scaling.
+ *
+ * Plus the band's marker (flag-marker, components/site/SiteFlagNav.vue). The
+ * band itself rides the root: its fields and labels recolor with the stage,
+ * so the wipe carries them. The marker has its own name so it's lifted out of
+ * the wipe and slides to the new page instead, along the same axis and in the
+ * same direction (the band is in flag order too). Within a section it is the
+ * only thing in the chrome that moves: project to project, word to word.
  */
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -261,6 +287,23 @@ main {
 }
 ::view-transition-new(*.word):only-child {
   animation: 500ms var(--ease-out) 150ms both vt-rise;
+}
+
+/* The marker moves on screen, so it eases both ways, like the word. Under
+   reduced motion Nuxt skips view transitions: the marker just appears. */
+::view-transition-group(flag-marker) {
+  animation-timing-function: var(--ease-in-out);
+}
+/* The marker takes its section's accent, so the old one is the previous
+   section's color (red on media, in dark). Show only the arriving marker,
+   like the word: it slides in its new color, without the previous one bleeding
+   through the crossfade. */
+::view-transition-old(flag-marker) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(flag-marker) {
+  animation: none;
 }
 
 @keyframes vt-wipe {

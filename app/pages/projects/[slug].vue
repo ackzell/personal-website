@@ -12,8 +12,6 @@ if (!project.value || !page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Project not found', fatal: true })
 }
 
-const previous = computed(() => projects.value?.[index.value - 1])
-const next = computed(() => projects.value?.[index.value + 1])
 const related = computed(() =>
   (project.value?.related ?? [])
     // Never the project itself: its word is already named by the heading.
@@ -58,16 +56,5 @@ useSeoMeta({
       <h2 id="related-heading">{{ t('projects.related') }}</h2>
       <ProjectLexicon :projects="related" />
     </section>
-
-    <nav flex justify="between" gap="group" mt="section" :aria-label="t('projects.title')">
-      <NuxtLinkLocale v-if="previous" :to="`/projects/${previous.slug}`" rel="prev">
-        ← {{ t('projects.previous') }}:
-        <span lang="nah">{{ previous.word }}</span>
-      </NuxtLinkLocale>
-      <NuxtLinkLocale v-if="next" :to="`/projects/${next.slug}`" rel="next" ml="auto">
-        {{ t('projects.next') }}:
-        <span lang="nah">{{ next.word }}</span> →
-      </NuxtLinkLocale>
-    </nav>
   </article>
 </template>

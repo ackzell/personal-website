@@ -3,7 +3,16 @@
 export const mainNav = [
   { key: 'about', to: '/', section: 'about' },
   { key: 'work', to: '/projects', section: 'work' },
-  { key: 'media', to: '/media', section: 'media' },
+  {
+    key: 'media',
+    to: '/media',
+    section: 'media',
+    // Labels come from `<key>.title`, the pages' own headings.
+    children: [
+      { key: 'videos', to: '/videos' },
+      { key: 'podcast', to: '/podcast' },
+    ],
+  },
 ] as const
 
 export const socialLinks = [
