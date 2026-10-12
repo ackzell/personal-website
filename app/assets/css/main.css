@@ -206,7 +206,7 @@ main {
     animation: none;
   }
   &::view-transition-old(page) {
-    animation: 180ms ease-in both vt-fade-out;
+    animation: 180ms var(--ease-out) both vt-fade-out;
   }
   &::view-transition-new(page) {
     animation: 500ms var(--ease-out) 150ms both vt-rise;
@@ -257,7 +257,7 @@ main {
 /* Words with no partner leave and arrive with their page. */
 ::view-transition-old(*.word):only-child {
   opacity: 1;
-  animation: 180ms ease-in both vt-fade-out;
+  animation: 180ms var(--ease-out) both vt-fade-out;
 }
 ::view-transition-new(*.word):only-child {
   animation: 500ms var(--ease-out) 150ms both vt-rise;
