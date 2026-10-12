@@ -14,8 +14,16 @@ const filled = (value: string) => value && value !== 'TODO'
 </script>
 
 <template>
-  <dl class="lexicon" grid gap="block" mt="0">
-    <div v-for="project in projects" :key="project.slug" class="lexicon__entry" relative grid gap="tight">
+  <!-- No gaps between entries, down or across: spacing is padding inside
+       each one, so the pointer never falls between entries and the spotlight
+       never drops. Block, not grid, so a parent can set it in columns. -->
+  <dl class="lexicon" mt="0">
+    <div
+      v-for="project in projects"
+      :key="project.slug"
+      class="lexicon__entry"
+      relative grid gap="tight" py="group"
+    >
       <dt flex="~ wrap" items="baseline" gap="x-group y-1">
         <NuxtLinkLocale
           :to="`/projects/${project.slug}`"
@@ -41,19 +49,33 @@ const filled = (value: string) => value && value !== 'TODO'
 </template>
 
 <style scoped>
+/* Entries' own padding is the gutter; a real column gap would be a dead zone. */
+.lexicon {
+  column-gap: 0;
+}
+
 /* The headword link covers its whole entry, so the entry is one target. */
 .lexicon__headword::after {
   content: '';
   position: absolute;
-  inset: calc(var(--gap-tight) * -1);
+  inset: 0;
 }
 
 .lexicon__entry {
-  transition: opacity 200ms var(--ease-out);
+  /* Stands in for a column gap when the list is set in columns. */
+  padding-inline-end: var(--gap-block);
+  break-inside: avoid;
+  transition: opacity 250ms var(--ease-out);
 }
 
-/* Spotlight: one entry in focus, the rest step back. */
-.lexicon:has(.lexicon__entry:hover, .lexicon__headword:focus-visible) .lexicon__entry:not(:hover, :focus-within) {
+/* Spotlight: one entry in focus, the rest step back. Pointer hover only on
+   devices that really hover: a tap on touch fires a sticky :hover. */
+.lexicon:has(.lexicon__headword:focus-visible) .lexicon__entry:not(:focus-within) {
   opacity: 0.4;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lexicon:has(.lexicon__entry:hover) .lexicon__entry:not(:hover) {
+    opacity: 0.4;
+  }
 }
 </style>

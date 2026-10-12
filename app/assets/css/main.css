@@ -70,7 +70,7 @@
   --code-casual: 0;
   /* Project words: lexicon headwords and project headings share one size, so
      the word morph between them is a pure move. */
-  --headword-size: clamp(2.25rem, 6vw, 4rem);
+  --headword-size: clamp(2rem, 4.5vw, 3rem);
 
   font-family: var(--font-body);
   font-weight: 400;
