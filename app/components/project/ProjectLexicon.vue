@@ -34,7 +34,17 @@ const filled = (value: string) => value && value !== 'TODO'
           decoration="none"
           :style="wordTransition(project.slug)"
         >
-          {{ project.word }}
+          <!-- One span per letter so the hover can ripple through the word.
+               Assistive tech gets the whole word from the hidden copy. -->
+          <span class="sr-only">{{ project.word }}</span>
+          <span aria-hidden="true">
+            <span
+              v-for="(char, i) in project.word"
+              :key="i"
+              class="lexicon__char"
+              :style="{ '--i': i }"
+            >{{ char }}</span>
+          </span>
         </NuxtLinkLocale>
         <span v-if="filled(project.pronunciation)" text="muted">/{{ project.pronunciation }}/</span>
         <span v-if="filled(project.meaning)" text="fg">‘{{ project.meaning }}’</span>
@@ -76,6 +86,86 @@ const filled = (value: string) => value && value !== 'TODO'
 @media (hover: hover) and (pointer: fine) {
   .lexicon:has(.lexicon__entry:hover) .lexicon__entry:not(:hover) {
     opacity: 0.4;
+  }
+}
+
+/*
+ * The word writes itself: letter by letter, left to right, each one leans to
+ * -15deg, softens fully casual and switches to its cursive form.
+ * Weight stays put: a heavier word read as bulging rather than being written.
+ * Mono widths hold across every axis, so nothing around the word moves.
+ *
+ * Each axis is its own registered property, so each can be timed on its own:
+ * CRSV is a switch, not a range, so it flips at the moment of peak speed,
+ * where motion hides the swap: mid-lean on the way in (ease-in-out is fastest
+ * halfway), right away on the way out (ease-out is fastest at the start).
+ * Flipping it anywhere else reads as a second wave. A single
+ * font-variation-settings transition can't separate the axes.
+ */
+@property --slnt {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --casl {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+@property --crsv {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.lexicon__headword {
+  --slnt: 0;
+  --casl: var(--heading-casual);
+  --crsv: 0;
+}
+.lexicon__headword:focus-visible {
+  --slnt: -15;
+  --casl: 1;
+  --crsv: 1;
+}
+@media (hover: hover) and (pointer: fine) {
+  .lexicon__entry:hover .lexicon__headword {
+    --slnt: -15;
+    --casl: 1;
+    --crsv: 1;
+  }
+}
+
+/* Leaving: quick and light; letters return to upright forms right away. */
+.lexicon__char {
+  font-variation-settings: 'CASL' var(--casl), 'CRSV' var(--crsv), 'slnt' var(--slnt);
+  transition:
+    --slnt 450ms var(--ease-out),
+    --casl 450ms var(--ease-out),
+    --crsv 0ms;
+  transition-delay: calc(var(--i) * 30ms);
+}
+/* Arriving: slow and symmetric, so the lean flows; the cursive swap waits
+   for the middle of each letter's lean. */
+.lexicon__entry:hover .lexicon__char,
+.lexicon__headword:focus-visible .lexicon__char {
+  transition:
+    --slnt 700ms var(--ease-in-out),
+    --casl 700ms var(--ease-in-out),
+    --crsv 0ms;
+  transition-delay:
+    calc(var(--i) * 45ms),
+    calc(var(--i) * 45ms),
+    calc(var(--i) * 45ms + 350ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Same end state, no ripple. */
+  .lexicon__char,
+  .lexicon__entry:hover .lexicon__char,
+  .lexicon__headword:focus-visible .lexicon__char {
+    transition-duration: 150ms, 150ms, 0ms;
+    transition-delay: 0ms;
   }
 }
 </style>

@@ -40,8 +40,12 @@ export default defineNuxtConfig({
     google: {
       experimental: {
         // Pin MONO so Google serves a smaller instance; keep CASL variable.
+        // slnt + CRSV drive the lexicon headword hover (lean into cursive
+        // forms); they roughly double the file (latin ~105 → ~221 KB).
         // (0.14 reads axes here; the per-family `variableAxis` is unreleased.)
-        variableAxis: { Recursive: { MONO: ['1'], CASL: [['0', '1']] } },
+        variableAxis: {
+          Recursive: { MONO: ['1'], CASL: [['0', '1']], CRSV: [['0', '1']], slnt: [['-15', '0']] },
+        },
       },
     },
   },
