@@ -168,8 +168,53 @@ pre code {
 }
 
 html {
-  /* Anchored scrolls stop below the sticky header (SiteHeader). */
+  /* Anchored and focused content stays clear of the sticky header and
+     footer (SiteHeader, SiteFooter). */
   scroll-padding-top: var(--header-height, 0);
+  scroll-padding-bottom: var(--footer-height, 0);
+}
+
+.site-header {
+  top: 0;
+}
+
+/*
+ * Small screens can't spare two bars. The header's brand row scrolls away and
+ * only the band sticks (--header-tuck, SiteHeader). The footer leaves the
+ * bottom for a rail of icons on the inline-end edge; <main> keeps a gutter at
+ * least as wide as the rail so nothing reads under it.
+ */
+@media (width < 40rem) {
+  :root {
+    --rail-width: 2.5rem;
+  }
+
+  html {
+    scroll-padding-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
+    scroll-padding-bottom: 0;
+  }
+
+  .site-header {
+    top: calc(-1 * var(--header-tuck, 0px));
+  }
+
+  main {
+    padding-inline-end: max(0px, var(--rail-width) - var(--gutter));
+  }
+
+  footer.site-footer {
+    position: fixed;
+    inset-inline-end: 0;
+    bottom: 0;
+    width: var(--rail-width);
+    padding: var(--space-2) 0;
+  }
+
+  .site-footer ul {
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+  }
 }
 
 body {
@@ -178,10 +223,11 @@ body {
   color: var(--fg);
 }
 
-/* The sticky header carries its own copy of the stage color, so it fades
-   with the body. */
+/* The sticky header and footer carry their own copy of the stage color, so
+   they fade with the body. */
 body,
-.site-header {
+.site-header,
+.site-footer {
   /* Fallback where view transitions don't run: fade the whole stage. */
   transition:
     background-color 600ms var(--ease-out),
@@ -191,7 +237,8 @@ body,
 @media (prefers-reduced-motion: reduce) {
   /* No movement, but the section change still reads: a short color fade. */
   body,
-  .site-header {
+  .site-header,
+  .site-footer {
     transition-duration: 200ms;
   }
 }
@@ -228,7 +275,7 @@ main {
 }
 
 /* The wipe is the color change; the body fade would only muddy it. */
-:root:active-view-transition :is(body, .site-header) {
+:root:active-view-transition :is(body, .site-header, .site-footer) {
   transition: none;
 }
 
@@ -358,7 +405,20 @@ a {
 .site {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  /* svh, not vh: on mobile, 100vh is the viewport with the address bar
+     hidden, so a short page overflowed by the bar's height. That scrolled
+     just far enough to collapse the bar, the overflow vanished, and the
+     browser snapped back to the top. */
+  min-height: 100svh;
+}
+
+@media (width < 40rem) {
+  /* Mobile tucks the brand row away on scroll. Leave room to scroll it out
+     even at the tallest viewport (address bar collapsed), so pages barely
+     taller than the screen don't lose their scroll room and snap back. */
+  .site {
+    min-height: calc(100lvh + var(--header-tuck, 0px));
+  }
 }
 
 main {
