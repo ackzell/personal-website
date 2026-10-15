@@ -65,23 +65,8 @@ export function useDragScroll(root: MaybeRefOrGetter<HTMLElement | null | undefi
     if ((event.target as Element).closest?.(selector)) event.preventDefault()
   }
 
-  onMounted(() => {
-    const el = toValue(root)
-    if (!el) return
-    el.addEventListener('pointerdown', onPointerDown)
-    el.addEventListener('pointermove', onPointerMove)
-    el.addEventListener('pointerup', onPointerUp)
-    el.addEventListener('pointercancel', onPointerUp)
-    el.addEventListener('dragstart', onDragStart)
-  })
-
-  onBeforeUnmount(() => {
-    const el = toValue(root)
-    if (!el) return
-    el.removeEventListener('pointerdown', onPointerDown)
-    el.removeEventListener('pointermove', onPointerMove)
-    el.removeEventListener('pointerup', onPointerUp)
-    el.removeEventListener('pointercancel', onPointerUp)
-    el.removeEventListener('dragstart', onDragStart)
-  })
+  useEventListener(root, 'pointerdown', onPointerDown)
+  useEventListener(root, 'pointermove', onPointerMove)
+  useEventListener(root, ['pointerup', 'pointercancel'], onPointerUp)
+  useEventListener(root, 'dragstart', onDragStart)
 }

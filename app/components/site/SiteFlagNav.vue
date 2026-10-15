@@ -90,29 +90,28 @@ function onKeydown(event: KeyboardEvent) {
  * at whichever edge has more to scroll to, and keep the current page in view.
  * scrollLeft, not scrollIntoView: the latter would also scroll the page under
  * the sticky header. When they fit, both are no-ops.
+ *
+ * The stops list comes and goes with the open section (v-if), so it's found
+ * again after each render; the scroll tracking follows it.
  */
-const edges = reactive({ start: false, end: false })
-const stopsList = () => nav.value?.querySelector<HTMLElement>('.flag-nav__stops')
+const stopsList = shallowRef<HTMLElement | null>(null)
+const findStops = () => (stopsList.value = nav.value?.querySelector<HTMLElement>('.flag-nav__stops') ?? null)
+watch(segments, findStops, { flush: 'post' })
 
-function syncEdges() {
-  const list = stopsList()
-  if (!list) return
-  edges.start = list.scrollLeft > 1
-  edges.end = list.scrollLeft + list.clientWidth < list.scrollWidth - 1
-}
+const { arrivedState, measure } = useScroll(stopsList, { offset: { left: 1 } })
 
 function showCurrent() {
-  const list = stopsList()
+  const list = stopsList.value
   const current = list?.querySelector<HTMLElement>('[aria-current="page"]')?.parentElement
   if (list && current) list.scrollLeft = current.offsetLeft - (list.clientWidth - current.offsetWidth) / 2
-  syncEdges()
+  measure()
 }
 
 watch(() => route.fullPath, () => nextTick(showCurrent))
 
 // Submenu labels: when they show, and where their ripple starts.
 const { reveal, rippleOrigin } = useSubmenuReveal({
-  submenu: stopsList,
+  submenu: () => stopsList.value,
   isSectionPage: () => mainNav.some((item) => isPage(item.to)),
   currentIndex: () => segments.value.find((segment) => segment.open)?.stops.findIndex((stop) => stop.current === 'page') ?? -1,
 })
@@ -122,15 +121,12 @@ useDragScroll(nav, '.flag-nav__stops')
 
 // The band resizes with the window, so whether the stops overflow can change
 // without a scroll.
-let resizeObserver: ResizeObserver | undefined
+useResizeObserver(nav, measure)
 
 onMounted(() => {
+  findStops()
   showCurrent()
-  resizeObserver = new ResizeObserver(syncEdges)
-  if (nav.value) resizeObserver.observe(nav.value)
 })
-
-onBeforeUnmount(() => resizeObserver?.disconnect())
 </script>
 
 <template>
@@ -141,7 +137,7 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
         :style="{ '--field': `var(--field-${segment.section})` }">
         <ul v-if="segment.stops.length > 1" class="flag-nav__stops" flex gap="0.5" m="0" p="0" list="none"
           :aria-label="segment.stops[0]!.label" :data-reveal="reveal || undefined"
-          :data-fade-start="edges.start || undefined" :data-fade-end="edges.end || undefined" @scroll.passive="syncEdges">
+          :data-fade-start="!arrivedState.left || undefined" :data-fade-end="!arrivedState.right || undefined">
           <li v-for="(stop, i) in segment.stops" :key="stop.key" class="flag-nav__stop" flex="auto"
             :data-child="stop.child" :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
             <!-- Label hierarchy through brightness and size, not hue: section

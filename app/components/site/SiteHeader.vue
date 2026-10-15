@@ -13,19 +13,12 @@
 const header = useTemplateRef<HTMLElement>('header')
 usePublishedHeight(header, '--header-height')
 
-let observer: ResizeObserver | undefined
-
-onMounted(() => {
-  observer = new ResizeObserver(() => {
-    if (!header.value) return
-    const nav = header.value.querySelector<HTMLElement>('.flag-nav')
-    const room = Number.parseFloat(getComputedStyle(header.value).paddingTop)
-    document.documentElement.style.setProperty('--header-tuck', `${Math.max((nav?.offsetTop ?? 0) - room, 0)}px`)
-  })
-  if (header.value) observer.observe(header.value)
+useResizeObserver(header, () => {
+  if (!header.value) return
+  const nav = header.value.querySelector<HTMLElement>('.flag-nav')
+  const room = Number.parseFloat(getComputedStyle(header.value).paddingTop)
+  document.documentElement.style.setProperty('--header-tuck', `${Math.max((nav?.offsetTop ?? 0) - room, 0)}px`)
 })
-
-onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
