@@ -172,6 +172,8 @@ html {
      footer (SiteHeader, SiteFooter). */
   scroll-padding-top: var(--header-height, 0);
   scroll-padding-bottom: var(--footer-height, 0);
+  /* No browser tap flash; links answer presses with their own :active state. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .site-header {
