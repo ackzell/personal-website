@@ -35,7 +35,7 @@ export default defineNuxtConfig({
         // Covers code (320) through headings (520) and a bold step.
         weights: ['300 700'],
       },
-      { name: 'Commit Mono', provider: 'fontsource', weights: [400, 700] },
+      { name: 'Source Code Pro', provider: 'google', weights: [400, 700] },
     ],
     google: {
       experimental: {

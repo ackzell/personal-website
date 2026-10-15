@@ -62,7 +62,7 @@
    * CASL and wght vary. Code reuses it with the casual axis off.
    */
   --font-heading: 'Recursive', ui-monospace, monospace;
-  --font-body: 'Commit Mono', ui-monospace, monospace;
+  --font-body: 'Source Code Pro', ui-monospace, monospace;
   --font-code: 'Recursive', ui-monospace, monospace;
   --heading-weight: 520;
   --heading-casual: 0.65;
