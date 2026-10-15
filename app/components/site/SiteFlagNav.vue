@@ -9,8 +9,9 @@ import { mainNav } from '~/config/nav'
  * A marker sits on the current page and slides to the next one with the page
  * transition (see "marker" in assets/css/main.css).
  *
- * Underneath it's a plain list of links: it works without JS, and below `sm`
- * the collapsed band only kicks in when scripting is on.
+ * Underneath it's a plain list of links, so it works without JS. Below `sm`
+ * the closed sections fold to stubs at their natural width and the open one
+ * takes the rest, its children scrolling sideways inside its own field.
  */
 const { t } = useI18n()
 const route = useRoute()
@@ -63,8 +64,10 @@ const segments = computed(() =>
   }),
 )
 
-/* Arrow keys scrub along the band; Tab still reaches every link. */
-const band = useTemplateRef<HTMLUListElement>('band')
+const nav = useTemplateRef<HTMLElement>('nav')
+
+/* Arrow keys scrub along the visible links; Tab still
+   reaches every link. */
 const moves: Record<string, (i: number, last: number) => number> = {
   ArrowLeft: (i) => i - 1,
   ArrowRight: (i) => i + 1,
@@ -74,8 +77,8 @@ const moves: Record<string, (i: number, last: number) => number> = {
 
 function onKeydown(event: KeyboardEvent) {
   const move = moves[event.key]
-  if (!move || !band.value) return
-  const links = [...band.value.querySelectorAll<HTMLAnchorElement>('a')]
+  if (!move || !nav.value) return
+  const links = [...nav.value.querySelectorAll<HTMLAnchorElement>('a')].filter((link) => link.checkVisibility())
   const i = links.indexOf(document.activeElement as HTMLAnchorElement)
   if (i === -1) return
   event.preventDefault()
@@ -83,65 +86,68 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 /*
- * Below `sm` the band collapses to its fields and the marker; the toggle opens
- * the full map. `compact` is only known after mount, so the server render and
- * no-JS visitors keep every link reachable.
+ * When the open section's stops don't fit they scroll sideways: they fade out
+ * at whichever edge has more to scroll to, and keep the current page in view.
+ * scrollLeft, not scrollIntoView: the latter would also scroll the page under
+ * the sticky header. When they fit, both are no-ops.
  */
-const open = ref(false)
-const compact = ref(false)
-const toggle = useTemplateRef<HTMLButtonElement>('toggle')
+const edges = reactive({ start: false, end: false })
+const stopsList = () => nav.value?.querySelector<HTMLElement>('.flag-nav__stops')
 
-watch(() => route.fullPath, () => (open.value = false))
-
-function onDocumentKeydown(event: KeyboardEvent) {
-  if (event.key !== 'Escape' || !open.value) return
-  open.value = false
-  toggle.value?.focus()
+function syncEdges() {
+  const list = stopsList()
+  if (!list) return
+  edges.start = list.scrollLeft > 1
+  edges.end = list.scrollLeft + list.clientWidth < list.scrollWidth - 1
 }
+
+function showCurrent() {
+  const list = stopsList()
+  const current = list?.querySelector<HTMLElement>('[aria-current="page"]')?.parentElement
+  if (list && current) list.scrollLeft = current.offsetLeft - (list.clientWidth - current.offsetWidth) / 2
+  syncEdges()
+}
+
+watch(() => route.fullPath, () => nextTick(showCurrent))
 
 // Submenu labels: when they show, and where their ripple starts.
 const { reveal, rippleOrigin } = useSubmenuReveal({
-  submenu: () => band.value?.querySelector<HTMLElement>('.flag-nav__stops'),
+  submenu: stopsList,
   isSectionPage: () => mainNav.some((item) => isPage(item.to)),
   currentIndex: () => segments.value.find((segment) => segment.open)?.stops.findIndex((stop) => stop.current === 'page') ?? -1,
 })
 
-let compactQuery: MediaQueryList | undefined
-const syncCompact = () => (compact.value = compactQuery?.matches ?? false)
+// The band resizes with the window, so whether the stops overflow can change
+// without a scroll.
+let resizeObserver: ResizeObserver | undefined
 
 onMounted(() => {
-  // Matches the `sm` breakpoint (40rem) used in the styles below.
-  compactQuery = window.matchMedia('(width < 40rem)')
-  syncCompact()
-  compactQuery.addEventListener('change', syncCompact)
-  document.addEventListener('keydown', onDocumentKeydown)
+  showCurrent()
+  resizeObserver = new ResizeObserver(syncEdges)
+  if (nav.value) resizeObserver.observe(nav.value)
 })
 
-onBeforeUnmount(() => {
-  compactQuery?.removeEventListener('change', syncCompact)
-  document.removeEventListener('keydown', onDocumentKeydown)
-})
+onBeforeUnmount(() => resizeObserver?.disconnect())
 </script>
 
 <template>
-  <nav class="flag-nav" relative grid grid-cols="[minmax(0,1fr)_auto]" items="center" gap="x-group"
-    :data-state="open ? 'open' : 'collapsed'" :aria-label="$t('nav.label')">
-    <ul id="flag-nav-band" ref="band" class="flag-nav__band" flex gap="1" m="0" p="0" list="none"
-      :inert="compact && !open" @keydown="onKeydown">
+  <nav ref="nav" class="flag-nav" flex="~ col" :aria-label="$t('nav.label')" @keydown="onKeydown">
+    <ul class="flag-nav__band" flex gap="1" m="0" p="0" list="none">
       <li v-for="segment in segments" :key="segment.key" class="flag-nav__segment data-[open=true]:flex-1" flex="none"
-        min-w="28" :data-open="segment.open" :data-split="segment.stops.length > 1"
+        min-w="28" :data-section="segment.section" :data-open="segment.open" :data-split="segment.stops.length > 1"
         :style="{ '--field': `var(--field-${segment.section})` }">
         <ul v-if="segment.stops.length > 1" class="flag-nav__stops" flex gap="0.5" m="0" p="0" list="none"
-          :aria-label="segment.stops[0]!.label" :data-reveal="reveal || undefined">
-          <li v-for="(stop, i) in segment.stops" :key="stop.key" flex="auto"
-            :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
+          :aria-label="segment.stops[0]!.label" :data-reveal="reveal || undefined"
+          :data-fade-start="edges.start || undefined" :data-fade-end="edges.end || undefined" @scroll.passive="syncEdges">
+          <li v-for="(stop, i) in segment.stops" :key="stop.key" class="flag-nav__stop" flex="auto"
+            :data-child="stop.child" :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
             <!-- Label hierarchy through brightness and size, not hue: section
                  labels (About, Work, Media) are full brightness and a step
                  larger; their children (project words, videos, podcast) are
                  smaller and dimmed until current or hovered. -->
             <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" :data-child="stop.child"
               class="flag-nav__link leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
-              :class="stop.child ? 'text-[0.75rem] text-muted hover:text-fg current:text-fg' : 'text-[1rem] text-fg'"
+              :class="stop.child ? 'text-[0.75rem] text-[var(--nav-child)] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold' : 'text-[1rem] text-fg'"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
                 <span v-if="segment.marked === stop.key" class="[view-transition-name:flag-marker]" absolute inset="0"
@@ -162,33 +168,48 @@ onBeforeUnmount(() => {
         </NuxtLinkLocale>
       </li>
     </ul>
-    <button ref="toggle" type="button"
-      class="flag-nav__toggle hidden text-sm text-muted hover:text-fg aria-expanded:text-fg" col-start="2" row-start="1"
-      items="center" gap="1" min-h="11" p="0" border="0" bg="transparent" font="inherit" cursor="pointer"
-      aria-controls="flag-nav-band" :aria-expanded="open" @click="open = !open">
-      {{ $t('nav.menu') }}
-      <span class="flag-nav__chevron i-iconoir-nav-arrow-down" aria-hidden="true" />
-    </button>
   </nav>
 </template>
 
 <style scoped>
 /*
- * Fields: the closed sections show their flag color (--field-*, main.css).
- * The open one is the stage itself, so its field is only a faint track for
- * the marker to ride on, and its children's fields are fainter still.
+ * Fields: a faint track for the marker to ride on, the same for every
+ * section, so color only shows where you are (the open section's label and
+ * the marker). The open section's children's fields are fainter still.
  * Closed fields are half as thick, so a paper field never reads as the
  * (paper) marker on the green and red stages.
  * No borders: the stage shows through the gaps.
  */
 .flag-nav {
   --field-height: var(--space-1);
+  /* Dimmer than fg for children, but brighter than --muted, which drops
+     under 4.5:1 for small text on the red stage. */
+  --nav-muted: color-mix(in srgb, var(--fg) 85%, var(--bg));
+}
+
+/*
+ * Children are tinted toward their section's flag. In light the stage is that
+ * flag, so mixing toward bg is the tint (20% holds 4.5:1 on red). In dark the
+ * field is a glow distinct from the stage, so mix it in directly. Work (paper
+ * and ink) barely moves either way.
+ */
+.flag-nav__segment {
+  --nav-child: color-mix(in srgb, var(--fg) 80%, var(--bg));
+  /* Current or hovered: still tinted, a step brighter. */
+  --nav-child-on: color-mix(in srgb, var(--fg) 90%, var(--bg));
+}
+
+@media (prefers-color-scheme: dark) {
+  .flag-nav__segment {
+    --nav-child: color-mix(in srgb, var(--field) 40%, var(--nav-muted));
+    --nav-child-on: color-mix(in srgb, var(--field) 40%, var(--fg));
+  }
 }
 
 .flag-nav__field {
   block-size: calc(var(--field-height) / 2);
   margin-block-start: calc(var(--field-height) / 2);
-  background: var(--field);
+  background: var(--line);
 }
 
 [data-open='true'] .flag-nav__field {
@@ -201,11 +222,14 @@ onBeforeUnmount(() => {
   background: color-mix(in srgb, var(--fg) 12%, var(--bg));
 }
 
-/* A section with no stops of its own (about, media): its link only spans its
-   label, and the track runs on to the next field. */
-.flag-nav__segment[data-open='true'][data-split='false'] {
+/* A section with no stops of its own (about): its link fills the open field,
+   so the marker does too. */
+.flag-nav__segment[data-split='false'] {
   display: flex;
-  background: linear-gradient(var(--line), var(--line)) top / 100% var(--field-height) no-repeat;
+}
+
+.flag-nav__segment[data-split='false']>.flag-nav__link {
+  flex: 1;
 }
 
 /*
@@ -244,26 +268,76 @@ onBeforeUnmount(() => {
   display: none;
 }
 
-.flag-nav__chevron {
-  transition: rotate 200ms var(--ease-out);
+/*
+ * The open section's stops scroll sideways when they don't fit (always on
+ * small screens, and between sm and a wide window when there are many
+ * projects), fading out at whichever edge has more to scroll to. When they
+ * fit, none of this shows.
+ */
+.flag-nav__stops {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: none;
+  --fade: var(--space-8);
+  mask-image: linear-gradient(to right,
+      transparent,
+      #000 var(--fade-start, 0px),
+      #000 calc(100% - var(--fade-end, 0px)),
+      transparent);
 }
 
-[aria-expanded='true']>.flag-nav__chevron {
-  rotate: 180deg;
+.flag-nav__stops::-webkit-scrollbar {
+  display: none;
 }
 
-/* Below sm, the map: segments stacked, project words wrapping. This is also
-   the no-JS layout, so every link stays reachable. */
+.flag-nav__stops[data-fade-start] {
+  --fade-start: var(--fade);
+}
+
+.flag-nav__stops[data-fade-end] {
+  --fade-end: var(--fade);
+}
+
+/* Grow to fill a short list (media), never shrink below the label. */
+.flag-nav__stop {
+  flex: 1 0 auto;
+  scroll-snap-align: start;
+}
+
+/*
+ * Below sm the flag folds: closed sections shrink to stubs at their label's
+ * width, the open one takes the rest of the band and holds its children,
+ * scrolling sideways when they don't fit. One row, so a child always sits
+ * inside its parent's field. Pure CSS, so the server render and no-JS match.
+ */
 @media (width < 40rem) {
-  .flag-nav__band {
-    grid-column: 1 / -1;
-    flex-direction: column;
-    gap: var(--gap-group);
+  .flag-nav__segment {
+    min-inline-size: 0;
   }
 
-  .flag-nav__stops {
-    flex-wrap: wrap;
-    row-gap: var(--gap-tight);
+  .flag-nav__segment[data-open='true'] {
+    flex: 1;
+  }
+
+  .flag-nav__segment[data-split='false']>.flag-nav__link {
+    min-inline-size: 0;
+  }
+
+  /* Closed sections step back to plain, dimmed labels: their fields already
+     carry the flag colors. */
+  .flag-nav__segment:not([data-open='true']) .flag-nav__link {
+    color: var(--nav-muted);
+  }
+
+  /* Section labels share one size, so the open one doesn't grow down out of
+     line with the rest; weight marks it instead. */
+  .flag-nav__link:not([data-child]) {
+    font-size: 0.875rem;
+  }
+
+  .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
+    font-weight: 700;
   }
 
   .flag-nav__link {
@@ -271,57 +345,11 @@ onBeforeUnmount(() => {
   }
 }
 
-/* With JS, the map starts collapsed to the fields and your position. The
-   toggle covers the whole band, so tapping the fields opens it too. */
-@media (width < 40rem) and (scripting: enabled) {
-  .flag-nav__toggle {
-    display: inline-flex;
-  }
-
-  .flag-nav[data-state='open'] .flag-nav__band {
-    grid-row: 2;
-    padding-block: var(--gap-tight) var(--gap-group);
-  }
-
-  .flag-nav[data-state='collapsed'] {
-    .flag-nav__band {
-      grid-column: 1;
-      flex-direction: row;
-      gap: var(--space-1);
-    }
-
-    .flag-nav__segment {
-      flex: 1;
-      min-inline-size: 0;
-    }
-
-    .flag-nav__segment[data-open='true'] {
-      flex: 3;
-    }
-
-    .flag-nav__stops {
-      flex-wrap: nowrap;
-    }
-
-    .flag-nav__link {
-      min-block-size: 0;
-      min-inline-size: 0;
-      padding: 0;
-    }
-
-    .flag-nav__segment[data-split='false']>.flag-nav__link {
-      flex-basis: 40%;
-    }
-
-    .flag-nav__link> :last-child {
-      display: none;
-    }
-
-    .flag-nav__toggle::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-    }
+/* In dark, the open section is named in its own flag color too, stronger
+   than the closed ones. In light it can't be: its color is the stage. */
+@media (width < 40rem) and (prefers-color-scheme: dark) {
+  .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
+    color: color-mix(in srgb, var(--field) 85%, var(--fg));
   }
 }
 
@@ -357,10 +385,6 @@ onBeforeUnmount(() => {
   .flag-nav__label {
     translate: none !important;
     transition-delay: 0ms !important;
-  }
-
-  .flag-nav__chevron {
-    transition: none;
   }
 
   /* The preview still shows, it just fades in instead of filling. */

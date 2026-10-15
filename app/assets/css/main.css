@@ -363,6 +363,10 @@ main {
 }
 ::view-transition-new(flag-marker) {
   animation: none;
+  /* Its own width, not the group's: the group interpolates size as it moves,
+     and from a wide field (about, below sm) the marker would cross the band
+     still that wide and only shrink on landing. This way it slides. */
+  inline-size: auto;
 }
 
 @keyframes vt-wipe {
