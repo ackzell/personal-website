@@ -21,5 +21,33 @@ export default defineNuxtPlugin((nuxtApp) => {
     // ViewTransition.types is missing in browsers without VT types; those get
     // the default crossfade.
     transition.types?.add(type)
+    transition.ready.then(slideMarkerAlongBand).catch(() => {})
   })
 })
+
+const MARKER_GROUP = '::view-transition-group(flag-marker)'
+
+/*
+ * The marker's group animates from its old screen position to its new one.
+ * When the header sits higher or lower in the new snapshot (the brand row
+ * tucked away, or the scroll clamped by a shorter page), that becomes a
+ * diagonal hop. The new band is already in place, so the marker starts on
+ * its row and only slides along it.
+ */
+function slideMarkerAlongBand() {
+  const effect = document.getAnimations()
+    .map((animation) => animation.effect)
+    .find((effect): effect is KeyframeEffect => effect instanceof KeyframeEffect && effect.pseudoElement === MARKER_GROUP)
+  if (!effect) return
+
+  const end = getComputedStyle(document.documentElement, MARKER_GROUP).transform
+  if (!end || end === 'none') return
+  const row = new DOMMatrix(end).m42
+
+  effect.setKeyframes(effect.getKeyframes().map((frame) => {
+    if (typeof frame.transform !== 'string' || frame.transform === 'none') return frame
+    const matrix = new DOMMatrix(frame.transform)
+    matrix.m42 = row
+    return { ...frame, transform: matrix.toString() }
+  }))
+}
