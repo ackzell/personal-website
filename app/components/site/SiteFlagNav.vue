@@ -117,6 +117,9 @@ const { reveal, rippleOrigin } = useSubmenuReveal({
   currentIndex: () => segments.value.find((segment) => segment.open)?.stops.findIndex((stop) => stop.current === 'page') ?? -1,
 })
 
+// Mouse users drag the stops sideways, as touch already scrolls them.
+useDragScroll(nav, '.flag-nav__stops')
+
 // The band resizes with the window, so whether the stops overflow can change
 // without a scroll.
 let resizeObserver: ResizeObserver | undefined
@@ -285,6 +288,16 @@ onBeforeUnmount(() => resizeObserver?.disconnect())
       #000 var(--fade-start, 0px),
       #000 calc(100% - var(--fade-end, 0px)),
       transparent);
+}
+
+.flag-nav__stops[data-dragging] {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+}
+
+.flag-nav__stops[data-dragging] .flag-nav__link {
+  cursor: grabbing;
 }
 
 .flag-nav__stops::-webkit-scrollbar {
