@@ -4,8 +4,9 @@ import { START_LOCATION, type RouteLocationNormalized } from 'vue-router'
 /*
  * Nuxt's default scroll behavior (wait for the page transition, restore saved
  * positions, honor hashes), with one change: on small screens, when the brand
- * row has already scrolled away (--header-tuck, SiteHeader), a new page opens
- * just under it instead of at the very top, so the header doesn't jump back.
+ * row has already scrolled away, fully or partly (--header-tuck, SiteHeader),
+ * a new page opens with it just as far tucked instead of at the very top, so
+ * the header doesn't jump back.
  */
 const samePath = (a: RouteLocationNormalized, b: RouteLocationNormalized) =>
   a.path.replace(/\/$/, '') === b.path.replace(/\/$/, '')
@@ -21,11 +22,14 @@ function hashTop(selector: string) {
   }
 }
 
-/** The brand row's height when it's tucked away on a small screen, else 0. */
+/**
+ * How much of the brand row is tucked away on a small screen, else 0. Keeping
+ * a partial tuck too means the band never drops mid-transition.
+ */
 function tuckedTop() {
   if (!window.matchMedia('(width < 40rem)').matches) return 0
   const tuck = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-tuck')) || 0
-  return window.scrollY >= tuck ? tuck : 0
+  return Math.min(window.scrollY, tuck)
 }
 
 export default <RouterConfig>{
