@@ -59,7 +59,8 @@ useEventListener(
 
 <template>
   <!-- The stage color behind it, so the page scrolls under, not through. -->
-  <footer ref="footer" class="site-footer" sticky bottom="0" z="10" bg="bg" px="track-wide" py="6" border="none">
+  <footer ref="footer" class="site-footer" sticky bottom="0" z="10" bg="bg" px="track-wide" py="6" border="none"
+    flex="~ wrap" items="center" gap="x-6 y-group">
     <SiteMarkLayer clipped />
     <!-- Icon-only links: the name lives in aria-label (screen readers) and
          title (hover). No gap: each link's padding is the spacing, so the
@@ -67,18 +68,13 @@ useEventListener(
          the icons stay 12px apart. The negative margin keeps them aligned. -->
     <ul flex="~ wrap" p="0" m="-1.5" list="none">
       <li v-for="link in socialLinks" :key="link.href" ref="items">
-        <a
-          :href="link.href"
-          rel="me noopener"
-          :aria-label="link.label"
-          :title="link.label"
-          class="text-lg"
-          inline-flex
-          p="1.5"
-        >
+        <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label" class="text-lg" inline-flex
+          p="1.5">
           <span :class="link.icon" aria-hidden="true" />
         </a>
       </li>
     </ul>
+    <!-- The header's lang="en" sits top right; its twin sits bottom right. -->
+    <SiteSchemeSwitch ml="auto" />
   </footer>
 </template>

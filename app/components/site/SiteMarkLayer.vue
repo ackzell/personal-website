@@ -45,14 +45,12 @@ const resting = useState('site-mark-resting', () => false)
   overflow: hidden;
   pointer-events: none;
   /* A shade of the stage itself, not the foreground: tone on tone. */
-  color: color-mix(in oklab, var(--bg) 55%, black);
+  color: color-mix(in oklab, var(--bg) 80%, black);
   transition: color 600ms var(--ease-out);
 }
 
-@media (prefers-color-scheme: dark) {
-  .site-mark {
-    color: color-mix(in oklab, var(--dark-accent) 22%, var(--bg));
-  }
+:root.dark .site-mark {
+  color: color-mix(in oklab, var(--dark-accent) 15%, var(--bg));
 }
 
 .site-mark__svg {

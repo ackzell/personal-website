@@ -11,6 +11,7 @@
  * Dark = "Deeper", near-black tinted toward the section color.
  */
 :root {
+  /* Follows the system until the footer switch picks one (SiteSchemeSwitch). */
   color-scheme: light dark;
 
   /* Soft flag (light) */
@@ -112,12 +113,16 @@
   --field-media: var(--softflag-red);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --field-about: var(--deeper-glow-green);
-    --field-work: var(--deeper-paper);
-    --field-media: var(--deeper-glow-red);
-  }
+/* Scheme classes come from @nuxtjs/color-mode: the system's, or the one picked. */
+:root.light {
+  color-scheme: light;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --field-about: var(--deeper-glow-green);
+  --field-work: var(--deeper-paper);
+  --field-media: var(--deeper-glow-red);
 }
 
 /* Semantic tokens. */
@@ -129,12 +134,10 @@
   --line: color-mix(in srgb, var(--fg) 20%, var(--bg));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: color-mix(in srgb, var(--dark-fill) 35%, var(--deeper-night));
-    --fg: var(--deeper-paper);
-    --accent: var(--dark-accent);
-  }
+:root.dark {
+  --bg: color-mix(in srgb, var(--dark-fill) 35%, var(--deeper-night));
+  --fg: var(--deeper-paper);
+  --accent: var(--dark-accent);
 }
 
 /* Spacing comes from the flow rules below, not UA margins. */
@@ -193,7 +196,7 @@ html {
 
   html {
     scroll-padding-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
-    scroll-padding-bottom: 0;
+    scroll-padding-bottom: var(--scheme-height, 0px);
   }
 
   .site-header {
@@ -202,14 +205,19 @@ html {
 
   main {
     padding-inline-end: max(0px, var(--rail-width) - var(--gutter));
+    /* The page's last lines can scroll clear of the scheme switch. */
+    padding-block-end: var(--scheme-height, 0px);
   }
 
   footer.site-footer {
     position: fixed;
     inset-inline-end: 0;
-    bottom: 0;
+    /* Standing on the scheme switch, which keeps the corner (SiteSchemeSwitch). */
+    bottom: var(--scheme-height, 0px);
     width: var(--rail-width);
     padding: var(--space-2) 0;
+    flex-direction: column;
+    gap: var(--space-1);
   }
 
   .site-footer ul {

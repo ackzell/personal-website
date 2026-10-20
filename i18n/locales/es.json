@@ -2,7 +2,10 @@
   "site": {
     "name": "ackzell.dev",
     "skipToContent": "Saltar al contenido",
-    "language": "Idioma"
+    "language": "Idioma",
+    "scheme": "Esquema de color",
+    "schemeLight": "Claro",
+    "schemeDark": "Oscuro"
   },
   "nav": {
     "label": "Principal",

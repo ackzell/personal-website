@@ -198,11 +198,9 @@ onMounted(() => {
   --nav-child-on: color-mix(in srgb, var(--fg) 90%, var(--bg));
 }
 
-@media (prefers-color-scheme: dark) {
-  .flag-nav__segment {
-    --nav-child: color-mix(in srgb, var(--field) 40%, var(--nav-muted));
-    --nav-child-on: color-mix(in srgb, var(--field) 40%, var(--fg));
-  }
+:root.dark .flag-nav__segment {
+  --nav-child: color-mix(in srgb, var(--field) 40%, var(--nav-muted));
+  --nav-child-on: color-mix(in srgb, var(--field) 40%, var(--fg));
 }
 
 .flag-nav__field {
@@ -356,8 +354,8 @@ onMounted(() => {
 
 /* In dark, the open section is named in its own flag color too, stronger
    than the closed ones. In light it can't be: its color is the stage. */
-@media (width < 40rem) and (prefers-color-scheme: dark) {
-  .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
+@media (width < 40rem) {
+  :root.dark .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
     color: color-mix(in srgb, var(--field) 85%, var(--fg));
   }
 }

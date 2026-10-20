@@ -2,7 +2,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
 
-  modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts', '@unocss/nuxt', '@vueuse/nuxt/module'],
+  modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts', '@unocss/nuxt', '@vueuse/nuxt/module', '@nuxtjs/color-mode'],
 
   css: ['~/assets/css/main.css'],
 
@@ -48,6 +48,12 @@ export default defineNuxtConfig({
         },
       },
     },
+  },
+
+  // Sets .light or .dark on <html> before first paint; main.css themes from
+  // those. Follows the system until the footer switch picks a scheme.
+  colorMode: {
+    storageKey: 'color-scheme',
   },
 
   content: {
