@@ -10,3 +10,4 @@ links:
   # TODO: marketplace, openvsx
 stack: [vscode, zed, typescript, vue]
 related: [tlachialoni]
+logo: /logos/tlapalli.svg

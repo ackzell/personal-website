@@ -28,4 +28,6 @@ export interface Project {
   related: string[]
   /** YouTube playlist with livestreams / progress updates. */
   devlogPlaylist?: string
+  /** The project's mark, a path under public/. Decorative: the word names the project. */
+  logo?: string
 }

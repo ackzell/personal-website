@@ -63,6 +63,8 @@ export default defineContentConfig({
         related: z.array(z.string()).default([]),
         // YouTube playlist with livestreams / progress updates.
         devlogPlaylist: z.string().optional(),
+        // The project's mark, served from public/ (e.g. /logos/tlapalli.svg).
+        logo: z.string().optional(),
       }),
     }),
 

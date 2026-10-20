@@ -421,6 +421,25 @@ main {
   animation: 500ms var(--ease-out) 150ms both vt-rise;
 }
 
+/*
+ * A project's plate (logo) travels with its word, on the word's timing. It
+ * grows between the lexicon margin and the heading, so unlike the word it
+ * changes size: keep the default crossfade, so the sharp new image takes over
+ * from the scaled old one. A plate hidden in the lexicon (no hover) is a
+ * transparent snapshot: the plate then fades in on its way, or out on its way
+ * back.
+ */
+::view-transition-group(*.plate) {
+  animation-duration: var(--word-transition);
+  animation-timing-function: var(--ease-in-out);
+}
+::view-transition-old(*.plate):only-child {
+  animation: 180ms var(--ease-out) both vt-fade-out;
+}
+::view-transition-new(*.plate):only-child {
+  animation: 500ms var(--ease-out) 150ms both vt-rise;
+}
+
 /* The marker moves on screen, so it eases both ways, like the word. Under
    reduced motion Nuxt skips view transitions: the marker just appears. */
 ::view-transition-group(flag-marker) {

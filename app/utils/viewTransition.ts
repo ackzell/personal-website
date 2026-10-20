@@ -8,3 +8,13 @@ export const wordTransition = (slug: string) => ({
   viewTransitionName: `word-${slug}`,
   viewTransitionClass: 'word',
 })
+
+/**
+ * View-transition style for a project's logo, so the plate travels between
+ * its lexicon entry and the project heading, alongside the word. The `plate`
+ * class picks up the plate animation in main.css. Same uniqueness rule.
+ */
+export const plateTransition = (slug: string) => ({
+  viewTransitionName: `plate-${slug}`,
+  viewTransitionClass: 'plate',
+})

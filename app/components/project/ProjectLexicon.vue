@@ -3,57 +3,38 @@
  * Projects as lexicon entries: the Nahuatl word is the headword, then its
  * pronunciation and meaning, then what the project is. Everything stays
  * visible; hovering or focusing an entry only spotlights it.
- * Headwords carry the word's view-transition name (see utils/viewTransition.ts),
+ * A project with a logo shows it as the entry's plate, like an illustrated
+ * dictionary: in the margin, revealed with the spotlight.
+ * Headwords and plates carry view-transition names (see utils/viewTransition.ts),
  * so a page must not list the same project twice.
  */
 defineProps<{ projects: Project[] }>()
-
-// Pronunciations and meanings come only from the owner; unfilled ones
-// (still `TODO` in content) stay out of the UI.
-const filled = (value: string) => value && value !== 'TODO'
 </script>
 
 <template>
   <!-- No gaps between entries, down or across: spacing is padding inside
        each one, so the pointer never falls between entries and the spotlight
        never drops. Block, not grid, so a parent can set it in columns. -->
-  <dl class="lexicon" mt="0">
-    <div
-      v-for="project in projects"
-      :key="project.slug"
-      class="lexicon__entry"
-      relative grid gap="tight" py="group"
-    >
-      <dt flex="~ wrap" items="baseline" gap="x-group y-1">
-        <NuxtLinkLocale
-          :to="`/projects/${project.slug}`"
-          class="lexicon__headword text-fg text-headword"
-          lang="nah"
-          typeset="heading"
-          leading="none"
-          decoration="none"
-          :style="wordTransition(project.slug)"
-        >
+  <dl class="lexicon">
+    <div v-for="project in projects" :key="project.slug" class="lexicon__entry" relative grid gap="tight" py="12">
+      <WordLine as="dt" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status">
+        <NuxtLinkLocale :to="`/projects/${project.slug}`" class="lexicon__headword text-fg text-headword" lang="nah"
+          typeset="heading" leading="none" decoration="none" :style="wordTransition(project.slug)">
           <!-- One span per letter so the hover can ripple through the word.
                Assistive tech gets the whole word from the hidden copy. -->
           <span class="sr-only">{{ project.word }}</span>
           <span aria-hidden="true">
-            <span
-              v-for="(char, i) in project.word"
-              :key="i"
-              class="lexicon__char"
-              :style="{ '--i': i }"
-            >{{ char }}</span>
+            <span v-for="(char, i) in project.word" :key="i" class="lexicon__char" :style="{ '--i': i }">{{ char
+              }}</span>
           </span>
         </NuxtLinkLocale>
-        <span v-if="filled(project.pronunciation)" text="muted">/{{ project.pronunciation }}/</span>
-        <span v-if="filled(project.meaning)" text="fg">‘{{ project.meaning }}’</span>
-      </dt>
+      </WordLine>
       <dd m="0" text="muted">
-        <span text="fg">{{ project.title }}.</span>
         {{ project.description }}
-        <span whitespace="nowrap">· <ProjectStatus :status="project.status" /></span>
       </dd>
+      <!-- Decorative: the headword already names the project. -->
+      <img v-if="project.logo" class="lexicon__plate" :src="project.logo" alt="" width="56" height="56" loading="lazy"
+        decoding="async" :style="plateTransition(project.slug)">
     </div>
   </dl>
 </template>
@@ -76,6 +57,55 @@ const filled = (value: string) => value && value !== 'TODO'
   padding-inline-end: var(--gap-block);
   break-inside: avoid;
   transition: opacity 250ms var(--ease-out);
+  /* The plate sits beside the headword line only; the description below runs
+     the full width. Every entry keeps that margin, logo or not, so headwords
+     wrap the same down the column. */
+  grid-template-columns: minmax(0, 1fr) var(--plate-size);
+  column-gap: var(--gap-group);
+  --plate-size: 3.5rem;
+}
+
+.lexicon__entry>dt {
+  grid-column: 1;
+}
+
+.lexicon__entry>dd {
+  grid-column: 1 / -1;
+}
+
+.lexicon__plate {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: start;
+  inline-size: var(--plate-size);
+  block-size: auto;
+}
+
+/*
+ * On devices that really hover, the plate waits in the margin and develops
+ * with the spotlight, like a print: in from the word's side, out of a blur,
+ * a beat after the headword starts to lean. It leaves at once. Touch keeps
+ * plates shown, as the flag band keeps its labels.
+ */
+@media (hover: hover) and (pointer: fine) {
+  .lexicon__plate {
+    opacity: 0;
+    translate: calc(-1 * var(--space-2)) 0;
+    filter: blur(6px);
+    transition:
+      opacity 150ms var(--ease-out),
+      translate 150ms var(--ease-out),
+      filter 150ms var(--ease-out);
+  }
+
+  .lexicon__entry:hover .lexicon__plate,
+  .lexicon__entry:has(.lexicon__headword:focus-visible) .lexicon__plate {
+    opacity: 1;
+    translate: 0 0;
+    filter: none;
+    transition-duration: 400ms, 600ms, 500ms;
+    transition-delay: 120ms;
+  }
 }
 
 /* Spotlight: one entry in focus, the rest step back. Pointer hover only on
@@ -83,6 +113,7 @@ const filled = (value: string) => value && value !== 'TODO'
 .lexicon:has(.lexicon__headword:focus-visible) .lexicon__entry:not(:focus-within) {
   opacity: 0.4;
 }
+
 @media (hover: hover) and (pointer: fine) {
   .lexicon:has(.lexicon__entry:hover) .lexicon__entry:not(:hover) {
     opacity: 0.4;
@@ -97,8 +128,8 @@ const filled = (value: string) => value && value !== 'TODO'
  *
  * Each axis is its own registered property, so each can be timed on its own:
  * CRSV is a switch, not a range, so it flips at the moment of peak speed,
- * where motion hides the swap: mid-lean on the way in (ease-in-out is fastest
- * halfway), right away on the way out (ease-out is fastest at the start).
+ * where motion hides the swap: early on both ways, since both ease out and
+ * ease-out is fastest at the start.
  * Flipping it anywhere else reads as a second wave. A single
  * font-variation-settings transition can't separate the axes.
  */
@@ -107,11 +138,13 @@ const filled = (value: string) => value && value !== 'TODO'
   inherits: true;
   initial-value: 0;
 }
+
 @property --casl {
   syntax: '<number>';
   inherits: true;
   initial-value: 0;
 }
+
 @property --crsv {
   syntax: '<number>';
   inherits: true;
@@ -123,11 +156,13 @@ const filled = (value: string) => value && value !== 'TODO'
   --casl: var(--heading-casual);
   --crsv: 0;
 }
+
 .lexicon__headword:focus-visible {
   --slnt: -15;
   --casl: 1;
   --crsv: 1;
 }
+
 @media (hover: hover) and (pointer: fine) {
   .lexicon__entry:hover .lexicon__headword {
     --slnt: -15;
@@ -145,26 +180,38 @@ const filled = (value: string) => value && value !== 'TODO'
     --crsv 0ms;
   transition-delay: calc(var(--i) * 30ms);
 }
-/* Arriving: slow and symmetric, so the lean flows; the cursive swap waits
-   for the middle of each letter's lean. */
+
+/* Arriving: the lean starts at once and settles slowly (ease-out), so the
+   hover answers right away. The cursive swap lands early in each letter's
+   lean, where ease-out moves fastest. */
 .lexicon__entry:hover .lexicon__char,
 .lexicon__headword:focus-visible .lexicon__char {
   transition:
-    --slnt 700ms var(--ease-in-out),
-    --casl 700ms var(--ease-in-out),
+    --slnt 600ms var(--ease-out),
+    --casl 600ms var(--ease-out),
     --crsv 0ms;
   transition-delay:
-    calc(var(--i) * 45ms),
-    calc(var(--i) * 45ms),
-    calc(var(--i) * 45ms + 350ms);
+    calc(var(--i) * 35ms),
+    calc(var(--i) * 35ms),
+    calc(var(--i) * 35ms + 60ms);
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   /* Same end state, no ripple. */
   .lexicon__char,
   .lexicon__entry:hover .lexicon__char,
   .lexicon__headword:focus-visible .lexicon__char {
     transition-duration: 150ms, 150ms, 0ms;
+    transition-delay: 0ms;
+  }
+
+  /* The plate still develops, as a plain fade. */
+  .lexicon__plate,
+  .lexicon__entry:hover .lexicon__plate,
+  .lexicon__entry:has(.lexicon__headword:focus-visible) .lexicon__plate {
+    translate: none;
+    filter: none;
     transition-delay: 0ms;
   }
 }
