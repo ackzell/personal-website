@@ -1,0 +1,305 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-19T18:51:16.399397+00:00",
+  "title": "Design System: ackzell.dev",
+  "extensions": {
+    "colorMeta": {
+      "soft-flag-green": {
+        "role": "primary",
+        "displayName": "Flag Green",
+        "canonical": "#00573c",
+        "tonalRamp": [
+          "#004c35",
+          "#00875d",
+          "#00c185",
+          "#00fbad",
+          "#37ffc1",
+          "#71ffd3",
+          "#abffe5",
+          "#e5fff7"
+        ]
+      },
+      "soft-flag-red": {
+        "role": "primary",
+        "displayName": "Flag Red",
+        "canonical": "#a51e2c",
+        "tonalRamp": [
+          "#410c11",
+          "#72151e",
+          "#a31e2c",
+          "#d52739",
+          "#e05564",
+          "#e98791",
+          "#f2b8be",
+          "#fbe9eb"
+        ]
+      },
+      "soft-flag-paper": {
+        "role": "secondary",
+        "displayName": "Soft Paper",
+        "canonical": "#f6f2ea",
+        "tonalRamp": [
+          "#362b17",
+          "#5e4c28",
+          "#876d3a",
+          "#b08e4b",
+          "#c3a873",
+          "#d4c19c",
+          "#e6dbc4",
+          "#f7f4ed"
+        ]
+      },
+      "soft-flag-ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#141312",
+        "tonalRamp": [
+          "#282624",
+          "#474340",
+          "#66615b",
+          "#847e77",
+          "#a09b96",
+          "#bcb8b4",
+          "#d7d5d3",
+          "#f3f2f2"
+        ]
+      },
+      "deeper-green": {
+        "role": "neutral",
+        "displayName": "Deeper Green",
+        "canonical": "#0a2a20",
+        "tonalRamp": [
+          "#0f3e2f",
+          "#1a6d53",
+          "#259c77",
+          "#30cb9b",
+          "#5dd8b2",
+          "#8ce4c8",
+          "#bbefdf",
+          "#eafaf5"
+        ]
+      },
+      "deeper-red": {
+        "role": "neutral",
+        "displayName": "Deeper Red",
+        "canonical": "#3f1216",
+        "tonalRamp": [
+          "#3c1115",
+          "#691e25",
+          "#962b34",
+          "#c43844",
+          "#d2636d",
+          "#df9198",
+          "#ecbec2",
+          "#f9ebec"
+        ]
+      },
+      "deeper-night": {
+        "role": "neutral",
+        "displayName": "Night",
+        "canonical": "#0c0b0a",
+        "tonalRamp": [
+          "#2a2623",
+          "#4a433d",
+          "#696158",
+          "#897e72",
+          "#a49b92",
+          "#beb8b2",
+          "#d9d5d1",
+          "#f3f2f1"
+        ]
+      },
+      "deeper-paper": {
+        "role": "neutral",
+        "displayName": "Deeper Paper",
+        "canonical": "#e4dcca",
+        "tonalRamp": [
+          "#332b1a",
+          "#594c2d",
+          "#806d41",
+          "#a78d55",
+          "#bba77a",
+          "#cfc1a1",
+          "#e3dac7",
+          "#f6f4ee"
+        ]
+      },
+      "deeper-glow-green": {
+        "role": "tertiary",
+        "displayName": "Glow Green",
+        "canonical": "#4a9273",
+        "tonalRamp": [
+          "#1a3328",
+          "#2d5946",
+          "#418065",
+          "#55a783",
+          "#7abc9f",
+          "#a1cfbb",
+          "#c7e3d7",
+          "#eef6f3"
+        ]
+      },
+      "deeper-glow-red": {
+        "role": "tertiary",
+        "displayName": "Glow Red",
+        "canonical": "#b84c4c",
+        "tonalRamp": [
+          "#371616",
+          "#612626",
+          "#8a3737",
+          "#b44747",
+          "#c67070",
+          "#d79999",
+          "#e7c3c3",
+          "#f8eded"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "heading": {
+        "displayName": "Heading",
+        "purpose": "h1–h4 in Recursive, casual 0.65."
+      },
+      "headword": {
+        "displayName": "Headword",
+        "purpose": "Project Nahuatl words; same size in lexicon and heading so the word travels as a pure move."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Prose in Commit Mono, 64ch."
+      },
+      "code": {
+        "displayName": "Code",
+        "purpose": "Snippets, casual axis off."
+      },
+      "nav-section": {
+        "displayName": "Section label",
+        "purpose": "About, Work, Media in the band."
+      },
+      "nav-child": {
+        "displayName": "Child label",
+        "purpose": "Projects, videos, podcast; muted until current."
+      }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Entrances, hovers, wipes."
+      },
+      {
+        "name": "ease-in-out",
+        "value": "cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Things that travel across the screen: the word, the marker."
+      },
+      {
+        "name": "page-transition",
+        "value": "550ms",
+        "purpose": "Section wipe and page hand-over."
+      },
+      {
+        "name": "word-transition",
+        "value": "600ms",
+        "purpose": "Headword travel between lexicon and heading."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "40rem"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Flag Field",
+      "kind": "custom",
+      "refersTo": "flag-field",
+      "description": "One section's field in the flag band; closed sections show their flag color, the open one is a faint track.",
+      "html": "<div class=\"ds-band\"><span class=\"ds-field\" style=\"--f:#00573c\"></span><span class=\"ds-field\" style=\"--f:#f6f2ea\"></span><span class=\"ds-field\" style=\"--f:#a51e2c\"></span></div>",
+      "css": ".ds-band{display:flex;gap:2px;width:240px;background:#141312;padding:12px}.ds-field{flex:1;height:4px;background:var(--f)}"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link-section",
+      "description": "Section link: field above, label below; hover previews the marker filling in.",
+      "html": "<a class=\"ds-nav\" href=\"#\"><span class=\"ds-nav-field\"></span><span>Work</span></a>",
+      "css": ".ds-nav{display:flex;flex-direction:column;gap:8px;width:112px;color:#f6f2ea;background:#00573c;padding:12px;text-decoration:none;font:400 16px/1.4 'Commit Mono',ui-monospace,monospace}.ds-nav-field{position:relative;display:block;height:4px;background:color-mix(in srgb,#f6f2ea 20%,#00573c)}.ds-nav-field::after{content:'';position:absolute;inset:0;background:#f6f2ea;opacity:.35;transform:scaleX(0);transform-origin:left;transition:transform 200ms cubic-bezier(.16,1,.3,1)}.ds-nav:hover .ds-nav-field::after,.ds-nav:focus-visible .ds-nav-field::after{transform:scaleX(1)}.ds-nav:focus-visible{outline:2px solid #f6f2ea;outline-offset:2px}"
+    },
+    {
+      "name": "Lexicon Entry",
+      "kind": "custom",
+      "refersTo": "headword",
+      "description": "A project word set large in Recursive; leans into cursive on hover (shown here as a simple weight-neutral slant).",
+      "html": "<a class=\"ds-entry\" href=\"#\"><span class=\"ds-word\">amoxtli</span><span class=\"ds-meta\">project</span></a>",
+      "css": ".ds-entry{display:flex;flex-direction:column;gap:8px;padding:16px;background:#f6f2ea;color:#141312;text-decoration:none}.ds-word{font:520 40px/1 Recursive,ui-monospace,monospace;font-variation-settings:'CASL' .65;transition:font-variation-settings 450ms cubic-bezier(.16,1,.3,1)}.ds-entry:hover .ds-word,.ds-entry:focus-visible .ds-word{font-variation-settings:'CASL' 1,'CRSV' 1,'slnt' -15}.ds-meta{font:400 12px/1.4 'Commit Mono',ui-monospace,monospace;opacity:.7}.ds-entry:focus-visible{outline:2px solid #141312;outline-offset:2px}"
+    },
+    {
+      "name": "Social Link",
+      "kind": "custom",
+      "refersTo": "social-link",
+      "description": "Icon-only link with a 30px target; label lives in aria-label and title.",
+      "html": "<a class=\"ds-social\" href=\"#\" aria-label=\"GitHub\" title=\"GitHub\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"currentColor\" aria-hidden=\"true\"><path d=\"M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48v-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.89 1.52 2.34 1.08 2.91.83.09-.65.35-1.08.63-1.33-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.64 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.37.2 2.39.1 2.64.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.69-4.57 4.93.36.31.68.92.68 1.85v2.74c0 .27.18.58.69.48A10 10 0 0 0 12 2z\"/></svg></a>",
+      "css": ".ds-social{display:inline-flex;padding:6px;color:#f6f2ea;background:#00573c}.ds-social:hover{opacity:.8}.ds-social:focus-visible{outline:2px solid #f6f2ea;outline-offset:2px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Flag Atlas",
+    "overview": "The site is a map you cross, not a stack of pages. Its three sections follow the colors of a flag, left to right: about (green), work (white), media (red). The whole stage takes the color of the section you are in, and a thin band of flag fields in the sticky header shows where you stand and where you can go. Moving between sections is a wipe along the flag, in the direction of travel.\n\nThe voice is casual, rigorous and quiet, \"engineer, not tinkerer\". The casual lives in the type: monospace throughout, with a variable axis that softens letterforms toward handwriting. The rigor lives in the structure: one grid, one spacing scale, one semantic color set that resolves per section.",
+    "keyCharacteristics": [
+      "Stage color is the navigation state: green, paper or red fills the page, tinted near-black in dark scheme.",
+      "Monospace everywhere, two families, three roles.",
+      "Flat and borderless. Depth is never simulated.",
+      "One marker (the accent bar in the flag band) is the only chrome element that moves within a section.",
+      "Every motion has a reduced-motion answer; content degrades to plain readable routes."
+    ],
+    "rules": [
+      {
+        "name": "The Stage Rule",
+        "body": "The page background is the section. Never introduce a second background color for cards, panels or code blocks; surfaces are the stage itself.",
+        "section": "colors"
+      },
+      {
+        "name": "The Semantic Only Rule",
+        "body": "Components use --bg, --fg, --accent, --muted, --line, never the raw palette.",
+        "section": "colors"
+      },
+      {
+        "name": "The Accent Is Foreground Rule",
+        "body": "In light scheme the accent is the text color; only in dark does the accent become a hue (the glow).",
+        "section": "colors"
+      },
+      {
+        "name": "The Brightness Hierarchy Rule",
+        "body": "Rank in navigation is carried by size and brightness, not hue.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lean Rule",
+        "body": "A headword leans -15° into cursive on hover or focus, letter by letter, only on devices that really hover. Weight never changes.",
+        "section": "typography"
+      },
+      {
+        "name": "The No Border Rule",
+        "body": "No borders, rules or outlines as decoration. The only outline is the 2px accent focus ring.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do let the stage color follow the section, and fade it over 600ms (200ms under reduced motion) where view transitions don't run.",
+      "Do use semantic color tokens and spacing roles (gap-group, mt-section) from the UnoCSS preset, not raw values.",
+      "Do give every motion a reduced-motion answer: the color change still reads, the movement goes.",
+      "Do keep icon-only controls labelled via aria-label and title, with touch targets at least 30px.",
+      "Do use ease-out (cubic-bezier(0.16, 1, 0.3, 1)) for entrances and ease-in-out (cubic-bezier(0.65, 0, 0.35, 1)) for things that move across the screen."
+    ],
+    "donts": [
+      "Don't add borders, drop shadows, cards or rounded corners.",
+      "Don't introduce a hue outside the flag palette, or a color that doesn't resolve per section and scheme.",
+      "Don't use text=\"…\" attributify on <a> or NuxtLink; it overwrites the link label.",
+      "Don't use Nahuatl as a visual motif, and don't invent words, pronunciations or meanings; they come from the owner.",
+      "Don't animate the weight axis; only slant, casual and cursive move."
+    ]
+  }
+}
