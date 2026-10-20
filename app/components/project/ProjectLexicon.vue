@@ -3,20 +3,44 @@
  * Projects as lexicon entries: the Nahuatl word is the headword, then its
  * pronunciation and meaning, then what the project is. Everything stays
  * visible; hovering or focusing an entry only spotlights it.
- * A project with a logo shows it as the entry's plate, like an illustrated
- * dictionary: in the margin, revealed with the spotlight.
- * Headwords and plates carry view-transition names (see utils/viewTransition.ts),
- * so a page must not list the same project twice.
+ * A project with a logo shows a glimpse of it behind the entry, like a print
+ * developing: large, washed out, revealed with the spotlight.
+ * Headwords and glimpses carry view-transition names (see utils/viewTransition.ts;
+ * the glimpse travels as the plate into the project heading's logo), so a page
+ * must not list the same project twice.
  */
-defineProps<{ projects: Project[] }>()
+const props = defineProps<{
+  projects: Project[]
+  /** Entries rise in one after another as the list arrives. */
+  stagger?: boolean
+}>()
+
+/*
+ * The stagger runs on each entry, but a headword and its glimpse arrive as
+ * their own view-transition snapshots, outside the entry's animation: give
+ * those the same delay (--rise-delay, main.css). A word traveling from a
+ * project page has a partner and isn't affected.
+ */
+const riseDelay = (i: number) => `${150 + Math.min(i, 8) * 60}ms`
+
+useHead({
+  style: [{
+    key: 'lexicon-stagger',
+    textContent: computed(() => (props.stagger
+      ? props.projects.map((project, i) =>
+        `::view-transition-new(word-${project.slug}),::view-transition-new(plate-${project.slug}){--rise-delay:${riseDelay(i)}}`).join('')
+      : '')),
+  }],
+})
 </script>
 
 <template>
   <!-- No gaps between entries, down or across: spacing is padding inside
        each one, so the pointer never falls between entries and the spotlight
        never drops. Block, not grid, so a parent can set it in columns. -->
-  <dl class="lexicon">
-    <div v-for="project in projects" :key="project.slug" class="lexicon__entry" relative grid gap="tight" py="12">
+  <dl class="lexicon" :class="{ 'lexicon--stagger': stagger }">
+    <div v-for="(project, i) in projects" :key="project.slug" class="lexicon__entry" relative grid gap="tight" py="12"
+      :style="stagger ? { '--rise-delay': riseDelay(i) } : undefined">
       <WordLine as="dt" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status">
         <NuxtLinkLocale :to="`/projects/${project.slug}`" class="lexicon__headword text-fg text-headword" lang="nah"
           typeset="heading" leading="none" decoration="none" :style="wordTransition(project.slug)">
@@ -32,9 +56,12 @@ defineProps<{ projects: Project[] }>()
       <dd m="0" text="muted">
         {{ project.description }}
       </dd>
-      <!-- Decorative: the headword already names the project. -->
-      <img v-if="project.logo" class="lexicon__plate" :src="project.logo" alt="" width="56" height="56" loading="lazy"
-        decoding="async" :style="plateTransition(project.slug)">
+      <!-- Decorative: the headword already names the project. A glimpse of
+           the logo, large and washed out behind the entry. -->
+      <span v-if="project.logo" class="lexicon__glimpse" aria-hidden="true">
+        <img class="lexicon__glimpse-img" :src="project.logo" alt="" width="288" height="288" loading="lazy"
+          decoding="async" :style="plateTransition(project.slug)">
+      </span>
     </div>
   </dl>
 </template>
@@ -57,53 +84,65 @@ defineProps<{ projects: Project[] }>()
   padding-inline-end: var(--gap-block);
   break-inside: avoid;
   transition: opacity 250ms var(--ease-out);
-  /* The plate sits beside the headword line only; the description below runs
-     the full width. Every entry keeps that margin, logo or not, so headwords
-     wrap the same down the column. */
-  grid-template-columns: minmax(0, 1fr) var(--plate-size);
-  column-gap: var(--gap-group);
-  --plate-size: 3.5rem;
+  /* Keeps the glimpse behind this entry's text, not the page's. */
+  isolation: isolate;
 }
 
-.lexicon__entry>dt {
-  grid-column: 1;
+/* Same rise as a page arriving (vt-rise, main.css), one entry after another. */
+.lexicon--stagger .lexicon__entry {
+  animation: 500ms var(--ease-out) var(--rise-delay) both vt-rise;
 }
 
-.lexicon__entry>dd {
-  grid-column: 1 / -1;
+@media (prefers-reduced-motion: reduce) {
+  .lexicon--stagger .lexicon__entry {
+    animation: none;
+  }
 }
 
-.lexicon__plate {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: start;
-  inline-size: var(--plate-size);
+/* Clipped to the entry and faded top and bottom, so it reads as a glimpse of
+   the logo rather than the logo. */
+.lexicon__glimpse {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, black 35%, black 65%, transparent);
+}
+
+.lexicon__glimpse-img {
+  position: absolute;
+  inset-inline-start: 30%;
+  inset-block-start: 50%;
+  inline-size: 18rem;
   block-size: auto;
+  max-inline-size: none;
+  translate: 0 -50%;
+  rotate: -8deg;
+  filter: saturate(0.6);
+  opacity: 0.16;
 }
 
 /*
- * On devices that really hover, the plate waits in the margin and develops
- * with the spotlight, like a print: in from the word's side, out of a blur,
- * a beat after the headword starts to lean. It leaves at once. Touch keeps
- * plates shown, as the flag band keeps its labels.
+ * On devices that really hover, the glimpse waits and develops with the
+ * spotlight, like a print: out of a blur, a beat after the headword starts to
+ * lean. It leaves at once. Touch keeps it shown, as the flag band keeps its
+ * labels.
  */
 @media (hover: hover) and (pointer: fine) {
-  .lexicon__plate {
+  .lexicon__glimpse-img {
     opacity: 0;
-    translate: calc(-1 * var(--space-2)) 0;
-    filter: blur(6px);
+    filter: blur(16px) saturate(0.6);
     transition:
-      opacity 150ms var(--ease-out),
-      translate 150ms var(--ease-out),
-      filter 150ms var(--ease-out);
+      opacity 200ms var(--ease-out),
+      filter 200ms var(--ease-out);
   }
 
-  .lexicon__entry:hover .lexicon__plate,
-  .lexicon__entry:has(.lexicon__headword:focus-visible) .lexicon__plate {
-    opacity: 1;
-    translate: 0 0;
-    filter: none;
-    transition-duration: 400ms, 600ms, 500ms;
+  .lexicon__entry:hover .lexicon__glimpse-img,
+  .lexicon__entry:has(.lexicon__headword:focus-visible) .lexicon__glimpse-img {
+    opacity: 0.16;
+    filter: blur(0) saturate(0.6);
+    transition-duration: 600ms, 800ms;
     transition-delay: 120ms;
   }
 }
@@ -206,12 +245,11 @@ defineProps<{ projects: Project[] }>()
     transition-delay: 0ms;
   }
 
-  /* The plate still develops, as a plain fade. */
-  .lexicon__plate,
-  .lexicon__entry:hover .lexicon__plate,
-  .lexicon__entry:has(.lexicon__headword:focus-visible) .lexicon__plate {
-    translate: none;
-    filter: none;
+  /* The glimpse still develops, as a plain fade. */
+  .lexicon__glimpse-img,
+  .lexicon__entry:hover .lexicon__glimpse-img,
+  .lexicon__entry:has(.lexicon__headword:focus-visible) .lexicon__glimpse-img {
+    filter: saturate(0.6);
     transition-delay: 0ms;
   }
 }

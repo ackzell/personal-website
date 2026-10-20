@@ -439,8 +439,9 @@ main {
   opacity: 1;
   animation: 180ms var(--ease-out) both vt-fade-out;
 }
+/* --rise-delay: a staggered list sets it per word (ProjectLexicon). */
 ::view-transition-new(*.word):only-child {
-  animation: 500ms var(--ease-out) 150ms both vt-rise;
+  animation: 500ms var(--ease-out) var(--rise-delay, 150ms) both vt-rise;
 }
 
 /*
@@ -459,7 +460,7 @@ main {
   animation: 180ms var(--ease-out) both vt-fade-out;
 }
 ::view-transition-new(*.plate):only-child {
-  animation: 500ms var(--ease-out) 150ms both vt-rise;
+  animation: 500ms var(--ease-out) var(--rise-delay, 150ms) both vt-rise;
 }
 
 /* The marker moves on screen, so it eases both ways, like the word. Under
