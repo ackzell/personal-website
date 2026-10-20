@@ -33,6 +33,6 @@ defineProps<{
   justify-self: center;
   inline-size: clamp(8rem, 36vw, 20rem);
   block-size: auto;
-  margin-block-end: clamp(var(--gap-block), 8vw, 6rem);
+  margin-block-end: clamp(var(--gap-block), 100vw, 6rem);
 }
 </style>
