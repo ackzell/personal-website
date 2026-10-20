@@ -8,6 +8,8 @@
   "editor.formatOnSave": true,
   "workbench.iconTheme": "gruvbox-material-icon-theme",
   "editor.renderWhitespace": "all",
+  "workbench.experimental.modernUIEditorTabStyle": "connected",
+  "workbench.experimental.modernUIUppercaseViewHeaders": false,
   "window.autoDetectColorScheme": true,
   "workbench.preferredLightColorTheme": "Tlapalli l-00: Obsidian Light",
   "workbench.preferredDarkColorTheme": "Tlapalli 00: Obsidian",
