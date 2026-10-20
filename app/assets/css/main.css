@@ -325,6 +325,20 @@ main {
   }
 }
 
+/* Words and plates travel only within a section (lexicon ↔ project). Across
+   sections they'd fly to wherever the other page happens to show the same
+   project (About's featured one, say): they ride their page instead. */
+:root:active-view-transition-type(section-forward, section-back) {
+  --travel-name: none;
+}
+
+/* Without the tiles, <main> rides the root on a section change. As its own
+   group it would slide from where the old page was scrolled to the new
+   page's top, reading as the old page scrolling up before the wipe. */
+:root:not(.has-tile-wipe):active-view-transition-type(section-forward, section-back) main {
+  view-transition-name: none;
+}
+
 :root:active-view-transition-type(section-forward) {
   --wipe-from: inset(0 0 0 100%);
   --unwipe-to: inset(0 100% 0 0);

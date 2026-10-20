@@ -3,9 +3,10 @@
  * between its lexicon headword and the project heading. The `word` class
  * picks up the word animation in main.css.
  * Names must be unique per page: only one element per slug may carry it.
+ * --travel-name (main.css) switches every name off on a section change.
  */
 export const wordTransition = (slug: string) => ({
-  viewTransitionName: `word-${slug}`,
+  viewTransitionName: `var(--travel-name, word-${slug})`,
   viewTransitionClass: 'word',
 })
 
@@ -15,6 +16,6 @@ export const wordTransition = (slug: string) => ({
  * class picks up the plate animation in main.css. Same uniqueness rule.
  */
 export const plateTransition = (slug: string) => ({
-  viewTransitionName: `plate-${slug}`,
+  viewTransitionName: `var(--travel-name, plate-${slug})`,
   viewTransitionClass: 'plate',
 })

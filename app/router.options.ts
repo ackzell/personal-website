@@ -32,8 +32,29 @@ function tuckedTop() {
   return Math.min(window.scrollY, tuck)
 }
 
+/**
+ * The page view transition in flight, from Nuxt's own hook rather than
+ * :active-view-transition, which Safari before 18.2 doesn't know. Nuxt starts
+ * it in beforeResolve, before scrollBehavior runs; the hook goes on during
+ * the first (hydration) call, ahead of any transition.
+ */
+let viewTransition: ViewTransition | null = null
+let tracking = false
+
+function trackViewTransitions() {
+  if (tracking) return
+  tracking = true
+  useNuxtApp().hook('page:view-transition:start', (transition) => {
+    viewTransition = transition
+    transition.finished.finally(() => {
+      if (viewTransition === transition) viewTransition = null
+    })
+  })
+}
+
 export default <RouterConfig>{
   scrollBehavior(to, from, savedPosition) {
+    trackViewTransitions()
     if (samePath(to, from)) {
       if (from.hash && !to.hash) return savedPosition ?? { left: 0, top: 0 }
       if (to.hash) return { el: to.hash, top: hashTop(to.hash), behavior: 'auto' }
@@ -52,6 +73,15 @@ export default <RouterConfig>{
 
     const nuxtApp = useNuxtApp()
     const router = useRouter()
+    // In a view transition the old page is already a still snapshot, so
+    // scroll as soon as the new page is in, before its snapshot is taken:
+    // otherwise it is captured where the old page was scrolled to.
+    if (viewTransition) {
+      return new Promise((resolve) => {
+        nuxtApp.hooks.hookOnce('page:finish', () =>
+          resolve(router.currentRoute.value.fullPath === to.fullPath ? position() : false))
+      })
+    }
     return new Promise((resolve) => {
       nuxtApp.hooks.hookOnce('page:loading:end', () => {
         const done = () => requestAnimationFrame(() =>
