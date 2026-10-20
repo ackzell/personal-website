@@ -12,8 +12,33 @@ const projectCopy = z.object({
   meaning: z.string(),
 })
 
+// Copy that differs per locale, kept beside the data it describes.
+const localized = <T extends z.ZodTypeAny>(schema: T) => z.object({ en: schema, es: schema })
+
+// A month, as `YYYY-MM`.
+const month = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
+
 export default defineContentConfig({
   collections: {
+    /**
+     * Roles, one file per company: `content/experience/<slug>.yml`.
+     * Dates and stack are shared; role and summary carry both locales, since
+     * the copy is short and the pairs are easier to keep in step side by side.
+     */
+    experience: defineCollection({
+      type: 'data',
+      source: 'experience/*.yml',
+      schema: z.object({
+        company: z.string(),
+        url: z.string().url().optional(),
+        start: month,
+        end: month,
+        role: localized(z.string()),
+        summary: localized(z.array(z.string())),
+        stack: z.array(z.string()).default([]),
+      }),
+    }),
+
     projectsMeta: defineCollection({
       type: 'data',
       source: 'projects/*.yml',
