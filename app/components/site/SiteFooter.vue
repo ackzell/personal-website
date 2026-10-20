@@ -78,3 +78,60 @@ useEventListener(
     <SiteSchemeSwitch ml="auto" />
   </footer>
 </template>
+
+<style scoped>
+/*
+ * Dock wave: the hovered icon grows most, its neighbors less, the next ones
+ * a touch. Scale the icon, not the <li>, which the FLIP above animates.
+ * The 12px between icons absorbs the growth, so nothing overlaps or reflows.
+ */
+.site-footer span {
+  --wave: 1;
+  --opacity: 1;
+  display: block;
+  transform: scale(var(--wave));
+  transform-origin: bottom center;
+  opacity: var(--opacity);
+}
+
+/* The rail grows inward, away from the screen edge. */
+@media (width < 40rem) {
+  .site-footer span {
+    transform-origin: right center;
+  }
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  /* Dimmed only where hover can bring them back; phones keep full opacity. */
+  .site-footer span {
+    --opacity: 0.25;
+    transition:
+      transform 260ms var(--ease-out),
+      opacity 260ms var(--ease-out);
+  }
+
+  /* While the wave runs, icons outside it fade further. :where() keeps this
+     at the resting rule's specificity, so the wave steps below still win. */
+  .site-footer:has(:where(li:hover, li:focus-within)) span {
+    --opacity: 0.1;
+  }
+
+  li:is(:hover, :focus-within) span {
+    --wave: 1.5;
+    --opacity: 1;
+  }
+
+  li:is(:hover, :focus-within)+li span,
+  li:has(+ li:is(:hover, :focus-within)) span {
+    --wave: 1.25;
+    --opacity: 0.50;
+  }
+
+  li:is(:hover, :focus-within)+li+li span,
+  li:has(+ li + li:is(:hover, :focus-within)) span {
+    --wave: 1.1;
+    --opacity: 0.25;
+  }
+
+}
+</style>
