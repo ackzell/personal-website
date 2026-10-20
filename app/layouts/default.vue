@@ -9,6 +9,7 @@ const isDev = import.meta.dev
 <template>
   <div class="site">
     <a href="#main" class="skip-link">{{ $t('site.skipToContent') }}</a>
+    <SiteMark />
     <SiteHeader />
     <main id="main" tabindex="-1">
       <slot />

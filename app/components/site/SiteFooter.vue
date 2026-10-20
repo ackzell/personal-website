@@ -34,3 +34,4 @@ usePublishedHeight(useTemplateRef<HTMLElement>('footer'), '--footer-height')
     </ul>
   </footer>
 </template>
+    <SiteMarkLayer clipped />

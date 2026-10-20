@@ -25,6 +25,7 @@ useResizeObserver(header, () => {
   <!-- The stage color behind it, so the page scrolls under, not through. -->
   <header ref="header" class="site-header" sticky z="10" bg="bg" flex="~ wrap" items="center" gap="y-group x-6"
     px="track-wide" pt="3" pb="2 sm:4" border="none">
+    <SiteMarkLayer clipped />
     <NuxtLinkLocale to="/" class="text-fg" typeset="code" decoration="none">{{ $t('site.name') }}</NuxtLinkLocale>
     <SiteLocaleSwitch ml="auto" />
     <!-- Its own row: the band spans the wide track, fields edge to edge.
