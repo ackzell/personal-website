@@ -241,7 +241,7 @@ body,
   body,
   .site-header,
   .site-footer {
-    transition-duration: 200ms;
+    transition-duration: 400ms;
   }
 }
 
@@ -324,6 +324,77 @@ main {
 :root:active-view-transition-type(section-back) {
   --wipe-from: inset(0 100% 0 0);
   --unwipe-to: inset(0 0 0 100%);
+}
+
+/* Tiled reveal (Chromium, once plugins/section-transition has the worklet and
+   WebGL ready): the new page arrives as square slabs spreading out from the
+   clicked link. The worklet masks cut the slabs as windows onto the new page;
+   the tile-fx canvas lights the same slabs above. Both read one linear
+   progress; the easing lives per slab. Under forced colors it stays the plain
+   wipe. */
+:root {
+  --tile-transition: 950ms;
+}
+
+.tile-fx {
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  pointer-events: none;
+  view-transition-name: tile-fx;
+}
+
+/* The light plays above the pages; traveling words and the marker stay on top. */
+::view-transition-group(tile-fx) {
+  z-index: 1;
+  animation: none;
+}
+::view-transition-old(tile-fx) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(tile-fx) {
+  animation: none;
+}
+::view-transition-group(*.word),
+::view-transition-group(*.plate),
+::view-transition-group(flag-marker) {
+  z-index: 2;
+}
+
+@property --wipe-progress {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@media (forced-colors: none) {
+  :root.has-tile-wipe:active-view-transition-type(section-forward, section-back) {
+    &::view-transition-new(root),
+    &::view-transition-new(page) {
+      animation: var(--tile-transition) linear both vt-tiles;
+      mask-image: paint(tile-wipe);
+    }
+    &::view-transition-new(page) {
+      --tile-ox: var(--tile-new-x);
+      --tile-oy: var(--tile-new-y);
+    }
+    /* The old content steps aside first; the old stage stays until the slabs
+       cover it, so the two pages' words never mix within a slab's edge. */
+    &::view-transition-old(page) {
+      animation: 200ms var(--ease-out) both vt-fade-out;
+    }
+  }
+}
+
+@keyframes vt-tiles {
+  from {
+    --wipe-progress: 0;
+  }
+  to {
+    --wipe-progress: 1;
+  }
 }
 
 /* A traveling word accelerates away and settles, rather than jumping. */
