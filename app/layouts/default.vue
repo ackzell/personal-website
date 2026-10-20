@@ -3,6 +3,9 @@ const section = useSection()
 
 useHead({ htmlAttrs: { 'data-section': section } })
 
+// Touch: swipe sideways to walk the flag band's stops.
+useSwipeNav()
+
 const isDev = import.meta.dev
 </script>
 
