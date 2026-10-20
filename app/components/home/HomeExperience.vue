@@ -6,8 +6,8 @@
  * the heading, beside the roles as they scroll by.
  *
  * The field of the role being read lights up: the one under the pointer or
- * focus, otherwise the one passing the upper part of the viewport. Pointing
- * also steps the other roles back, as lexicon entries do. The lit field fills
+ * focus, otherwise the one passing the upper part of the viewport. The other
+ * roles step back, as lexicon entries do, so the lit role reads alone. The lit field fills
  * with the accent from the top; every field keeps its share of the career.
  *
  * Roles and fields are both links to the role: following one brings the role
@@ -43,8 +43,20 @@ function formatMonth(month: string) {
   return monthFormat.value.format(new Date(Date.UTC(year!, m! - 1)))
 }
 
+// While a followed link scrolls to its role, the target stays lit instead of
+// every role the scroll passes on the way. Released once scrolling settles
+// (debounced scroll, since scrollend isn't everywhere yet).
+const travelling = ref(false)
+const arrive = useDebounceFn(() => {
+  travelling.value = false
+}, 150)
+useEventListener('scroll', () => {
+  if (travelling.value) arrive()
+}, { passive: true })
+
 // The role crossing a thin line a third of the way down the viewport.
 useIntersectionObserver(entries, (records) => {
+  if (travelling.value) return
   for (const record of records) {
     if (record.isIntersecting) reading.value = (record.target as HTMLElement).dataset.slug
   }
@@ -71,6 +83,9 @@ function go(event: MouseEvent, slug: string) {
   if (!el) return
   event.preventDefault()
   reading.value = slug
+  travelling.value = true
+  // Already in place: no scroll comes to release it.
+  arrive()
   el.scrollIntoView({ block: 'start', behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth' })
   history.replaceState(history.state, '', `#role-${slug}`)
 }
@@ -101,9 +116,9 @@ function leave(slug: string) {
 
       <ol class="experience__list" m="0" p="0" list="none">
         <li v-for="role in roles" :id="`role-${role.slug}`" ref="entries" :key="role.slug" :data-slug="role.slug"
-          class="experience__entry" relative grid
-          gap="x-group y-tight" pb="block" @pointerenter="hovered = role.slug" @pointerleave="leave(role.slug)"
-          @focusin="hovered = role.slug" @focusout="leave(role.slug)">
+          class="experience__entry" :class="{ 'is-lit': lit === role.slug }" relative grid gap="x-group y-tight"
+          pb="block" @pointerenter="hovered = role.slug" @pointerleave="leave(role.slug)" @focusin="hovered = role.slug"
+          @focusout="leave(role.slug)">
           <p class="experience__dates tabular-nums" typeset="code" text="sm muted">
             <time :datetime="role.start">{{ formatMonth(role.start) }}</time>
             <span aria-hidden="true">&ensp;–&ensp;</span>
@@ -208,6 +223,24 @@ function leave(slug: string) {
   transition-duration: 500ms;
 }
 
+/*
+ * The lit field glows like a neon tube. Glow is light, so it's built like
+ * light: a core hotter than the accent, then halos of growing radius and
+ * falling strength (the bloom falloff), added onto the stage with
+ * plus-lighter instead of painted over it. It comes on steady: a strike
+ * flicker read as dizzying, so the light just moves.
+ */
+.experience__field.is-lit::after {
+  background-color: color-mix(in oklab, var(--accent), white 45%);
+  border: 1px solid var(--accent);
+  box-shadow: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
+    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent),
+    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
+    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
+  mix-blend-mode: plus-lighter;
+}
+
 .experience__band[data-state='pending'] .experience__field {
   scale: 1 0;
   transition: none;
@@ -216,6 +249,9 @@ function leave(slug: string) {
 .experience__entry {
   scroll-margin-top: var(--heading-height, 0px);
   transition: opacity 250ms var(--ease-out);
+  /* Keeps the company link's z-index inside its entry, so it scrolls under
+     the sticky heading like the rest of the role. */
+  isolation: isolate;
 }
 
 /* The role's link covers its whole entry, so the entry is one target; the
@@ -242,16 +278,10 @@ function leave(slug: string) {
   }
 }
 
-/* Spotlight, as in the lexicon: focus anywhere, pointer only where it really
-   hovers, since a tap on touch leaves a sticky :hover. */
-.experience__list:has(:focus-visible) .experience__entry:not(:focus-within) {
+/* Spotlight, as in the lexicon, on the role lit in the band: pointed at,
+   focused, or being read. Until one is lit (or without JS) all stay full. */
+.experience__list:has(.is-lit) .experience__entry:not(.is-lit) {
   opacity: 0.4;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .experience__list:has(.experience__entry:hover) .experience__entry:not(:hover) {
-    opacity: 0.4;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
