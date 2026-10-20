@@ -17,3 +17,15 @@ node_modules
 .env
 .env.*
 !.env.example
+
+# Local tooling state
+.codegraph/
+.atl/
+.claude/settings.local.json
+.claude/worktrees/
+# Installed third-party skills and agents; reinstall instead of versioning
+.claude/skills/
+.claude/agents/
+# Impeccable: keep the design tokens, ignore sessions, caches and references
+.impeccable/*
+!.impeccable/design.json
