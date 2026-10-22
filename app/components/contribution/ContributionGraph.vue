@@ -182,7 +182,8 @@ const name = (repo: string) => repo.split('/')[1]
         <span class="sr-only">{{ t('contributions.errata') }}: {{ errataCount }}</span>
         <span aria-hidden="true">{{ shownFlag }}</span>
       </button>
-      <span class="errata-switch__count tabular-nums" aria-hidden="true"># {{ errataCount }}</span>
+      <span class="errata-switch__count tabular-nums" aria-hidden="true"># {{ errataCount }} {{ $t('typos-docs-etc')
+        }}</span>
     </div>
 
     <Transition mode="out-in" :css="reducedMotion !== 'reduce'">
@@ -190,9 +191,9 @@ const name = (repo: string) => repo.split('/')[1]
         <li v-for="(row, i) in rows" ref="items" :key="row.key" class="log__row"
           :class="[`log__row--${row.kind}`, { 'is-lit': row.repo && lit === row.repo }]"
           :style="{ '--i': i, '--batch': batch[row.key] ?? 0 }" :data-key="row.key" :data-repo="row.repo"
-          :data-state="waiting.has(row.key) ? 'pending' : undefined"
-          @pointerenter="hovered = row.repo" @pointerleave="leave(row.repo)" @focusin="hovered = row.repo"
-          @focusout="leave(row.repo)" @click="go($event, row.repo)"
+          :data-state="waiting.has(row.key) ? 'pending' : undefined" @pointerenter="hovered = row.repo"
+          @pointerleave="leave(row.repo)" @focusin="hovered = row.repo" @focusout="leave(row.repo)"
+          @click="go($event, row.repo)"
           :data-erratum="(row.kind === 'merge' && row.merge.erratum) || (row.kind === 'project' && row.erratum) || undefined"
           :data-gap="(row.kind === 'year' && row.gap) || undefined">
           <span class="log__graph" aria-hidden="true">
@@ -516,5 +517,4 @@ const name = (repo: string) => repo.split('/')[1]
 .errata-switch__count {
   opacity: 0.8;
 }
-
 </style>
