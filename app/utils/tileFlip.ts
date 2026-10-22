@@ -8,7 +8,7 @@
  * Decorative: the canvas is aria-hidden, takes no pointer events, and is blank
  * outside a transition.
  */
-export const TILE_SIZE = 50
+export const TILE_SIZE = 20
 
 export type Rgb = [number, number, number]
 
