@@ -305,6 +305,18 @@ main {
   animation-timing-function: var(--ease-out);
 }
 
+/* The page never travels: as a group it would slide from where the old page
+   was scrolled to the new page's top, so the new page would come down from
+   above. The old one stays where it was read (--page-shift, router.options)
+   while it fades. */
+::view-transition-group(page) {
+  animation: none;
+}
+
+::view-transition-old(page) {
+  translate: 0 var(--page-shift, 0px);
+}
+
 /* Same section: chrome holds still, the page hands over. */
 :root:active-view-transition-type(section-same) {
   &::view-transition-old(root),
@@ -316,6 +328,26 @@ main {
   }
   &::view-transition-new(page) {
     animation: 500ms var(--ease-out) 150ms both vt-rise;
+  }
+
+  /* The page draws above the root, so the header and footer get their own
+     layers on top; otherwise the old page shows what it had scrolled under
+     them while it fades. They swap at once, as the root does. */
+  & .site-header {
+    view-transition-name: site-header;
+  }
+  & .site-footer {
+    view-transition-name: site-footer;
+  }
+  &::view-transition-group(site-header),
+  &::view-transition-group(site-footer) {
+    z-index: 1;
+  }
+  &::view-transition-old(site-header),
+  &::view-transition-new(site-header),
+  &::view-transition-old(site-footer),
+  &::view-transition-new(site-footer) {
+    animation: none;
   }
 }
 

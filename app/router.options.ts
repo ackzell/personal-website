@@ -1,5 +1,6 @@
 import type { RouterConfig } from '@nuxt/schema'
 import { START_LOCATION, type RouteLocationNormalized } from 'vue-router'
+import { trackPageScroll } from '~/utils/pageScroll'
 
 /*
  * Nuxt's default scroll behavior (wait for the page transition, restore saved
@@ -46,8 +47,15 @@ function trackViewTransitions() {
   tracking = true
   useNuxtApp().hook('page:view-transition:start', (transition) => {
     viewTransition = transition
+    // How far the page scrolled between the snapshots, so the old page can
+    // fade where it was instead of sliding in from its scroll (main.css).
+    const root = document.documentElement
+    const from = window.scrollY
+    transition.ready.then(() => root.style.setProperty('--page-shift', `${window.scrollY - from}px`), () => {})
     transition.finished.finally(() => {
-      if (viewTransition === transition) viewTransition = null
+      if (viewTransition !== transition) return
+      viewTransition = null
+      root.style.removeProperty('--page-shift')
     })
   })
 }
@@ -73,16 +81,26 @@ export default <RouterConfig>{
 
     const nuxtApp = useNuxtApp()
     const router = useRouter()
-    // In a view transition the old page is already a still snapshot, so
-    // scroll as soon as the new page is in, before its snapshot is taken:
-    // otherwise it is captured where the old page was scrolled to.
+    // In a view transition the old page is already a still snapshot, so the
+    // scroll can't be seen: to the top, make it now. Waiting for the new page
+    // is too late in Safari, which takes its snapshot before the router
+    // scrolls; the header shows untucked and then slides up into place.
+    if (viewTransition && !savedPosition && !to.hash) {
+      const scroll = Promise.resolve(position())
+      trackPageScroll(scroll)
+      return scroll
+    }
+    // A saved position or a hash needs the new page's height, so it scrolls
+    // as soon as the new page is in, before its snapshot is taken (Chromium).
     if (viewTransition) {
-      return new Promise((resolve) => {
+      const scroll = new Promise<ReturnType<typeof position> | false>((resolve) => {
         nuxtApp.hooks.hookOnce('page:finish', () =>
           resolve(router.currentRoute.value.fullPath === to.fullPath ? position() : false))
       })
+      trackPageScroll(scroll)
+      return scroll
     }
-    return new Promise((resolve) => {
+    const scroll = new Promise<ReturnType<typeof position> | false>((resolve) => {
       nuxtApp.hooks.hookOnce('page:loading:end', () => {
         const done = () => requestAnimationFrame(() =>
           resolve(router.currentRoute.value.fullPath === to.fullPath ? position() : false))
@@ -91,5 +109,7 @@ export default <RouterConfig>{
         else done()
       })
     })
+    trackPageScroll(scroll)
+    return scroll
   },
 }

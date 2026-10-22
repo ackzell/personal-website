@@ -62,7 +62,12 @@ useIntersectionObserver(entries, (records) => {
   }
 }, { rootMargin: '-33% 0px -66% 0px' })
 
-onMounted(() => {
+// Observers started after the page scrolls (pageScrolled), past setup.
+const stops: (() => void)[] = []
+onBeforeUnmount(() => stops.forEach((stop) => stop()))
+
+onMounted(async () => {
+  await pageScrolled()
   const el = band.value
   if (!el) return
   if (el.getBoundingClientRect().top < window.innerHeight) return
@@ -72,6 +77,7 @@ onMounted(() => {
     state.value = 'drawn'
     stop()
   }, { threshold: 0.25 })
+  stops.push(stop)
 })
 
 /* Each role arrives on its own the first time it scrolls in, piece by piece:
@@ -81,7 +87,9 @@ onMounted(() => {
 const waiting = ref(new Set<string>())
 const batch = ref<Record<string, number>>({})
 
-onMounted(() => {
+onMounted(async () => {
+  // Measured where the page will be read, not where the last one was left.
+  await pageScrolled()
   const below = (entries.value ?? []).filter((el) => el.getBoundingClientRect().top > window.innerHeight)
   if (!below.length) return
   waiting.value = new Set(below.map((el) => el.dataset.slug!))
@@ -96,6 +104,7 @@ onMounted(() => {
     waiting.value = next
     if (!next.size) stop()
   }, { rootMargin: '0px 0px -30% 0px' })
+  stops.push(stop)
 })
 
 const reducedMotion = usePreferredReducedMotion()

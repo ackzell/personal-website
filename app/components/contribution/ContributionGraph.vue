@@ -143,7 +143,9 @@ const waiting = ref(new Set<string>())
 const batch = ref<Record<string, number>>({})
 let stopArriving: (() => void) | undefined
 
-onMounted(() => {
+onMounted(async () => {
+  // Measured where the page will be read, not where the last one was left.
+  await pageScrolled()
   const below = (items.value ?? []).filter((el) => el.getBoundingClientRect().top > window.innerHeight)
   if (!below.length) return
   waiting.value = new Set(below.map((el) => el.dataset.key!))
@@ -160,6 +162,7 @@ onMounted(() => {
   }, { rootMargin: '0px 0px -15% 0px' })
   stopArriving = stop
 })
+onBeforeUnmount(() => stopArriving?.())
 
 const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric', timeZone: 'UTC' }))
 const formatDate = (date: string) => monthFormat.value.format(new Date(`${date}T00:00:00Z`))
