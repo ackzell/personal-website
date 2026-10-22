@@ -3,10 +3,12 @@ import { animate, scrambleText } from 'animejs'
 
 /*
  * The footer's twin of the header's lang="en": the switch as the CSS it sets,
- * color-scheme="light" or "dark". It starts on the system's scheme; a press
- * flips to the other one and keeps it.
+ * color-scheme="system", "light" or "dark". It starts on the system's scheme;
+ * each press moves to the next one and keeps it.
  */
-type Scheme = 'light' | 'dark'
+type Scheme = 'system' | 'light' | 'dark'
+
+const order: Scheme[] = ['system', 'light', 'dark']
 
 const colorMode = useColorMode()
 const reduceMotion = usePreferredReducedMotion()
@@ -15,12 +17,20 @@ const { t } = useI18n()
 // The phone rail stands on it (main.css), so it needs the height.
 usePublishedHeight(useTemplateRef<HTMLElement>('root'), '--scheme-height')
 
-// Before the scheme is known (prerendered pages, until mount) the module
-// reports "system"; the text stays hidden until then (template).
-const scheme = computed<Scheme>(() => (colorMode.value === 'dark' ? 'dark' : 'light'))
-const next = computed<Scheme>(() => (scheme.value === 'dark' ? 'light' : 'dark'))
+// The stored preference, not the resolved scheme, so "system" can show. Until
+// it is known (prerendered pages, until mount) the text stays hidden. Gated on
+// mount too: the server renders it hidden, and if the client already knows the
+// scheme at hydration, Vue never patches that mismatched style away.
+const mounted = useMounted()
+const known = computed(() => mounted.value && !colorMode.unknown)
+const scheme = computed<Scheme>(() => {
+  const preference = colorMode.preference as Scheme
+  return order.includes(preference) ? preference : 'system'
+})
+const next = computed<Scheme>(() => order[(order.indexOf(scheme.value) + 1) % order.length]!)
 
 const labels = computed<Record<Scheme, string>>(() => ({
+  system: t('site.schemeSystem'),
   light: t('site.schemeLight'),
   dark: t('site.schemeDark'),
 }))
@@ -69,7 +79,7 @@ function toggle() {
     <span class="scheme-switch__name" aria-hidden="true">color-scheme="</span>
     <button type="button" class="scheme-switch__value" :title="labels[next]" data-no-scramble @click="toggle">
       <span class="sr-only">{{ $t('site.scheme') }}: {{ labels[scheme] }}</span>
-      <span class="scheme-switch__text" :style="{ visibility: colorMode.unknown ? 'hidden' : undefined }" aria-hidden="true">{{ shown }}</span>
+      <span class="scheme-switch__text" :style="{ visibility: known ? undefined : 'hidden' }" aria-hidden="true">{{ shown }}</span>
     </button>
     <span class="scheme-switch__name" aria-hidden="true">"</span>
   </div>

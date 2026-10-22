@@ -4,6 +4,7 @@
     "skipToContent": "Skip to content",
     "language": "Language",
     "scheme": "Color scheme",
+    "schemeSystem": "System",
     "schemeLight": "Light",
     "schemeDark": "Dark"
   },

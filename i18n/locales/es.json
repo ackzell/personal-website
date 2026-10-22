@@ -4,6 +4,7 @@
     "skipToContent": "Saltar al contenido",
     "language": "Idioma",
     "scheme": "Esquema de color",
+    "schemeSystem": "Sistema",
     "schemeLight": "Claro",
     "schemeDark": "Oscuro"
   },
