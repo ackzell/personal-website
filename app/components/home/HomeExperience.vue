@@ -74,6 +74,30 @@ onMounted(() => {
   }, { threshold: 0.25 })
 })
 
+/* Each role arrives on its own the first time it scrolls in, piece by piece:
+   dates, role, summary, stack. Roles that come in together follow one another
+   down the list, as the band's fields do. Roles already on screen at mount
+   (and every role without JS) are simply there. */
+const waiting = ref(new Set<string>())
+const batch = ref<Record<string, number>>({})
+
+onMounted(() => {
+  const below = (entries.value ?? []).filter((el) => el.getBoundingClientRect().top > window.innerHeight)
+  if (!below.length) return
+  waiting.value = new Set(below.map((el) => el.dataset.slug!))
+  const { stop } = useIntersectionObserver(below, (records) => {
+    const arriving = records.filter((record) => record.isIntersecting).map((record) => (record.target as HTMLElement).dataset.slug!)
+    if (!arriving.length) return
+    const next = new Set(waiting.value)
+    for (const [order, slug] of arriving.entries()) {
+      batch.value[slug] = order
+      next.delete(slug)
+    }
+    waiting.value = next
+    if (!next.size) stop()
+  }, { rootMargin: '0px 0px -30% 0px' })
+})
+
 const reducedMotion = usePreferredReducedMotion()
 
 /* Bring a role to the top, just under the sticky heading (its scroll margin),
@@ -116,28 +140,37 @@ function leave(slug: string) {
 
       <ol class="experience__list" m="0" p="0" list="none">
         <li v-for="role in roles" :id="`role-${role.slug}`" ref="entries" :key="role.slug" :data-slug="role.slug"
-          class="experience__entry" :class="{ 'is-lit': lit === role.slug }" relative grid gap="x-group y-tight"
-          pb="block" @pointerenter="hovered = role.slug" @pointerleave="leave(role.slug)" @focusin="hovered = role.slug"
-          @focusout="leave(role.slug)">
-          <p class="experience__dates tabular-nums" typeset="code" text="sm muted">
+          class="experience__entry" :class="{ 'is-lit': lit === role.slug }"
+          :data-state="waiting.has(role.slug) ? 'pending' : undefined" :style="{ '--batch': batch[role.slug] ?? 0 }"
+          relative grid gap="x-group y-tight" pb="block" @pointerenter="hovered = role.slug"
+          @pointerleave="leave(role.slug)" @focusin="hovered = role.slug" @focusout="leave(role.slug)">
+          <p class="experience__dates experience__piece tabular-nums" style="--j: 0" typeset="code" text="xs muted">
             <time :datetime="role.start">{{ formatMonth(role.start) }}</time>
             <span aria-hidden="true">&ensp;–&ensp;</span>
             <span class="sr-only">–</span>
             <time :datetime="role.end">{{ formatMonth(role.end) }}</time>
           </p>
           <div grid gap="tight">
-            <h3 m="0">
+            <h3 class="experience__piece" style="--j: 1" m="0">
               <a :href="`#role-${role.slug}`" class="experience__target text-fg decoration-none"
                 @click="go($event, role.slug)">{{ role.role }}</a>
               <span text="muted" font="normal">·
-                <a v-if="role.url" :href="role.url" class="experience__company" target="_blank" rel="noopener">{{
-                  role.company }}</a>
+                <a v-if="role.url" :href="role.url" class="experience__company" target="_blank" rel="noopener"
+                  :aria-label="role.company">
+                  <span aria-hidden="true">
+                    <span v-for="(char, i) in role.company" :key="i" class="experience__char" :style="{ '--i': i }">{{
+                      char }}</span>
+                  </span>
+                  <span class="experience__out i-iconoir-arrow-up-right" aria-hidden="true" />
+                </a>
                 <template v-else>{{ role.company }}</template>
               </span>
             </h3>
-            <p v-for="(line, i) in role.summary" :key="i" m="0">{{ line }}</p>
-            <ul v-if="role.stack.length" class="experience__stack" flex flex-wrap gap="x-group y-1" m="0" mt="tight"
-              p="0" list="none" typeset="code" text="sm muted">
+            <p v-for="(line, i) in role.summary" :key="i" class="experience__piece" :style="{ '--j': i + 2 }" m="0">{{
+              line }}</p>
+            <ul v-if="role.stack.length" class="experience__stack experience__piece"
+              :style="{ '--j': role.summary.length + 2 }" m="0" mt="tight" p="0" list="none" typeset="code"
+              text="sm muted">
               <li v-for="tool in role.stack" :key="tool">{{ tool }}</li>
             </ul>
           </div>
@@ -265,17 +298,154 @@ function leave(slug: string) {
 .experience__company {
   position: relative;
   z-index: 1;
+  text-decoration: none;
+}
+
+/*
+ * The company writes itself as the lexicon's headwords do: letter by letter
+ * it leans, softens fully casual and turns cursive, and the way out slides in
+ * after it. Mono widths hold across every axis, so nothing beside it moves.
+ * The arrow's room is kept, so it never pushes the line.
+ */
+@property --slnt {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --casl {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --crsv {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.experience__company {
+  --slnt: 0;
+  --casl: var(--heading-casual);
+  --crsv: 0;
+}
+
+.experience__company:hover,
+.experience__company:focus-visible {
+  --slnt: -15;
+  --casl: 1;
+  --crsv: 1;
+}
+
+.experience__char {
+  font-variation-settings: 'CASL' var(--casl), 'CRSV' var(--crsv), 'slnt' var(--slnt);
+  transition:
+    --slnt 450ms var(--ease-out),
+    --casl 450ms var(--ease-out),
+    --crsv 0ms;
+  transition-delay: calc(var(--i) * 20ms);
+}
+
+.experience__company:hover .experience__char,
+.experience__company:focus-visible .experience__char {
+  transition:
+    --slnt 600ms var(--ease-out),
+    --casl 600ms var(--ease-out),
+    --crsv 0ms;
+  transition-delay:
+    calc(var(--i) * 25ms),
+    calc(var(--i) * 25ms),
+    calc(var(--i) * 25ms + 60ms);
+}
+
+.experience__out {
+  margin-inline-start: 0.15em;
+  font-size: 0.85em;
+  opacity: 0;
+  translate: -0.3em 0.3em;
+  transition:
+    opacity 200ms var(--ease-out),
+    translate 200ms var(--ease-out);
+}
+
+.experience__company:hover .experience__out,
+.experience__company:focus-visible .experience__out {
+  opacity: 1;
+  translate: 0 0;
+  transition-duration: 400ms;
+  transition-delay: 120ms;
+}
+
+/* Touch has no hover to reveal it: the way out stays shown. */
+@media not ((hover: hover) and (pointer: fine)) {
+  .experience__out {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+/* The stack is a run of names, not a row of tags: one muted line, comma
+   separated, that reads as a footnote to the role. */
+.experience__stack li {
+  display: inline;
+}
+
+.experience__stack li + li::before {
+  content: ', ';
+}
+
+/*
+ * Arriving: each piece rises a little out of a soft blur, a beat after the
+ * one above it. Roles arriving together follow each other (--batch), at the
+ * band's own pace. Leaving the pending state is the only transition, so
+ * nothing replays.
+ */
+.experience__piece {
+  transition:
+    opacity 600ms var(--ease-out),
+    translate 700ms var(--ease-out),
+    filter 600ms var(--ease-out);
+  transition-delay: calc(var(--batch, 0) * 140ms + var(--j, 0) * 70ms);
+}
+
+.experience__entry[data-state='pending'] .experience__piece {
+  opacity: 0;
+  translate: 0 1rem;
+  filter: blur(6px);
+  transition: none;
 }
 
 @media (width >=48rem) {
   .experience__entry {
-    grid-template-columns: 12ch minmax(0, 1fr);
+    grid-template-columns: 15ch minmax(0, 1fr);
   }
 
   /* Dates sit on the role's line, not the block's top edge. */
   .experience__dates {
-    padding-block-start: 0.15em;
+    padding-block-start: 0.35em;
+    white-space: nowrap;
   }
+}
+
+/* The lit role's dates light with its field: the same neon, as text. They
+   come on with the field's fill and go out quicker, as it empties. Set on
+   the dates' contents: the dates themselves carry the arrival. */
+.experience__dates > * {
+  transition:
+    color 250ms var(--ease-out),
+    text-shadow 250ms var(--ease-out);
+}
+
+.experience__entry.is-lit .experience__dates > * {
+  color: color-mix(in oklab, var(--accent), white 45%);
+  text-shadow: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
+    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent),
+    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
+    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
+  mix-blend-mode: plus-lighter;
+  transition-duration: 500ms;
 }
 
 /* Spotlight, as in the lexicon, on the role lit in the band: pointed at,
@@ -308,6 +478,29 @@ function leave(slug: string) {
   .experience__band[data-state='pending'] .experience__field {
     scale: none;
     opacity: 0;
+  }
+
+  /* Pieces still arrive in order, as a fade in place. */
+  .experience__entry[data-state='pending'] .experience__piece {
+    translate: none;
+    filter: none;
+  }
+
+  .experience__piece {
+    transition: opacity 300ms var(--ease-out);
+    transition-delay: calc(var(--batch, 0) * 80ms + var(--j, 0) * 40ms);
+  }
+
+  /* Same end state, no ripple, no slide. */
+  .experience__char,
+  .experience__company:hover .experience__char,
+  .experience__company:focus-visible .experience__char {
+    transition-duration: 150ms, 150ms, 0ms;
+    transition-delay: 0ms;
+  }
+
+  .experience__out {
+    translate: none;
   }
 }
 </style>
