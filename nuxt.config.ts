@@ -56,6 +56,11 @@ export default defineNuxtConfig({
     storageKey: 'color-scheme',
   },
 
+  runtimeConfig: {
+    // Optional; lifts GitHub's search rate limit (server/api/contributions.get.ts).
+    githubToken: '',
+  },
+
   content: {
     // Node >= 22.5 ships node:sqlite, so no native addon to build.
     experimental: { sqliteConnector: 'native' },

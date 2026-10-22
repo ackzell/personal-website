@@ -1,7 +1,12 @@
 // @unocss-include — icon classes below are read by UnoCSS from this file.
 /** Main navigation. Labels come from `nav.<key>` in i18n/locales. */
 export const mainNav = [
-  { key: 'about', to: '/', section: 'about' },
+  {
+    key: 'about',
+    to: '/',
+    section: 'about',
+    children: [{ key: 'contributions', to: '/contributions' }],
+  },
   { key: 'work', to: '/projects', section: 'work' },
   {
     key: 'media',

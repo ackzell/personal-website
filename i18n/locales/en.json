@@ -44,5 +44,9 @@
     "title": "Podcast",
     "intro": "My typeof Radio is a Spanish-language podcast about web development."
   },
+  "contributions": {
+    "title": "Contributions",
+    "errata": "Errata"
+  },
   "placeholder": "Coming soon."
 }

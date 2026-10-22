@@ -44,5 +44,9 @@
     "title": "Podcast",
     "intro": "My typeof Radio es un podcast en español sobre desarrollo web."
   },
+  "contributions": {
+    "title": "Contribuciones",
+    "errata": "Fe de erratas"
+  },
   "placeholder": "Próximamente."
 }

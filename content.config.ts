@@ -39,6 +39,20 @@ export default defineContentConfig({
       }),
     }),
 
+    /**
+     * Curation for the merged pull requests fetched from GitHub
+     * (server/api/contributions.get.ts), by `owner/repo#number`.
+     */
+    contributions: defineCollection({
+      type: 'data',
+      source: 'contributions.yml',
+      schema: z.object({
+        errata: z.array(z.string()).default([]),
+        hidden: z.array(z.string()).default([]),
+        notes: z.record(z.string(), localized(z.string())).default({}),
+      }),
+    }),
+
     projectsMeta: defineCollection({
       type: 'data',
       source: 'projects/*.yml',
