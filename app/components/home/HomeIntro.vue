@@ -46,6 +46,16 @@ let lastTop = Number.NaN
 let lastWidth = Number.NaN
 let frame = 0
 
+type Placed = {
+  block: Block
+  text: string
+  width: number
+  /** Start-aligned position; pieces beside the ring always use it. */
+  x: number
+  y: number
+  split: boolean
+}
+
 /* Measure each element's own font, so the canvas measurements match what
    the browser paints. Rerun when the text or the type scale changes. */
 function prepareBlock(el: HTMLElement, text: string): Block {
@@ -117,13 +127,13 @@ function flow(force = false) {
   // About 12 characters: narrower and a side holds stray words, not lines.
   const minSide = fontSize * 7
   let y = m.offsetHeight + lead
-  let i = 0
+  const placed: Placed[] = []
   for (const [index, block] of blocks.entries()) {
     if (index > 0) y += block.before
     let cursor: LayoutCursor | undefined
     let done = false
     while (!done) {
-      let placed = false
+      let any = false
       const h = halfChord(y, block.lineHeight, top, r)
       const pieces: [number, number][] = h === null ? [[0, width]] : [[0, cx - h], [cx + h, width]]
       for (const [from, to] of pieces) {
@@ -136,26 +146,38 @@ function flow(force = false) {
         // A word wider than this side would be cut in two; leave the side
         // empty and let the word find room further down.
         if (h !== null && line.end.graphemeIndex > 0) continue
-        let span = pool[i]
-        if (!span) {
-          span = document.createElement('span')
-          layer.append(span)
-          pool[i] = span
-        }
-        if (span.textContent !== line.text) span.textContent = line.text
-        Object.assign(span.style, block.style)
-        span.style.lineHeight = `${block.lineHeight}px`
         // A left piece hugs the ring: set against it, ragged on the outside.
         const x = h !== null && from === 0 ? to - line.width : from
-        span.style.transform = `translate(${x}px, ${y}px)`
+        placed.push({ block, text: line.text, width: line.width, x, y, split: h !== null })
         cursor = line.end
-        placed = true
-        i++
+        any = true
       }
-      if (placed || !done) y += block.lineHeight
+      if (any || !done) y += block.lineHeight
     }
   }
-  for (const extra of pool.splice(i)) extra.remove()
+
+  // While the ring parts the text, whole lines center on its axis so the
+  // column reads as split down the middle; otherwise they sit at the start.
+  // Each line only knows how far it would move; the layer eases one shared
+  // amount (--centered), so flipping back and forth mid-move reverses
+  // smoothly and lines rewrapping on scroll never fly across.
+  layer.classList.toggle('is-centered', placed.some(p => p.split))
+
+  for (const [i, p] of placed.entries()) {
+    let span = pool[i]
+    if (!span) {
+      span = document.createElement('span')
+      layer.append(span)
+      pool[i] = span
+    }
+    if (span.textContent !== p.text) span.textContent = p.text
+    Object.assign(span.style, p.block.style)
+    span.style.lineHeight = `${p.block.lineHeight}px`
+    span.style.setProperty('--x', `${p.x}px`)
+    span.style.setProperty('--dx', p.split ? '0px' : `${cx - p.width / 2 - p.x}px`)
+    span.style.transform = `translateY(${p.y}px)`
+  }
+  for (const extra of pool.splice(placed.length)) extra.remove()
 }
 
 function schedule() {
@@ -233,6 +255,14 @@ onBeforeUnmount(() => cancelAnimationFrame(frame))
   margin-block-start: var(--gap-group);
 }
 
+/* Small enough on a phone for each half of the name to fit beside the ring,
+   so the name can read "Axel ◯ Martinez" as it rises through it. */
+@media (width < 40rem) {
+  .home-intro>h1 {
+    font-size: 1.375rem;
+  }
+}
+
 /* Laid out by script: the mark holds just under the header. */
 .is-flowing .home-intro__mark {
   position: sticky;
@@ -251,6 +281,22 @@ onBeforeUnmount(() => cancelAnimationFrame(frame))
   inset-inline-start: 0;
   white-space: pre;
   pointer-events: auto;
+  translate: calc(var(--x, 0px) + var(--centered) * var(--dx, 0px)) 0;
+}
+
+/* Registered so it can transition: 0 at the start, 1 centered. */
+@property --centered {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+.home-intro__lines {
+  transition: --centered 600ms var(--ease-in-out);
+}
+
+.home-intro__lines.is-centered {
+  --centered: 1;
 }
 
 /*
