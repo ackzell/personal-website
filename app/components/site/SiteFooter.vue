@@ -42,13 +42,20 @@ useEventListener(
         const from = last!.rects[i]
         const to = next.rects[i]
         if (!from || !to) return
-        el.animate([{ transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)` }, { transform: 'none' }], {
-          duration: 420,
-          delay: i * 45,
-          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-          // Hold the old spot while waiting for its turn.
-          fill: 'backwards',
-        })
+        // Carried in slightly raised, then lowered into the slot: it lands.
+        el.animate(
+          [
+            { transform: `translate(${from.left - to.left}px, ${from.top - to.top}px)`, easing: 'cubic-bezier(0.16, 1, 0.3, 1)' },
+            { transform: 'translateY(-6px) scale(1.06)', offset: 0.6, easing: 'cubic-bezier(0.45, 0, 0.2, 1)' },
+            { transform: 'none' },
+          ],
+          {
+            duration: 620,
+            delay: i * 45,
+            // Hold the old spot while waiting for its turn.
+            fill: 'backwards',
+          },
+        )
       })
     }
     last = next
