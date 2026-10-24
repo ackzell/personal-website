@@ -140,6 +140,23 @@
   --accent: var(--dark-accent);
 }
 
+/*
+ * Glow marks what's lit: the role being read, the page you're on. Glow is
+ * light, so it's built like light: a core hotter than the accent, then halos
+ * of growing radius and falling strength (the bloom falloff), added onto the
+ * stage with plus-lighter instead of painted over it. --glow-near drops the
+ * wide halos, for bars inside a clipping box.
+ */
+:root {
+  --hot: color-mix(in oklab, var(--accent), white 45%);
+  --glow-near: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
+    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent);
+  --glow: var(--glow-near),
+    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
+    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
 /* Spacing comes from the flow rules below, not UA margins. */
 :where(h1, h2, h3, h4, p, ul, ol, dl, dd, pre, figure, blockquote) {
   margin-block: 0;

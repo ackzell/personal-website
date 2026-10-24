@@ -250,13 +250,6 @@ function blur(slug: string) {
   /* Where the sticky header ends. On mobile the brand row tucks away and
      only the band stays (see main.css). */
   --stick-top: var(--header-height, 0px);
-  /* The neon of a lit field (see below): a hot core and its halos. */
-  --hot: color-mix(in oklab, var(--accent), white 45%);
-  --glow: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
-    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
-    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent),
-    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
-    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
 }
 
 @media (width < 40rem) {
@@ -335,11 +328,8 @@ function blur(slug: string) {
 }
 
 /*
- * The lit field glows like a neon tube. Glow is light, so it's built like
- * light: a core hotter than the accent, then halos of growing radius and
- * falling strength (the bloom falloff), added onto the stage with
- * plus-lighter instead of painted over it. It comes on steady: a strike
- * flicker read as dizzying, so the light just moves.
+ * The lit field glows like a neon tube (--glow, see main.css). It comes on
+ * steady: a strike flicker read as dizzying, so the light just moves.
  */
 .experience__field.is-lit::after {
   background-color: var(--hot);
