@@ -1,4 +1,5 @@
 company: Accelya Group
+url: https://w3.accelya.com/
 start: 2024-01
 end: 2026-06
 role:
@@ -13,4 +14,20 @@ summary:
     - Participo en el desarrollo frontend con corrección de errores, nuevas funcionalidades e iniciativas de pruebas apoyadas en IA que sumaron miles de tests.
     - Lidero la migración de Angular a Next.js (el tercer proyecto de migración exitoso entre empresas) y apoyo la iniciativa de Design System.
     - Desarrollé la interfaz de un chatbot que consume el servicio AWS Bedrock.
-stack: [Angular 10, React, Next.js, TypeScript, TailwindCSS, Jasmine, Karma, Vitest, MSW, Windows, GitLab, Jira, Playwright, AWS Lambdas]
+stack:
+  [
+    Angular 10,
+    React,
+    Next.js,
+    TypeScript,
+    TailwindCSS,
+    Jasmine,
+    Karma,
+    Vitest,
+    MSW,
+    Windows,
+    GitLab,
+    Jira,
+    Playwright,
+    AWS Lambdas,
+  ]

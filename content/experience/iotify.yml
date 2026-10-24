@@ -1,5 +1,4 @@
 company: IoTIFY
-url: https://iotify.io
 start: 2021-03
 end: 2023-04
 role:
@@ -16,4 +15,25 @@ summary:
     - Diseñé y mantuve el código frontend durante la migración a un stack más moderno.
     - Tomé decisiones estratégicas sobre la integración de librerías de terceros y los estándares técnicos.
     - Contribuí a ciclos de desarrollo rápidos en el dominio de IoT.
-stack: [Vue 2, Vue 3, Vuex, Pinia, Vuetify, Element Plus, Meteor, MongoDB, Sass, Vite, TypeScript, AWS EC2, Bitbucket, Jira, Ubuntu, Windows 11, Cypress, Prettier, ESLint]
+stack:
+  [
+    Vue 2,
+    Vue 3,
+    Vuex,
+    Pinia,
+    Vuetify,
+    Element Plus,
+    Meteor,
+    MongoDB,
+    Sass,
+    Vite,
+    TypeScript,
+    AWS EC2,
+    Bitbucket,
+    Jira,
+    Ubuntu,
+    Windows 11,
+    Cypress,
+    Prettier,
+    ESLint,
+  ]

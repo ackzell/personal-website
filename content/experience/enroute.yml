@@ -1,4 +1,5 @@
 company: Enroute Systems
+url: https://enroutesystems.com/
 start: 2023-05
 end: 2024-01
 role:
@@ -11,4 +12,20 @@ summary:
   es:
     - Trabajé de forma remota como desarrollador full stack en un equipo extendido para una empresa Fintech.
     - Implementé nuevas funcionalidades para un sistema interno dentro de un equipo multidisciplinario.
-stack: [React, MaterialUI, React Query, TypeScript, GitHub, Jira, Mac OS, Jest, Prettier, ESLint, Postgres, Storybook, NestJS, AWS Lambdas]
+stack:
+  [
+    React,
+    MaterialUI,
+    React Query,
+    TypeScript,
+    GitHub,
+    Jira,
+    Mac OS,
+    Jest,
+    Prettier,
+    ESLint,
+    Postgres,
+    Storybook,
+    NestJS,
+    AWS Lambdas,
+  ]
