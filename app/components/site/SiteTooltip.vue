@@ -9,8 +9,9 @@
  * stacks over it. It stays in the DOM while hidden, as the name's description.
  *
  * `pointerOnly` is for a mark whose details are already said beside it: it
- * takes no keyboard stop or tap, stays out of the accessibility tree, and
- * covers its parent, padded out to a target worth aiming at.
+ * takes no keyboard stop, stays out of the accessibility tree, and covers its
+ * parent, padded out to a target worth aiming at. A tap on it opens the
+ * tooltip instead of following whatever link it sits in.
  */
 import type { VirtualElement } from '@floating-ui/dom'
 import { computePosition, flip, offset, shift } from '@floating-ui/dom'
@@ -131,7 +132,11 @@ function focus(event: FocusEvent) {
 
 function tap(event: MouseEvent) {
   const type = (event as PointerEvent).pointerType
-  if (props.pointerOnly || (type !== 'touch' && type !== 'pen')) return
+  if (type !== 'touch' && type !== 'pen') return
+  if (props.pointerOnly) {
+    event.preventDefault()
+    event.stopPropagation()
+  }
   if (shown.value) hide()
   else show(false)
 }
