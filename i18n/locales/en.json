@@ -11,8 +11,8 @@
   "nav": {
     "label": "Main",
     "about": "About",
-    "work": "Work",
-    "media": "Media"
+    "work": "Projects",
+    "media": "Content"
   },
   "home": {
     "title": "Axel Martínez",
@@ -34,7 +34,7 @@
     }
   },
   "media": {
-    "title": "Media"
+    "title": "Content"
   },
   "videos": {
     "title": "Videos",
