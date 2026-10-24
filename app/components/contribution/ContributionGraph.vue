@@ -39,12 +39,24 @@ const errataCount = computed(() => props.projects.reduce((n, p) => n + p.merges.
  */
 const flag = (on: boolean) => (on ? '--errata' : '--no-errata')
 const shownFlag = ref(flag(showErrata.value))
+
+/*
+ * On arrival the command types itself in, key by key behind a block cursor,
+ * and only then prints its output. It's all CSS from the first paint (each
+ * key knows its place, --c, and the line its length, --typed), so the
+ * server's HTML types in the same way and nothing flashes before hydration.
+ * The first run ends it.
+ */
+const command = 'git log --graph'
+const typed = command.length + 1 + shownFlag.value.length
+const booting = ref(true)
 const runs = ref(0)
 let scrambling: ReturnType<typeof animate> | undefined
 
 function toggleErrata() {
   const from = shownFlag.value
   showErrata.value = !showErrata.value
+  booting.value = false
   const to = flag(showErrata.value)
   runs.value++
   // The run prints every row itself; nothing waits to scroll in after it.
@@ -172,18 +184,19 @@ const name = (repo: string) => repo.split('/')[1]
 </script>
 
 <template>
-  <div class="contributions" grid gap="block">
+  <div class="contributions" grid gap="block" :data-booting="booting || undefined" :style="{ '--typed': typed }">
     <!-- The switch as the log's own command, like lang="en" and
          color-scheme="system": the flag flips on the git log below it. -->
     <div class="errata-switch">
-      <span aria-hidden="true">$ git log --graph</span>
+      <span aria-hidden="true">$ <span v-for="(key, c) in command" :key="c" class="key" :style="{ '--c': c }">{{ key
+      }}</span></span>
       <button type="button" class="errata-switch__value" :aria-pressed="showErrata" data-no-scramble
         @click="toggleErrata">
         <span class="sr-only">{{ t('contributions.errata') }}: {{ errataCount }}</span>
-        <span aria-hidden="true">{{ shownFlag }}</span>
+        <span aria-hidden="true"><span v-for="(key, c) in shownFlag" :key="c" class="key"
+            :style="{ '--c': command.length + 1 + c }">{{ key }}</span></span>
       </button>
-      <span class="errata-switch__count tabular-nums" aria-hidden="true"># {{ errataCount }} {{ $t('typos-docs-etc')
-        }}</span>
+      <span class="errata-switch__count tabular-nums" aria-hidden="true"># {{ errataCount }} </span>
     </div>
 
     <Transition mode="out-in" :css="reducedMotion !== 'reduce'">
@@ -213,7 +226,7 @@ const name = (repo: string) => repo.split('/')[1]
           </h2>
 
           <div v-else class="log__merge" grid gap="1">
-            <a :href="row.merge.url" target="_blank" rel="noopener">{{ row.merge.title }}</a>
+            <a decoration-0 :href="row.merge.url" target="_blank" rel="noopener">{{ row.merge.title }}</a>
             <p v-if="row.merge.note" m="0">{{ row.merge.note }}</p>
             <p m="0" typeset="code" text="sm muted" class="tabular-nums">
               #{{ row.merge.number }} · <time :datetime="row.merge.merged">{{ formatDate(row.merge.merged) }}</time>
@@ -235,12 +248,27 @@ const name = (repo: string) => repo.split('/')[1]
 @media (width < 40rem) {
   .contributions {
     --stick-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
+    /* The log is dense with code and indents by lanes: a step smaller still,
+       and its main line closer to the edge, so the text keeps its width. */
+    font-size: 0.9em;
+  }
+
+  .log {
+    margin-inline-start: calc(var(--gutter) / -2);
   }
 }
 
+/* A run-on repo name or title breaks anywhere rather than push the page
+   sideways. */
+.log__repo,
+.log__merge {
+  overflow-wrap: anywhere;
+}
+
 .log {
-  /* One line of the drawing; every glyph sits on this grid. */
-  --lh: 1.65rem;
+  /* One line of the drawing; every glyph sits on this grid. In em, so the
+     grid follows the text size (smaller on phones). */
+  --lh: 1.65em;
 
   /* Room past the oldest project, so it can scroll up to the reading line. */
   padding-block-end: 60svh;
@@ -282,7 +310,7 @@ const name = (repo: string) => repo.split('/')[1]
   inset-block: 0;
   inset-inline-start: 0;
   inline-size: 3ch;
-  font: 400 1rem/var(--lh) var(--font-body);
+  font: 400 1em/var(--lh) var(--font-body);
   white-space: pre;
   overflow: hidden;
   pointer-events: none;
@@ -391,8 +419,8 @@ const name = (repo: string) => repo.split('/')[1]
   content: '·';
 }
 
-.log__row--merge[data-erratum] .log__merge {
-  font-size: 0.875rem;
+.log__row--merge[data-erratum] .log__merge> :not(:last-child) {
+  font-size: 0.875em;
 }
 
 .log__row--merge[data-erratum] .log__merge>a,
@@ -456,8 +484,84 @@ const name = (repo: string) => repo.split('/')[1]
   }
 }
 
+/* Each line lands bright and cools, like phosphor. Shadows in currentColor,
+   so every glyph glows in its own color. */
+.log--printing>.log__row {
+  animation-name: log-print, phosphor;
+  animation-duration: 160ms, 900ms;
+}
+
+@keyframes phosphor {
+  from {
+    text-shadow:
+      0 0 0.5em color-mix(in oklab, currentColor 70%, transparent),
+      0 0 0.12em currentColor;
+  }
+}
+
+/* Booting: the command types in a key at a time once the page wipe is half
+   done, the cursor rests a beat at its end (enter), and the rows on screen
+   print the way a run prints them. */
+.contributions {
+  --key: 32ms;
+  --boot: 280ms;
+  --booted: calc(var(--boot) + (var(--typed) + 1) * var(--key) + 140ms);
+}
+
+/* A key stays blank until the cursor, on its cell, moves past it. */
+[data-booting] .key {
+  animation:
+    key-blank calc(var(--boot) + (var(--c) + 1) * var(--key)) step-end,
+    key-cursor var(--key) step-end calc(var(--boot) + var(--c) * var(--key));
+}
+
+[data-booting] .errata-switch__value::after {
+  content: '';
+  position: absolute;
+  inset-block: var(--space-1);
+  inset-inline-start: 100%;
+  inline-size: 1ch;
+  animation: key-cursor calc(var(--key) + 140ms) step-end calc(var(--boot) + var(--typed) * var(--key));
+}
+
+[data-booting] .errata-switch__count {
+  animation: boot-in 300ms var(--ease-out) var(--booted) both;
+}
+
+[data-booting] .log:not(.log--printing)>.log__row {
+  animation: log-print 160ms var(--ease-out) both, phosphor 900ms var(--ease-out) both;
+  animation-delay: calc(var(--booted) + min(var(--i) * 24ms, 1200ms));
+}
+
+@keyframes key-blank {
+
+  from,
+  to {
+    color: transparent;
+  }
+}
+
+@keyframes key-cursor {
+
+  from,
+  to {
+    background-color: var(--accent);
+  }
+}
+
+@keyframes boot-in {
+  from {
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .log--printing>.log__row {
+
+  .log--printing>.log__row,
+  [data-booting] .key,
+  [data-booting] .errata-switch__value::after,
+  [data-booting] .errata-switch__count,
+  [data-booting] .log>.log__row {
     animation: none;
   }
 
@@ -492,11 +596,12 @@ const name = (repo: string) => repo.split('/')[1]
   font-family: var(--font-code);
   font-weight: var(--code-weight);
   font-variation-settings: 'CASL' 0;
-  font-size: 0.875rem;
+  font-size: 0.875em;
   color: var(--muted);
 }
 
 .errata-switch__value {
+  position: relative;
   padding: var(--space-1) 0.15em;
   border: 0;
   background: none;
