@@ -50,7 +50,7 @@ const resting = useState('site-mark-resting', () => false)
 }
 
 :root.dark .site-mark {
-  color: color-mix(in oklab, var(--dark-accent) 15%, var(--bg));
+  color: color-mix(in oklab, var(--dark-accent) 18%, var(--bg));
 }
 
 .site-mark__svg {
