@@ -150,9 +150,13 @@ Below 40rem, the layout simplifies: the header's brand row scrolls away and only
 
 ## Elevation & Depth
 
-Flat, with no shadows at all. Depth is conveyed by tonal separation and motion: the sticky header and footer carry their own copy of the stage color so content scrolls under them rather than through them, and spotlighted lexicon entries step the others back to 40% opacity.
+Flat, with no drop shadows. Depth is conveyed by tonal separation and motion: the sticky header and footer carry their own copy of the stage color so content scrolls under them rather than through them, and spotlighted lexicon entries step the others back to 40% opacity.
+
+The one exception is light, not depth: what's lit glows like a neon tube. A core hotter than the accent (`--hot`, the accent mixed 45% toward white), then zero-offset halos of growing radius and falling strength (`--glow`, five layers out to 56px; `--glow-near`, the first three, for bars inside a clipping box), added onto the stage with `plus-lighter`. It comes on steady, never with a strike flicker. Tokens live in `main.css`.
 
 ### Named Rules
+**The Lit Rule.** Glow marks what's lit, and nothing else: the experience role being read, the page you're on in the flag band. Hover and focus preview without light (a field brightens, a marker fills faintly); chrome such as the footer icons never glows. Light only adds onto a darker stage, so it stays off the ink marker on light work's paper.
+
 **The No Border Rule.** No borders, rules or outlines as decoration. The stage shows through the gaps between fields. The only outline is the 2px accent focus ring.
 
 ## Shapes
@@ -163,7 +167,8 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 
 ### Flag Band (navigation)
 - **Character:** A row of colored fields, in flag order, with a label under each. Closed sections show their flag color; the open section is the stage itself with a faint track for the marker to ride on.
-- **Marker:** One accent bar marks the current page. It slides between pages on navigation, in the direction of travel, arriving in its new section's accent.
+- **Marker:** One accent bar marks the current page. It slides between pages on navigation, in the direction of travel, arriving in its new section's accent. It's lit per The Lit Rule, with `--glow-near` since the open section's stops scroll sideways and would clip wider halos.
+- **Intro:** On a full load (not in-app navigation) the light runs along the band once, field by field, left to right, under a second end to end, and leaves the marker lit. Reduced motion skips it.
 - **Hover / Focus:** A faint marker (35% accent) fills the field from the left, as the real one would arrive. Pressing firms it up to 60%. Not shown on the current page.
 - **Submenu labels:** At rest an open section shows children as fields plus the current label. As the pointer nears, labels ripple in from the stop nearest it, 60ms per step; picking a child hides the rest until the pointer leaves and returns. Touch keeps them shown.
 - **Mobile:** Collapsed fields with a Menu toggle covering the whole band; open, segments stack and project words wrap, with 2.75rem targets.
@@ -192,6 +197,7 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 
 ### Don't:
 - **Don't** add borders, drop shadows, cards or rounded corners.
+- **Don't** glow anything that isn't lit (The Lit Rule), and don't make the glow flicker.
 - **Don't** introduce a hue outside the flag palette, or a color that doesn't resolve per section and scheme.
 - **Don't** use `text="…"` attributify on `<a>` or `NuxtLink`; it overwrites the link label.
 - **Don't** use Nahuatl as a visual motif, and don't invent words, pronunciations or meanings; they come from the owner.

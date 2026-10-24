@@ -123,9 +123,32 @@ useDragScroll(nav, '.flag-nav__stops')
 // without a scroll.
 useResizeObserver(nav, measure)
 
+/*
+ * On a full load the light runs along the band once, field by field, left to
+ * right, and leaves the marker lit. Not on in-app navigation, and not under
+ * reduced motion. Each field's ::before carries the light (see the styles).
+ */
+const fullLoad = import.meta.client && useNuxtApp().isHydrating
+
+function ignite() {
+  if (!fullLoad || !nav.value || matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const fields = [...nav.value.querySelectorAll<HTMLElement>('.flag-nav__field')].filter((field) => field.checkVisibility())
+  // Under a second end to end, however many fields there are.
+  const step = Math.min(110, 900 / fields.length)
+  fields.forEach((field, n) => {
+    field.animate({ opacity: [0, 1, 0], offset: [0, 0.25, 1] }, {
+      pseudoElement: '::before',
+      duration: 450,
+      delay: n * step,
+      easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+    })
+  })
+}
+
 onMounted(() => {
   findStops()
   showCurrent()
+  ignite()
 })
 </script>
 
@@ -149,7 +172,7 @@ onMounted(() => {
               :class="stop.child ? 'text-[0.75rem] text-[var(--nav-child)] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold' : 'text-[1rem] text-fg'"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
-                <span v-if="segment.marked === stop.key" class="[view-transition-name:flag-marker]" absolute inset="0"
+                <span v-if="segment.marked === stop.key" class="flag-nav__marker [view-transition-name:flag-marker]" absolute inset="0"
                   bg="accent" />
               </span>
               <span class="flag-nav__label" pe="3">{{ stop.label }}</span>
@@ -161,7 +184,7 @@ onMounted(() => {
           flex flex-col gap="2" pb="1" min-w="28" decoration="none">
           <span class="flag-nav__field" relative block aria-hidden="true">
             <!-- One per page; the name lets the page transition slide it (main.css). -->
-            <span v-if="segment.marked" class="[view-transition-name:flag-marker]" absolute inset="0" bg="accent" />
+            <span v-if="segment.marked" class="flag-nav__marker [view-transition-name:flag-marker]" absolute inset="0" bg="accent" />
           </span>
           <span pe="3">{{ segment.stops[0]!.label }}</span>
         </NuxtLinkLocale>
@@ -265,6 +288,33 @@ onMounted(() => {
   display: none;
 }
 
+/* The light that runs along the band on a full load (ignite). Plain accent
+   on light work's paper, for the same reason as the marker below. */
+.flag-nav__field::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--accent);
+  opacity: 0;
+  pointer-events: none;
+}
+
+:root:is(.dark, :not([data-section='work'])) .flag-nav__field::before {
+  background-color: var(--hot);
+  box-shadow: var(--glow-near);
+  mix-blend-mode: plus-lighter;
+}
+
+/* The marker is lit: you are here. It glows like the experience band's lit
+   field (--glow-near, see main.css); a preview stays faint and unlit. Light
+   adds onto a darker stage, so not for the ink marker on light work's paper,
+   where it would wash out. */
+:root:is(.dark, :not([data-section='work'])) .flag-nav__marker {
+  background-color: var(--hot);
+  box-shadow: var(--glow-near);
+  mix-blend-mode: plus-lighter;
+}
+
 /*
  * The open section's stops scroll sideways when they don't fit (always on
  * small screens, and between sm and a wide window when there are many
@@ -276,6 +326,10 @@ onMounted(() => {
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
+  /* Room for the marker's glow above the fields, which the scroll box
+     would otherwise clip. */
+  padding-block-start: var(--space-3);
+  margin-block-start: calc(-1 * var(--space-3));
   --fade: var(--space-8);
   mask-image: linear-gradient(to right,
       transparent,
