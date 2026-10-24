@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const { t } = useI18n()
-const [{ data: projects }, { data: roles }] = await Promise.all([useProjects(), useExperience()])
+const [{ data: projects }, { data: roles }, { data: recognition }] = await Promise.all([
+  useProjects(),
+  useExperience(),
+  useRecognition(),
+])
 
 const featured = computed(() => projects.value?.find((project) => project.featured))
 
@@ -14,7 +18,7 @@ useSeoMeta({ title: '', description: () => t('home.intro') })
     </section>
 
     <section aria-labelledby="timeline-heading">
-      <HomeExperience v-if="roles?.length" :title="$t('home.timeline')" :roles="roles" />
+      <HomeExperience v-if="roles?.length" :title="$t('home.timeline')" :roles="roles" :recognition="recognition ?? []" />
     </section>
 
     <section v-if="featured" aria-labelledby="featured-heading">

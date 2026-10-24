@@ -1,0 +1,11 @@
+kind: award
+title:
+  en: Ceneval Excellence Award
+  es: Premio Ceneval al Desempeño de Excelencia
+short: Ceneval
+issuer: CENEVAL
+start: 2013-03
+detail:
+  en: EGEL Software Engineering exam, with an outstanding score in every evaluated area.
+  es: EGEL Ingeniería de Software, con desempeño sobresaliente en todas las áreas evaluadas.
+score: [4, 4]

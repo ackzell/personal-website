@@ -5,21 +5,44 @@
  * spent there. The heading sticks under the header, and the band sticks under
  * the heading, beside the roles as they scroll by.
  *
- * The field of the role being read lights up: the one under the pointer or
- * focus, otherwise the one passing the upper part of the viewport. The other
- * roles step back, as lexicon entries do, so the lit role reads alone. The lit field fills
- * with the accent from the top; every field keeps its share of the career.
+ * The field of the role being read lights up: the one holding focus,
+ * otherwise the one passing the upper part of the viewport. The other roles
+ * step back, as lexicon entries do, so the lit role reads alone. The lit field
+ * fills with the accent from the top; every field keeps its share of the
+ * career. Pointing at a role only previews it, so the light stays with the
+ * role being read: its field brightens, and if it had stepped back it comes
+ * part of the way forward.
  *
  * Roles and fields are both links to the role: following one brings the role
  * to the top, under the heading.
+ *
+ * Awards and certifications are footnotes to the role held when they were
+ * earned, each marked with a small square, and the same square, smaller, marks
+ * its month beside the role's field. They light with their role.
  *
  * The band draws itself in once, top to bottom, the first time it scrolls
  * into view. Server-rendered fields are already full, so without JS (or when
  * the band is already on screen) nothing waits on the animation.
  */
-const props = defineProps<{ title: string, roles: Role[] }>()
+const props = defineProps<{ title: string, roles: Role[], recognition: Recognition[] }>()
 
-const { locale } = useI18n()
+const monthIndex = (month: string) => {
+  const [year, m] = month.split('-').map(Number)
+  return year! * 12 + m!
+}
+
+// Each role's awards and certifications, oldest first, with where each one
+// falls down the role's field (0 at its end, the field's top, to 1 at its start).
+const earned = computed(() => {
+  const byRole: Record<string, { item: Recognition, at: number }[]> = {}
+  for (const item of [...props.recognition].sort((a, b) => a.start.localeCompare(b.start))) {
+    const role = props.roles.find((role) => role.start <= item.start && item.start <= role.end)
+    if (!role) continue
+    const at = (monthIndex(role.end) - monthIndex(item.start) + 0.5) / role.months
+    ;(byRole[role.slug] ??= []).push({ item, at })
+  }
+  return byRole
+})
 
 const heading = useTemplateRef<HTMLElement>('heading')
 const band = useTemplateRef<HTMLElement>('band')
@@ -27,7 +50,8 @@ const entries = useTemplateRef<HTMLElement[]>('entries')
 
 const hovered = ref<string>()
 const reading = ref<string>()
-const lit = computed(() => hovered.value ?? reading.value)
+const focused = ref<string>()
+const lit = computed(() => focused.value ?? reading.value)
 // pending: hidden, waiting to scroll in. drawn: fields grown to full.
 const state = ref<'drawn' | 'pending'>('drawn')
 
@@ -36,12 +60,7 @@ const { height: headingHeight } = useElementSize(heading, undefined, { box: 'bor
 const lastYear = computed(() => props.roles[0]?.end.slice(0, 4))
 const firstYear = computed(() => props.roles.at(-1)?.start.slice(0, 4))
 
-const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric', timeZone: 'UTC' }))
-
-function formatMonth(month: string) {
-  const [year, m] = month.split('-').map(Number)
-  return monthFormat.value.format(new Date(Date.UTC(year!, m! - 1)))
-}
+const formatMonth = useMonthFormat()
 
 // While a followed link scrolls to its role, the target stays lit instead of
 // every role the scroll passes on the way. Released once scrolling settles
@@ -126,6 +145,10 @@ function go(event: MouseEvent, slug: string) {
 function leave(slug: string) {
   if (hovered.value === slug) hovered.value = undefined
 }
+
+function blur(slug: string) {
+  if (focused.value === slug) focused.value = undefined
+}
 </script>
 
 <template>
@@ -140,19 +163,30 @@ function leave(slug: string) {
           <!-- Pointer shortcuts to the roles' own links, so kept out of the tab
                order and the accessibility tree. -->
           <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1"
-            class="experience__field" :class="{ 'is-lit': lit === role.slug }"
+            class="experience__field" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
             :style="{ '--months': role.months, '--i': i }" @click="go($event, role.slug)"
-            @pointerenter="hovered = role.slug" @pointerleave="leave(role.slug)" />
+            @pointerenter="hovered = role.slug" @pointerleave="leave(role.slug)">
+            <span v-for="{ item, at } in earned[role.slug]" :key="item.slug" class="experience__tick"
+              :style="{ '--at': at }">
+              <!-- The band is out of the accessibility tree, and the note
+                   under the role says the same: pointer only. -->
+              <SiteTooltip pointer-only>
+                <template #tip>
+                  <HomeEarnedTip :item="item" />
+                </template>
+              </SiteTooltip>
+            </span>
+          </a>
         </div>
         <span class="tabular-nums">{{ firstYear }}</span>
       </div>
 
       <ol class="experience__list" m="0" p="0" list="none">
         <li v-for="role in roles" :id="`role-${role.slug}`" ref="entries" :key="role.slug" :data-slug="role.slug"
-          class="experience__entry" :class="{ 'is-lit': lit === role.slug }"
+          class="experience__entry" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
           :data-state="waiting.has(role.slug) ? 'pending' : undefined" :style="{ '--batch': batch[role.slug] ?? 0 }"
           relative grid gap="x-group y-tight" pb="block" @pointerenter="hovered = role.slug"
-          @pointerleave="leave(role.slug)" @focusin="hovered = role.slug" @focusout="leave(role.slug)">
+          @pointerleave="leave(role.slug)" @focusin="focused = role.slug" @focusout="blur(role.slug)">
           <p class="experience__dates experience__piece tabular-nums" style="--j: 0" typeset="code" text="xs muted">
             <time :datetime="role.start">{{ formatMonth(role.start) }}</time>
             <span aria-hidden="true">&ensp;–&ensp;</span>
@@ -182,6 +216,28 @@ function leave(slug: string) {
               text="sm muted">
               <li v-for="tool in role.stack" :key="tool">{{ tool }}</li>
             </ul>
+            <ul v-if="earned[role.slug]" class="experience__earned experience__piece"
+              :style="{ '--j': role.summary.length + 3 }" m="0" mt="tight" p="0" list="none" grid typeset="code"
+              text="sm muted">
+              <li v-for="{ item } in earned[role.slug]" :key="item.slug" flex items="center" gap="tight">
+                <span class="experience__square" aria-hidden="true" />
+                <!-- Short in the line; the whole entry in its tooltip. -->
+                <SiteTooltip>
+                  {{ item.short }}
+                  <template #tip>
+                    <HomeEarnedTip :item="item" />
+                  </template>
+                </SiteTooltip>
+                <span v-if="item.score" class="experience__score" aria-hidden="true" flex items="center">
+                  <span v-for="area in item.score[1]" :key="area" class="experience__area"
+                    :class="{ 'is-scored': area <= item.score[0] }" :style="{ '--k': area - 1 }" />
+                </span>
+                <span class="tabular-nums">
+                  <time :datetime="item.start">{{ item.start.slice(0, 4) }}</time>
+                  <template v-if="item.end">–<time :datetime="item.end">{{ item.end.slice(2, 4) }}</time></template>
+                </span>
+              </li>
+            </ul>
           </div>
         </li>
       </ol>
@@ -194,6 +250,13 @@ function leave(slug: string) {
   /* Where the sticky header ends. On mobile the brand row tucks away and
      only the band stays (see main.css). */
   --stick-top: var(--header-height, 0px);
+  /* The neon of a lit field (see below): a hot core and its halos. */
+  --hot: color-mix(in oklab, var(--accent), white 45%);
+  --glow: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
+    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent),
+    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
+    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
 }
 
 @media (width < 40rem) {
@@ -236,7 +299,13 @@ function leave(slug: string) {
   background-color: var(--line);
   transform-origin: top;
   transition:
-    scale 700ms var(--ease-out) calc(var(--i) * 90ms);
+    scale 700ms var(--ease-out) calc(var(--i) * 90ms),
+    background-color 150ms var(--ease-out);
+}
+
+/* Pointed at but not being read: the field brightens, without the light. */
+.experience__field.is-hovered:not(.is-lit) {
+  background-color: var(--muted);
 }
 
 /* A wider hit area than the 4px bar. Fields touch through it, so the pointer
@@ -273,13 +342,9 @@ function leave(slug: string) {
  * flicker read as dizzying, so the light just moves.
  */
 .experience__field.is-lit::after {
-  background-color: color-mix(in oklab, var(--accent), white 45%);
+  background-color: var(--hot);
   border: 1px solid var(--accent);
-  box-shadow: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
-    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
-    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent),
-    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
-    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
+  box-shadow: var(--glow);
   mix-blend-mode: plus-lighter;
 }
 
@@ -404,6 +469,98 @@ function leave(slug: string) {
   content: ', ';
 }
 
+/* Earned along the role: footnotes under the stack, set in from it. */
+.experience__earned {
+  gap: var(--space-1);
+  padding-inline-start: var(--space-4);
+}
+
+/* Each one's mark, and its month on the band: a square of the band's
+   width, smaller beside the field so it reads as a point in time, not a
+   bullet for the text across from it. Both light with the role. */
+.experience__square,
+.experience__tick {
+  flex: none;
+  inline-size: var(--space-2);
+  block-size: var(--space-2);
+  background-color: var(--muted);
+  transition:
+    background-color 250ms var(--ease-out),
+    box-shadow 250ms var(--ease-out),
+    scale 250ms var(--ease-out);
+}
+
+.experience__tick {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: calc(var(--at) * 100%);
+  inset-inline-start: calc(100% + 3px);
+  inline-size: 3px;
+  block-size: 3px;
+  translate: 0 -50%;
+}
+
+.experience__field.is-lit .experience__tick,
+.experience__entry.is-lit .experience__square {
+  background-color: var(--hot);
+  box-shadow: var(--glow);
+  mix-blend-mode: plus-lighter;
+  transition-duration: 500ms;
+}
+
+/* Activated: the square under the pointer, or the one beside the name being
+   read, burns hotter than its lit role and swells a little. */
+.experience__field .experience__tick:hover,
+.experience__earned li:has(.site-tooltip__name:hover, .site-tooltip__name:focus-visible) .experience__square {
+  background-color: color-mix(in oklab, var(--accent), white 75%);
+  box-shadow: var(--glow), 0 0 8px 2px color-mix(in oklab, var(--accent) 80%, transparent);
+  mix-blend-mode: plus-lighter;
+  transition-duration: 200ms;
+}
+
+.experience__field .experience__tick:hover {
+  scale: 1.8;
+}
+
+.experience__earned li:has(.site-tooltip__name:hover, .site-tooltip__name:focus-visible) .experience__square {
+  scale: 1.3;
+}
+
+/* An award's score: one short field per evaluated area, built like the
+   band's, with the stage showing between them. */
+.experience__score {
+  gap: 3px;
+}
+
+.experience__area {
+  position: relative;
+  inline-size: 3px;
+  block-size: 1em;
+  background-color: var(--line);
+}
+
+.experience__area::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-color: var(--accent);
+  transform-origin: top;
+  scale: 1 0;
+  transition: scale 250ms var(--ease-out);
+}
+
+/* Lit with the role, the scored areas fill one after another and glow like
+   its field. Emptying is quicker and all at once. */
+
+.experience__entry.is-lit .experience__area.is-scored::after {
+  scale: 1 1;
+  background-color: var(--hot);
+  box-shadow: var(--glow);
+  mix-blend-mode: plus-lighter;
+  transition-duration: 500ms;
+  transition-delay: calc(var(--k) * 80ms);
+}
+
 /*
  * Arriving: each piece rises a little out of a soft blur, a beat after the
  * one above it. Roles arriving together follow each other (--batch), at the
@@ -447,20 +604,21 @@ function leave(slug: string) {
 }
 
 .experience__entry.is-lit .experience__dates > * {
-  color: color-mix(in oklab, var(--accent), white 45%);
-  text-shadow: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
-    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
-    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent),
-    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
-    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
+  color: var(--hot);
+  text-shadow: var(--glow);
   mix-blend-mode: plus-lighter;
   transition-duration: 500ms;
 }
 
-/* Spotlight, as in the lexicon, on the role lit in the band: pointed at,
-   focused, or being read. Until one is lit (or without JS) all stay full. */
+/* Spotlight, as in the lexicon, on the role lit in the band: focused or
+   being read. Until one is lit (or without JS) all stay full. A role pointed
+   at comes part of the way forward, still behind the lit one. */
 .experience__list:has(.is-lit) .experience__entry:not(.is-lit) {
   opacity: 0.4;
+}
+
+.experience__list:has(.is-lit) .experience__entry.is-hovered:not(.is-lit) {
+  opacity: 0.7;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -510,6 +668,18 @@ function leave(slug: string) {
 
   .experience__out {
     translate: none;
+  }
+
+  /* Scored areas fill as a fade in place. */
+  .experience__area::after {
+    scale: 1 1;
+    opacity: 0;
+    transition: opacity 150ms var(--ease-out);
+  }
+
+  .experience__entry.is-lit .experience__area.is-scored::after {
+    opacity: 1;
+    transition-delay: 0ms;
   }
 }
 </style>

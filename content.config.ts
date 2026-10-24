@@ -40,6 +40,28 @@ export default defineContentConfig({
     }),
 
     /**
+     * Awards and certifications, one file per entry:
+     * `content/recognition/<slug>.yml`. A certification keeps the month it
+     * lapsed; expired ones stay listed, dated.
+     */
+    recognition: defineCollection({
+      type: 'data',
+      source: 'recognition/*.yml',
+      schema: z.object({
+        kind: z.enum(['award', 'certification']),
+        title: localized(z.string()),
+        // What the entry is called where room is short (an acronym, a name).
+        short: z.string(),
+        issuer: z.string(),
+        start: month,
+        end: month.optional(),
+        detail: localized(z.string()).optional(),
+        // Areas scored outstanding, out of the areas evaluated.
+        score: z.tuple([z.number(), z.number()]).optional(),
+      }),
+    }),
+
+    /**
      * Curation for the merged pull requests fetched from GitHub
      * (server/api/contributions.get.ts), by `owner/repo#number`.
      */
