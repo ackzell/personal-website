@@ -534,7 +534,7 @@ function blur(slug: string) {
   position: absolute;
   inset: 0;
   background-color: var(--accent);
-  transform-origin: top;
+  transform-origin: bottom;
   scale: 1 0;
   transition: scale 250ms var(--ease-out);
 }
