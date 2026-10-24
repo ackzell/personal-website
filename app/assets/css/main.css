@@ -488,6 +488,16 @@ main {
 }
 
 /*
+ * A project with a light-scheme mark (logoLight) renders both images; only the one for the
+ * current scheme shows. The hidden one is display:none, so a view transition
+ * never captures it and the plate's transition name stays unique.
+ */
+:root.dark img[data-scheme='light'],
+:root:not(.dark) img[data-scheme='dark'] {
+  display: none;
+}
+
+/*
  * A project's plate (logo) travels with its word, on the word's timing. It
  * grows between the lexicon margin and the heading, so unlike the word it
  * changes size: keep the default crossfade, so the sharp new image takes over

@@ -79,6 +79,8 @@ export default defineContentConfig({
         devlogPlaylist: z.string().optional(),
         // The project's mark, served from public/ (e.g. /logos/tlapalli.svg).
         logo: z.string().optional(),
+        // The mark for the light scheme; `logo` is for the dark one.
+        logoLight: z.string().optional(),
       }),
     }),
 

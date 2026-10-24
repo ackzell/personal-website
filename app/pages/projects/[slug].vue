@@ -31,7 +31,7 @@ useSeoMeta({
        the footer, however short the entry is. -->
   <div v-if="project" class="project-page">
     <article class="page project">
-      <WordHeading :slug="project.slug" :word="project.word" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status" :logo="project.logo" />
+      <WordHeading :slug="project.slug" :word="project.word" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status" :logo="project.logo" :logo-light="project.logoLight" />
 
       <p class="project__title">{{ project.title }}</p>
       <p class="project__description">{{ project.description }}</p>

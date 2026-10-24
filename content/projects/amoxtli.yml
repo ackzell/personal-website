@@ -7,4 +7,6 @@ repos:
   - ackzell/amoxtli-vue
 stack: [nuxt, vue, tutorialkit, webcontainers]
 related: [yehyecoa]
+logo: /logos/amoxtli-vue.svg
+logoLight: /logos/amoxtli-vue_light.svg
 # TODO: livestreams playlist id, and previewAccess (mailto or form) — never the preview URL

@@ -18,8 +18,12 @@ const filled = (value: string) => value && value !== 'TODO'
     <li v-for="project in projects" :key="project.slug" class="index__item">
       <span class="index__line">
         <!-- Decorative: the word already names the project. -->
-        <img v-if="project.logo" class="index__plate" :src="project.logo" alt="" width="24" height="24"
-          loading="lazy" decoding="async" :style="plateTransition(project.slug)">
+        <template v-if="project.logo">
+          <img class="index__plate" :src="project.logo" alt="" width="24" height="24" loading="lazy" decoding="async"
+            :data-scheme="project.logoLight ? 'dark' : undefined" :style="plateTransition(project.slug)">
+          <img v-if="project.logoLight" class="index__plate" :src="project.logoLight" alt="" width="24" height="24"
+            loading="lazy" decoding="async" data-scheme="light" :style="plateTransition(project.slug)">
+        </template>
         <span v-else class="index__plate" aria-hidden="true" />
         <NuxtLinkLocale :to="`/projects/${project.slug}`" class="index__word" lang="nah"
           :style="wordTransition(project.slug)">

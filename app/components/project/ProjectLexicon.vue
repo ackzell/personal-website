@@ -60,7 +60,9 @@ useHead({
            the logo, large and washed out behind the entry. -->
       <span v-if="project.logo" class="lexicon__glimpse" aria-hidden="true">
         <img class="lexicon__glimpse-img" :src="project.logo" alt="" width="288" height="288" loading="lazy"
-          decoding="async" :style="plateTransition(project.slug)">
+          decoding="async" :data-scheme="project.logoLight ? 'dark' : undefined" :style="plateTransition(project.slug)">
+        <img v-if="project.logoLight" class="lexicon__glimpse-img" :src="project.logoLight" alt="" width="288"
+          height="288" loading="lazy" decoding="async" data-scheme="light" :style="plateTransition(project.slug)">
       </span>
     </div>
   </dl>

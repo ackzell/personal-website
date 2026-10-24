@@ -30,4 +30,6 @@ export interface Project {
   devlogPlaylist?: string
   /** The project's mark, a path under public/. Decorative: the word names the project. */
   logo?: string
+  /** The mark for the light scheme; `logo` is for the dark one. */
+  logoLight?: string
 }

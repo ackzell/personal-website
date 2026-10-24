@@ -58,6 +58,7 @@ async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
         related: item.related ?? [],
         devlogPlaylist: item.devlogPlaylist,
         logo: item.logo,
+        logoLight: item.logoLight,
       }
     })
     .sort((a, b) => a.order - b.order)
