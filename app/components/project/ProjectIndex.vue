@@ -70,7 +70,7 @@ const filled = (value: string) => value && value !== 'TODO'
 
 .index__word {
   font-family: var(--font-heading);
-  font-size: 1.25rem;
+  font-size: 1.25em;
   font-weight: var(--heading-weight);
   line-height: 1.2;
   color: var(--fg);
@@ -121,7 +121,7 @@ const filled = (value: string) => value && value !== 'TODO'
   margin: 0;
   padding-block-start: var(--space-2);
   padding-inline-start: calc(var(--plate-size) + var(--space-2));
-  font-size: 0.875rem;
+  font-size: 0.875em;
   color: var(--muted);
 }
 

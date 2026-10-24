@@ -82,6 +82,17 @@ export const presetAckzell = definePreset(() => ({
       muted: 'var(--muted)',
       line: 'var(--line)',
     },
+    // The text scale in em, so it follows body: phones set body a step
+    // smaller (main.css) and every text-* follows without its own rule.
+    // Line heights unitless, the same ratios as the default rem scale.
+    text: {
+      'xs': { fontSize: '0.75em', lineHeight: 'calc(1 / 0.75)' },
+      'sm': { fontSize: '0.875em', lineHeight: 'calc(1.25 / 0.875)' },
+      'base': { fontSize: '1em', lineHeight: '1.5' },
+      'lg': { fontSize: '1.125em', lineHeight: 'calc(1.75 / 1.125)' },
+      'xl': { fontSize: '1.25em', lineHeight: 'calc(1.75 / 1.25)' },
+      '2xl': { fontSize: '1.5em', lineHeight: 'calc(2 / 1.5)' },
+    },
   },
   rules: [
     spaceRule,
