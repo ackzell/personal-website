@@ -7,7 +7,9 @@
  * `clipped` wraps it in a box that fills the parent: `clip-path` (unlike
  * overflow) also clips fixed descendants, so the copy keeps the viewport's
  * geometry but only shows inside its bar. Every copy has the same geometry,
- * so they line up exactly.
+ * so they line up exactly. Any other bar that paints the stage color (sticky
+ * headings, pinned trails) takes a clipped copy the same way; it must be a
+ * stacking context. Spans, so it can sit inside a heading.
  */
 defineProps<{ clipped?: boolean }>()
 
@@ -15,11 +17,11 @@ const resting = useState('site-mark-resting', () => false)
 </script>
 
 <template>
-  <div :class="{ 'site-mark-clip': clipped }" aria-hidden="true">
-    <div class="site-mark">
+  <span :class="{ 'site-mark-clip': clipped }" aria-hidden="true">
+    <span class="site-mark">
       <SiteMarkGlyph class="site-mark__svg" :data-resting="resting" />
-    </div>
-  </div>
+    </span>
+  </span>
 </template>
 
 <style scoped>

@@ -153,7 +153,7 @@ function blur(slug: string) {
 
 <template>
   <div class="experience" :style="{ '--heading-height': `${headingHeight}px` }">
-    <h2 id="timeline-heading" ref="heading" class="experience__heading" m="0" py="group" bg="bg">{{ title }}</h2>
+    <h2 id="timeline-heading" ref="heading" class="experience__heading running-head" m="0" py="group" bg="bg"><SiteMarkLayer clipped />{{ title }}</h2>
 
     <div class="experience__body" grid gap="x-block">
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
