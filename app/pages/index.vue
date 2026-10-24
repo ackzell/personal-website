@@ -22,7 +22,7 @@ useSeoMeta({ title: '', description: () => t('home.intro') })
     </section>
 
     <section v-if="featured" aria-labelledby="featured-heading">
-      <h2 id="featured-heading">{{ $t('home.featured') }}</h2>
+      <h2 id="featured-heading" class="running-head">{{ $t('home.featured') }}</h2>
       <ProjectLexicon :projects="[featured]" />
       <NuxtLinkLocale :to="'/projects'">{{ $t('home.allProjects') }}</NuxtLinkLocale>
     </section>

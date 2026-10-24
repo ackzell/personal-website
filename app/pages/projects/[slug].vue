@@ -46,7 +46,7 @@ useSeoMeta({
 
       <section v-if="related.length" aria-labelledby="related-heading" mt="section">
         <!-- A running head, like the projects page title: the words below are the content. -->
-        <h2 id="related-heading" mb="group" typeset="body" text="sm muted" uppercase tracking="[0.08em]">{{ t('projects.related') }}</h2>
+        <h2 id="related-heading" mb="group" class="running-head">{{ t('projects.related') }}</h2>
         <ProjectIndex :projects="related" />
       </section>
     </article>

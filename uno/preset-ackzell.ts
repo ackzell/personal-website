@@ -103,6 +103,11 @@ export const presetAckzell = definePreset(() => ({
     // links: `text` as an attribute breaks <a> (see uno.config.ts).
     ['text-headword', { 'font-size': 'var(--headword-size)', 'line-height': '1' }],
   ],
+  shortcuts: {
+    // A quiet label over content that speaks for itself, like a dictionary's
+    // running head: Projects, Experience, Content.
+    'running-head': 'typeset-body text-sm text-muted uppercase tracking-[0.08em]',
+  },
   variants: [
     // current:… styles the link for the current page or section. Covers
     // aria-current="page" and "true" alike, but not an explicit "false".

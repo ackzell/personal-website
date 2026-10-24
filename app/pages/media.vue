@@ -6,7 +6,7 @@ useSeoMeta({ title: () => t('media.title') })
 
 <template>
   <div class="page">
-    <h1>{{ $t('media.title') }}</h1>
+    <h1 class="running-head">{{ $t('media.title') }}</h1>
 
     <section aria-labelledby="videos-heading">
       <h2 id="videos-heading">{{ $t('videos.title') }}</h2>

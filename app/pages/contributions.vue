@@ -11,7 +11,7 @@ useSeoMeta({ title: () => t('contributions.title') })
 <template>
   <div class="page">
     <!-- A running head, as on Projects: the log is the content. -->
-    <h1 track="wide" typeset="body" text="sm muted" uppercase tracking="[0.08em]">{{ $t('contributions.title') }}
+    <h1 track="wide" class="running-head">{{ $t('contributions.title') }}
       <span v-if="total" class="tabular-nums">({{ total }})</span>
     </h1>
     <ContributionGraph v-if="projects" :projects="projects" mt="block" />

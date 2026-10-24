@@ -131,6 +131,7 @@ A three-field flag palette with a near-black twin. Light takes the colors straig
 - **Headword** (520, clamp(2rem, 4.5vw, 3rem), 1.0): Project Nahuatl words, in the lexicon and as project headings. Same size in both places so the word can travel between them as a pure move.
 - **Heading** (520, CASL 0.65, 1.15): h1–h4, balanced wrapping.
 - **Body** (400, 1rem, 1.65): Prose, at most 64ch.
+- **Running head** (400, 0.875rem, uppercase, 0.08em tracking, muted): The quiet label over a section whose content speaks for itself (Projects, Experience, Content). Use the `running-head` shortcut.
 - **Section label** (400, 1rem, 1.4): About, Work, Media in the flag band, full brightness.
 - **Child label** (400, 0.75rem, 1.4): Projects, videos, podcast in the band, dimmed until current or hovered.
 - **Code** (320, CASL 0, 1.65): Snippets and inline code.
