@@ -182,6 +182,11 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Spotlight:** Hovering or focusing one entry dims the rest to 40%.
 - **Hover:** Letters lean into cursive per The Lean Rule.
 
+### Experience Band
+- **Character:** The flag band standing up: one field per role, newest on top, each as tall as the time spent there, sticky beside the roles. Awards and certifications mark their month with a small square.
+- **Lit:** The role being read lights its field per The Lit Rule; the other roles step back. Pointing at a role brightens its field without the light.
+- **Arrival:** Fields draw in top to bottom the first time the band scrolls into view; under reduced motion they fade in.
+
 ### Links
 - **Style:** Accent colored, underlined by default; navigation links drop the underline and rely on the band.
 - **Focus:** 2px accent outline, 2px offset.
