@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@chenglou/pretext": "1.0.0",
+    "@floating-ui/dom": "1.8.0",
     "@nuxt/content": "^3.16.1",
     "@nuxtjs/color-mode": "4.0.1",
     "@nuxtjs/i18n": "^10.6.0",
