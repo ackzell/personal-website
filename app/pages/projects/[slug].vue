@@ -31,9 +31,10 @@ useSeoMeta({
        the footer, however short the entry is. -->
   <div v-if="project" class="project-page">
     <article class="page project">
-      <WordHeading :slug="project.slug" :word="project.word" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status" :logo="project.logo" :logo-light="project.logoLight" />
+      <WordHeading :slug="project.slug" :word="project.word" :pronunciation="project.pronunciation"
+        :meaning="project.meaning" :status="project.status" :logo="project.logo" :logo-light="project.logoLight" />
 
-      <p class="project__title">{{ project.title }}</p>
+      <p class="project__title">{{ project.links.site }}</p>
       <p class="project__description">{{ project.description }}</p>
 
       <ul v-if="project.repos.length" class="project__repos">
@@ -56,7 +57,9 @@ useSeoMeta({
     <nav class="project-page__trail" aria-label="Breadcrumb" px="track-wide">
       <SiteMarkLayer clipped class="project-page__mark" />
       <ol flex gap="tight" p="0" m="0" list="none" text="sm">
-        <li><NuxtLinkLocale to="/projects">{{ t('projects.title') }}</NuxtLinkLocale></li>
+        <li>
+          <NuxtLinkLocale to="/projects">{{ t('projects.title') }}</NuxtLinkLocale>
+        </li>
         <li flex gap="tight">
           <span aria-hidden="true" text="muted">/</span>
           <span aria-current="page" lang="nah">{{ project.word }}</span>
@@ -73,10 +76,12 @@ useSeoMeta({
   display: flex;
   flex-direction: column;
 }
+
 .project-page {
   position: relative;
   flex: 1;
 }
+
 /* Out of flow, inside the entry's own bottom padding (--gap-section), so the
    trail never adds height to the page. */
 .project-page__trail {
