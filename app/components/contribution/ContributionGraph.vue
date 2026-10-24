@@ -40,6 +40,14 @@ const errataCount = computed(() => props.projects.reduce((n, p) => n + p.merges.
 const flag = (on: boolean) => (on ? '--errata' : '--no-errata')
 const shownFlag = ref(flag(showErrata.value))
 
+// The prompt's two answers, spelled out; the one in force capitalized, as a
+// shell marks its default.
+const answers = computed(() => [
+  { value: true, label: t('contributions.yes') },
+  { value: false, label: t('contributions.no') },
+])
+const capitalize = (word: string) => word.charAt(0).toUpperCase() + word.slice(1)
+
 /*
  * On arrival the command types itself in, key by key behind a block cursor,
  * and only then prints its output. It's all CSS from the first paint (each
@@ -185,18 +193,24 @@ const name = (repo: string) => repo.split('/')[1]
 
 <template>
   <div class="contributions" grid gap="block" :data-booting="booting || undefined" :style="{ '--typed': typed }">
-    <!-- The switch as the log's own command, like lang="en" and
-         color-scheme="system": the flag flips on the git log below it. -->
+    <!-- The switch as the log's own command and the question it asks: the
+         answer picks the flag on the git log below it. -->
     <div class="errata-switch">
-      <span aria-hidden="true">$ <span v-for="(key, c) in command" :key="c" class="key" :style="{ '--c': c }">{{ key
-      }}</span></span>
-      <button type="button" class="errata-switch__value" :aria-pressed="showErrata" data-no-scramble
-        @click="toggleErrata">
-        <span class="sr-only">{{ t('contributions.errata') }}: {{ errataCount }}</span>
-        <span aria-hidden="true"><span v-for="(key, c) in shownFlag" :key="c" class="key"
-            :style="{ '--c': command.length + 1 + c }">{{ key }}</span></span>
-      </button>
-      <span class="errata-switch__count tabular-nums" aria-hidden="true"># {{ errataCount }} </span>
+      <SiteMarkLayer clipped />
+      <p class="errata-switch__command" m="0" aria-hidden="true">$ <span v-for="(key, c) in command" :key="c"
+          class="key" :style="{ '--c': c }">{{ key }}</span> <span class="errata-switch__flag"><span
+            v-for="(key, c) in shownFlag" :key="c" class="key" :style="{ '--c': command.length + 1 + c }">{{ key
+            }}</span></span></p>
+      <p class="errata-switch__prompt" m="0" role="group" :aria-label="t('contributions.prompt', { count: errataCount })">
+        <span aria-hidden="true">? {{ t('contributions.prompt', { count: errataCount }) }} [</span>
+        <template v-for="(answer, a) in answers" :key="answer.label">
+          <span v-if="a > 0" aria-hidden="true">/</span>
+          <button type="button" class="errata-switch__answer" :aria-pressed="showErrata === answer.value"
+            data-no-scramble @click="answer.value !== showErrata && toggleErrata()">{{ showErrata === answer.value
+              ? capitalize(answer.label) : answer.label }}</button>
+        </template>
+        <span aria-hidden="true">]</span>
+      </p>
     </div>
 
     <Transition mode="out-in" :css="reducedMotion !== 'reduce'">
@@ -515,16 +529,16 @@ const name = (repo: string) => repo.split('/')[1]
     key-cursor var(--key) step-end calc(var(--boot) + var(--c) * var(--key));
 }
 
-[data-booting] .errata-switch__value::after {
+[data-booting] .errata-switch__flag::after {
   content: '';
   position: absolute;
-  inset-block: var(--space-1);
+  inset-block: 0;
   inset-inline-start: 100%;
   inline-size: 1ch;
   animation: key-cursor calc(var(--key) + 140ms) step-end calc(var(--boot) + var(--typed) * var(--key));
 }
 
-[data-booting] .errata-switch__count {
+[data-booting] .errata-switch__prompt {
   animation: boot-in 300ms var(--ease-out) var(--booted) both;
 }
 
@@ -559,8 +573,8 @@ const name = (repo: string) => repo.split('/')[1]
 
   .log--printing>.log__row,
   [data-booting] .key,
-  [data-booting] .errata-switch__value::after,
-  [data-booting] .errata-switch__count,
+  [data-booting] .errata-switch__flag::after,
+  [data-booting] .errata-switch__prompt,
   [data-booting] .log>.log__row {
     animation: none;
   }
@@ -589,10 +603,8 @@ const name = (repo: string) => repo.split('/')[1]
   background: var(--bg);
   transition: background-color 600ms var(--ease-out);
   justify-self: stretch;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 0.6ch;
+  display: grid;
+  gap: var(--space-1);
   font-family: var(--font-code);
   font-weight: var(--code-weight);
   font-variation-settings: 'CASL' 0;
@@ -600,14 +612,18 @@ const name = (repo: string) => repo.split('/')[1]
   color: var(--muted);
 }
 
-.errata-switch__value {
+.errata-switch__flag {
   position: relative;
+  color: var(--fg);
+}
+
+.errata-switch__answer {
   padding: var(--space-1) 0.15em;
   border: 0;
   background: none;
   font: inherit;
   font-variation-settings: inherit;
-  color: var(--fg);
+  color: inherit;
   cursor: pointer;
   text-decoration: underline;
   text-decoration-color: transparent;
@@ -615,11 +631,17 @@ const name = (repo: string) => repo.split('/')[1]
   transition: text-decoration-color 150ms ease, color 150ms ease;
 }
 
-.errata-switch__value:is(:hover, :focus-visible) {
+.errata-switch__answer[aria-pressed='true'] {
+  color: var(--fg);
+  cursor: default;
+}
+
+.errata-switch__answer:is(:hover, :focus-visible) {
+  color: var(--fg);
   text-decoration-color: currentColor;
 }
 
-.errata-switch__count {
-  opacity: 0.8;
+.errata-switch__answer[aria-pressed='true']:hover {
+  text-decoration-color: transparent;
 }
 </style>

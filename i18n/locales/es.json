@@ -46,7 +46,10 @@
   },
   "contributions": {
     "title": "Contribuciones",
-    "errata": "Fe de erratas"
+    "errata": "Errata",
+    "prompt": "¿Mostrar {count} erratas (typos, docs, etc.)?",
+    "yes": "sí",
+    "no": "no"
   },
   "placeholder": "Próximamente."
 }

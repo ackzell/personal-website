@@ -46,8 +46,10 @@
   },
   "contributions": {
     "title": "Contributions",
-    "errata": "Errata"
+    "errata": "Errata",
+    "prompt": "Show {count} errata (typos, docs, etc.)?",
+    "yes": "yes",
+    "no": "no"
   },
-  "placeholder": "Coming soon.",
-  "typos-docs-etc": "typos, docs, etc"
+  "placeholder": "Coming soon."
 }
