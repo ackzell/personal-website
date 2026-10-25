@@ -79,7 +79,8 @@ function toggle() {
     <span class="scheme-switch__name" aria-hidden="true">color-scheme="</span>
     <button type="button" class="scheme-switch__value" :title="labels[next]" data-no-scramble @click="toggle">
       <span class="sr-only">{{ $t('site.scheme') }}: {{ labels[scheme] }}</span>
-      <span class="scheme-switch__text" :style="{ visibility: known ? undefined : 'hidden' }" aria-hidden="true">{{ shown }}</span>
+      <span class="scheme-switch__text" :style="{ visibility: known ? undefined : 'hidden' }" aria-hidden="true">{{
+        shown }}</span>
     </button>
     <span class="scheme-switch__name" aria-hidden="true">"</span>
   </div>
@@ -92,7 +93,7 @@ function toggle() {
   font-family: var(--font-code);
   font-weight: var(--code-weight);
   font-variation-settings: 'CASL' 0;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 

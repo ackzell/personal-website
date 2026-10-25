@@ -18,13 +18,8 @@ const next = computed(() => {
        to, in that language. -->
   <div class="locale-switch">
     <span aria-hidden="true">lang="</span>
-    <NuxtLink
-      class="locale-switch__value"
-      :to="switchLocalePath(next.code)"
-      :lang="next.language"
-      :hreflang="next.language"
-      :title="next.name"
-    >
+    <NuxtLink class="locale-switch__value" :to="switchLocalePath(next.code)" :lang="next.language"
+      :hreflang="next.language" :title="next.name">
       <span class="sr-only">{{ next.name }}</span>
       <span aria-hidden="true">{{ locale }}</span>
     </NuxtLink>
@@ -39,7 +34,7 @@ const next = computed(() => {
   font-family: var(--font-code);
   font-weight: var(--code-weight);
   font-variation-settings: 'CASL' 0;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
   color: var(--muted);
 }
 

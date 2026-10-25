@@ -232,8 +232,8 @@ onBeforeUnmount(() => cancelAnimationFrame(frame))
 
 .home-intro__mark {
   /* Small enough on a phone to leave a readable column on each side. */
-  inline-size: clamp(5rem, 20vw, 14rem);
-  block-size: clamp(5rem, 20vw, 14rem);
+  inline-size: clamp(5rem, 25vw, 14rem);
+  block-size: clamp(5rem, 25vw, 14rem);
   margin-inline: auto;
   /* Read by the script as the room kept between the ring and the text. */
   column-gap: clamp(var(--gap-tight), 2vw, var(--gap-group));

@@ -39,7 +39,7 @@ const earned = computed(() => {
     const role = props.roles.find((role) => role.start <= item.start && item.start <= role.end)
     if (!role) continue
     const at = (monthIndex(role.end) - monthIndex(item.start) + 0.5) / role.months
-    ;(byRole[role.slug] ??= []).push({ item, at })
+      ; (byRole[role.slug] ??= []).push({ item, at })
   }
   return byRole
 })
@@ -153,9 +153,11 @@ function blur(slug: string) {
 
 <template>
   <div class="experience" :style="{ '--heading-height': `${headingHeight}px` }">
-    <h2 id="timeline-heading" ref="heading" class="experience__heading running-head" m="0" py="group" bg="bg"><SiteMarkLayer clipped />{{ title }}</h2>
+    <h2 id="timeline-heading" ref="heading" class="experience__heading running-head" m="0" py="group" bg="bg">
+      <SiteMarkLayer clipped />{{ title }}
+    </h2>
 
-    <div class="experience__body" grid gap="x-block">
+    <div class="experience__body" grid gap="x-block" mb-60>
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
         text="sm muted">
         <span class="tabular-nums">{{ lastYear }}</span>
@@ -455,7 +457,7 @@ function blur(slug: string) {
   display: inline;
 }
 
-.experience__stack li + li::before {
+.experience__stack li+li::before {
   content: ', ';
 }
 
@@ -587,13 +589,13 @@ function blur(slug: string) {
 /* The lit role's dates light with its field: the same neon, as text. They
    come on with the field's fill and go out quicker, as it empties. Set on
    the dates' contents: the dates themselves carry the arrival. */
-.experience__dates > * {
+.experience__dates>* {
   transition:
     color 250ms var(--ease-out),
     text-shadow 250ms var(--ease-out);
 }
 
-.experience__entry.is-lit .experience__dates > * {
+.experience__entry.is-lit .experience__dates>* {
   color: var(--hot);
   text-shadow: var(--glow);
   mix-blend-mode: plus-lighter;
