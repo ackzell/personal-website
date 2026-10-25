@@ -15,6 +15,19 @@ const projectCopy = z.object({
 // Copy that differs per locale, kept beside the data it describes.
 const localized = <T extends z.ZodTypeAny>(schema: T) => z.object({ en: schema, es: schema })
 
+// Where a project (or one of its parts) lives, beyond its repos.
+const links = z
+  .object({
+    site: z.string().url(),
+    video: z.string().url(),
+    marketplace: z.string().url(),
+    openvsx: z.string().url(),
+    release: z.string().url(),
+    previewAccess: z.string(),
+  })
+  .partial()
+  .default({})
+
 // A month, as `YYYY-MM`.
 const month = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/)
 
@@ -84,17 +97,7 @@ export default defineContentConfig({
         featured: z.boolean().default(false),
         order: z.number(),
         repos: z.array(z.string()).default([]),
-        links: z
-          .object({
-            site: z.string().url(),
-            video: z.string().url(),
-            marketplace: z.string().url(),
-            openvsx: z.string().url(),
-            release: z.string().url(),
-            previewAccess: z.string(),
-          })
-          .partial()
-          .default({}),
+        links,
         stack: z.array(z.string()).default([]),
         related: z.array(z.string()).default([]),
         // YouTube playlist with livestreams / progress updates.
@@ -104,6 +107,33 @@ export default defineContentConfig({
         // The mark for the light scheme; `logo` is for the dark one.
         logoLight: z.string().optional(),
       }),
+    }),
+
+    /**
+     * Parts of a project that grew into a family (tlapalli: its themes, its
+     * site), one file per part: `content/projects/<project>/<part>.yml`. Each
+     * gets its own page under the project's, with the same facts a project has.
+     */
+    partsMeta: defineCollection({
+      type: 'data',
+      source: 'projects/*/*.yml',
+      schema: z.object({
+        order: z.number(),
+        repos: z.array(z.string()).default([]),
+        links,
+        stack: z.array(z.string()).default([]),
+        devlogPlaylist: z.string().optional(),
+      }),
+    }),
+
+    parts_en: defineCollection({
+      type: 'page',
+      source: { include: 'en/projects/*/*.md', prefix: '/projects' },
+    }),
+
+    parts_es: defineCollection({
+      type: 'page',
+      source: { include: 'es/projects/*/*.md', prefix: '/projects' },
     }),
 
     projects_en: defineCollection({

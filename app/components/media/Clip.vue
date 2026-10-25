@@ -1,0 +1,82 @@
+<script setup lang="ts">
+/**
+ * A short silent loop in a case study (Motion Canvas renders, screen
+ * captures), placed from markdown:
+ *
+ *   ::media-clip{src="/media/tlapalli/intro.mp4" webm="/media/tlapalli/intro.webm" poster="/media/tlapalli/intro.webp" label="…" width="1920" height="1080" youtube="https://youtu.be/…"}
+ *   Caption, in the page's own language.
+ *   ::
+ *
+ * It plays while it's on screen and rests when it isn't. Under reduced motion
+ * it never starts on its own: the poster stays until it's asked to play. A
+ * pause control is always there, since a loop never ends by itself. Without
+ * JS it's a plain video with the browser's controls. `youtube` links the
+ * full, narrated version.
+ */
+const props = defineProps<{
+  src: string
+  webm?: string
+  poster?: string
+  /** What the clip shows, for anyone who can't see it. */
+  label: string
+  width: number | string
+  height: number | string
+  youtube?: string
+  wide?: boolean
+}>()
+
+const { t } = useI18n()
+const slots = useSlots()
+
+const video = useTemplateRef<HTMLVideoElement>('video')
+const mounted = useMounted()
+const reducedMotion = usePreferredReducedMotion()
+
+// null until the visitor chooses; then their choice wins over the default.
+const wants = ref<boolean | null>(null)
+const visible = ref(false)
+const playing = ref(false)
+
+useIntersectionObserver(video, ([entry]) => {
+  visible.value = entry?.isIntersecting ?? false
+}, { threshold: 0.5 })
+
+const shouldPlay = computed(() => visible.value && (wants.value ?? reducedMotion.value !== 'reduce'))
+
+watch(shouldPlay, (play) => {
+  const el = video.value
+  if (!el) return
+  // play() rejects when the browser blocks it; the poster simply stays.
+  if (play) el.play().catch(() => {})
+  else el.pause()
+})
+
+function toggle() {
+  wants.value = !playing.value
+  // Off screen the observer won't flip anything, so act on the click directly.
+  if (wants.value) video.value?.play().catch(() => {})
+  else video.value?.pause()
+}
+
+const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/mp4')
+</script>
+
+<template>
+  <figure class="media media--clip" :class="{ 'track-wide': props.wide }">
+    <div class="media__frame">
+      <video ref="video" :poster="poster" :width="width" :height="height" :aria-label="label" :controls="!mounted"
+        muted loop playsinline preload="metadata" @play="playing = true" @pause="playing = false">
+        <source v-if="webm" :src="webm" type="video/webm">
+        <source :src="src" :type="source(src)">
+      </video>
+      <button v-if="mounted" type="button" class="media__toggle" :aria-label="playing ? t('projects.media.pause') : t('projects.media.play')" @click="toggle">
+        <span :class="playing ? 'i-iconoir-pause-solid' : 'i-iconoir-play-solid'" aria-hidden="true" />
+      </button>
+    </div>
+    <figcaption v-if="slots.default || youtube" class="media__caption">
+      <slot mdc-unwrap="p" />
+      <a v-if="youtube" :href="youtube" class="media__out">{{ t('projects.media.youtube') }}<span
+          class="i-iconoir-arrow-up-right" aria-hidden="true" /></a>
+    </figcaption>
+  </figure>
+</template>

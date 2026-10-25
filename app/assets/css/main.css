@@ -672,3 +672,91 @@ main:focus {
 .prose > :is(h2, h3) {
   margin-top: var(--gap-block);
 }
+
+/*
+ * A case study's body (pages/projects/[slug].vue) sits on the page's own
+ * tracks, so its media can step out of the text column onto the wide one
+ * (track-wide) while the prose keeps its measure.
+ */
+.story {
+  grid-column: full;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+:where(.story) > * {
+  grid-column: content;
+}
+
+/* Case study media (components/media/*.vue): more room around them
+   than between paragraphs, so a figure reads as its own stop. */
+:where(.prose) > .media,
+:where(.prose) > .media + * {
+  margin-top: var(--gap-block);
+}
+
+.media {
+  display: grid;
+  gap: var(--gap-tight);
+  /* <figure> carries a 40px UA inline margin; the reset above only clears
+     the block margins. */
+  margin-inline: 0;
+}
+
+/* A faint field of the foreground holds the space until the media arrives;
+   no frame line, the capture's own edge is the edge. */
+.media__frame {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--fg) 6%, var(--bg));
+}
+
+.media__frame :is(img, video) {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
+.media__caption {
+  max-inline-size: var(--content-width);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* Caption links (YouTube, the live site) close their line. */
+.media__caption > .media__out {
+  margin-inline-start: var(--gap-group);
+}
+
+.media__out {
+  white-space: nowrap;
+  text-underline-offset: 0.25em;
+}
+
+.media__out > [class*='i-'] {
+  margin-inline-start: 0.2em;
+  font-size: 0.85em;
+}
+
+/* A loop's pause control: a square of the stage in the clip's corner, quiet
+   until the clip is hovered or the control is reached. */
+.media__toggle {
+  position: absolute;
+  inset: auto var(--space-3) var(--space-3) auto;
+  display: grid;
+  place-items: center;
+  inline-size: 2.5rem;
+  block-size: 2.5rem;
+  padding: 0;
+  border: 0;
+  background: var(--bg);
+  color: var(--fg);
+  cursor: pointer;
+  opacity: 0.72;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.media__frame:hover .media__toggle,
+.media__toggle:focus-visible {
+  opacity: 1;
+}

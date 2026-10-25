@@ -9,6 +9,7 @@ const sectionByRoute: Record<string, Section> = {
   contributions: 'about',
   projects: 'work',
   'projects-slug': 'work',
+  'projects-slug-part': 'work',
   media: 'media',
   videos: 'media',
   podcast: 'media',

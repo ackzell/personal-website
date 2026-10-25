@@ -27,10 +27,31 @@
     "pronunciation": "Pronunciation",
     "meaning": "Meaning",
     "related": "Related projects",
+    "parts": "In this project",
+    "alsoIn": "Also in {word}",
     "status": {
       "shipped": "Shipped",
       "active": "Active",
       "experiment": "Experiment"
+    },
+    "ledger": {
+      "site": "Site",
+      "install": "Install",
+      "source": "Source",
+      "stack": "Stack",
+      "devlog": "Devlog",
+      "release": "Release",
+      "video": "Video",
+      "access": "Preview",
+      "requestAccess": "Request access"
+    },
+    "media": {
+      "play": "Play",
+      "pause": "Pause",
+      "youtube": "Full video on YouTube",
+      "tryLive": "Try it here",
+      "openSite": "Open in a new tab",
+      "watch": "Watch on YouTube"
     }
   },
   "media": {

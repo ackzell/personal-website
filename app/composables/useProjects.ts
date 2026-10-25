@@ -23,6 +23,26 @@ export function useProjectPage(slug: MaybeRefOrGetter<string>) {
   )
 }
 
+/** A project's parts (`content/projects/<slug>/<part>.yml`), sorted by `order`. */
+export function useProjectParts(slug: MaybeRefOrGetter<string>) {
+  const { locale } = useI18n()
+
+  return useAsyncData(
+    () => `project-parts-${locale.value}-${toValue(slug)}`,
+    () => fetchParts(locale.value, toValue(slug)),
+  )
+}
+
+/** The body of one part's page, in the current locale. */
+export function useProjectPartPage(slug: MaybeRefOrGetter<string>, part: MaybeRefOrGetter<string>) {
+  const { locale } = useI18n()
+
+  return useAsyncData(
+    () => `project-part-page-${locale.value}-${toValue(slug)}-${toValue(part)}`,
+    () => queryCollection(`parts_${locale.value}`).path(`/projects/${toValue(slug)}/${toValue(part)}`).first(),
+  )
+}
+
 const slugOf = (stem: string) => stem.split('/').pop()!
 
 async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
@@ -59,6 +79,39 @@ async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
         devlogPlaylist: item.devlogPlaylist,
         logo: item.logo,
         logoLight: item.logoLight,
+      }
+    })
+    .sort((a, b) => a.order - b.order)
+}
+
+async function fetchParts(locale: 'en' | 'es', parent: string): Promise<ProjectPart[]> {
+  const [meta, copy] = await Promise.all([
+    queryCollection('partsMeta').all(),
+    queryCollection(`parts_${locale}`).select('stem', 'title', 'description').all(),
+  ])
+
+  const inParent = (stem: string) => stem.split('/').at(-2) === parent
+  const copyBySlug = new Map(copy.filter((page) => inParent(page.stem)).map((page) => [slugOf(page.stem), page]))
+
+  return meta
+    .filter((item) => inParent(item.stem))
+    .map((item): ProjectPart => {
+      const slug = slugOf(item.stem)
+      const page = copyBySlug.get(slug)
+      if (!page) {
+        throw new Error(`Part "${parent}/${slug}" has no ${locale} copy in content/${locale}/projects/${parent}/`)
+      }
+
+      return {
+        parent,
+        slug,
+        title: page.title,
+        description: page.description,
+        order: item.order,
+        repos: item.repos ?? [],
+        links: item.links ?? {},
+        stack: item.stack ?? [],
+        devlogPlaylist: item.devlogPlaylist,
       }
     })
     .sort((a, b) => a.order - b.order)

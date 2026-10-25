@@ -1,13 +1,7 @@
 pronunciation: tlah-PAH-lee
 status: shipped
 order: 2
-repos:
-  - ackzell/tlapalli-vscode-theme
-  - ackzell/tlapalli-zed-theme
-  - ackzell/tlapalli-website
-links:
-  site: https://tlapalli.ackzell.dev
-  # TODO: marketplace, openvsx
-stack: [vscode, zed, typescript, vue]
+# Repos, links and stack live with the parts (projects/tlapalli/*.yml).
+stack: []
 related: [tlachialoni]
 logo: /logos/tlapalli.svg
