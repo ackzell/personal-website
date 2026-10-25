@@ -62,6 +62,20 @@ useEventListener(
   },
   { passive: true },
 )
+
+/*
+ * The dock wave for a finger: dragged along the icons, it follows the one
+ * under it. A touch keeps reporting to the element it started on, so look up
+ * what's under the finger instead of trusting the event's target.
+ */
+const touched = ref<number>()
+function follow(event: PointerEvent) {
+  if (event.pointerType === 'mouse') return
+  const item = document.elementFromPoint(event.clientX, event.clientY)?.closest('li')
+  const index = item ? (items.value ?? []).indexOf(item) : -1
+  touched.value = index === -1 ? undefined : index
+}
+const letGo = () => (touched.value = undefined)
 </script>
 
 <template>
@@ -74,10 +88,11 @@ useEventListener(
          30px touch targets (WCAG 2.2 asks for 24px) sit edge to edge while
          the icons stay 12px apart. The negative margin keeps them aligned.
          Icons sized in rem, off the em text scale, so phones keep the targets. -->
-    <ul flex="~ wrap" p="0" m="-1.5" list="none">
-      <li v-for="link in socialLinks" :key="link.href" ref="items">
-        <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label" class="text-[1.125rem]" inline-flex
-          p="1.5">
+    <ul class="site-footer__links" flex="~ wrap" p="0" m="-1.5" list="none" @pointerdown="follow" @pointermove="follow"
+      @pointerup="letGo" @pointercancel="letGo">
+      <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined">
+        <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label"
+          class="text-[1.125rem] site-footer__land" :style="{ '--i': i }" inline-flex p="1.5">
           <span :class="link.icon" aria-hidden="true" />
         </a>
       </li>
@@ -93,7 +108,7 @@ useEventListener(
  * a touch. Scale the icon, not the <li>, which the FLIP above animates.
  * The 12px between icons absorbs the growth, so nothing overlaps or reflows.
  */
-.site-footer span {
+.site-footer__links span {
   --wave: 1;
   --opacity: 1;
   display: block;
@@ -104,14 +119,15 @@ useEventListener(
 
 /* The rail grows inward, away from the screen edge. */
 @media (width < 40rem) {
-  .site-footer span {
+  .site-footer__links span {
     transform-origin: right center;
   }
 }
 
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  /* Dimmed only where hover can bring them back; phones keep full opacity. */
-  .site-footer span {
+
+  /* Dimmed at rest; hover brings them back (a drag does on touch, below). */
+  .site-footer__links span {
     --opacity: 0.25;
     transition:
       transform 260ms var(--ease-out),
@@ -141,5 +157,86 @@ useEventListener(
     --opacity: 0.25;
   }
 
+}
+
+/*
+ * Landing: on the first paint the icons come in one after another, rising
+ * from the bottom edge (sliding in from the screen's edge on the rail), so
+ * they arrive instead of just being there. On the link, not the icon, which
+ * carries the wave, nor the <li>, which the FLIP moves.
+ */
+.site-footer__land {
+  animation: site-footer-land 300ms var(--ease-out) calc(var(--i) * 50ms) backwards;
+}
+
+@keyframes site-footer-land {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@media (width < 40rem) {
+  @keyframes site-footer-land {
+    from {
+      opacity: 0;
+      transform: translateX(8px);
+    }
+  }
+}
+
+/* Fewer, gentler: they fade in where they are. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes site-footer-land {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* A drag along the icons is theirs, not the page's: on the rail it runs the
+   same way as scrolling, and the page scrolls from anywhere else. */
+.site-footer__links {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/*
+ * The same wave for a finger (data-touched, set while dragging). Apart from
+ * the hover rules: on touch, :hover sticks to the last tapped icon, so it
+ * can't stand in for "under the finger now".
+ */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* Dimmed at rest, as with a mouse: a drag along them brings them back. */
+  .site-footer__links span {
+    --opacity: 0.25;
+    transition:
+      transform 260ms var(--ease-out),
+      opacity 260ms var(--ease-out);
+  }
+
+  /* :where() keeps this below the wave steps, as with hover. */
+  .site-footer__links:has(:where([data-touched])) span {
+    --opacity: 0.1;
+  }
+
+  li[data-touched] span {
+    --wave: 1.5;
+    --opacity: 1;
+  }
+
+  li[data-touched]+li span,
+  li:has(+ li[data-touched]) span {
+    --wave: 1.25;
+    --opacity: 0.50;
+  }
+
+  li[data-touched]+li+li span,
+  li:has(+ li + li[data-touched]) span {
+    --wave: 1.1;
+    --opacity: 0.25;
+  }
 }
 </style>
