@@ -156,10 +156,26 @@ function toggle() {
   transition: opacity 300ms var(--ease-out);
 }
 
-/* Playing, the thumbnail lifts off the player; anything else puts it back
-   over YouTube's own screens. */
-[data-state='playing'] .video__poster {
+/* Playing, the thumbnail lifts off the player. Paused, it stays off and a
+   veil dims the held frame instead, so the video reads as paused, not reset.
+   Anything else puts it back over YouTube's own screens. */
+[data-state='playing'] .video__poster,
+[data-state='paused'] .video__poster {
   opacity: 0;
+}
+
+.video__cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+  pointer-events: none;
+}
+
+[data-state='paused'] .video__cover::before {
+  opacity: 1;
 }
 
 /* The control sits where the loops keep theirs. While the video plays it
