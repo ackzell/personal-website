@@ -41,6 +41,30 @@ defineProps<{ crumbs: { label: string, to?: string, lang?: string }[] }>()
   flex: 1;
 }
 
+/*
+ * Entrance: the entry's blocks rise one after another, as the lexicon's
+ * entries do, on every visit. Only blocks move: the word, plate and part
+ * names inside them travel as their own snapshots, which a block's rise
+ * doesn't reach, so a traveling word never fades on its way.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .project > :slotted(*) {
+    animation: 500ms var(--ease-out) var(--enter-delay, 390ms) both vt-rise;
+  }
+
+  .project > :slotted(:nth-child(1)) {
+    --enter-delay: 150ms;
+  }
+
+  .project > :slotted(:nth-child(2)) {
+    --enter-delay: 230ms;
+  }
+
+  .project > :slotted(:nth-child(3)) {
+    --enter-delay: 310ms;
+  }
+}
+
 /* Out of flow, inside the entry's own bottom padding (--gap-section), so the
    trail never adds height to the page. */
 .project-page__trail {

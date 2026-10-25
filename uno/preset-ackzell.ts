@@ -107,6 +107,12 @@ export const presetAckzell = definePreset(() => ({
     // A quiet label over content that speaks for itself, like a dictionary's
     // running head: Projects, Experience, Content.
     'running-head': 'typeset-body text-sm text-muted uppercase tracking-[0.08em]',
+    // What an entry is, under its word, the way a dictionary sets a
+    // definition: muted, so the word leads. Entries (the lexicon, a project or
+    // part heading) at body size; sub-entries (parts, related projects) a
+    // step down. Spacing stays with each entry's own layout.
+    'gloss': 'text-muted',
+    'gloss-sub': 'gloss text-[0.875em]',
   },
   variants: [
     // current:… styles the link for the current page or section. Covers

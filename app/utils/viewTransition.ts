@@ -11,6 +11,17 @@ export const wordTransition = (slug: string) => ({
 })
 
 /**
+ * View-transition style for a part's name, so it travels between its row in
+ * a parts list and the part's heading. Both render at --subentry-size, so it
+ * rides the word animation as a pure move. Same uniqueness rule: a part page
+ * leaves itself out of its siblings list.
+ */
+export const partTransition = (parent: string, slug: string) => ({
+  viewTransitionName: `var(--travel-name, part-${parent}-${slug})`,
+  viewTransitionClass: 'word',
+})
+
+/**
  * View-transition style for a project's logo, so the plate travels between
  * its lexicon entry and the project heading, alongside the word. The `plate`
  * class picks up the plate animation in main.css. Same uniqueness rule.

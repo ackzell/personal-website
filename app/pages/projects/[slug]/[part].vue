@@ -31,15 +31,24 @@ useSeoMeta({
     { label: project.word, to: `/projects/${project.slug}`, lang: 'nah' },
     { label: part.title },
   ]">
-    <!-- The family's word over the part's name, the way a sub-entry sits
-         under its headword. The word travels here from the project page. -->
-    <header>
-      <NuxtLinkLocale :to="`/projects/${project.slug}`" class="part__family" typeset="heading" lang="nah"
-        :style="wordTransition(project.slug)">{{ project.word }}</NuxtLinkLocale>
-      <h1 class="part__title" typeset="heading">{{ part.title }}</h1>
+    <!-- The family's headword, with its mark, over the part's name, the way a
+         sub-entry sits under its headword. Word and mark keep their project
+         page size and travel names, so from the project page the word holds
+         still while the plate shrinks into the margin beside it. -->
+    <header class="part-head" pt="block">
+      <ProjectSticker v-if="project.logo" class="part-head__plate" :src="project.logo"
+        :style="plateTransition(project.slug)" />
+      <NuxtLinkLocale :to="`/projects/${project.slug}`" class="part-head__family text-headword" typeset="heading"
+        lang="nah"><span :style="wordTransition(project.slug)">{{ project.word }}</span></NuxtLinkLocale>
+      <!-- Set as the parts list's names end their hover lean, so the name
+           arrives here the way it left the list; it travels from that row. -->
+      <h1 class="part-head__title" typeset="heading">
+        <span class="part-head__slash" aria-hidden="true">/</span><span
+          :style="partTransition(project.slug, part.slug)">{{ part.title }}</span>
+      </h1>
     </header>
 
-    <p class="project__description">{{ part.description }}</p>
+    <p class="gloss" mt="tight">{{ part.description }}</p>
 
     <ProjectLedger :project="part" mt="block" />
 
@@ -53,21 +62,47 @@ useSeoMeta({
 </template>
 
 <style scoped>
-.part__family {
-  display: inline-block;
-  font-size: 1.25rem;
-  line-height: 1.2;
-  color: var(--muted);
-  text-decoration: none;
+/* Mark in the margin, spanning both lines; headword over sub-entry beside it. */
+.part-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: var(--space-5);
 }
 
-.part__family:hover {
+.part-head__plate {
+  grid-row: span 2;
+  inline-size: clamp(4rem, 9vw, 6rem);
+  block-size: auto;
+}
+
+.part-head__family {
+  justify-self: start;
   color: var(--fg);
+  text-decoration: none;
+  transition: color 200ms var(--ease-out);
 }
 
-.part__title {
-  margin: var(--space-1) 0 0;
-  font-size: var(--headword-size);
-  line-height: 1;
+.part-head__family:hover {
+  color: var(--accent);
+}
+
+.part-head__title {
+  grid-column: 2;
+  margin: var(--space-2) 0 0;
+  font-size: var(--subentry-size);
+  line-height: 1.2;
+  font-variation-settings: 'CASL' 1, 'CRSV' 1, 'slnt' -15;
+}
+
+.part-head__slash {
+  margin-inline-end: 0.2em;
+  color: var(--muted);
+  font-variation-settings: 'CASL' 0, 'slnt' 0;
+}
+
+/* Without a mark the headword and sub-entry take the whole row. */
+.part-head:not(:has(.part-head__plate)) > * {
+  grid-column: 1 / -1;
 }
 </style>

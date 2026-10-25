@@ -53,7 +53,7 @@ useHead({
           </span>
         </NuxtLinkLocale>
       </WordLine>
-      <dd m="0" text="muted">
+      <dd class="gloss" m="0">
         {{ project.description }}
       </dd>
       <!-- Decorative: the headword already names the project. A glimpse of

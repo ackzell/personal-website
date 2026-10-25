@@ -37,7 +37,7 @@ const filled = (value: string) => value && value !== 'TODO'
         <span class="index__leader" aria-hidden="true" />
         <span v-if="filled(project.meaning)" class="index__gloss">‘{{ project.meaning }}’</span>
       </span>
-      <p class="index__desc">{{ project.description }}</p>
+      <p class="index__desc gloss-sub">{{ project.description }}</p>
     </li>
   </ul>
 </template>
@@ -125,8 +125,6 @@ const filled = (value: string) => value && value !== 'TODO'
   margin: 0;
   padding-block-start: var(--space-2);
   padding-inline-start: calc(var(--plate-size) + var(--space-2));
-  font-size: 0.875em;
-  color: var(--muted);
 }
 
 .index__item:is(:hover, :focus-within) .index__plate {
