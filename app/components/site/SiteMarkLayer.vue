@@ -46,13 +46,23 @@ const resting = useState('site-mark-resting', () => false)
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  /* A shade of the stage itself, not the foreground: tone on tone. */
-  color: color-mix(in oklab, var(--bg) 80%, black);
+  /* A shade of the stage itself, not the foreground: tone on tone, lighter
+     on light and darker on dark. */
+  color: color-mix(in oklab, var(--bg) 90%, white);
   transition: color 600ms var(--ease-out);
 }
 
 :root.dark .site-mark {
-  color: color-mix(in oklab, var(--dark-accent) 18%, var(--bg));
+  color: color-mix(in oklab, var(--bg) 60%, black);
+}
+
+/* Work flips to contrast: a dark mark on light, a light mark on dark. */
+:root[data-section='work'] .site-mark {
+  color: color-mix(in oklab, var(--bg) 90%, black);
+}
+
+:root.dark[data-section='work'] .site-mark {
+  color: color-mix(in oklab, var(--dark-accent) 20%, var(--bg));
 }
 
 .site-mark__svg {
