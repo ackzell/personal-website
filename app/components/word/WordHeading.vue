@@ -7,8 +7,6 @@ defineProps<{
   status?: ProjectStatus
   /** The project's mark; shown large above the word, like the home mark. */
   logo?: string
-  /** The mark for the light scheme; `logo` is for the dark one. */
-  logoLight?: string
 }>()
 </script>
 
@@ -16,12 +14,10 @@ defineProps<{
   <!-- The same word line as the lexicon entry it came from, with extra room
        above so the entry opens clear of the header band. -->
   <header class="word-heading" grid track="wide" pt="block">
-    <!-- Decorative: the word names the project. The same plate as the lexicon
-         entry's, so it travels here with the word and grows into place. -->
-    <img v-if="logo" class="word-heading__plate" :src="logo" alt="" width="320" height="320" decoding="async"
-      :data-scheme="logoLight ? 'dark' : undefined" :style="plateTransition(slug)">
-    <img v-if="logo && logoLight" class="word-heading__plate" :src="logoLight" alt="" width="320" height="320"
-      decoding="async" data-scheme="light" :style="plateTransition(slug)">
+    <!-- The same plate as the lexicon entry's, so it travels here with the
+         word and grows into place, then rests as a sticker. As a silhouette
+         both scheme variants of the mark look the same, so one will do. -->
+    <ProjectSticker v-if="logo" class="word-heading__plate" :src="logo" :style="plateTransition(slug)" />
     <WordLine :pronunciation="pronunciation" :meaning="meaning" :status="status">
       <h1 class="text-headword" lang="nah">
         <span :style="wordTransition(slug)">{{ word }}</span>

@@ -1,0 +1,177 @@
+<script setup lang="ts">
+/**
+ * A project's mark as a metallic sticker: a silhouette (black in the dark
+ * scheme, silver in the light one) with a hairline edge and the mark's own
+ * detail faintly over it. It tilts toward the pointer and catches a sheen
+ * there, its colour coming back; at rest a glint crosses it now and then, a
+ * hint that it answers to the pointer.
+ *
+ * Driven by state, not :hover, so a finger dragged on it does the same; a
+ * touch keeps reporting to it after leaving it, so the position is clamped to
+ * its edges. Decorative: whatever it sits beside names the project.
+ */
+defineProps<{ src: string }>()
+
+const root = useTemplateRef<HTMLElement>('root')
+const active = ref(false)
+
+const clamp = (value: number) => Math.min(1, Math.max(0, value))
+
+function tilt(event: PointerEvent) {
+  const el = root.value
+  if (!el) return
+  const box = el.getBoundingClientRect()
+  el.style.setProperty('--x', String(clamp((event.clientX - box.left) / box.width)))
+  el.style.setProperty('--y', String(clamp((event.clientY - box.top) / box.height)))
+  active.value = true
+}
+
+function rest() {
+  active.value = false
+}
+
+// A mouse button let go over it still hovers; a lifted finger doesn't.
+function release(event: PointerEvent) {
+  if (event.pointerType !== 'mouse') rest()
+}
+</script>
+
+<template>
+  <span ref="root" class="sticker" aria-hidden="true" :style="{ '--mark': `url(${src})` }"
+    :data-active="active || undefined" @pointerdown="tilt" @pointermove="tilt" @pointerup="release"
+    @pointerleave="rest" @pointercancel="rest">
+    <img class="sticker__face" :src="src" alt="" width="320" height="320" decoding="async" draggable="false">
+    <img class="sticker__detail" :src="src" alt="" width="320" height="320" decoding="async" draggable="false">
+    <span class="sticker__shine" />
+  </span>
+</template>
+
+<style scoped>
+/* Dark scheme: a black sticker with light catching on it. */
+.sticker {
+  --x: 0.5;
+  --y: 0.5;
+  --edge: #3a3a3a;
+  --face: brightness(0);
+  --detail: 0.25;
+  --glare: 0.25;
+  --band: 0.28;
+  --band-cool: 0.18;
+  --band-warm: 0.14;
+  --streak: 0;
+  --grain: rgb(255 255 255 / 0.04);
+  --glint: 0.35;
+  position: relative;
+  display: block;
+  /* The outline follows the mark's shape: four hairline shadows of the
+     silhouette, one per side. */
+  filter: drop-shadow(1.5px 0 0 var(--edge)) drop-shadow(-1.5px 0 0 var(--edge)) drop-shadow(0 1.5px 0 var(--edge)) drop-shadow(0 -1.5px 0 var(--edge));
+  transition: transform 400ms var(--ease-out);
+  /* A drag that starts on it tilts it instead of scrolling the page; there's
+     room either side to scroll from. No callout or selection on a long press. */
+  touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* Light scheme: silver. Pale metal only reads as shiny with a dark streak
+   beside the bright one, so the band gets one. */
+:root:not(.dark) .sticker {
+  --edge: #9a9a9a;
+  --face: brightness(0) invert(0.83);
+  --detail: 0.4;
+  --glare: 0.6;
+  --band: 0.7;
+  --band-cool: 0.3;
+  --band-warm: 0.25;
+  --streak: 0.14;
+  --grain: rgb(0 0 0 / 0.04);
+  --glint: 0.8;
+}
+
+.sticker[data-active] {
+  transform: perspective(900px) rotateX(calc((0.5 - var(--y)) * 14deg)) rotateY(calc((var(--x) - 0.5) * 14deg));
+  transition-duration: 120ms;
+}
+
+.sticker__face {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+  filter: var(--face);
+}
+
+/* The mark's own detail, in black and white over the silhouette; its colour
+   comes back while it's active. */
+.sticker__detail {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  filter: grayscale();
+  opacity: var(--detail);
+  transition: filter 300ms var(--ease-out);
+}
+
+.sticker[data-active] .sticker__detail {
+  filter: none;
+}
+
+/* The sheen, cut to the mark: a brushed grain, a diagonal band that slides
+   with the pointer, and a soft glare opposite it. */
+.sticker__shine {
+  position: absolute;
+  inset: 0;
+  mask: var(--mark) center / 100% 100% no-repeat;
+  background:
+    radial-gradient(circle at calc((1 - var(--x)) * 120%) calc((1 - var(--y)) * 100%), rgb(255 255 255 / var(--glare)), transparent 45%),
+    linear-gradient(115deg, transparent 20%, rgb(0 0 0 / var(--streak)) 34%, rgb(255 255 255 / var(--band)) 44%, rgb(180 200 255 / var(--band-cool)) 50%, rgb(255 220 240 / var(--band-warm)) 56%, rgb(0 0 0 / calc(var(--streak) / 2)) 64%, transparent 75%) calc(var(--x) * 100%) calc(var(--y) * 100%) / 250% 250%,
+    repeating-linear-gradient(90deg, var(--grain) 0 1px, transparent 1px 3px);
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+  pointer-events: none;
+}
+
+.sticker[data-active] .sticker__shine {
+  opacity: 1;
+}
+
+/* The glint at rest. It sweeps in the first part of the cycle and waits out
+   the rest; the first one waits for the page to settle. */
+.sticker::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  mask: var(--mark) center / 100% 100% no-repeat;
+  background: linear-gradient(115deg, transparent 40%, rgb(255 255 255 / var(--glint)) 50%, transparent 60%) 100% 0 / 300% 100% no-repeat;
+  animation: sticker-glint 35s var(--ease-in-out) 1.5s infinite;
+  pointer-events: none;
+}
+
+.sticker[data-active]::after {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes sticker-glint {
+  0% {
+    background-position: 100% 0;
+  }
+
+  14%,
+  100% {
+    background-position: 0 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sticker[data-active] {
+    transform: none;
+  }
+
+  .sticker::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+</style>
