@@ -33,6 +33,9 @@ interface Stop {
 
 const stripSlash = (path: string) => (path.length > 1 ? path.replace(/\/$/, '') : path)
 const isPage = (to: string) => stripSlash(route.path) === stripSlash(localePath(to))
+/** "page" on the page itself, "true" on a page under it (a project's part). */
+const currentAt = (to: string): Current =>
+  isPage(to) ? 'page' : stripSlash(route.path).startsWith(`${stripSlash(localePath(to))}/`) ? 'true' : undefined
 
 const segments = computed(() =>
   mainNav.map((item) => {
@@ -47,7 +50,7 @@ const segments = computed(() =>
     if (open && item.section === 'work') {
       for (const project of projects.value ?? []) {
         const to = `/projects/${project.slug}`
-        stops.push({ key: project.slug, to, label: project.word, lang: 'nah', current: isPage(to) ? 'page' : undefined, child: true })
+        stops.push({ key: project.slug, to, label: project.word, lang: 'nah', current: currentAt(to), child: true })
       }
     }
     if (open && 'children' in item) {
@@ -56,9 +59,11 @@ const segments = computed(() =>
       }
     }
 
-    // The marker marks the page itself when it's on the band, otherwise the
-    // section (e.g. /videos).
-    const marked = stops.find((stop) => stop.current === 'page') ?? (current && stops.length === 1 ? stops[0] : undefined)
+    // The marker marks the page itself when it's on the band, then the child
+    // it sits under (a project's part), otherwise the section (e.g. /videos).
+    const marked = stops.find((stop) => stop.current === 'page')
+      ?? stops.find((stop) => stop.child && stop.current)
+      ?? (current && stops.length === 1 ? stops[0] : undefined)
 
     return { ...item, open, stops, marked: marked?.key }
   }),
@@ -102,18 +107,30 @@ const { arrivedState, measure } = useScroll(stopsList, { offset: { left: 1 } })
 
 function showCurrent() {
   const list = stopsList.value
-  const current = list?.querySelector<HTMLElement>('[aria-current="page"]')?.parentElement
-  if (list && current) list.scrollLeft = current.offsetLeft - (list.clientWidth - current.offsetWidth) / 2
+  if (!list) return
+  // On the section's own page nothing in the list is current: back to the start.
+  const current = list.querySelector<HTMLElement>('[aria-current]')?.parentElement
+  if (!current) list.scrollLeft = 0
+  else {
+    // Measured against the list itself: offsetLeft would count from the
+    // nearest positioned ancestor, past the section's link.
+    const box = list.getBoundingClientRect()
+    const item = current.getBoundingClientRect()
+    list.scrollLeft += item.left - box.left - (box.width - item.width) / 2
+  }
   measure()
 }
 
 watch(() => route.fullPath, () => nextTick(showCurrent))
+// Opening a section mounts its list after the route has changed.
+watch(stopsList, showCurrent, { flush: 'post' })
 
 // Submenu labels: when they show, and where their ripple starts.
 const { reveal, rippleOrigin } = useSubmenuReveal({
   submenu: () => stopsList.value,
   isSectionPage: () => mainNav.some((item) => isPage(item.to)),
-  currentIndex: () => segments.value.find((segment) => segment.open)?.stops.findIndex((stop) => stop.current === 'page') ?? -1,
+  // Among the children only: the section's link isn't in the submenu list.
+  currentIndex: () => segments.value.find((segment) => segment.open)?.stops.slice(1).findIndex((stop) => stop.current) ?? -1,
 })
 
 // Mouse users drag the stops sideways, as touch already scrolls them.
@@ -155,39 +172,42 @@ onMounted(() => {
 <template>
   <nav ref="nav" class="flag-nav" flex="~ col" :aria-label="$t('nav.label')" @keydown="onKeydown">
     <ul class="flag-nav__band" flex gap="1" m="0" p="0" list="none">
-      <li v-for="segment in segments" :key="segment.key" class="flag-nav__segment data-[open=true]:flex-1" flex="none"
-        min-w="28" :data-section="segment.section" :data-open="segment.open" :data-split="segment.stops.length > 1"
+      <li v-for="segment in segments" :key="segment.key" class="flag-nav__segment data-[open=true]:flex-1" flex="~ none"
+        gap="0.5" min-w="28" :data-section="segment.section" :data-open="segment.open" :data-split="segment.stops.length > 1"
         :style="{ '--field': `var(--field-${segment.section})` }">
+        <!-- Label hierarchy through brightness and size, not hue: section
+             labels (About, Work, Media) are full brightness and a step
+             larger; their children (project words, videos, podcast) are
+             smaller and dimmed until current or hovered.
+             The section's own link sits outside the children's scroller, so
+             it stays in view however far they scroll. -->
+        <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current"
+          class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
+          flex flex-col gap="2" pb="1" min-w="28" decoration="none">
+          <span class="flag-nav__field" relative block aria-hidden="true">
+            <!-- One per page; the name lets the page transition slide it (main.css). -->
+            <span v-if="segment.marked === segment.key" class="flag-nav__marker [view-transition-name:flag-marker]"
+              absolute inset="0" bg="accent" />
+          </span>
+          <span pe="3">{{ segment.stops[0]!.label }}</span>
+        </NuxtLinkLocale>
         <ul v-if="segment.stops.length > 1" class="flag-nav__stops" flex gap="0.5" m="0" p="0" list="none"
           :aria-label="segment.stops[0]!.label" :data-reveal="reveal || undefined"
-          :data-fade-start="!arrivedState.left || undefined" :data-fade-end="!arrivedState.right || undefined">
-          <li v-for="(stop, i) in segment.stops" :key="stop.key" class="flag-nav__stop" flex="auto"
-            :data-child="stop.child" :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
-            <!-- Label hierarchy through brightness and size, not hue: section
-                 labels (About, Work, Media) are full brightness and a step
-                 larger; their children (project words, videos, podcast) are
-                 smaller and dimmed until current or hovered. -->
-            <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" :data-child="stop.child"
-              class="flag-nav__link leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
-              :class="stop.child ? 'text-[0.75rem] text-[var(--nav-child)] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold' : 'text-[1rem] text-fg'"
+          :data-fade-start="!arrivedState.left || undefined" :data-fade-end="!arrivedState.right || undefined"
+          :style="{ '--children': segment.stops.length - 1 }">
+          <li v-for="(stop, i) in segment.stops.slice(1)" :key="stop.key" class="flag-nav__stop" flex="auto" data-child
+            :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
+            <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child
+              class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
-                <span v-if="segment.marked === stop.key" class="flag-nav__marker [view-transition-name:flag-marker]" absolute inset="0"
-                  bg="accent" />
+                <span v-if="segment.marked === stop.key" class="flag-nav__marker [view-transition-name:flag-marker]"
+                  absolute inset="0" bg="accent" />
               </span>
               <span class="flag-nav__label" pe="3">{{ stop.label }}</span>
             </NuxtLinkLocale>
           </li>
         </ul>
-        <NuxtLinkLocale v-else :to="segment.to" :aria-current="segment.stops[0]!.current"
-          class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
-          flex flex-col gap="2" pb="1" min-w="28" decoration="none">
-          <span class="flag-nav__field" relative block aria-hidden="true">
-            <!-- One per page; the name lets the page transition slide it (main.css). -->
-            <span v-if="segment.marked" class="flag-nav__marker [view-transition-name:flag-marker]" absolute inset="0" bg="accent" />
-          </span>
-          <span pe="3">{{ segment.stops[0]!.label }}</span>
-        </NuxtLinkLocale>
       </li>
     </ul>
   </nav>
@@ -244,12 +264,19 @@ onMounted(() => {
 
 /* A section with no stops of its own (about): its link fills the open field,
    so the marker does too. */
-.flag-nav__segment[data-split='false'] {
-  display: flex;
-}
-
 .flag-nav__segment[data-split='false']>.flag-nav__link {
   flex: 1;
+}
+
+/* With children, the section's link and each child share the spare width
+   alike, as if they were one list. */
+.flag-nav__segment[data-split='true']>.flag-nav__link {
+  flex: 1 0 auto;
+}
+
+.flag-nav__segment>.flag-nav__stops {
+  flex: var(--children) 1 auto;
+  min-inline-size: 0;
 }
 
 /*
@@ -284,7 +311,8 @@ onMounted(() => {
   opacity: 0.6;
 }
 
-.flag-nav__link[aria-current='page'] .flag-nav__field::after {
+.flag-nav__link[aria-current='page'] .flag-nav__field::after,
+.flag-nav__link[data-child][aria-current] .flag-nav__field::after {
   display: none;
 }
 
@@ -381,8 +409,14 @@ onMounted(() => {
     flex: 1;
   }
 
-  .flag-nav__segment[data-split='false']>.flag-nav__link {
+  .flag-nav__segment>.flag-nav__link {
     min-inline-size: 0;
+  }
+
+  /* The section's link keeps its label's width; its children scroll in
+     what's left. */
+  .flag-nav__segment[data-split='true']>.flag-nav__link {
+    flex: none;
   }
 
   /* Closed sections step back to plain, dimmed labels: their fields already
@@ -394,7 +428,7 @@ onMounted(() => {
   /* Section labels share one size, so the open one doesn't grow down out of
      line with the rest; weight marks it instead. */
   .flag-nav__link:not([data-child]) {
-    font-size: 0.875rem;
+    font-size: 0.75rem;
   }
 
   .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
@@ -424,7 +458,7 @@ onMounted(() => {
  * pointer leaves and returns; opening a section reveals its children. Pointer devices only: touch keeps them shown.
  */
 @media (hover: hover) and (pointer: fine) and (width >=40rem) {
-  .flag-nav__link[data-child]:not([aria-current='page']) .flag-nav__label {
+  .flag-nav__link[data-child]:not([aria-current]) .flag-nav__label {
     opacity: 0;
     translate: 0 -0.25rem;
     transition:
