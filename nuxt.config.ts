@@ -19,6 +19,8 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
       ],
+      // A screen that would switch on from JS (usePowerOn) is simply lit.
+      noscript: [{ innerHTML: '<style>.power-screen{clip-path:none!important;animation:none!important}</style>' }],
     },
   },
 

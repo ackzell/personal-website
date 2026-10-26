@@ -24,6 +24,8 @@ const props = defineProps<{
   title: string
   poster?: string
   wide?: boolean
+  /** Laid out but not shown (a MediaPalette entry that isn't picked): it pauses. */
+  inactive?: boolean
 }>()
 
 const { t } = useI18n()
@@ -70,6 +72,12 @@ useEventListener(window, 'message', (event: MessageEvent) => {
   if (playerState === 1) state.value = 'playing'
   else if (playerState === 2 && state.value !== 'loading') state.value = 'paused'
   else if (playerState === 0) state.value = 'ended'
+})
+
+watch(() => props.inactive, (inactive) => {
+  if (!inactive || (state.value !== 'playing' && state.value !== 'loading')) return
+  state.value = 'paused'
+  command('pauseVideo')
 })
 
 function toggle() {

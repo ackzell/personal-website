@@ -15,6 +15,7 @@ const EDGE = 24
  *
  * A swipe that starts in something that scrolls sideways (the band's own
  * stops, a carousel) scrolls that instead. Mostly-vertical moves are scrolls.
+ * While a modal is up (a lightbox), its swipes are its own.
  */
 export function useSwipeNav() {
   const route = useRoute()
@@ -56,7 +57,8 @@ export function useSwipeNav() {
     if (event.touches.length !== 1 || !touch) return
     if (touch.clientX < EDGE || touch.clientX > window.innerWidth - EDGE) return
     if (scrollsSideways(event.target as Element)) return
-    start = { x: touch.clientX, y: touch.clientY, time: event.timeStamp }
+    if (document.querySelector(':modal')) return
+    start ={ x: touch.clientX, y: touch.clientY, time: event.timeStamp }
   }
 
   function onTouchEnd(event: TouchEvent) {

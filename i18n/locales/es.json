@@ -51,7 +51,17 @@
       "youtube": "Video completo en YouTube",
       "tryLive": "Pruébalo aquí",
       "openSite": "Abrir en una pestaña nueva",
-      "watch": "Ver en YouTube"
+      "watch": "Ver en YouTube",
+      "expand": "TODO(owner)",
+      "lightbox": {
+        "close": "TODO(owner)",
+        "previous": "TODO(owner)",
+        "next": "TODO(owner)",
+        "zoomIn": "TODO(owner)",
+        "zoomOut": "TODO(owner)",
+        "fit": "TODO(owner)",
+        "counter": "{index} / {total}"
+      }
     }
   },
   "media": {

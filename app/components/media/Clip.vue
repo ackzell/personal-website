@@ -23,7 +23,13 @@ const props = defineProps<{
   height: number | string
   youtube?: string
   wide?: boolean
+  /** Laid out but not shown (a MediaPalette clip that isn't picked): it rests. */
+  inactive?: boolean
+  /** Offers a larger view: an expand control, and the clip itself, emit `expand`. */
+  expandable?: boolean
 }>()
+
+const emit = defineEmits<{ expand: [] }>()
 
 const { t } = useI18n()
 const slots = useSlots()
@@ -41,7 +47,8 @@ useIntersectionObserver(video, ([entry]) => {
   visible.value = entry?.isIntersecting ?? false
 }, { threshold: 0.5 })
 
-const shouldPlay = computed(() => visible.value && (wants.value ?? reducedMotion.value !== 'reduce'))
+const shouldPlay = computed(() =>
+  visible.value && !props.inactive && (wants.value ?? reducedMotion.value !== 'reduce'))
 
 watch(shouldPlay, (play) => {
   const el = video.value
@@ -65,12 +72,17 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   <figure class="media media--clip" :class="{ 'track-wide': props.wide }">
     <div class="media__frame">
       <video ref="video" :poster="poster" :width="width" :height="height" :aria-label="label" :controls="!mounted"
-        muted loop playsinline preload="metadata" @play="playing = true" @pause="playing = false">
+        muted loop playsinline preload="metadata" :class="{ 'media__expandable': expandable && mounted }"
+        @play="playing = true" @pause="playing = false" @click="expandable && mounted && emit('expand')">
         <source v-if="webm" :src="webm" type="video/webm">
         <source :src="src" :type="source(src)">
       </video>
       <button v-if="mounted" type="button" class="media__toggle" :aria-label="playing ? t('projects.media.pause') : t('projects.media.play')" @click="toggle">
         <span :class="playing ? 'i-iconoir-pause-solid' : 'i-iconoir-play-solid'" aria-hidden="true" />
+      </button>
+      <button v-if="mounted && expandable" type="button" class="media__toggle media__expand"
+        :aria-label="t('projects.media.expand')" @click="emit('expand')">
+        <span class="i-iconoir-expand" aria-hidden="true" />
       </button>
     </div>
     <figcaption v-if="slots.default || youtube" class="media__caption">

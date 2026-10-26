@@ -727,6 +727,63 @@ main:focus {
   background: color-mix(in srgb, var(--fg) 6%, var(--bg));
 }
 
+/* A captured app window (media--window): the corners, rim and shadow macOS
+   gave it, so it reads as a window on a desktop rather than a panel of the
+   page. The radius is a share of the capture's own size, so at any width it
+   covers the corner the capture baked in. */
+.media--window .media__frame {
+  border-radius: 1.5% / 2.4%;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--fg) 14%, transparent),
+    0 0.75rem 2rem -0.5rem rgb(0 0 0 / 0.45);
+}
+
+/*
+ * A screen switching on (usePowerOn): a bright line across the middle, like
+ * a tube warming up, that opens onto the picture. It runs once, the first
+ * time the screen is seen. The clip reaches past the edges so the window's
+ * shadow isn't cut while it opens. An `auto` screen switches on with the
+ * page, as its block rises in (ProjectPage.vue), without waiting on JS. An
+ * `off` screen that JS never turns on lights itself after a few seconds.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-power='auto'] .power-screen {
+    animation: 450ms 350ms both power-on;
+  }
+
+  [data-power='off'] .power-screen {
+    clip-path: inset(50% 50%);
+    animation: 1ms 3s forwards power-safety;
+  }
+
+  [data-power='on'] .power-screen {
+    animation: 450ms both power-on;
+  }
+}
+
+@keyframes power-on {
+  0% {
+    clip-path: inset(50% 50%);
+    filter: brightness(2.5);
+    animation-timing-function: var(--ease-out);
+  }
+  30% {
+    clip-path: inset(calc(50% - 1px) -3rem);
+    filter: brightness(2.5);
+    animation-timing-function: var(--ease-out);
+  }
+  100% {
+    clip-path: inset(-3rem);
+    filter: none;
+  }
+}
+
+@keyframes power-safety {
+  to {
+    clip-path: inset(-3rem);
+  }
+}
+
 .media__frame :is(img, video) {
   display: block;
   inline-size: 100%;
@@ -740,7 +797,7 @@ main:focus {
 }
 
 /* Caption links (YouTube, the live site) close their line. */
-.media__caption > .media__out {
+.media__caption > .media__out:not(:first-child) {
   margin-inline-start: var(--gap-group);
 }
 
@@ -775,4 +832,14 @@ main:focus {
 .media__frame:hover .media__toggle,
 .media__toggle:focus-visible {
   opacity: 1;
+}
+
+/* A larger view (MediaClip `expandable`): beside the pause control, and the
+   clip itself opens it too. */
+.media__toggle.media__expand {
+  inset-inline-end: calc(var(--space-3) + 2.5rem + var(--space-2));
+}
+
+.media__expandable {
+  cursor: zoom-in;
 }
