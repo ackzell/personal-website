@@ -1,7 +1,8 @@
-pronunciation: TODO
+pronunciation: yeh-yeh-CO-ah
 status: active
 order: 4
 repos:
   - ackzell/yehyecoa-vue
-stack: [vue, monaco, partykit, pinia]
+stack: [vue, typescript, monaco, partykit, pinia, dexie, unocss]
 related: [amoxtli]
+devlogPlaylist: PLB7_0uWtxEak
