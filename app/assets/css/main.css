@@ -189,6 +189,13 @@ pre code {
   font: inherit;
 }
 
+/* Highlighted code is colored by its tlapalli gem (tlapalli.css), straight
+   on the stage: no panel of its own (The Stage Rule). */
+pre.shiki {
+  overflow-x: auto;
+  color: var(--code-fg);
+}
+
 html {
   /* Anchored and focused content stays clear of the sticky header and
      footer (SiteHeader, SiteFooter). */

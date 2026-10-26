@@ -1,10 +1,15 @@
+import tlapalliJson from './shiki/tlapalli.json'
+
+// JSON widens `type` to string; Shiki wants to know it's a dark or light theme.
+const tlapalli = tlapalliJson.map((theme) => ({ ...theme, type: theme.type as 'dark' | 'light' }))
+
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
 
   modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts', '@unocss/nuxt', '@vueuse/nuxt/module', '@nuxtjs/color-mode'],
 
-  css: ['~/assets/css/main.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/tlapalli.css'],
 
   experimental: {
     // Route changes run as view transitions (skipped under reduced motion).
@@ -66,6 +71,22 @@ export default defineNuxtConfig({
   content: {
     // Node >= 22.5 ships node:sqlite, so no native addon to build.
     experimental: { sqliteConnector: 'native' },
+    // Code is colored with the tlapalli themes, every gem at once: each token
+    // carries a --shiki-<gem> variable per theme, and CSS picks one
+    // (main.css, MediaTake). No highlighting happens in the browser.
+    build: {
+      markdown: {
+        highlight: {
+          // A string names one of Shiki's bundled themes; these are passed as
+          // the theme objects themselves.
+          theme: {
+            default: tlapalli.find((theme) => theme.name === 'tlapalli-jade')!,
+            ...Object.fromEntries(tlapalli.map((theme) => [theme.name.replace('tlapalli-', ''), theme])),
+          },
+          langs: ['ts', 'tsx', 'vue', 'js', 'json', 'css', 'html', 'bash', 'yaml'],
+        },
+      },
+    },
   },
 
   i18n: {
