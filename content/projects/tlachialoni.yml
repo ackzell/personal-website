@@ -5,6 +5,7 @@ repos:
   - ackzell/tlachialoni
 links:
   video: https://youtu.be/3mEV4Aqni_s
-stack: [electron, typescript, vite]
+stack: [electron, vue, typescript, vite, opencode, speckit]
 related: [tlapalli]
 logo: /logos/tlachialoni.svg
+devlogPlaylist: PLJVYH4tDVvAg
