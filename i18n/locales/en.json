@@ -61,6 +61,12 @@
         "zoomOut": "Zoom out",
         "fit": "Fit to screen",
         "counter": "{index} of {total}"
+      },
+      "take": {
+        "files": "Files",
+        "gem": "Code theme",
+        "scrub": "Scrub through the clip",
+        "running": "Running {file}, line {lines} | Running {file}, lines {lines}"
       }
     }
   },

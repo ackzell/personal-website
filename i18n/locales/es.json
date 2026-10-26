@@ -61,6 +61,12 @@
         "zoomOut": "TODO(owner)",
         "fit": "TODO(owner)",
         "counter": "{index} / {total}"
+      },
+      "take": {
+        "files": "Archivos",
+        "gem": "Tema del código",
+        "scrub": "Recorre el clip",
+        "running": "Corre {file}, línea {lines} | Corre {file}, líneas {lines}"
       }
     }
   },
