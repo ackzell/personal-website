@@ -104,9 +104,14 @@ function tryLive() {
   background: color-mix(in srgb, var(--accent) 22%, var(--bg));
 }
 
+/* Phones: the mat runs to the screen's edges, out of the page gutter and
+   the room <main> keeps for the social rail (main.css), so the narrow frame
+   gets every pixel. The caption keeps the text measure. */
 @media (width < 40rem) {
   .site__mat {
-    padding: var(--space-2);
+    padding: var(--space-1);
+    /* margin-inline: calc(-1 * var(--gutter)) calc(-1 * max(var(--gutter), var(--rail-width))); */
+    margin-inline: calc(-1 * var(--gutter) + var(--space-2)) calc(-1 * max(var(--gutter) + var(--space-2)));
   }
 }
 
