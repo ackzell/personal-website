@@ -15,9 +15,10 @@ What this page can't show is the room. In a workshop an instructor broadcasts, a
 ::media-palette{dir="/media/yehyecoa-vue" width="1440" height="810" label="Yehyecoa's features"}
 ---
 items:
-  - id: promo
-    name: promo
-    label: The promo video, without its music. The name types in, then the playground, live sync and snapshots in turn.
+  - id: video
+    name: video
+    label: TODO(owner)
+    video: https://youtu.be/XD68rXTeyMQ
   - id: live-edit
     name: live edit
     label: A title edited in the editor; the preview beside it updates as it's typed.

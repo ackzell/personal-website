@@ -15,9 +15,10 @@ Lo que esta página no puede mostrar es el salón. En un taller, quien imparte t
 ::media-palette{dir="/media/yehyecoa-vue" width="1440" height="810" label="Funciones de Yehyecoa"}
 ---
 items:
-  - id: promo
-    name: promo
-    label: El video promocional, sin su música. El nombre se escribe solo y luego aparecen el playground, la sincronización en vivo y los snapshots.
+  - id: video
+    name: video
+    label: TODO(owner)
+    video: https://youtu.be/XD68rXTeyMQ
   - id: live-edit
     name: edición en vivo
     label: Un título editado en el editor; la vista previa de al lado se actualiza mientras se escribe.
