@@ -4,8 +4,10 @@
  *
  * It starts `auto`: CSS switches the screen on as soon as the page paints,
  * with the page's own entrance, never waiting on JS. Once mounted, a screen
- * that's still below the fold goes `off` and switches `on` the first time a
- * third of it is on screen; one already in view is left as it is.
+ * that's still below the fold goes `off` and switches `on` as soon as its top
+ * edge rises past the bottom tenth of the screen; one already in view is left
+ * as it is. Waiting for more of it to show left a large window dark well
+ * after it was in plain sight.
  *
  * Without JS, a <noscript> style (nuxt.config.ts) keeps it simply lit.
  */
@@ -16,7 +18,7 @@ export function usePowerOn(target: MaybeRefOrGetter<HTMLElement | null | undefin
     if (!entry?.isIntersecting) return
     power.value = 'on'
     stop()
-  }, { threshold: 0.33, immediate: false })
+  }, { rootMargin: '0px 0px -10% 0px', immediate: false })
 
   onMounted(() => {
     const el = toValue(target)
