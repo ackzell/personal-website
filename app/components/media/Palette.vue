@@ -84,7 +84,32 @@ const tabs = useTemplateRef<HTMLButtonElement[]>('tabs')
 const list = useTemplateRef<HTMLElement>('list')
 const { arrivedState, measure } = useScroll(list, { offset: { left: 1, right: 1 } })
 // The list mounts after hydration and changes shape with the screen.
-useResizeObserver(list, () => measure())
+useResizeObserver(list, () => {
+  measure()
+  place()
+})
+
+// The picked row's fill is one box under the list that travels to whichever
+// row is picked, so the choice reads as a move, not a swap. It's set by its
+// edges, so each can travel on its own (the CSS stretches it toward the
+// pick). It's placed before it can travel: the first placement lands
+// without moving.
+const mark = ref<Record<string, string>>()
+const marked = ref(false)
+
+function place() {
+  const tab = tabs.value?.[active.value]
+  if (!tab) return
+  mark.value = {
+    '--mark-x0': `${tab.offsetLeft}px`,
+    '--mark-y0': `${tab.offsetTop}px`,
+    '--mark-x1': `${tab.offsetLeft + tab.offsetWidth}px`,
+    '--mark-y1': `${tab.offsetTop + tab.offsetHeight}px`,
+  }
+  if (!marked.value) requestAnimationFrame(() => (marked.value = true))
+}
+
+watch(active, place, { flush: 'post' })
 
 watch(active, (i) => {
   const row = list.value
@@ -133,6 +158,7 @@ const larger = computed(() => clips.value.map((i) => props.items[i]!).map((item)
 watch(showing, (now, before) => {
   if (now === null && before !== null && before !== active.value) {
     leaving.value = null
+    forward.value = before > active.value
     active.value = before
   }
 })
@@ -144,6 +170,8 @@ watch(showing, (now, before) => {
       :data-fade-start="!arrivedState.left || undefined" :data-fade-end="!arrivedState.right || undefined"
       aria-orientation="vertical" :aria-label="label"
       @keydown="onKeydown">
+      <span v-if="mark" class="palette__mark" :class="{ 'is-placed': marked }" :style="{ ...mark, '--i': active }"
+        :data-dir="forward ? 'forward' : 'back'" aria-hidden="true" />
       <button v-for="(item, i) in items" :id="`${uid}-tab-${i}`" ref="tabs" :key="item.id" type="button" role="tab"
         class="palette__item" :style="{ '--i': i }" :aria-selected="i === active" :aria-controls="`${uid}-panel-${i}`"
         :tabindex="i === active ? 0 : -1" @click="pick(i)">
@@ -212,7 +240,21 @@ watch(showing, (now, before) => {
   top: var(--gap-block);
 }
 
+/* The chosen row's fill, filled the way the app fills its palette's current
+   row, drawn under the names and carried from row to row. */
+.palette__mark {
+  position: absolute;
+  inset: 0 auto auto 0;
+  translate: var(--mark-x0) var(--mark-y0);
+  inline-size: calc(var(--mark-x1) - var(--mark-x0));
+  block-size: calc(var(--mark-y1) - var(--mark-y0));
+  background: color-mix(in srgb, var(--fg) 10%, transparent);
+  pointer-events: none;
+}
+
 .palette__item {
+  /* Over the fill. */
+  position: relative;
   padding: var(--space-2) var(--space-3);
   border: 0;
   background: transparent;
@@ -229,9 +271,7 @@ watch(showing, (now, before) => {
   color: var(--fg);
 }
 
-/* The chosen row, filled the way the app fills its palette's current row. */
 .palette__item[aria-selected='true'] {
-  background: color-mix(in srgb, var(--fg) 10%, transparent);
   color: var(--fg);
 }
 
@@ -315,8 +355,39 @@ watch(showing, (now, before) => {
     opacity: 0;
   }
 
+  /* The fill travels across the list, so it eases both ways. Its leading
+     edge sets off first and the trailing one follows, so it stretches toward
+     the pick and gathers itself there, the way the clip wipes in from that
+     side. It lands just ahead of the wipe. */
+  .palette__mark.is-placed {
+    --lead: 280ms var(--ease-in-out);
+    --trail: 300ms var(--ease-in-out) 80ms;
+  }
+
+  .palette__mark.is-placed[data-dir='forward'] {
+    transition:
+      --mark-x1 var(--lead), --mark-y1 var(--lead),
+      --mark-x0 var(--trail), --mark-y0 var(--trail);
+  }
+
+  .palette__mark.is-placed[data-dir='back'] {
+    transition:
+      --mark-x0 var(--lead), --mark-y0 var(--lead),
+      --mark-x1 var(--trail), --mark-y1 var(--trail);
+  }
+
+  /* It fills in with its row. */
+  [data-power='off'] :is(.palette__item, .palette__mark) {
+    opacity: 0;
+  }
+
   :is([data-power='auto'], [data-power='on']) .palette__item {
     animation: 300ms var(--ease-out) calc(120ms + var(--i) * 25ms) both palette-row;
+  }
+
+  /* Faded in only: a held translate would pin it to its first row. */
+  :is([data-power='auto'], [data-power='on']) .palette__mark {
+    animation: 300ms var(--ease-out) calc(120ms + var(--i) * 25ms) both palette-fade;
   }
 }
 
@@ -329,6 +400,31 @@ watch(showing, (now, before) => {
   .palette__scan {
     display: none;
   }
+}
+
+/* The fill's edges, typed so they can travel. */
+@property --mark-x0 {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --mark-y0 {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --mark-x1 {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --mark-y1 {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
 }
 
 @keyframes palette-wipe {
@@ -382,7 +478,10 @@ watch(showing, (now, before) => {
   }
 
   .palette__list {
-    position: static;
+    /* Still the fill's frame, and it scrolls with the names; no longer
+       stuck, so the sticky offset would only push it under the window. */
+    position: relative;
+    top: auto;
     display: flex;
     overflow-x: auto;
     overscroll-behavior-x: contain;
