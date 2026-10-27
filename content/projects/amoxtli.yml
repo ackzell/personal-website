@@ -5,8 +5,9 @@ order: 1
 repos:
   - ackzell/amoxtli-vue-2
   - ackzell/amoxtli-vue
-stack: [nuxt, vue, tutorialkit, webcontainers]
+stack: [nuxt, vue, nuxt-content, almostnode, monaco, shiki, twoslash]
 related: [yehyecoa]
+devlogPlaylist: PLmJs3lfUmCdTQDpZop2BC1EJ5emEpTBPn
 logo: /logos/amoxtli-vue.svg
 logoLight: /logos/amoxtli-vue_light.svg
-# TODO: livestreams playlist id, and previewAccess (mailto or form) — never the preview URL
+# TODO(owner): links.previewAccess (mailto or form), never the preview URL

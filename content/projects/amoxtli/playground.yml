@@ -1,0 +1,4 @@
+order: 1
+repos:
+  - ackzell/almostnode
+stack: [almostnode, vite, monaco, birpc]
