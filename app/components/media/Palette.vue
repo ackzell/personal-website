@@ -137,6 +137,8 @@ function onKeydown(event: KeyboardEvent) {
 
 const stage = useTemplateRef<HTMLElement>('stage')
 const power = usePowerOn(stage)
+// The lightbox opens out of the window and goes back into it.
+const windowFrame = () => stage.value?.querySelector<HTMLElement>('.is-active .media__frame')
 
 const src = (item: PaletteItem, ext: string) => `${props.dir}/${item.id}.${ext}`
 
@@ -198,7 +200,7 @@ watch(showing, (now, before) => {
       </div>
       <span v-if="leaving !== null" :key="switches" class="palette__scan" aria-hidden="true" />
     </div>
-    <MediaLightbox v-if="mounted" v-model:index="expanded" :items="larger" />
+    <MediaLightbox v-if="mounted" v-model:index="expanded" :items="larger" :from="windowFrame" />
   </div>
 </template>
 
@@ -382,12 +384,18 @@ watch(showing, (now, before) => {
   }
 
   :is([data-power='auto'], [data-power='on']) .palette__item {
-    animation: 300ms var(--ease-out) calc(120ms + var(--i) * 25ms) both palette-row;
+    animation: 300ms var(--ease-out) calc(var(--rows-after, 0ms) + var(--i) * 25ms) both palette-row;
   }
 
   /* Faded in only: a held translate would pin it to its first row. */
   :is([data-power='auto'], [data-power='on']) .palette__mark {
-    animation: 300ms var(--ease-out) calc(120ms + var(--i) * 25ms) both palette-fade;
+    animation: 300ms var(--ease-out) calc(var(--rows-after, 0ms) + var(--i) * 25ms) both palette-fade;
+  }
+
+  /* With the page's entrance, the rows wait for the window to begin; once
+     scrolled to, they fill in with it. */
+  [data-power='auto'] {
+    --rows-after: 120ms;
   }
 }
 
