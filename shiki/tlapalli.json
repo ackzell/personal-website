@@ -5,7 +5,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#faf8fb",
-      "editor.foreground": "#5c3f83"
+      "editor.foreground": "#5c3f83",
+      "editor.selectionBackground": "#c2b2e5"
     },
     "settings": [
       {
@@ -302,7 +303,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#060407",
-      "editor.foreground": "#997cc0"
+      "editor.foreground": "#997cc0",
+      "editor.selectionBackground": "#2a1a4d"
     },
     "settings": [
       {
@@ -599,7 +601,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#f8f3f3",
-      "editor.foreground": "#992630"
+      "editor.foreground": "#992630",
+      "editor.selectionBackground": "#d27b7b77"
     },
     "settings": [
       {
@@ -897,7 +900,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#0c0707",
-      "editor.foreground": "#d96670"
+      "editor.foreground": "#d96670",
+      "editor.selectionBackground": "#842d2d77"
     },
     "settings": [
       {
@@ -1195,7 +1199,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#faf8f6",
-      "editor.foreground": "#756042"
+      "editor.foreground": "#756042",
+      "editor.selectionBackground": "#d2a47b77"
     },
     "settings": [
       {
@@ -1492,7 +1497,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#090705",
-      "editor.foreground": "#bda88a"
+      "editor.foreground": "#bda88a",
+      "editor.selectionBackground": "#84562d77"
     },
     "settings": [
       {
@@ -1789,7 +1795,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#f4f8f6",
-      "editor.foreground": "#3c7159"
+      "editor.foreground": "#3c7159",
+      "editor.selectionBackground": "#7bd2a077"
     },
     "settings": [
       {
@@ -2086,7 +2093,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#070b09",
-      "editor.foreground": "#6aad8f"
+      "editor.foreground": "#6aad8f",
+      "editor.selectionBackground": "#2d845277"
     },
     "settings": [
       {
@@ -2377,7 +2385,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#f2f5f8",
-      "editor.foreground": "#2b4a66"
+      "editor.foreground": "#2b4a66",
+      "editor.selectionBackground": "#7babd277"
     },
     "settings": [
       {
@@ -2674,7 +2683,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#070a0d",
-      "editor.foreground": "#99b8d4"
+      "editor.foreground": "#99b8d4",
+      "editor.selectionBackground": "#2d5d8477"
     },
     "settings": [
       {
@@ -2971,7 +2981,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#fdfdfd",
-      "editor.foreground": "#4f4f4f"
+      "editor.foreground": "#4f4f4f",
+      "editor.selectionBackground": "#00000033"
     },
     "settings": [
       {
@@ -3268,7 +3279,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#020202",
-      "editor.foreground": "#a7a7a7"
+      "editor.foreground": "#a7a7a7",
+      "editor.selectionBackground": "#ffffff30"
     },
     "settings": [
       {
@@ -3565,7 +3577,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#faf5f9",
-      "editor.foreground": "#75083c"
+      "editor.foreground": "#75083c",
+      "editor.selectionBackground": "#d27bb177"
     },
     "settings": [
       {
@@ -3862,7 +3875,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#0a0509",
-      "editor.foreground": "#f78abe"
+      "editor.foreground": "#f78abe",
+      "editor.selectionBackground": "#842d6377"
     },
     "settings": [
       {
@@ -4159,7 +4173,8 @@
     "type": "light",
     "colors": {
       "editor.background": "#f6fafa",
-      "editor.foreground": "#33615f"
+      "editor.foreground": "#33615f",
+      "editor.selectionBackground": "#7bd2cf77"
     },
     "settings": [
       {
@@ -4456,7 +4471,8 @@
     "type": "dark",
     "colors": {
       "editor.background": "#050909",
-      "editor.foreground": "#6aadaa"
+      "editor.foreground": "#6aadaa",
+      "editor.selectionBackground": "#2d848177"
     },
     "settings": [
       {

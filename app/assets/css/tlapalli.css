@@ -3,6 +3,7 @@
 /* Code anywhere is jade, unless a block names another gem (data-gem). */
 :root.dark {
   --code-fg: #6aad8f;
+  --code-selection: #2d845277;
 }
 :root.dark .shiki span {
   color: var(--shiki-jade);
@@ -10,14 +11,21 @@
 }
 :root:not(.dark) {
   --code-fg: #3c7159;
+  --code-selection: #7bd2a077;
 }
 :root:not(.dark) .shiki span {
   color: var(--shiki-jade-light);
   font-style: var(--shiki-jade-light-font-style);
 }
 
+/* Selected code keeps its colors over the gem's selection, as in the editor. */
+.shiki ::selection {
+  background-color: var(--code-selection);
+}
+
 :root.dark [data-gem='amethyst'] {
   --code-fg: #997cc0;
+  --code-selection: #2a1a4d;
 }
 :root.dark [data-gem='amethyst'] .shiki span {
   color: var(--shiki-amethyst);
@@ -25,6 +33,7 @@
 }
 :root:not(.dark) [data-gem='amethyst'] {
   --code-fg: #5c3f83;
+  --code-selection: #c2b2e5;
 }
 :root:not(.dark) [data-gem='amethyst'] .shiki span {
   color: var(--shiki-amethyst-light);
@@ -33,6 +42,7 @@
 
 :root.dark [data-gem='fire-opal'] {
   --code-fg: #d96670;
+  --code-selection: #842d2d77;
 }
 :root.dark [data-gem='fire-opal'] .shiki span {
   color: var(--shiki-fire-opal);
@@ -40,6 +50,7 @@
 }
 :root:not(.dark) [data-gem='fire-opal'] {
   --code-fg: #992630;
+  --code-selection: #d27b7b77;
 }
 :root:not(.dark) [data-gem='fire-opal'] .shiki span {
   color: var(--shiki-fire-opal-light);
@@ -48,6 +59,7 @@
 
 :root.dark [data-gem='gold'] {
   --code-fg: #bda88a;
+  --code-selection: #84562d77;
 }
 :root.dark [data-gem='gold'] .shiki span {
   color: var(--shiki-gold);
@@ -55,6 +67,7 @@
 }
 :root:not(.dark) [data-gem='gold'] {
   --code-fg: #756042;
+  --code-selection: #d2a47b77;
 }
 :root:not(.dark) [data-gem='gold'] .shiki span {
   color: var(--shiki-gold-light);
@@ -63,6 +76,7 @@
 
 :root.dark [data-gem='jade'] {
   --code-fg: #6aad8f;
+  --code-selection: #2d845277;
 }
 :root.dark [data-gem='jade'] .shiki span {
   color: var(--shiki-jade);
@@ -70,6 +84,7 @@
 }
 :root:not(.dark) [data-gem='jade'] {
   --code-fg: #3c7159;
+  --code-selection: #7bd2a077;
 }
 :root:not(.dark) [data-gem='jade'] .shiki span {
   color: var(--shiki-jade-light);
@@ -78,6 +93,7 @@
 
 :root.dark [data-gem='lapis-lazuli'] {
   --code-fg: #99b8d4;
+  --code-selection: #2d5d8477;
 }
 :root.dark [data-gem='lapis-lazuli'] .shiki span {
   color: var(--shiki-lapis-lazuli);
@@ -85,6 +101,7 @@
 }
 :root:not(.dark) [data-gem='lapis-lazuli'] {
   --code-fg: #2b4a66;
+  --code-selection: #7babd277;
 }
 :root:not(.dark) [data-gem='lapis-lazuli'] .shiki span {
   color: var(--shiki-lapis-lazuli-light);
@@ -93,6 +110,7 @@
 
 :root.dark [data-gem='obsidian'] {
   --code-fg: #a7a7a7;
+  --code-selection: #ffffff30;
 }
 :root.dark [data-gem='obsidian'] .shiki span {
   color: var(--shiki-obsidian);
@@ -100,6 +118,7 @@
 }
 :root:not(.dark) [data-gem='obsidian'] {
   --code-fg: #4f4f4f;
+  --code-selection: #00000033;
 }
 :root:not(.dark) [data-gem='obsidian'] .shiki span {
   color: var(--shiki-obsidian-light);
@@ -108,6 +127,7 @@
 
 :root.dark [data-gem='quartz'] {
   --code-fg: #f78abe;
+  --code-selection: #842d6377;
 }
 :root.dark [data-gem='quartz'] .shiki span {
   color: var(--shiki-quartz);
@@ -115,6 +135,7 @@
 }
 :root:not(.dark) [data-gem='quartz'] {
   --code-fg: #75083c;
+  --code-selection: #d27bb177;
 }
 :root:not(.dark) [data-gem='quartz'] .shiki span {
   color: var(--shiki-quartz-light);
@@ -123,6 +144,7 @@
 
 :root.dark [data-gem='turquoise'] {
   --code-fg: #6aadaa;
+  --code-selection: #2d848177;
 }
 :root.dark [data-gem='turquoise'] .shiki span {
   color: var(--shiki-turquoise);
@@ -130,6 +152,7 @@
 }
 :root:not(.dark) [data-gem='turquoise'] {
   --code-fg: #33615f;
+  --code-selection: #7bd2cf77;
 }
 :root:not(.dark) [data-gem='turquoise'] .shiki span {
   color: var(--shiki-turquoise-light);
