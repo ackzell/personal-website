@@ -30,3 +30,13 @@ export const plateTransition = (slug: string) => ({
   viewTransitionName: `var(--travel-name, plate-${slug})`,
   viewTransitionClass: 'plate',
 })
+
+/**
+ * View-transition style for a media section's name (Videos, Podcast), so it
+ * travels between its door on the hub and the section's heading. Both render
+ * at --headword-size, like a project's word. Same uniqueness rule.
+ */
+export const mediaTransition = (slug: 'videos' | 'podcast') => ({
+  viewTransitionName: `var(--travel-name, media-${slug})`,
+  viewTransitionClass: 'word',
+})

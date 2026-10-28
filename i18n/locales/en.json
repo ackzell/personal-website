@@ -71,15 +71,48 @@
     }
   },
   "media": {
-    "title": "Content"
+    "title": "Content",
+    "guide": {
+      "legend": {
+        "label": "How to read the guide",
+        "videos": "Each frame is a video, oldest first. A longer row has more videos.",
+        "episodes": "",
+        "length": "Episode length",
+        "downloads": "Downloads",
+        "views": "Darker is more viewed",
+        "bars": "Each cell is a video, in the playlist's order.",
+        "videoLength": "Wider is longer"
+      },
+      "label": "Series, by latest release",
+      "videos": "{count} video | {count} videos",
+      "episodes": "{count} episode | {count} episodes",
+      "views": "{count} views",
+      "downloads": "{count} downloads",
+      "thatWeek": "{count} videos that week",
+      "openPlaylist": "Open the playlist",
+      "openPodcast": "Listen on mytypeof.dev",
+      "season": "Season {n}",
+      "playlists": "{count} playlist | {count} playlists",
+      "sort": {
+        "label": "Sort",
+        "order": "Playlist order",
+        "views": "Most viewed",
+        "length": "Longest"
+      },
+      "find": "Find a video",
+      "none": "Nothing matches.",
+      "showAll": "Show all {count}"
+    }
   },
   "videos": {
     "title": "Videos",
-    "intro": "Video series on YouTube, where I build things piece by piece."
+    "intro": "Video series on YouTube, where I build things piece by piece.",
+    "rest": "Everything else is on the channel."
   },
   "podcast": {
     "title": "Podcast",
-    "intro": "My typeof Radio is a Spanish-language podcast about web development."
+    "intro": "My typeof Radio is a Spanish-language podcast about web development.",
+    "rest": "Every episode is on mytypeof.dev."
   },
   "contributions": {
     "title": "Contributions",

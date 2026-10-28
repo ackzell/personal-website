@@ -11,14 +11,24 @@
  * `pointerOnly` is for a mark whose details are already said beside it: it
  * takes no keyboard stop, stays out of the accessibility tree, and covers its
  * parent, padded out to a target worth aiming at. A tap on it opens the
- * tooltip instead of following whatever link it sits in.
+ * tooltip instead of following whatever link it sits in, unless `passTaps`
+ * leaves taps to the control it sits in (a picker whose pick says enough).
+ *
+ * `placement` puts it above the pointer instead of below (it flips when
+ * there's no room), and `tipAttrs` land on the tooltip itself, e.g. to set its
+ * colors through --tooltip-bg and --tooltip-fg.
  */
 import type { VirtualElement } from '@floating-ui/dom'
 import { computePosition, flip, offset, shift } from '@floating-ui/dom'
 
 defineOptions({ inheritAttrs: false })
 
-const props = defineProps<{ pointerOnly?: boolean }>()
+const props = withDefaults(defineProps<{
+  pointerOnly?: boolean
+  passTaps?: boolean
+  placement?: 'top' | 'bottom'
+  tipAttrs?: Record<string, string>
+}>(), { placement: 'bottom' })
 
 // Share of the remaining distance covered each frame.
 const EASING = 0.28
@@ -48,8 +58,12 @@ async function place() {
     : trigger.value
   const { x, y } = await computePosition(reference, tip.value, {
     strategy: 'fixed',
-    placement: 'bottom-start',
-    middleware: [offset(following.value ? 14 : 6), flip({ fallbackPlacements: ['top-start'] }), shift({ padding: 12 })],
+    placement: `${props.placement}-start`,
+    middleware: [
+      offset(following.value ? 14 : 6),
+      flip({ fallbackPlacements: [props.placement === 'top' ? 'bottom-start' : 'top-start'] }),
+      shift({ padding: 12 }),
+    ],
   })
   target.x = x
   target.y = y
@@ -132,7 +146,7 @@ function focus(event: FocusEvent) {
 
 function tap(event: MouseEvent) {
   const type = (event as PointerEvent).pointerType
-  if (type !== 'touch' && type !== 'pen') return
+  if ((type !== 'touch' && type !== 'pen') || props.passTaps) return
   if (props.pointerOnly) {
     event.preventDefault()
     event.stopPropagation()
@@ -161,18 +175,16 @@ onBeforeUnmount(() => {
 
 <template>
   <component :is="pointerOnly ? 'span' : 'button'" ref="trigger" v-bind="$attrs"
-    :type="pointerOnly ? undefined : 'button'" class="site-tooltip__name"
-    :data-pointer-only="pointerOnly || undefined" :aria-describedby="pointerOnly ? undefined : id"
-    @pointerenter="enter" @pointermove="move" @pointerleave="leave" @focus="focus" @blur="hide" @click="tap"
-    @keydown.esc="hide">
+    :type="pointerOnly ? undefined : 'button'" class="site-tooltip__name" :data-pointer-only="pointerOnly || undefined"
+    :aria-describedby="pointerOnly ? undefined : id" @pointerenter="enter" @pointermove="move" @pointerleave="leave"
+    @focus="focus" @blur="hide" @click="tap" @keydown.esc="hide">
     <slot />
   </component>
 
   <Teleport to="body">
-    <span :id="id" ref="tip" role="tooltip" class="site-tooltip"
+    <span :id="id" ref="tip" v-bind="tipAttrs" role="tooltip" class="site-tooltip"
       :aria-hidden="pointerOnly || undefined" :data-shown="shown || undefined"
-      :style="{ translate: `${position.x}px ${position.y}px` }" @pointerenter="keep"
-      @pointerleave="hideSoon">
+      :style="{ translate: `${position.x}px ${position.y}px` }" @pointerenter="keep" @pointerleave="hideSoon">
       <slot name="tip" />
     </span>
   </Teleport>
@@ -212,9 +224,9 @@ onBeforeUnmount(() => {
   display: block;
   inline-size: max-content;
   max-inline-size: min(22rem, calc(100vw - 24px));
-  padding: var(--space-2) var(--space-3);
-  color: var(--bg);
-  background-color: var(--fg);
+  padding: var(--space-1);
+  color: var(--tooltip-fg, var(--bg));
+  background-color: var(--tooltip-bg, var(--fg));
   opacity: 0;
   visibility: hidden;
   pointer-events: none;

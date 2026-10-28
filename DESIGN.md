@@ -188,6 +188,19 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Lit:** The role being read lights its field per The Lit Rule; the other roles step back. Pointing at a role brightens its field without the light.
 - **Arrival:** Fields draw in top to bottom the first time the band scrolls into view; under reduced motion they fade in.
 
+### Media Guide
+- **Character:** Data, not a feed: each series (a playlist, or a podcast season) is one strip of square cells, a cell per release, oldest first, so a series reads as how much there is. A strip is as long as its release count against the longest on the page; time is not a shared axis, since the old playlists would shrink to slivers. The row's text carries the count, years and, for the podcast, hours and downloads.
+- **Cells:** A video is a 16:9 frame; an episode is a bar as tall as it runs, shaded by its downloads, by rank among the episodes (22% for the fewest to full for the most; a linear scale bunches, since one episode far outdraws the rest). Height stays length. Videos sit at 78%; full on hover or focus. Each cell links to its release.
+- **Readout:** Pointing at or focusing a cell names it in the line under the strip (date, title, length); at rest the line gives the series' first and last dates. A video's cell also brings up its own YouTube still at 16:9 in a tooltip that trails the pointer (SiteTooltip), fetched only then; episodes have no still. Touch follows the link.
+- **Legend:** A small key pinned top right beneath the header while the guide is on screen (about a quarter of the width on phones), stage-colored, muted, no border: for the podcast a short and a tall bar ("taller is longer") and a light-to-full ramp ("darker is more downloaded"), then "each bar is an episode, oldest first"; for videos, "each frame is a video, oldest first; a longer row has more videos".
+- **Rows:** Stage color only, no rules between them. The name opens the latest releases and the way out to YouTube or mytypeof.dev.
+- **Mobile:** The name, stats and note stack above the strip.
+
+### Media Doors
+- **Character:** The media hub is two doors, side by side, with no gap between them: the headword (Videos, Podcast) at the project headword size, one line on what it is, and what's behind it in data (count, years, hours). The headword link covers the whole door, and the word travels into the section's heading as a project's word does (same size on both ends, so a pure move).
+- **Hover / Focus:** As in the lexicon, the pointed-at door's word leans and its arrow steps forward while the other door steps back to 40%. Reduced motion keeps the end state without the transition.
+- **Mobile:** The doors stack.
+
 ### Links
 - **Style:** Accent colored, underlined by default; navigation links drop the underline and rely on the band.
 - **Focus:** 2px accent outline, 2px offset.
