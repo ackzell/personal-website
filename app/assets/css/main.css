@@ -316,6 +316,26 @@ body,
  * same direction (the band is in flag order too). Within a section it is the
  * only thing in the chrome that moves: project to project, word to word.
  */
+/* The word's lean, one registered property per axis so each can be timed on
+   its own (ProjectLexicon, MediaDoors). */
+@property --slnt {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --casl {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --crsv {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
 :root {
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);

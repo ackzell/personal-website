@@ -71,15 +71,48 @@
     }
   },
   "media": {
-    "title": "Medios"
+    "title": "Medios",
+    "guide": {
+      "legend": {
+        "label": "Cómo leer la guía",
+        "videos": "Cada cuadro es un video, del más antiguo al más nuevo. Una fila más larga tiene más videos.",
+        "episodes": "Cada barra es un episodio, del más antiguo al más nuevo.",
+        "length": "Más alta, más larga",
+        "downloads": "Más oscura, más descargada",
+        "views": "Más oscura, más vista",
+        "bars": "Cada celda es un video, en el orden de la lista.",
+        "videoLength": "Más ancha, más larga"
+      },
+      "label": "Series, por último lanzamiento",
+      "videos": "{count} video | {count} videos",
+      "episodes": "{count} episodio | {count} episodios",
+      "views": "{count} vistas",
+      "downloads": "{count} descargas",
+      "thatWeek": "{count} videos esa semana",
+      "openPlaylist": "Abrir la lista",
+      "openPodcast": "Escuchar en mytypeof.dev",
+      "season": "Temporada {n}",
+      "playlists": "{count} lista | {count} listas",
+      "sort": {
+        "label": "Ordenar",
+        "order": "Orden de la lista",
+        "views": "Más vistos",
+        "length": "Más largos"
+      },
+      "find": "Buscar un video",
+      "none": "Nada coincide.",
+      "showAll": "Ver los {count}"
+    }
   },
   "videos": {
     "title": "Videos",
-    "intro": "Series de videos en YouTube donde construyo cosas paso a paso."
+    "intro": "Series de videos en YouTube donde construyo cosas paso a paso.",
+    "rest": "Todo lo demás está en el canal."
   },
   "podcast": {
     "title": "Podcast",
-    "intro": "My typeof Radio es un podcast en español sobre desarrollo web."
+    "intro": "My typeof Radio es un podcast en español sobre desarrollo web.",
+    "rest": "Todos los episodios están en mytypeof.dev."
   },
   "contributions": {
     "title": "Contribuciones",

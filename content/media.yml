@@ -1,0 +1,44 @@
+# What I add to the series on the media pages. The releases themselves come
+# from their feeds at build time (server/api/playlists/[id].get.ts,
+# server/api/episodes.get.ts); only what's listed here shows, and everything
+# else stays on YouTube and mytypeof.dev. Playlists reach back to their latest
+# 15 videos.
+
+# TODO: the notes below are placeholders, to be replaced with real ones.
+podcast:
+  title: My typeof Radio
+  note:
+    en: "[Placeholder] What the podcast is, in my own words."
+    es: "[Provisional] Qué es el podcast, en mis palabras."
+
+# One row per playlist, newest first; titles are the playlists' own.
+# Playlists with a project keep a link to it.
+series:
+  - playlist: PLmJs3lfUmCdTQDpZop2BC1EJ5emEpTBPn
+    title: Amoxtli Vue - A book about Vue
+    project: amoxtli
+    note: &note
+      en: "[Placeholder] One line about this series, in my own words."
+      es: "[Provisional] Una línea sobre esta serie, en mis palabras."
+  - playlist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP
+    title: Tlapalli
+    project: tlapalli
+    note: *note
+  - playlist: PLmJs3lfUmCdTcQmLUv2YFX-L0TqkM7PM1
+    title: My Talks
+    note: *note
+  - playlist: PLmJs3lfUmCdR-1js29OeqNR_YBm2Qy2r5
+    title: "Camati: Nuxt + Vuetify"
+    note: *note
+  - playlist: PLmJs3lfUmCdS8W27OoWj3uGDP6g4ypNyw
+    title: Meteor + Vue
+    note: *note
+  - playlist: PLmJs3lfUmCdTvQfcaFgdJUP-J5wdm5Owq
+    title: "Sass: Custom checkboxes"
+    note: *note
+  - playlist: PLmJs3lfUmCdSuMvPIPhz_OOT1pWm0iLZZ
+    title: Introducción a Vue.js
+    note: *note
+  - playlist: PLmJs3lfUmCdT9MyG60Oo6HM7xAn79vwZ0
+    title: Heartbeat
+    note: *note

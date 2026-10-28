@@ -174,24 +174,6 @@ useHead({
  * Flipping it anywhere else reads as a second wave. A single
  * font-variation-settings transition can't separate the axes.
  */
-@property --slnt {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --casl {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
-@property --crsv {
-  syntax: '<number>';
-  inherits: true;
-  initial-value: 0;
-}
-
 .lexicon__headword {
   --slnt: 0;
   --casl: var(--heading-casual);

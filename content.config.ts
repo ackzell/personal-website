@@ -88,6 +88,31 @@ export default defineContentConfig({
       }),
     }),
 
+    /**
+     * What I add to the series on the media pages. Their releases come from the
+     * playlists' and the podcast's feeds (server/api/playlists, server/api/episodes);
+     * only the series listed here appear, and the rest stays on YouTube and
+     * mytypeof.dev.
+     */
+    media: defineCollection({
+      type: 'data',
+      source: 'media.yml',
+      schema: z.object({
+        podcast: z.object({ title: z.string(), note: localized(z.string()) }).optional(),
+        series: z
+          .array(
+            z.object({
+              // YouTube playlist id (the `list=` in the URL).
+              playlist: z.string(),
+              title: z.string(),
+              note: localized(z.string()),
+              project: z.string().optional(),
+            }),
+          )
+          .default([]),
+      }),
+    }),
+
     projectsMeta: defineCollection({
       type: 'data',
       source: 'projects/*.yml',

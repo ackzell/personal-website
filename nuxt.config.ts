@@ -66,6 +66,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Optional; lifts GitHub's search rate limit (server/api/contributions.get.ts).
     githubToken: '',
+    // Optional; adds download counts to the podcast (server/api/episodes.get.ts).
+    // Server-only: read at build time, never sent to the browser.
+    buzzsproutApiKey: process.env.BUZZSPROUT_API_KEY ?? '',
+    // Optional; adds every video, with lengths and views, to the playlists
+    // (server/utils/youtube.ts). Server-only, like the one above.
+    youtubeApiKey: process.env.YT_API_KEY ?? '',
   },
 
   content: {
