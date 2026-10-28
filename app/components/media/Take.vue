@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { VNode } from 'vue'
+import type { Gem } from '~/composables/useCodeGem'
 
 /**
  * What you write beside what you get: a scene's code, one file per tab, next
@@ -30,7 +31,8 @@ import type { VNode } from 'vue'
  * tick at each cue.
  *
  * The code is colored in the visitor's tlapalli gem (useCodeGem), which every
- * take can change; a change recolors every take. Beside its code, a clip sits
+ * take can change; a change recolors every take, washing down the lines from
+ * the top, and hovering a gem names it in a tooltip. Beside its code, a clip sits
  * halfway down, so a long file doesn't leave it hanging at the top.
  *
  * Below 56rem the clip comes first and stays pinned under the header while
@@ -72,6 +74,29 @@ const blocks = () => (slots.default?.() ?? []).filter(isBlock)
 const caption = () => (slots.default?.() ?? []).filter((node) =>
   !isBlock(node) && !(typeof node.children === 'string' && !node.children.trim()))
 const fileOf = (block: Block, i: number) => block.props.filename ?? block.props.language ?? `${i + 1}`
+
+/* The gem */
+
+// Shared by every take: a pick in one washes the new color down all of them.
+// Counted, not watched off the gem itself, so the stored gem arriving on
+// mount swaps in quietly instead of washing over a page just opened.
+const picks = useState('code-gem-picks', () => 0)
+const recoloring = ref(false)
+// The wash (240ms, plus a 300ms cap on the stagger) has settled by then.
+const { start: settle } = useTimeoutFn(() => { recoloring.value = false }, 600, { immediate: false })
+
+watch(picks, () => {
+  recoloring.value = true
+  settle()
+})
+
+// The gem's tooltip, sized to the bar it names.
+const GEM_TIP = '--tooltip-bg: var(--code-fg); font-size: 0.75rem; padding: var(--space-1) var(--space-2)'
+
+function choose(next: Gem) {
+  picks.value++
+  pick(next)
+}
 
 const tab = ref(0)
 const tabs = useTemplateRef<HTMLButtonElement[]>('tabs')
@@ -206,8 +231,10 @@ watch([cue, tab, panels], () => {
     const file = panel.dataset.file
     const lit = cue.value && cueFile(cue.value) === file ? cue.value.lines : []
     const cued = new Set(sortedCues.value.filter((c) => cueFile(c) === file).flatMap((c) => c.lines))
-    for (const line of panel.querySelectorAll<HTMLElement>('.line')) {
+    for (const [i, line] of panel.querySelectorAll<HTMLElement>('.line').entries()) {
       const n = Number(line.getAttribute('line'))
+      // Where the line falls in the wash.
+      line.style.setProperty('--i', String(i))
       line.classList.toggle('take__cued', lit.includes(n))
       line.classList.toggle('take__cueable', cued.has(n))
     }
@@ -241,7 +268,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 </script>
 
 <template>
-  <figure class="media take track-wide" :data-gem="gem">
+  <figure class="media take track-wide" :class="{ 'take--recoloring': recoloring }" :data-gem="gem">
     <div class="take__body">
       <div class="take__code">
         <div class="take__bar">
@@ -257,13 +284,24 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 
           <div v-if="mounted" class="take__gems">
             <span :id="`${uid}-gems`" class="take__gems-label">
-              {{ t('projects.media.take.gem') }} <span class="take__gem-name">{{ gemName(gem) }}</span>
+              {{ t('projects.media.take.gem') }}
+              <span class="take__gem-slot">
+                <Transition name="take-roll" mode="out-in">
+                  <span :key="gem" class="take__gem-name">{{ gemName(gem) }}</span>
+                </Transition>
+              </span>
             </span>
             <div role="radiogroup" class="take__gem-row" :aria-labelledby="`${uid}-gems`">
-              <label v-for="g in GEMS" :key="g" class="take__gem" :data-gem="g" :title="gemName(g)">
+              <label v-for="g in GEMS" :key="g" class="take__gem" :data-gem="g">
                 <input type="radio" class="sr-only" :name="`${uid}-gem`" :value="g" :checked="gem === g"
-                  @change="pick(g)">
+                  @change="choose(g)">
                 <span class="sr-only">{{ gemName(g) }}</span>
+                <!-- The radio already says its name; this is for the pointer. -->
+                <!-- Above, in its gem's own color, as the code would be. -->
+                <SiteTooltip pointer-only pass-taps placement="top"
+                  :tip-attrs="{ 'data-gem': g, style: GEM_TIP }">
+                  <template #tip>{{ gemName(g) }}</template>
+                </SiteTooltip>
               </label>
             </div>
           </div>
@@ -410,8 +448,43 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   color: var(--muted);
 }
 
+/* Room for the longest name ("Lapis Lazuli"), so a pick changing its length
+   doesn't slide the gems out from under the pointer. */
+.take__gem-slot {
+  display: inline-block;
+  min-inline-size: 12ch;
+}
+
+/* The name in its gem's own text color, the color of the code it names. */
 .take__gem-name {
-  color: var(--fg);
+  display: inline-block;
+  color: var(--code-fg);
+}
+
+/* A picked name rolls in from below as the last one leaves upward. */
+.take-roll-enter-active {
+  transition: transform 160ms var(--ease-out), opacity 160ms var(--ease-out);
+}
+
+.take-roll-leave-active {
+  transition: transform 100ms var(--ease-in-out), opacity 100ms var(--ease-in-out);
+}
+
+.take-roll-enter-from {
+  transform: translateY(0.5em);
+  opacity: 0;
+}
+
+.take-roll-leave-to {
+  transform: translateY(-0.5em);
+  opacity: 0;
+}
+
+/* The wash: on a pick, each line takes the new gem a beat after the one
+   above it, capped so a long file still settles quickly. */
+.take--recoloring .take__panel :deep(.shiki span:not(.line)) {
+  transition: color 240ms var(--ease-out);
+  transition-delay: min(calc(var(--i, 0) * 14ms), 300ms);
 }
 
 .take__gem-row {
@@ -419,6 +492,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 }
 
 .take__gem {
+  position: relative;
   display: grid;
   place-items: center;
   inline-size: 1.875rem;
@@ -610,6 +684,9 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 @media (prefers-reduced-motion: reduce) {
   .take__tab,
   .take__gem::before,
+  .take-roll-enter-active,
+  .take-roll-leave-active,
+  .take--recoloring .take__panel :deep(.shiki span:not(.line)),
   .take__panel :deep(.line),
   .take__panel :deep(.line)::before {
     transition: none;
