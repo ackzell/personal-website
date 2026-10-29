@@ -692,6 +692,26 @@ main:focus {
   padding-block: var(--gap-block) var(--gap-section);
 }
 
+/* A section's child page (Videos, Podcast, Contributions): its blocks rise
+   one after another on every visit, as a project's entry does (ProjectPage).
+   A block that brings its own entrance (the guide, the log) opts out with
+   data-own-entrance. The heading's word travels as its own snapshot, which
+   the rise doesn't reach. */
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter > :not([data-own-entrance]) {
+    animation: 500ms var(--ease-out) calc(150ms + var(--enter-step, 3) * 80ms) backwards vt-rise;
+  }
+  .page-enter > :nth-child(1) {
+    --enter-step: 0;
+  }
+  .page-enter > :nth-child(2) {
+    --enter-step: 1;
+  }
+  .page-enter > :nth-child(3) {
+    --enter-step: 2;
+  }
+}
+
 /* Defaults use :where() so any utility overrides them without a fight. */
 :where(.page) > * {
   grid-column: content;

@@ -381,10 +381,54 @@ function watchPanel(element: unknown) {
   watcher.observe(element)
 }
 onBeforeUnmount(() => watcher?.disconnect())
+
+// Entrance: each strip draws itself in, a row after the one above. Rows on
+// screen from the start draw as the page arrives (their animation is in the
+// server's markup, so nothing flashes on load). Rows below draw as they're
+// scrolled up the screen, tied to the scroll (CSS scroll-driven animations),
+// so scrolling back undraws them. Where that isn't supported they wait out
+// of sight and draw once they're well in, in the order they came up.
+const root = useTemplateRef<HTMLElement>('root')
+// Without scroll-driven animations: how far up from the bottom of the screen
+// a row's top has to come before it draws.
+const REVEAL_AT = 0.3
+const linked = ref(new Set<string>())
+const waiting = ref(new Set<string>())
+const order = ref<Record<string, number>>({})
+let arrivals: IntersectionObserver | undefined
+onMounted(() => {
+  if (reducedMotion.value) return
+  const scrollDriven = CSS.supports('animation-timeline: view()')
+  // Measured from the page's top: a new page arrives scrolled there.
+  const line = window.innerHeight * (scrollDriven ? 1 : 1 - REVEAL_AT)
+  const below = [...root.value?.querySelectorAll<HTMLElement>('.guide__row[data-row]') ?? []]
+    .filter((element) => element.getBoundingClientRect().top + window.scrollY > line)
+  if (!below.length) return
+  const ids = new Set(below.map((element) => element.dataset.row!))
+  if (scrollDriven) {
+    linked.value = ids
+    return
+  }
+  waiting.value = ids
+  arrivals = new IntersectionObserver((entries) => {
+    const next = new Set(waiting.value)
+    let batch = 0
+    for (const { target, isIntersecting } of entries) {
+      if (!isIntersecting) continue
+      const id = (target as HTMLElement).dataset.row!
+      order.value[id] = batch++
+      next.delete(id)
+      arrivals!.unobserve(target)
+    }
+    waiting.value = next
+  }, { rootMargin: `0px 0px -${REVEAL_AT * 100}% 0px` })
+  below.forEach((element) => arrivals!.observe(element))
+})
+onBeforeUnmount(() => arrivals?.disconnect())
 </script>
 
 <template>
-  <div class="guide">
+  <div ref="root" class="guide">
     <!-- A key to the marks, pinned top right under the header while the guide is on screen. The marks are drawn
          with the strip's own cell styles, so key and strip can't drift. -->
     <aside class="guide__legend" :aria-label="t('media.guide.legend.label')">
@@ -405,8 +449,10 @@ onBeforeUnmount(() => watcher?.disconnect())
       </p>
     </aside>
     <div role="list" :aria-label="t('media.guide.label')">
-      <section v-for="{ row, cells, width, totals, idle, bars, big, all } in rows" :key="row.id" class="guide__row"
-        role="listitem">
+      <section v-for="({ row, cells, width, totals, idle, bars, big, all }, index) in rows" :key="row.id"
+        class="guide__row" :class="{ 'guide__row--waiting': waiting.has(row.id), 'guide__row--linked': linked.has(row.id) }"
+        :style="{ '--row': order[row.id] ?? index, '--enter-base': row.id in order ? '0ms' : undefined }"
+        :data-row="row.id" role="listitem">
         <div class="guide__who">
           <h2 m="0" class="guide__name">
             <button type="button" :aria-expanded="open.has(row.id) || listing?.row.id === row.id"
@@ -428,10 +474,10 @@ onBeforeUnmount(() => watcher?.disconnect())
             @contextmenu="lastPointer !== 'mouse' && $event.preventDefault()"
             :class="{ 'guide__strip--bars': bars, 'guide__strip--wrap': row.kind === 'playlist' }"
             :style="{ '--cells': cells.length, 'inline-size': width }" :aria-hidden="big || undefined">
-            <a v-for="cell in cells" :key="cell.release.id" class="guide__cell"
+            <a v-for="(cell, i) in cells" :key="cell.release.id" class="guide__cell"
               :class="{ 'guide__cell--on': reading[row.id]?.id === cell.release.id }" :href="cell.release.url"
               :aria-label="cell.label" :tabindex="big ? -1 : undefined"
-              :style="{ height: cell.height, '--min': cell.minutes, '--shade': cell.shade }"
+              :style="{ height: cell.height, '--min': cell.minutes, '--shade': cell.shade, '--i': i }"
               :data-release="cell.release.id" @focus="read(row.id, cell)" @blur="delete reading[row.id]"
               @click="tap($event, row, cell)" />
           </div>
@@ -742,6 +788,112 @@ onBeforeUnmount(() => watcher?.disconnect())
 .guide__cell:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
+}
+
+/*
+ * Entrance: a row's name rises, then its strip draws itself in left to right,
+ * each mark growing along what it measures: an episode's bar up to its
+ * length, a reel's cell across to its length, a frame settling into place.
+ * The sweep takes longer for a longer row, up to a cap. Rows come one after
+ * another (--row), and the reading line under the strip arrives last.
+ * Backwards fill only, so nothing lingers on the marks once they're in.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .guide__row {
+    --enter: calc(var(--enter-base, 300ms) + min(var(--row, 0), 5) * 90ms);
+  }
+
+  .guide__who {
+    animation: 500ms var(--ease-out) var(--enter) backwards vt-rise;
+  }
+
+  .guide__cell {
+    --sweep: calc(var(--i, 0) / max(var(--cells, 1) - 1, 1) * min(var(--cells, 1) * 16ms, 560ms));
+    animation: 460ms var(--ease-out) calc(var(--enter) + 80ms + var(--sweep)) backwards guide-settle;
+  }
+
+  .guide__strip--bars .guide__cell {
+    transform-origin: bottom;
+    animation-name: guide-grow-up;
+  }
+
+  .guide__strip--wrap.guide__strip--bars .guide__cell {
+    transform-origin: left;
+    animation-name: guide-grow-across;
+  }
+
+  .guide__read {
+    animation: 400ms var(--ease-out) calc(var(--enter) + 420ms) backwards guide-fade-in;
+  }
+
+  .guide__legend-in {
+    animation: 600ms var(--ease-out) 900ms backwards guide-fade-in;
+  }
+
+  /*
+   * Scrolled to: the same marks, drawn by the scroll instead of the clock.
+   * Each row is its own timeline, and the ranges are lengths of scroll from
+   * when the row's top comes up past the bottom of the screen, so a row that
+   * grows (its list opened) doesn't undraw. The name rises first; the strip
+   * sweeps in as the row's top travels from about 90% to 45% of the screen;
+   * the reading line follows.
+   */
+  .guide__row--linked {
+    view-timeline: --guide-row block;
+  }
+
+  .guide__row--linked :is(.guide__who, .guide__cell, .guide__read) {
+    animation-duration: auto;
+    animation-delay: 0s;
+    animation-fill-mode: both;
+    animation-timeline: --guide-row;
+  }
+
+  .guide__row--linked .guide__who {
+    animation-range: cover 8svh cover 28svh;
+  }
+
+  .guide__row--linked .guide__cell {
+    --p: calc(var(--i, 0) / max(var(--cells, 1) - 1, 1));
+    animation-range: cover calc(10svh + var(--p) * 25svh) cover calc(22svh + var(--p) * 25svh);
+  }
+
+  .guide__row--linked .guide__read {
+    animation-range: cover 45svh cover 58svh;
+  }
+
+  /* Out of sight until scrolled to; the animations start when this goes. */
+  .guide__row--waiting :is(.guide__who, .guide__cell, .guide__read) {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@keyframes guide-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes guide-settle {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+@keyframes guide-grow-up {
+  from {
+    opacity: 0;
+    scale: 1 0;
+  }
+}
+
+@keyframes guide-grow-across {
+  from {
+    opacity: 0;
+    scale: 0 1;
+  }
 }
 
 /* The card over the strip: the inverse of the stage, like SiteTooltip, so
