@@ -534,8 +534,9 @@ onBeforeUnmount(() => arrivals?.disconnect())
       </template>
     </GuideSheet>
 
-    <!-- A row's list, on a phone. -->
-    <GuideSheet v-model:item="listing" :label="listing?.row.title" tall>
+    <!-- A row's list, on a phone. Held tall only when it can be searched (so
+         it doesn't jump as it narrows); a short season fits what it holds. -->
+    <GuideSheet v-model:item="listing" :label="listing?.row.title" :tall="listing?.big">
       <template #head="{ item }">
         <h2 class="guide__sheet-title" m="0">{{ item.row.title }}</h2>
         <p m="0" text="sm">
