@@ -14,6 +14,7 @@
  * goes to it.
  * The items themselves live on YouTube and mytypeof.dev.
  */
+import { animate, useMotionValue, useMotionValueEvent, useSpring, useTransform, useVelocity, type Transition } from 'motion-v'
 import type { ListItem } from './GuideList.vue'
 
 const props = defineProps<{ series: GuideSeries[] }>()
@@ -160,14 +161,36 @@ function cellAt(event: PointerEvent, cells: Cell[]) {
  * just above the pointer, still only, since the line under the strip says
  * the rest. A finger hides that line, so above the strip the card says it
  * all, and it steps from cell to cell under the finger.
+ *
+ * It rides springs: it trails the pointer a hair and swings as it goes, its
+ * top leaning back against the way it's moving (hung from the pointer, at
+ * its foot), and rights itself as it comes to rest. It stops without
+ * overshooting, and the lean has a spring of its own, so it eases upright
+ * rather than snapping back when the card stops.
  */
 type Row = GuideSeries
 const card = useTemplateRef<HTMLElement>('card')
 const preview = ref<{ row: Row, cell: Cell, touch: boolean } | null>(null)
-const at = reactive({ x: 0, y: 0 })
+const at = { x: useMotionValue(0), y: useMotionValue(0) }
+// Moving right at this speed (px/s) leans it the most, back to the left.
+const lean = useTransform(useVelocity(at.x), [-3200, 0, 3200], [5, 0, -5], { clamp: true })
+const swing = useSpring(lean, { bounce: 0, visualDuration: 0.2 })
+const FOLLOW: Transition = { type: 'spring', bounce: 0, visualDuration: 0.22 }
+const STEP: Transition = { type: 'spring', bounce: 0, visualDuration: 0.28 }
 // Off screen, it appears where it belongs rather than gliding in.
 const placed = ref(false)
 const EDGE = 12
+
+// Written straight to the card each frame, outside Vue.
+function paint() {
+  const element = card.value
+  if (!element) return
+  element.style.translate = `${at.x.get()}px ${at.y.get()}px`
+  element.style.rotate = reducedMotion.value ? '' : `${swing.get()}deg`
+}
+useMotionValueEvent(at.x, 'change', paint)
+useMotionValueEvent(at.y, 'change', paint)
+useMotionValueEvent(swing, 'change', paint)
 
 async function aim(x: number, above: number, below: number) {
   await nextTick()
@@ -175,8 +198,19 @@ async function aim(x: number, above: number, below: number) {
   if (!element) return
   const header = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
   const { offsetWidth: width, offsetHeight: height } = element
-  at.x = Math.min(Math.max(EDGE, x - width / 2), window.innerWidth - width - EDGE)
-  at.y = above - height - EDGE >= header + EDGE ? above - height - EDGE : below + EDGE
+  const to = {
+    x: Math.min(Math.max(EDGE, x - width / 2), window.innerWidth - width - EDGE),
+    y: above - height - EDGE >= header + EDGE ? above - height - EDGE : below + EDGE,
+  }
+  if (!placed.value || reducedMotion.value) {
+    at.x.jump(to.x)
+    at.y.jump(to.y)
+    paint()
+  } else {
+    const spring = preview.value?.touch ? STEP : FOLLOW
+    animate(at.x, to.x, spring)
+    animate(at.y, to.y, spring)
+  }
   requestAnimationFrame(() => {
     placed.value = true
   })
@@ -522,7 +556,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
     <Teleport to="body">
       <component :is="preview?.touch ? 'button' : 'span'" v-if="preview" ref="card" class="guide__card"
         :type="preview.touch ? 'button' : undefined" :data-touch="preview.touch || undefined"
-        :data-placed="placed || undefined" :style="{ translate: `${at.x}px ${at.y}px` }" aria-hidden="true"
+        :data-placed="placed || undefined" aria-hidden="true"
         tabindex="-1" @click="lay(preview.row, preview.cell)">
         <span v-if="preview.row.kind === 'playlist'" class="guide__still"
           :class="{ 'guide__still--stale': still !== wanted }">
@@ -930,9 +964,9 @@ onBeforeUnmount(() => arrivals?.disconnect())
 }
 
 /* The card over the strip: the inverse of the stage, like SiteTooltip, so
-   it reads as lifted off the page. It fades and grows in a beat after it's
-   placed, and follows from there; the box holds its shape while the first
-   still loads. */
+   it reads as lifted off the page. It fades and pops in a beat after it's
+   placed, and follows from there on springs (script); the box holds its
+   shape while the first still loads. */
 .guide__card {
   all: unset;
   position: fixed;
@@ -968,9 +1002,8 @@ onBeforeUnmount(() => arrivals?.disconnect())
 @media (prefers-reduced-motion: no-preference) {
   .guide__card[data-placed] {
     transition:
-      translate 160ms var(--ease-out),
       opacity 200ms var(--ease-out),
-      scale 260ms var(--ease-out);
+      scale var(--pop-duration) var(--ease-pop);
   }
 }
 
