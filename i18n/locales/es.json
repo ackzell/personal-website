@@ -76,12 +76,12 @@
       "legend": {
         "label": "Cómo leer la guía",
         "videos": "Cada cuadro es un video, del más antiguo al más nuevo. Una fila más larga tiene más videos.",
-        "episodes": "Cada barra es un episodio, del más antiguo al más nuevo.",
-        "length": "Más alta, más larga",
-        "downloads": "Más oscura, más descargada",
-        "views": "Más oscura, más vista",
-        "bars": "Cada celda es un video, en el orden de la lista.",
-        "videoLength": "Más ancha, más larga"
+        "episodes": "",
+        "length": "Duración",
+        "downloads": "Descargas",
+        "views": "Vistas",
+        "bars": "",
+        "videoLength": "Duración"
       },
       "label": "Series, por último lanzamiento",
       "videos": "{count} video | {count} videos",
