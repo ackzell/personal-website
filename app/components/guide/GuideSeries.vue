@@ -814,9 +814,11 @@ onBeforeUnmount(() => arrivals?.disconnect())
 }
 
 /*
- * Entrance: a row's name rises, then its strip draws itself in left to right,
- * each mark growing along what it measures: an episode's bar up to its
- * length, a reel's cell across to its length, a frame settling into place.
+ * Entrance: a row's name develops and lifts, landing on the work section's
+ * spring (vt-develop, vt-lift: main.css), then its strip draws itself in
+ * left to right, each mark springing out along what it measures, a touch
+ * past and back (--ease-pop): an episode's bar up to its length, a reel's
+ * cell across to its length, a frame settling into place.
  * The sweep takes longer for a longer row, up to a cap. Rows come one after
  * another (--row), and the reading line under the strip arrives last.
  * Backwards fill only, so nothing lingers on the marks once they're in.
@@ -827,12 +829,15 @@ onBeforeUnmount(() => arrivals?.disconnect())
   }
 
   .guide__who {
-    animation: 500ms var(--ease-out) var(--enter) backwards vt-rise;
+    --lift-from: 0 var(--space-6);
+    animation:
+      400ms var(--ease-out) var(--enter) backwards vt-develop,
+      var(--arrive-duration) var(--ease-arrive) var(--enter) backwards vt-lift;
   }
 
   .guide__cell {
     --sweep: calc(var(--i, 0) / max(var(--cells, 1) - 1, 1) * min(var(--cells, 1) * 16ms, 560ms));
-    animation: 460ms var(--ease-out) calc(var(--enter) + 80ms + var(--sweep)) backwards guide-settle;
+    animation: var(--pop-duration) var(--ease-pop) calc(var(--enter) + 80ms + var(--sweep)) backwards guide-settle;
   }
 
   .guide__strip--bars .guide__cell {
@@ -861,7 +866,8 @@ onBeforeUnmount(() => arrivals?.disconnect())
    * sweeps in as the row's top travels from about 78% to 42% of the screen,
    * up where the eye is rather than at the bottom edge; the reading line
    * follows. Near the page's end it all runs shorter (--fit), so the last
-   * rows finish before the scroll does.
+   * rows finish before the scroll does. No springs here: tied to the scroll,
+   * an overshoot would only follow the finger back and forth.
    */
   .guide__row--linked {
     view-timeline: --guide-row block;
@@ -872,9 +878,11 @@ onBeforeUnmount(() => arrivals?.disconnect())
     animation-delay: 0s;
     animation-fill-mode: both;
     animation-timeline: --guide-row;
+    animation-timing-function: var(--ease-out);
   }
 
   .guide__row--linked .guide__who {
+    animation-name: vt-rise;
     animation-range: cover calc(20svh * var(--fit, 1)) cover calc(38svh * var(--fit, 1));
   }
 
