@@ -4,4 +4,4 @@ repos:
   - ackzell/tlapalli-screenshots
 links:
   site: https://tlapalli.ackzell.dev
-stack: [typescript, vue, nuxt]
+stack: [typescript, vue, nuxt, unocss]

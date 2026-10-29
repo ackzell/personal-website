@@ -9,8 +9,25 @@ const props = defineProps<{ project: ProjectFacts }>()
 
 const { t } = useI18n()
 
-type Item = { label: string, href?: string, muted?: string }
+type Item = { label: string, href?: string, muted?: string, icon?: string }
 type Row = { key: string, label: string, items: Item[] }
+
+/* A brand mark for a stack entry, by the slug the project's metadata uses.
+   Classes are spelled out whole, and here rather than in a util: UnoCSS only
+   generates the icons it finds written in files it scans, and plain .ts isn't
+   one. Entries without a mark (mostly the project's own niche tools) get a
+   quiet generic one, so the run keeps its rhythm. */
+const marks: Record<string, string> = {
+  'nuxt': 'i-simple-icons-nuxt',
+  'vue': 'i-simple-icons-vuedotjs',
+  'vite': 'i-simple-icons-vite',
+  'electron': 'i-simple-icons-electron',
+  'typescript': 'i-simple-icons-typescript',
+  'pinia': 'i-simple-icons-pinia',
+  'unocss': 'i-simple-icons-unocss',
+  'zed': 'i-simple-icons-zedindustries',
+}
+const stackIcon = (slug: string) => marks[slug] ?? 'i-iconoir-package'
 
 const host = (url: string) => new URL(url).host
 
@@ -46,7 +63,7 @@ const rows = computed<Row[]>(() => {
       label: t('projects.ledger.access'),
       items: links.previewAccess ? [{ label: t('projects.ledger.requestAccess'), href: links.previewAccess }] : [],
     },
-    { key: 'stack', label: t('projects.ledger.stack'), items: stack.map((label) => ({ label })) },
+    { key: 'stack', label: t('projects.ledger.stack'), items: stack.map((label) => ({ label, icon: stackIcon(label) })) },
   ]
   return all.filter((row) => row.items.length)
 })
@@ -63,7 +80,9 @@ const rows = computed<Row[]>(() => {
               <span v-if="item.muted" class="ledger__muted">{{ item.muted }}</span>{{ item.label }}<span
                 class="ledger__out i-iconoir-arrow-up-right" aria-hidden="true" />
             </a>
-            <span v-else>{{ item.label }}</span>
+            <span v-else>
+              <span v-if="item.icon" class="ledger__mark" :class="item.icon" aria-hidden="true" />{{ item.label }}
+            </span>
           </li>
         </ul>
       </dd>
@@ -93,10 +112,16 @@ const rows = computed<Row[]>(() => {
   gap: 0 var(--gap-group);
 }
 
-/* Plain values (the stack) read as a run, set apart by a middle dot. */
-.ledger__items > li + li:not(:has(a))::before {
+/* Plain values read as a run, set apart by a middle dot; the stack's marks
+   set its entries apart instead. */
+.ledger__items>li+li:not(:has(a, .ledger__mark))::before {
   content: '·';
   margin-inline-end: var(--gap-group);
+  color: var(--muted);
+}
+
+.ledger__mark {
+  margin-inline-end: 0.4em;
   color: var(--muted);
 }
 
