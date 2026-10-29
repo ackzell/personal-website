@@ -1,4 +1,6 @@
 <script setup lang="ts" generic="T">
+import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackControls, type Transition } from 'motion-v'
+
 /**
  * A sheet that rises from the foot of the screen with something lifted out
  * of the guide: a release tapped on a touch screen, or a row's list on a
@@ -32,12 +34,15 @@ const wide = useMediaQuery('(width >= 64rem)')
 // Docked at the side, this time it's up; chosen as it opens.
 const docked = ref(false)
 
-const RISE_MS = 420
-const DROP_MS = 260
-// Far enough (px), or fast enough (px/ms), to let it go.
+// Springs, so a sheet let go mid-flight keeps the finger's speed, and any
+// move can be taken over by the next one (a grab, another pick).
+const RISE: Transition = { type: 'spring', bounce: 0.12, visualDuration: 0.45 }
+const SETTLE: Transition = { type: 'spring', bounce: 0.2, visualDuration: 0.35 }
+const DROP: Transition = { type: 'spring', bounce: 0, visualDuration: 0.28 }
+const SLIDE_OUT: Transition = { duration: 0.26, ease: 'easeIn' }
+// Far enough (px), or fast enough (px/s), to let it go.
 const AWAY_PX = 110
-const FLICK = 0.5
-const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
+const FLICK = 500
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const panel = useTemplateRef<HTMLElement>('panel')
@@ -45,41 +50,55 @@ const panel = useTemplateRef<HTMLElement>('panel')
 // The one on screen. It lags `item` on the way out, so it can drop away
 // with its contents.
 const showing = shallowRef<{ item: T } | null>(null)
-// How far it's been dragged down, in px, while a finger holds it.
-const dragged = ref(0)
+// How far down the sheet is, in px: dragged, rising or dropping. Written
+// straight to the page each frame, outside Vue.
+const y = useMotionValue(0)
+// Its height as it went up; the dark lifts as `y` covers it.
+let span = 320
 const holding = ref(false)
+let moving: AnimationPlaybackControls | undefined
 
-const ms = (duration: number) => reducedMotion.value === 'reduce' ? 0 : duration
+const motion = (transition: Transition) => reducedMotion.value === 'reduce' ? { duration: 0 } : transition
 
-function rise() {
-  const options = { duration: ms(RISE_MS), easing: EASE_OUT }
-  if (docked.value) {
-    dialog.value?.animate([{ translate: '100% 0' }, { translate: '0 0' }], options)
-    return
-  }
-  panel.value?.animate([{ translate: '0 100%' }, { translate: '0 0' }], options)
-  dialog.value?.animate([{ backgroundColor: 'transparent' }, {}], options)
+useMotionValueEvent(y, 'change', (now) => {
+  if (panel.value) panel.value.style.translate = now ? `0 ${now}px` : ''
+  dialog.value?.style.setProperty('--lift', String(Math.min(1, Math.max(0, now) / span)))
+})
+
+function slide(to: number, transition: Transition, velocity = y.getVelocity()) {
+  moving?.stop()
+  moving = animate(y, to, { ...motion(transition), velocity })
+  return moving
 }
 
-// It drops from wherever the finger left it.
+function rise() {
+  if (docked.value) {
+    animate(dialog.value!, { x: ['100%', 0] }, motion(DROP))
+    return
+  }
+  span = panel.value?.offsetHeight || span
+  y.jump(span)
+  slide(0, RISE, 0)
+}
+
+// It drops from wherever the finger left it, as fast as it was thrown.
 async function drop() {
   const el = dialog.value
   if (!el?.open) return
-  const options: KeyframeAnimationOptions = { duration: ms(DROP_MS), easing: 'ease-in', fill: 'forwards' }
   if (docked.value) {
-    await el.animate([{ translate: '0 0' }, { translate: '100% 0' }], options).finished
+    await animate(el, { x: '100%' }, motion(SLIDE_OUT))
     el.close()
-    el.getAnimations().forEach((animation) => animation.cancel())
+    el.style.transform = ''
     showing.value = null
     return
   }
-  const from = `0 ${dragged.value}px`
-  const fade = el.animate([{}, { backgroundColor: 'transparent' }], options)
-  await panel.value?.animate([{ translate: from }, { translate: '0 100%' }], options).finished
+  span = panel.value?.offsetHeight || span
+  const run = slide(span, DROP)
+  await run
+  // Something else took it over on the way down (another pick).
+  if (run !== moving) return
   el.close()
-  fade.cancel()
-  panel.value?.getAnimations().forEach((animation) => animation.cancel())
-  dragged.value = 0
+  y.jump(0)
   showing.value = null
 }
 
@@ -92,8 +111,10 @@ watch(item, async (now) => {
   }
   showing.value = { item: now }
   if (el.open) {
-    // Docked, the next pick takes the last one's place, from its top.
+    // Docked, the next pick takes the last one's place, from its top. Caught
+    // on its way down, the sheet comes back up from there.
     panel.value?.scrollTo(0, 0)
+    if (!docked.value && y.get() > 0) slide(0, SETTLE)
     return
   }
   panel.value?.scrollTo(0, 0)
@@ -121,34 +142,44 @@ function tapAbove(event: MouseEvent) {
 }
 
 // What's pressed in the head (the close button, a field) is used, not dragged.
-let start = { y: 0, time: 0 }
 function grab(event: PointerEvent) {
   if (docked.value || event.button !== 0 || (event.target as HTMLElement).closest('button, a, input, [role="group"]')) return
   ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
+  hold(event.clientY)
+}
+
+// A finger catches the sheet wherever it is, mid-rise or mid-drop.
+let start = 0
+function hold(from: number) {
+  moving?.stop()
   holding.value = true
-  start = { y: event.clientY - dragged.value, time: event.timeStamp }
+  start = from - y.get()
 }
 
 // Down it follows the finger; up it gives a little and no more.
 function pull(event: PointerEvent) {
-  if (!holding.value) return
-  const dy = event.clientY - start.y
-  dragged.value = dy > 0 ? dy : dy / 6
+  if (holding.value) follow(event.clientY)
 }
 
-function letGo(event: PointerEvent) {
-  if (holding.value) settle(event.timeStamp)
+function follow(finger: number) {
+  const dy = finger - start
+  y.set(dy > 0 ? dy : dy / 6)
 }
 
-function settle(time: number) {
+function letGo() {
+  if (holding.value) settle()
+}
+
+// The motion value knows how fast it was moving when the finger lifted (and
+// that it wasn't, if the finger rested first). A flick up sends it home.
+function settle() {
   holding.value = false
-  const speed = dragged.value / Math.max(1, time - start.time)
-  if (dragged.value > AWAY_PX || speed > FLICK) {
+  const speed = y.getVelocity()
+  if (speed > -FLICK && (y.get() > AWAY_PX || speed > FLICK)) {
     item.value = null
     return
   }
-  panel.value?.animate([{ translate: `0 ${dragged.value}px` }, { translate: '0 0' }], { duration: ms(RISE_MS), easing: EASE_OUT })
-  dragged.value = 0
+  slide(0, SETTLE, speed)
 }
 
 // Below the top it's touch events, not pointer ones: the browser claims a
@@ -165,22 +196,20 @@ function touchDown(event: TouchEvent) {
 }
 
 function touchMove(event: TouchEvent) {
-  const y = event.touches[0]?.clientY
-  if (pulling === 'no' || y === undefined || !event.cancelable) return
+  const finger = event.touches[0]?.clientY
+  if (pulling === 'no' || finger === undefined || !event.cancelable) return
   if (pulling === 'maybe') {
-    if (y < from) pulling = 'no'
-    if (y <= from) return
+    if (finger < from) pulling = 'no'
+    if (finger <= from) return
     pulling = 'yes'
-    holding.value = true
-    start = { y: from, time: event.timeStamp }
+    hold(from)
   }
   event.preventDefault()
-  const dy = y - start.y
-  dragged.value = dy > 0 ? dy : dy / 6
+  follow(finger)
 }
 
-function touchUp(event: TouchEvent) {
-  if (pulling === 'yes' && holding.value) settle(event.timeStamp)
+function touchUp() {
+  if (pulling === 'yes' && holding.value) settle()
   pulling = 'no'
 }
 
@@ -189,10 +218,9 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
 
 <template>
   <dialog ref="dialog" class="sheet" :aria-label="label"
-    :class="{ 'sheet--docked': docked }" :style="{ '--lift': Math.min(1, Math.max(0, dragged) / 320) }"
+    :class="{ 'sheet--docked': docked }"
     @cancel="cancel" @click="tapAbove">
-    <div ref="panel" class="sheet__panel" :class="{ 'is-holding': holding, 'sheet__panel--tall': tall }"
-      :style="{ translate: dragged ? `0 ${dragged}px` : undefined }" @touchstart.passive="touchDown"
+    <div ref="panel" class="sheet__panel" :class="{ 'is-holding': holding, 'sheet__panel--tall': tall }" @touchstart.passive="touchDown"
       @touchend="touchUp" @touchcancel="touchUp">
       <template v-if="showing">
         <div class="sheet__grab" @pointerdown="grab" @pointermove="pull" @pointerup="letGo" @pointercancel="letGo">
@@ -253,7 +281,11 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
   overscroll-behavior: contain;
   padding: 0 var(--gap-group) max(var(--gap-block), env(safe-area-inset-bottom));
   background: var(--bg);
-  box-shadow: 0 -1px 0 color-mix(in oklab, var(--fg) 12%, transparent);
+  /* The second shadow fills in below, for when a spring or a pull up lifts
+     it past where it rests. */
+  box-shadow:
+    0 -1px 0 color-mix(in oklab, var(--fg) 12%, transparent),
+    0 4rem 0 var(--bg);
 }
 
 .sheet__panel--tall {
