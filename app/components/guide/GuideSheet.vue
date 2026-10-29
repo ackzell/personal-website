@@ -1,26 +1,22 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
 /**
- * A release lifted out of the guide on a touch screen: a tap on a cell
- * raises this sheet from the bottom instead of leaving for YouTube. A video
- * plays right here (MediaVideo, with its way out to YouTube under it); an
- * episode has its way out to mytypeof.dev.
+ * A sheet that rises from the foot of the screen with something lifted out
+ * of the guide: a release tapped on a touch screen, or a row's list on a
+ * phone. `item` is what it holds, or null while it's down; the slots draw
+ * it, `head` at the top, where a finger takes hold, and the rest below.
  *
  * Dragged down by its top it follows the finger as the dark lifts, and let
  * go far or fast enough it drops away; otherwise it settles back. Escape,
  * the close button or a tap above it close it too. It's a modal <dialog>,
- * so focus stays inside and goes back to the cell that opened it.
+ * so focus stays inside and goes back to whatever opened it. `tall` holds it
+ * at nearly the screen's height, so a list that narrows doesn't make it jump.
  */
-export interface SheetRelease {
-  /** The YouTube video's id, for a playlist's release. */
-  video?: string
-  title: string
-  /** The playlist or season it's from. */
-  from: string
-  figures: { value: string, unit?: string, soft?: boolean }[]
-  url: string
-}
-
-const release = defineModel<SheetRelease | null>('release', { required: true })
+defineProps<{ label?: string, tall?: boolean }>()
+const item = defineModel<T | null>('item', { required: true })
+defineSlots<{
+  head: (props: { item: T }) => unknown
+  default: (props: { item: T }) => unknown
+}>()
 
 const { t } = useI18n()
 const reducedMotion = usePreferredReducedMotion()
@@ -35,15 +31,12 @@ const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const panel = useTemplateRef<HTMLElement>('panel')
 
-// The one on screen. It lags `release` on the way out, so it can drop away
+// The one on screen. It lags `item` on the way out, so it can drop away
 // with its contents.
-const showing = ref<SheetRelease | null>(null)
+const showing = shallowRef<{ item: T } | null>(null)
 // How far it's been dragged down, in px, while a finger holds it.
 const dragged = ref(0)
 const holding = ref(false)
-
-const watchUrl = (video: string) => `https://www.youtube.com/watch?v=${video}`
-const poster = (video: string) => `https://i.ytimg.com/vi/${video}/hqdefault.jpg`
 
 const ms = (duration: number) => reducedMotion.value === 'reduce' ? 0 : duration
 
@@ -66,15 +59,16 @@ async function drop() {
   showing.value = null
 }
 
-watch(release, async (now) => {
+watch(item, async (now) => {
   const el = dialog.value
   if (!el || !import.meta.client) return
-  if (!now) {
+  if (now === null) {
     drop()
     return
   }
-  showing.value = now
+  showing.value = { item: now }
   if (el.open) return
+  panel.value?.scrollTo(0, 0)
   el.showModal()
   await nextTick()
   rise()
@@ -83,17 +77,18 @@ watch(release, async (now) => {
 // Escape goes the same way down as the close button.
 function cancel(event: Event) {
   event.preventDefault()
-  release.value = null
+  item.value = null
 }
 
 // The dark above the sheet is the dialog itself.
 function tapAbove(event: MouseEvent) {
-  if (event.target === dialog.value) release.value = null
+  if (event.target === dialog.value) item.value = null
 }
 
+// What's pressed in the head (the close button, a field) is used, not dragged.
 let start = { y: 0, time: 0 }
 function grab(event: PointerEvent) {
-  if (event.button !== 0) return
+  if (event.button !== 0 || (event.target as HTMLElement).closest('button, a, input, [role="group"]')) return
   ;(event.currentTarget as HTMLElement).setPointerCapture(event.pointerId)
   holding.value = true
   start = { y: event.clientY - dragged.value, time: event.timeStamp }
@@ -111,7 +106,7 @@ function letGo(event: PointerEvent) {
   holding.value = false
   const speed = dragged.value / Math.max(1, event.timeStamp - start.time)
   if (dragged.value > AWAY_PX || speed > FLICK) {
-    release.value = null
+    item.value = null
     return
   }
   panel.value?.animate([{ translate: `0 ${dragged.value}px` }, { translate: '0 0' }], { duration: ms(RISE_MS), easing: EASE_OUT })
@@ -120,29 +115,21 @@ function letGo(event: PointerEvent) {
 </script>
 
 <template>
-  <dialog ref="dialog" class="sheet" :aria-label="showing?.title"
+  <dialog ref="dialog" class="sheet" :aria-label="label"
     :style="{ '--lift': Math.min(1, Math.max(0, dragged) / 320) }" @cancel="cancel" @click="tapAbove">
-    <div ref="panel" class="sheet__panel" :class="{ 'is-holding': holding }"
+    <div ref="panel" class="sheet__panel" :class="{ 'is-holding': holding, 'sheet__panel--tall': tall }"
       :style="{ translate: dragged ? `0 ${dragged}px` : undefined }">
-      <div v-for="item in showing ? [showing] : []" :key="item.url" class="sheet__in">
+      <template v-if="showing">
         <div class="sheet__grab" @pointerdown="grab" @pointermove="pull" @pointerup="letGo" @pointercancel="letGo">
           <span class="sheet__handle" aria-hidden="true" />
-          <p class="sheet__from" m="0" text="sm muted">{{ item.from }}</p>
-          <h2 class="sheet__title" m="0">{{ item.title }}</h2>
-          <p m="0" text="sm">
-            <GuideFigures :figures="item.figures" />
-          </p>
+          <slot name="head" :item="showing.item" />
           <button type="button" class="sheet__close" :aria-label="t('projects.media.lightbox.close')"
-            @click="release = null">
+            @click="item = null">
             <span class="i-iconoir-xmark" aria-hidden="true" />
           </button>
         </div>
-        <MediaVideo v-if="item.video" :src="watchUrl(item.video)" :title="item.title" :poster="poster(item.video)" />
-        <p v-if="!item.video" m="0">
-          <a :href="item.url" class="sheet__out">{{ t('media.guide.openPodcast') }}<span class="i-iconoir-arrow-up-right"
-              aria-hidden="true" /></a>
-        </p>
-      </div>
+        <slot :item="showing.item" />
+      </template>
     </div>
   </dialog>
 </template>
@@ -181,6 +168,9 @@ function letGo(event: PointerEvent) {
 
 .sheet__panel {
   box-sizing: border-box;
+  display: grid;
+  align-content: start;
+  gap: var(--gap-group);
   inline-size: min(100%, 36rem);
   max-block-size: 92svh;
   overflow-y: auto;
@@ -190,9 +180,8 @@ function letGo(event: PointerEvent) {
   box-shadow: 0 -1px 0 color-mix(in oklab, var(--fg) 12%, transparent);
 }
 
-.sheet__in {
-  display: grid;
-  gap: var(--gap-group);
+.sheet__panel--tall {
+  block-size: 92svh;
 }
 
 /* The top of the sheet is what a finger takes hold of. */
@@ -220,14 +209,6 @@ function letGo(event: PointerEvent) {
   background: color-mix(in oklab, var(--fg) 25%, transparent);
 }
 
-.sheet__title {
-  font-family: var(--font-heading);
-  font-variation-settings: 'CASL' var(--heading-casual);
-  font-size: 1.25rem;
-  line-height: 1.2;
-  text-wrap: balance;
-}
-
 .sheet__close {
   all: unset;
   position: absolute;
@@ -241,20 +222,8 @@ function letGo(event: PointerEvent) {
   cursor: pointer;
 }
 
-.sheet__close:focus-visible,
-.sheet__out:focus-visible {
+.sheet__close:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;
-}
-
-.sheet__out {
-  display: inline-flex;
-  gap: 0.4ch;
-  align-items: center;
-}
-
-/* MediaVideo sits in the sheet edge to edge of its text, with no room above. */
-.sheet__in :deep(.media) {
-  margin: 0;
 }
 </style>

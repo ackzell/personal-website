@@ -12,7 +12,7 @@
  * release into a sheet (GuideSheet) rather than leaving the site.
  * The items themselves live on YouTube and mytypeof.dev.
  */
-import type { SheetRelease } from './GuideSheet.vue'
+import type { ListItem } from './GuideList.vue'
 
 const props = defineProps<{ series: GuideSeries[] }>()
 
@@ -119,7 +119,7 @@ const rows = computed(() => props.series.map((row) => {
     big: row.kind === 'playlist' && releases.length > 12,
     totals,
     idle: `${formatDate(from)} → ${formatDate(to)}`,
-    all: releases.map((release, index) => ({ release, number: index + 1 })),
+    all: releases.map((release, index) => ({ release, number: index + 1, figures: figures(release, row.kind === 'playlist' ? index + 1 : undefined) })),
   }
 }))
 
@@ -186,6 +186,7 @@ async function aim(x: number, above: number, below: number) {
  * only the one it rests on for a beat is fetched.
  */
 const stillOf = (id: string, size = 'mqdefault') => `https://i.ytimg.com/vi/${id}/${size}.jpg`
+const watchUrl = (id: string) => `https://www.youtube.com/watch?v=${id}`
 const ready = new Set<string>()
 const still = ref<string>()
 const wanted = ref<string>()
@@ -240,7 +241,6 @@ function hover(event: PointerEvent, row: Row, cells: Cell[]) {
  * was a scroll all along, and the browser takes it over.
  */
 let gesture: { row: string, start: string, scrubbed: boolean, timer?: ReturnType<typeof setTimeout> } | undefined
-let lastPointer = 'mouse'
 
 function stepTo(strip: HTMLElement, row: Row, cell: Cell) {
   show(row, cell, true)
@@ -250,7 +250,6 @@ function stepTo(strip: HTMLElement, row: Row, cell: Cell) {
 }
 
 function press(event: PointerEvent, row: Row, cells: Cell[]) {
-  lastPointer = event.pointerType
   if (event.pointerType === 'mouse') return
   const cell = cellAt(event, cells)
   if (!cell) return
@@ -293,8 +292,9 @@ function abandon(row: string) {
   hide(row)
 }
 
-// The release in the sheet, for a tap on a touch screen.
-const sheet = ref<SheetRelease | null>(null)
+// What a tap on a touch screen lifts into a sheet.
+interface Lifted { video?: string, title: string, from: string, figures: Figure[], url: string }
+const sheet = shallowRef<Lifted | null>(null)
 function lay(row: Row, cell: Cell) {
   hide()
   sheet.value = {
@@ -306,6 +306,12 @@ function lay(row: Row, cell: Cell) {
   }
 }
 
+// Whatever was last pressed with: a tap is told from a click by it.
+let lastPointer = 'mouse'
+useEventListener('pointerdown', (event: PointerEvent) => {
+  lastPointer = event.pointerType
+}, { passive: true, capture: true })
+
 // A click or the keyboard follows the link; a tap opens the sheet, unless
 // it ended a scrub (then the card is the way in).
 function tap(event: MouseEvent, row: Row, cell: Cell) {
@@ -315,20 +321,37 @@ function tap(event: MouseEvent, row: Row, cell: Cell) {
   gesture = undefined
   if (!scrubbed) lay(row, cell)
 }
+
+// One from a row's list, the same way.
+function pick(event: MouseEvent, row: Row, item: ListItem) {
+  if (lastPointer === 'mouse' || event.detail === 0) return
+  event.preventDefault()
+  lay(row, item)
+}
+
 const open = ref(new Set<string>())
 const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
+// Phones, where the name and the strip stack (see the styles).
+const narrow = useMediaQuery('(width < 52rem)')
+// The row whose list is up in a sheet, on a phone.
+const listing = shallowRef<{ row: Row, items: ListItem[], big: boolean } | null>(null)
 
-// Opening a row brings it to the top of the page: the list is what's wanted
-// now, and it's longer than the screen.
-async function toggle(id: string, event: MouseEvent) {
-  const row = (event.currentTarget as HTMLElement).closest('.guide__row')
-  const next = new Set(open.value)
-  const closing = next.delete(id)
-  if (!closing) next.add(id)
-  open.value = next
+// On a phone the list rises in a sheet of its own, with its own scroll. On
+// a wider screen it opens under the row, closing any other (one is browsed
+// at a time; the strips do the comparing), and that brings the row to the top
+// of the page: the list is what's wanted now, and it's longer than the
+// screen.
+async function toggle(row: Row, items: ListItem[], big: boolean, event: MouseEvent) {
+  if (narrow.value) {
+    listing.value = { row, items, big }
+    return
+  }
+  const section = (event.currentTarget as HTMLElement).closest('.guide__row')
+  const closing = open.value.has(row.id)
+  open.value = closing ? new Set() : new Set([row.id])
   if (closing) return
   await nextTick()
-  row?.scrollIntoView({ block: 'start', behavior: reducedMotion.value ? 'auto' : 'smooth' })
+  section?.scrollIntoView({ block: 'start', behavior: reducedMotion.value ? 'auto' : 'smooth' })
 }
 
 // The key is for reading the strips. While an open list is on screen the
@@ -348,30 +371,6 @@ function watchPanel(element: unknown) {
   watcher.observe(element)
 }
 onBeforeUnmount(() => watcher?.disconnect())
-
-// The list under an open row: in the playlist's order, or by what was
-// watched or how long it runs, narrowed by a word in the title. It starts at
-// a dozen and opens out on request, so 89 stills aren't asked for at once.
-type Order = 'order' | 'views' | 'length'
-const orders: Order[] = ['order', 'views', 'length']
-const order = ref<Record<string, Order>>({})
-const query = ref<Record<string, string>>({})
-const everything = ref(new Set<string>())
-const PAGE = 12
-
-function browse(id: string, all: { release: GuideRelease, number: number }[]) {
-  const word = (query.value[id] ?? '').trim().toLowerCase()
-  const found = word ? all.filter(({ release }) => release.title.toLowerCase().includes(word)) : [...all]
-  const by = order.value[id] ?? 'order'
-  if (by === 'views') found.sort((a, b) => (b.release.views ?? 0) - (a.release.views ?? 0))
-  else if (by === 'length') found.sort((a, b) => (b.release.duration ?? 0) - (a.release.duration ?? 0))
-  return { found, shown: everything.value.has(id) ? found : found.slice(0, PAGE) }
-}
-
-function showAll(id: string) {
-  everything.value = new Set(everything.value).add(id)
-}
-
 </script>
 
 <template>
@@ -400,8 +399,9 @@ function showAll(id: string) {
         role="listitem">
         <div class="guide__who">
           <h2 m="0" class="guide__name">
-            <button type="button" :aria-expanded="open.has(row.id)" :aria-controls="`guide-${row.id}`"
-              @click="toggle(row.id, $event)">
+            <button type="button" :aria-expanded="open.has(row.id) || listing?.row.id === row.id"
+              :aria-controls="`guide-${row.id}`" :aria-haspopup="narrow ? 'dialog' : undefined"
+              @click="toggle(row, all, big, $event)">
               {{ row.title }}
             </button>
           </h2>
@@ -435,41 +435,8 @@ function showAll(id: string) {
         </div>
 
         <div :id="`guide-${row.id}`" :ref="watchPanel" class="guide__panel" :hidden="!open.has(row.id)">
-          <div v-if="row.kind === 'playlist' && all.length > 4" class="guide__tools">
-            <div class="guide__orders" role="group" :aria-label="t('media.guide.sort.label')">
-              <button v-for="by in orders" :key="by" type="button" :aria-pressed="(order[row.id] ?? 'order') === by"
-                @click="order[row.id] = by">
-                {{ t(`media.guide.sort.${by}`) }}
-              </button>
-            </div>
-            <input v-if="big" v-model="query[row.id]" class="guide__find" type="search"
-              :aria-label="t('media.guide.find')" :placeholder="t('media.guide.find')">
-          </div>
-          <template v-if="open.has(row.id)">
-            <ol class="guide__list" list-none p="0" m="0">
-              <li v-for="{ release, number } in browse(row.id, all).shown" :key="release.id">
-                <a :href="release.url" class="guide__item">
-                  <img v-if="row.kind === 'playlist'" class="guide__thumb" :src="stillOf(release.id)" alt="" width="160"
-                    height="90" loading="lazy">
-                  <span class="guide__title">{{ release.title }}</span>
-                  <GuideFigures class="guide__meta" text="sm"
-                    :figures="figures(release, row.kind === 'playlist' ? number : undefined)" />
-                </a>
-              </li>
-            </ol>
-            <p v-if="!browse(row.id, all).found.length" m="0" text="sm muted">{{ t('media.guide.none') }}</p>
-            <p v-else-if="browse(row.id, all).shown.length < browse(row.id, all).found.length" m="0" text="sm">
-              <button type="button" class="guide__more" @click="showAll(row.id)">
-                {{ t('media.guide.showAll', { count: n(browse(row.id, all).found.length) }) }}
-              </button>
-            </p>
-          </template>
-          <p m="0" text="sm">
-            <NuxtLinkLocale v-if="row.project" :to="`/projects/${row.project}`" class="guide__project">{{ row.project }}
-            </NuxtLinkLocale>
-            <a :href="row.url">{{ $t(row.kind === 'podcast' ? 'media.guide.openPodcast' : 'media.guide.openPlaylist') }}
-              ↗</a>
-          </p>
+          <GuideList v-if="open.has(row.id)" :row="row" :items="all" :big="big"
+            @pick="(event, item) => pick(event, row, item)" />
         </div>
       </section>
     </div>
@@ -489,7 +456,42 @@ function showAll(id: string) {
         </span>
       </component>
     </Teleport>
-    <GuideSheet v-model:release="sheet" />
+
+    <!-- A release, tapped: a video plays right here, with its way out to YouTube under it; an episode has its way
+         out to mytypeof.dev. -->
+    <GuideSheet v-model:item="sheet" :label="sheet?.title">
+      <template #head="{ item }">
+        <p m="0" text="sm muted">{{ item.from }}</p>
+        <h2 class="guide__sheet-title" m="0">{{ item.title }}</h2>
+        <p m="0" text="sm">
+          <GuideFigures :figures="item.figures" />
+        </p>
+      </template>
+      <template #default="{ item }">
+        <MediaVideo v-if="item.video" :key="item.video" class="guide__sheet-video"
+          :src="watchUrl(item.video)" :title="item.title"
+          :poster="stillOf(item.video, 'hqdefault')" />
+        <p v-else m="0">
+          <a :href="item.url" class="guide__sheet-out">{{ t('media.guide.openPodcast') }}<span
+              class="i-iconoir-arrow-up-right" aria-hidden="true" /></a>
+        </p>
+      </template>
+    </GuideSheet>
+
+    <!-- A row's list, on a phone. -->
+    <GuideSheet v-model:item="listing" :label="listing?.row.title" tall>
+      <template #head="{ item }">
+        <h2 class="guide__sheet-title" m="0">{{ item.row.title }}</h2>
+        <p m="0" text="sm">
+          <GuideFigures :figures="rows.find(({ row }) => row.id === item.row.id)?.totals ?? []" />
+        </p>
+        <p v-if="item.row.note" m="0" text="sm muted">{{ item.row.note }}</p>
+      </template>
+      <template #default="{ item }">
+        <GuideList :key="item.row.id" :row="item.row" :items="item.items" :big="item.big" pinned
+          @pick="(event, picked) => pick(event, item.row, picked)" />
+      </template>
+    </GuideSheet>
   </div>
 </template>
 
@@ -858,110 +860,28 @@ function showAll(id: string) {
   display: none;
 }
 
-.guide__tools {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-group);
-  align-items: baseline;
-  justify-content: space-between;
-}
-
-.guide__orders {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--gap-group);
-}
-
-.guide__orders button,
-.guide__more {
-  all: unset;
-  cursor: pointer;
-  font-size: 0.875rem;
-  text-underline-offset: 0.25em;
-}
-
-.guide__orders button {
-  color: var(--muted);
-}
-
-.guide__orders button[aria-pressed='true'] {
-  color: inherit;
-  text-decoration: underline;
-}
-
-.guide__orders button:hover,
-.guide__more:hover {
-  text-decoration: underline;
-}
-
-.guide__orders button:focus-visible,
-.guide__more:focus-visible,
-.guide__find:focus-visible,
-.guide__item:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 3px;
-}
-
-.guide__find {
-  all: unset;
-  box-sizing: border-box;
-  inline-size: min(100%, 16rem);
-  padding-block: 0.2rem;
-  border-block-end: 1px solid color-mix(in oklab, currentColor 40%, transparent);
-  font-size: 0.875rem;
-  caret-color: currentColor;
-}
-
-.guide__find::placeholder {
-  color: var(--muted);
-}
-
-.guide__find::selection {
-  background: color-mix(in oklab, currentColor 30%, transparent);
-}
-
-.guide__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
-  gap: var(--gap-block) var(--gap-group);
-}
-
-.guide__item {
-  display: grid;
-  gap: 0.4rem;
-  align-content: start;
-  font-size: 0.875rem;
-  text-decoration: none;
-}
-
-.guide__thumb {
-  display: block;
-  inline-size: 100%;
-  block-size: auto;
-  aspect-ratio: 16 / 9;
-  object-fit: cover;
-  background: color-mix(in oklab, var(--fg) 12%, transparent);
-}
-
-.guide__title {
+/* What's in a sheet. */
+.guide__sheet-title {
+  font-family: var(--font-heading);
+  font-variation-settings: 'CASL' var(--heading-casual);
+  font-size: 1.25rem;
+  line-height: 1.2;
   text-wrap: balance;
 }
 
-.guide__item:hover .guide__title {
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
+.guide__sheet-video {
+  margin: 0;
 }
 
-/* Under a title, every figure is quiet: the title is the one bright line. */
-.guide__meta,
-.guide__meta :deep(.figure__value) {
-  color: var(--muted);
+.guide__sheet-out {
+  display: inline-flex;
+  gap: 0.4ch;
+  align-items: center;
 }
 
-.guide__project {
-  margin-inline-end: var(--gap-group);
-  font-family: var(--font-heading);
-  font-variation-settings: 'CASL' var(--heading-casual);
+.guide__sheet-out:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 /* Phones: the name and notes stack above the track. */
