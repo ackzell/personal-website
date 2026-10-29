@@ -395,6 +395,27 @@ const REVEAL_AT = 0.3
 const linked = ref(new Set<string>())
 const waiting = ref(new Set<string>())
 const order = ref<Record<string, number>>({})
+// A drawn-by-scroll row finishes this far (screens) after its top comes up.
+// One too near the page's end to be scrolled that far has its whole
+// sequence squeezed (--fit) to finish just before the bottom; measured again
+// as the page changes height (a list opened, a turned phone).
+const REVEAL_SPAN = 0.68
+const fit = ref<Record<string, number>>({})
+function measureFit() {
+  const screen = window.innerHeight
+  // A row's timeline starts once its top clears the page's scroll padding
+  // (room left for the footer), not the very bottom of the screen.
+  const end = document.documentElement.scrollHeight - (Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingBottom) || 0)
+  const next: Record<string, number> = {}
+  for (const element of root.value?.querySelectorAll<HTMLElement>('.guide__row[data-row]') ?? []) {
+    if (!linked.value.has(element.dataset.row!)) continue
+    const room = (end - element.getBoundingClientRect().top - window.scrollY) / screen - 0.06
+    if (room < REVEAL_SPAN) next[element.dataset.row!] = Math.max(0.3, room / REVEAL_SPAN)
+  }
+  fit.value = next
+}
+const page = shallowRef<HTMLElement>()
+useResizeObserver(page, measureFit)
 let arrivals: IntersectionObserver | undefined
 onMounted(() => {
   if (reducedMotion.value) return
@@ -407,6 +428,7 @@ onMounted(() => {
   const ids = new Set(below.map((element) => element.dataset.row!))
   if (scrollDriven) {
     linked.value = ids
+    page.value = document.documentElement
     return
   }
   waiting.value = ids
@@ -451,7 +473,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
     <div role="list" :aria-label="t('media.guide.label')">
       <section v-for="({ row, cells, width, totals, idle, bars, big, all }, index) in rows" :key="row.id"
         class="guide__row" :class="{ 'guide__row--waiting': waiting.has(row.id), 'guide__row--linked': linked.has(row.id) }"
-        :style="{ '--row': order[row.id] ?? index, '--enter-base': row.id in order ? '0ms' : undefined }"
+        :style="{ '--row': order[row.id] ?? index, '--enter-base': row.id in order ? '0ms' : undefined, '--fit': fit[row.id] }"
         :data-row="row.id" role="listitem">
         <div class="guide__who">
           <h2 m="0" class="guide__name">
@@ -836,8 +858,10 @@ onBeforeUnmount(() => arrivals?.disconnect())
    * Each row is its own timeline, and the ranges are lengths of scroll from
    * when the row's top comes up past the bottom of the screen, so a row that
    * grows (its list opened) doesn't undraw. The name rises first; the strip
-   * sweeps in as the row's top travels from about 90% to 45% of the screen;
-   * the reading line follows.
+   * sweeps in as the row's top travels from about 78% to 42% of the screen,
+   * up where the eye is rather than at the bottom edge; the reading line
+   * follows. Near the page's end it all runs shorter (--fit), so the last
+   * rows finish before the scroll does.
    */
   .guide__row--linked {
     view-timeline: --guide-row block;
@@ -851,16 +875,16 @@ onBeforeUnmount(() => arrivals?.disconnect())
   }
 
   .guide__row--linked .guide__who {
-    animation-range: cover 8svh cover 28svh;
+    animation-range: cover calc(20svh * var(--fit, 1)) cover calc(38svh * var(--fit, 1));
   }
 
   .guide__row--linked .guide__cell {
     --p: calc(var(--i, 0) / max(var(--cells, 1) - 1, 1));
-    animation-range: cover calc(10svh + var(--p) * 25svh) cover calc(22svh + var(--p) * 25svh);
+    animation-range: cover calc((22svh + var(--p) * 24svh) * var(--fit, 1)) cover calc((34svh + var(--p) * 24svh) * var(--fit, 1));
   }
 
   .guide__row--linked .guide__read {
-    animation-range: cover 45svh cover 58svh;
+    animation-range: cover calc(56svh * var(--fit, 1)) cover calc(68svh * var(--fit, 1));
   }
 
   /* Out of sight until scrolled to; the animations start when this goes. */
