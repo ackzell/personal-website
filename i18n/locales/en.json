@@ -79,9 +79,9 @@
         "episodes": "",
         "length": "Episode length",
         "downloads": "Downloads",
-        "views": "Darker is more viewed",
-        "bars": "Each cell is a video, in the playlist's order.",
-        "videoLength": "Wider is longer"
+        "views": "Views",
+        "bars": "",
+        "videoLength": "Video length"
       },
       "label": "Series, by latest release",
       "videos": "{count} video | {count} videos",
