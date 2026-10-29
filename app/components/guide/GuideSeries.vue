@@ -8,8 +8,12 @@
  * whatever the dates say) and runs as a reel: cells of one height, each as wide
  * as the video runs, wrapping onto new lines, so a row's length is its runtime. Pointing at or focusing a cell reads out what
  * it is under the row; the name opens the releases to browse, with the way out.
+ * On a touch screen a finger scrubs along a strip, and a tap lifts the
+ * release into a sheet (GuideSheet) rather than leaving the site.
  * The items themselves live on YouTube and mytypeof.dev.
  */
+import type { SheetRelease } from './GuideSheet.vue'
+
 const props = defineProps<{ series: GuideSeries[] }>()
 
 const { t, n, locale } = useI18n()
@@ -27,7 +31,7 @@ function formatLength(seconds: number) {
 
 // A figure is a number and its unit, split out of the message that says both
 // ("{count} views"), so each language keeps its own plural and word order.
-type Figure = { value: string, unit?: string }
+type Figure = { value: string, unit?: string, soft?: boolean }
 const MARK = '\u0001'
 function figure(key: string, value: string, plural: number): Figure {
   const unit = t(key, { count: MARK }, plural).replace(MARK, '').trim()
@@ -39,7 +43,7 @@ function figure(key: string, value: string, plural: number): Figure {
 function figures(release: GuideRelease, number?: number): Figure[] {
   return [
     ...(number ? [{ value: `#${number}` }] : []),
-    { value: formatDate(release.published) },
+    { value: formatDate(release.published), soft: true },
     ...(release.duration ? [{ value: formatLength(release.duration) }] : []),
     ...(release.views ? [figure('media.guide.views', n(release.views), release.views)] : []),
     ...(release.downloads ? [figure('media.guide.downloads', n(release.downloads), release.downloads)] : []),
@@ -119,10 +123,198 @@ const rows = computed(() => props.series.map((row) => {
   }
 }))
 
-// Which cell is being read out in each row (the line under the strip, which
-// also serves the keyboard), and which video's still is on show: only the one
-// pointed at, so nothing is fetched until then.
+// Which cell is being read out in each row: the line under the strip, which
+// also serves the keyboard.
+type Cell = { release: GuideRelease, figures: Figure[] }
 const reading = ref<Record<string, { title: string, figures: Figure[], id: string }>>({})
+function read(row: string, cell: Cell) {
+  reading.value[row] = { title: cell.release.title, figures: cell.figures, id: cell.release.id }
+}
+
+// The cell under the pointer, or the nearest one when it's in the gaps
+// between them, so reading along a strip never drops out. A touch keeps
+// reporting to the cell it started on, so look at what's under it instead.
+function cellAt(event: PointerEvent, cells: Cell[]) {
+  const strip = event.currentTarget as HTMLElement
+  let target = document.elementFromPoint(event.clientX, event.clientY)?.closest<HTMLElement>('[data-release]')
+  if (!target || !strip.contains(target)) {
+    let best = Infinity
+    for (const element of strip.querySelectorAll<HTMLElement>('[data-release]')) {
+      const box = element.getBoundingClientRect()
+      const dx = Math.max(box.left - event.clientX, 0, event.clientX - box.right)
+      const dy = Math.max(box.top - event.clientY, 0, event.clientY - box.bottom)
+      if (dx * dx + dy * dy < best) {
+        best = dx * dx + dy * dy
+        target = element
+      }
+    }
+  }
+  return cells.find(({ release }) => release.id === target?.dataset.release)
+}
+
+/*
+ * The card that shows what's being read: one for the whole guide, so moving
+ * to the next cell swaps its picture rather than its box. A mouse carries it
+ * just above the pointer, still only, since the line under the strip says
+ * the rest. A finger hides that line, so above the strip the card says it
+ * all, and it steps from cell to cell under the finger.
+ */
+type Row = GuideSeries
+const card = useTemplateRef<HTMLElement>('card')
+const preview = ref<{ row: Row, cell: Cell, touch: boolean } | null>(null)
+const at = reactive({ x: 0, y: 0 })
+// Off screen, it appears where it belongs rather than gliding in.
+const placed = ref(false)
+const EDGE = 12
+
+async function aim(x: number, above: number, below: number) {
+  await nextTick()
+  const element = card.value
+  if (!element) return
+  const header = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
+  const { offsetWidth: width, offsetHeight: height } = element
+  at.x = Math.min(Math.max(EDGE, x - width / 2), window.innerWidth - width - EDGE)
+  at.y = above - height - EDGE >= header + EDGE ? above - height - EDGE : below + EDGE
+  requestAnimationFrame(() => {
+    placed.value = true
+  })
+}
+
+/*
+ * The still on the card. The one on show stays until the next has loaded
+ * and decoded, so a swap is never an empty box; a sweep passes cells by, and
+ * only the one it rests on for a beat is fetched.
+ */
+const stillOf = (id: string, size = 'mqdefault') => `https://i.ytimg.com/vi/${id}/${size}.jpg`
+const ready = new Set<string>()
+const still = ref<string>()
+const wanted = ref<string>()
+let fetchTimer: ReturnType<typeof setTimeout> | undefined
+function want(id: string) {
+  const src = stillOf(id)
+  wanted.value = src
+  clearTimeout(fetchTimer)
+  if (ready.has(src)) {
+    still.value = src
+    return
+  }
+  fetchTimer = setTimeout(() => {
+    const image = new Image()
+    image.src = src
+    image.decode().catch(() => {}).then(() => {
+      ready.add(src)
+      if (wanted.value === src) still.value = src
+    })
+  }, 60)
+}
+
+function show(row: Row, cell: Cell, touch: boolean) {
+  read(row.id, cell)
+  if (row.kind === 'playlist') want(cell.release.id)
+  // A mouse reads a podcast's bars from the line under the strip.
+  else if (!touch) return
+  preview.value = { row, cell, touch }
+}
+
+let hideTimer: ReturnType<typeof setTimeout> | undefined
+function hide(row?: string) {
+  clearTimeout(hideTimer)
+  if (row) delete reading.value[row]
+  preview.value = null
+  placed.value = false
+}
+
+function hover(event: PointerEvent, row: Row, cells: Cell[]) {
+  if (event.pointerType !== 'mouse') return
+  const cell = cellAt(event, cells)
+  if (!cell) return
+  show(row, cell, false)
+  if (preview.value) aim(event.clientX, event.clientY - 8, event.clientY + 20)
+}
+
+/*
+ * A finger on a strip. Held, or dragged along it, it scrubs: the cell under
+ * it is read out and the card steps along above. Let go after a scrub, the
+ * card stays a moment to be read, and tapped it opens that release. A tap
+ * that didn't scrub opens the release it landed on. Dragged up or down, it
+ * was a scroll all along, and the browser takes it over.
+ */
+let gesture: { row: string, start: string, scrubbed: boolean, timer?: ReturnType<typeof setTimeout> } | undefined
+let lastPointer = 'mouse'
+
+function stepTo(strip: HTMLElement, row: Row, cell: Cell) {
+  show(row, cell, true)
+  const { top, bottom } = strip.getBoundingClientRect()
+  const box = strip.querySelector(`[data-release="${CSS.escape(cell.release.id)}"]`)!.getBoundingClientRect()
+  aim(box.left + box.width / 2, top, bottom)
+}
+
+function press(event: PointerEvent, row: Row, cells: Cell[]) {
+  lastPointer = event.pointerType
+  if (event.pointerType === 'mouse') return
+  const cell = cellAt(event, cells)
+  if (!cell) return
+  clearTimeout(hideTimer)
+  clearTimeout(gesture?.timer)
+  // The cell fills in at once, under the finger.
+  read(row.id, cell)
+  // The sheet's still is on its way while the finger is still down.
+  if (row.kind === 'playlist') new Image().src = stillOf(cell.release.id, 'hqdefault')
+  // A beat before the card, in case this is the start of a scroll.
+  const strip = event.currentTarget as HTMLElement
+  const timer = setTimeout(() => stepTo(strip, row, cell), 90)
+  gesture = { row: row.id, start: cell.release.id, scrubbed: false, timer }
+}
+
+// Within the cell it started on, it's still a press.
+function scrub(event: PointerEvent, row: Row, cells: Cell[]) {
+  if (event.pointerType === 'mouse' || gesture?.row !== row.id) return
+  const cell = cellAt(event, cells)
+  if (!cell || cell.release.id === reading.value[row.id]?.id) return
+  gesture.scrubbed = true
+  clearTimeout(gesture.timer)
+  stepTo(event.currentTarget as HTMLElement, row, cell)
+}
+
+function lift(event: PointerEvent) {
+  if (event.pointerType === 'mouse' || !gesture) return
+  clearTimeout(gesture.timer)
+  hideTimer = setTimeout(hide, 1800)
+}
+
+// Scrolled, the strip moves out from under the card.
+useEventListener('scroll', () => {
+  if (preview.value) hide()
+}, { passive: true, capture: true })
+
+function abandon(row: string) {
+  clearTimeout(gesture?.timer)
+  gesture = undefined
+  hide(row)
+}
+
+// The release in the sheet, for a tap on a touch screen.
+const sheet = ref<SheetRelease | null>(null)
+function lay(row: Row, cell: Cell) {
+  hide()
+  sheet.value = {
+    video: row.kind === 'playlist' ? cell.release.id : undefined,
+    title: cell.release.title,
+    from: row.title,
+    figures: cell.figures,
+    url: cell.release.url,
+  }
+}
+
+// A click or the keyboard follows the link; a tap opens the sheet, unless
+// it ended a scrub (then the card is the way in).
+function tap(event: MouseEvent, row: Row, cell: Cell) {
+  if (lastPointer === 'mouse' || event.detail === 0) return
+  event.preventDefault()
+  const scrubbed = gesture?.scrubbed
+  gesture = undefined
+  if (!scrubbed) lay(row, cell)
+}
 const open = ref(new Set<string>())
 const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
@@ -180,8 +372,6 @@ function showAll(id: string) {
   everything.value = new Set(everything.value).add(id)
 }
 
-// YouTube's own still for a video.
-const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
 </script>
 
 <template>
@@ -192,7 +382,8 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
       <p class="guide__legend-in" :class="{ 'guide__legend-in--away': listed.size }" m="0" text="xs muted">
         <template v-if="hasBars">
           <span class="guide__key">
-            <span class="guide__swatch" :class="podcast ? 'guide__swatch--bars' : 'guide__swatch--runs'" aria-hidden="true"><i /><i /></span>
+            <span class="guide__swatch" :class="podcast ? 'guide__swatch--bars' : 'guide__swatch--runs'"
+              aria-hidden="true"><i /><i /></span>
             {{ t(podcast ? 'media.guide.legend.length' : 'media.guide.legend.videoLength') }}
           </span>
           <span class="guide__key">
@@ -200,12 +391,13 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
             {{ t(hasViews ? 'media.guide.legend.views' : 'media.guide.legend.downloads') }}
           </span>
         </template>
-        <span class="guide__key">{{ t(podcast ? 'media.guide.legend.episodes' : hasBars ? 'media.guide.legend.bars' : 'media.guide.legend.videos') }}</span>
+        <span class="guide__key">{{ t(podcast ? 'media.guide.legend.episodes' : hasBars ? 'media.guide.legend.bars' :
+          'media.guide.legend.videos') }}</span>
       </p>
     </aside>
     <div role="list" :aria-label="t('media.guide.label')">
-      <section v-for="{ row, cells, width, range, totals, idle, bars, big, all } in rows" :key="row.id"
-        class="guide__row" role="listitem">
+      <section v-for="{ row, cells, width, totals, idle, bars, big, all } in rows" :key="row.id" class="guide__row"
+        role="listitem">
         <div class="guide__who">
           <h2 m="0" class="guide__name">
             <button type="button" :aria-expanded="open.has(row.id)" :aria-controls="`guide-${row.id}`"
@@ -213,29 +405,25 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
               {{ row.title }}
             </button>
           </h2>
-          <p class="guide__stats" m="0" text="sm"><GuideFigures :figures="totals" /></p>
+          <p class="guide__stats" m="0" text="sm">
+            <GuideFigures :figures="totals" />
+          </p>
           <p v-if="row.note" class="guide__note" m="0" text="sm muted">{{ row.note }}</p>
         </div>
 
         <div class="guide__right">
-          <div class="guide__strip"
+          <div class="guide__strip" @pointerdown="press($event, row, cells)"
+            @pointermove="hover($event, row, cells); scrub($event, row, cells)" @pointerup="lift"
+            @pointercancel="abandon(row.id)" @pointerleave="$event.pointerType === 'mouse' && hide(row.id)"
+            @contextmenu="lastPointer !== 'mouse' && $event.preventDefault()"
             :class="{ 'guide__strip--bars': bars, 'guide__strip--wrap': row.kind === 'playlist' }"
             :style="{ '--cells': cells.length, 'inline-size': width }" :aria-hidden="big || undefined">
-            <a v-for="cell in cells" :key="cell.release.id" class="guide__cell" :href="cell.release.url"
+            <a v-for="cell in cells" :key="cell.release.id" class="guide__cell"
+              :class="{ 'guide__cell--on': reading[row.id]?.id === cell.release.id }" :href="cell.release.url"
               :aria-label="cell.label" :tabindex="big ? -1 : undefined"
               :style="{ height: cell.height, '--min': cell.minutes, '--shade': cell.shade }"
-              @pointerenter="reading[row.id] = { title: cell.release.title, figures: cell.figures, id: cell.release.id }"
-              @focus="reading[row.id] = { title: cell.release.title, figures: cell.figures, id: cell.release.id }"
-              @pointerleave="delete reading[row.id]" @blur="delete reading[row.id]">
-              <SiteTooltip v-if="row.kind === 'playlist'" pointer-only pass-taps placement="top">
-                <template #tip>
-                  <span class="guide__still">
-                    <img v-if="reading[row.id]?.id === cell.release.id" :src="still(cell.release.id)" alt="" width="320"
-                      height="180">
-                  </span>
-                </template>
-              </SiteTooltip>
-            </a>
+              :data-release="cell.release.id" @focus="read(row.id, cell)" @blur="delete reading[row.id]"
+              @click="tap($event, row, cell)" />
           </div>
           <p class="guide__read" m="0" text="sm" aria-hidden="true">
             <template v-if="reading[row.id]">
@@ -261,7 +449,7 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
             <ol class="guide__list" list-none p="0" m="0">
               <li v-for="{ release, number } in browse(row.id, all).shown" :key="release.id">
                 <a :href="release.url" class="guide__item">
-                  <img v-if="row.kind === 'playlist'" class="guide__thumb" :src="still(release.id)" alt="" width="160"
+                  <img v-if="row.kind === 'playlist'" class="guide__thumb" :src="stillOf(release.id)" alt="" width="160"
                     height="90" loading="lazy">
                   <span class="guide__title">{{ release.title }}</span>
                   <GuideFigures class="guide__meta" text="sm"
@@ -285,6 +473,23 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
         </div>
       </section>
     </div>
+
+    <Teleport to="body">
+      <component :is="preview?.touch ? 'button' : 'span'" v-if="preview" ref="card" class="guide__card"
+        :type="preview.touch ? 'button' : undefined" :data-touch="preview.touch || undefined"
+        :data-placed="placed || undefined" :style="{ translate: `${at.x}px ${at.y}px` }" aria-hidden="true"
+        tabindex="-1" @click="lay(preview.row, preview.cell)">
+        <span v-if="preview.row.kind === 'playlist'" class="guide__still"
+          :class="{ 'guide__still--stale': still !== wanted }">
+          <img v-if="still" :src="still" alt="" width="320" height="180">
+        </span>
+        <span v-if="preview.touch" class="guide__card-text" text="sm">
+          <span class="guide__card-title">{{ preview.cell.release.title }}</span>
+          <GuideFigures :figures="preview.cell.figures" />
+        </span>
+      </component>
+    </Teleport>
+    <GuideSheet v-model:release="sheet" />
   </div>
 </template>
 
@@ -293,20 +498,21 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   --label: 17rem;
 }
 
-/* Zero-height sticky anchor: the key rides top right beneath the header and
-   scrolls away with the guide. */
+/* Zero-height sticky anchor: the key rides right, centered in what the header
+   leaves of the screen, while the guide passes through the middle, and
+   scrolls away with it. Sticking the anchor itself there (rather than under
+   the header) keeps the key centered before the guide's top reaches the
+   header too. */
 .guide__legend {
   position: sticky;
-  inset-block-start: calc(var(--header-height, 0px) + var(--gap-tight));
+  inset-block-start: calc(var(--header-height, 0px) + (100svh - var(--header-height, 0px)) / 2);
   z-index: 5;
   block-size: 0;
 }
 
 .guide__legend-in {
   position: absolute;
-  /* Centered in what the header leaves of the screen (the anchor sits a
-     tight gap below the header). */
-  inset-block-start: calc((100svh - var(--header-height, 0px)) / 2 - var(--gap-tight));
+  inset-block-start: 0;
   translate: 0 -50%;
   inset-inline-end: -2rem;
   display: grid;
@@ -505,9 +711,20 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   background: color-mix(in oklab, var(--fg) calc(var(--shade, 78) * 1%), transparent);
 }
 
-.guide__strip .guide__cell:hover,
+/* The cell being read fills in, under a mouse, a finger or the keyboard. */
+.guide__strip .guide__cell--on,
 .guide__strip .guide__cell:focus-visible {
   background: var(--fg);
+}
+
+/* Sideways along a strip is the finger's to read with; up and down still
+   scrolls the page. A finger held on a cell scrubs, so no link preview or
+   selection comes up under it. */
+.guide__strip {
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .guide__cell:focus-visible {
@@ -515,13 +732,53 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   outline-offset: 2px;
 }
 
-/* A video's tooltip (SiteTooltip) trails the pointer with its own still at
-   16:9; the line under the strip says what it is. The box holds the shape
-   while the still loads. */
+/* The card over the strip: the inverse of the stage, like SiteTooltip, so
+   it reads as lifted off the page. It fades and grows in a beat after it's
+   placed, and follows from there; the box holds its shape while the first
+   still loads. */
+.guide__card {
+  all: unset;
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  z-index: 100;
+  box-sizing: border-box;
+  display: grid;
+  gap: var(--space-1);
+  inline-size: 14rem;
+  max-inline-size: calc(100vw - 24px);
+  padding: var(--space-1);
+  color: var(--bg);
+  background: var(--fg);
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.94;
+  transform-origin: bottom center;
+}
+
+.guide__card[data-placed] {
+  opacity: 1;
+  scale: 1;
+}
+
+/* Let go of, it's the way into the release. */
+.guide__card[data-touch] {
+  inline-size: 16rem;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .guide__card[data-placed] {
+    transition:
+      translate 160ms var(--ease-out),
+      opacity 200ms var(--ease-out),
+      scale 260ms var(--ease-out);
+  }
+}
+
 .guide__still {
   display: block;
-  inline-size: 14rem;
-  max-inline-size: 100%;
   aspect-ratio: 16 / 9;
   background: color-mix(in oklab, var(--bg) 25%, transparent);
 }
@@ -531,6 +788,37 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   inline-size: 100%;
   block-size: 100%;
   object-fit: cover;
+  transition: opacity 120ms var(--ease-out);
+}
+
+/* The last still holds while the next loads, a step back so it's plain
+   it's on its way. */
+.guide__still--stale img {
+  opacity: 0.55;
+}
+
+.guide__card-text {
+  display: grid;
+  gap: 0.15rem;
+  padding: 0.15rem var(--space-1) var(--space-1);
+  line-height: 1.3;
+}
+
+.guide__card-title {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* The figures take the card's colors, not the page's. */
+.guide__card :deep(.figure__value) {
+  color: inherit;
+}
+
+.guide__card :deep(.figure__unit) {
+  color: inherit;
+  opacity: 0.7;
 }
 
 /* The title is the line, its figures the line under it, so neither crowds the
