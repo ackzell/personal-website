@@ -70,12 +70,12 @@ const rows = computed<Row[]>(() => {
 </script>
 
 <template>
-  <dl v-if="rows.length" class="ledger" m="0">
-    <div v-for="row in rows" :key="row.key" class="ledger__row">
+  <dl v-if="rows.length" class="ledger" m="0" data-own-entrance>
+    <div v-for="(row, r) in rows" :key="row.key" class="ledger__row" :style="{ '--row': r }">
       <dt class="ledger__label running-head">{{ row.label }}</dt>
       <dd class="ledger__value" m="0">
         <ul class="ledger__items" m="0" p="0" list="none">
-          <li v-for="item in row.items" :key="item.label">
+          <li v-for="(item, i) in row.items" :key="item.label" :style="{ '--i': i }">
             <a v-if="item.href" :href="item.href" class="ledger__link">
               <span v-if="item.muted" class="ledger__muted">{{ item.muted }}</span>{{ item.label }}<span
                 class="ledger__out i-iconoir-arrow-up-right" aria-hidden="true" />
@@ -123,6 +123,33 @@ const rows = computed<Row[]>(() => {
 .ledger__mark {
   margin-inline-end: 0.4em;
   color: var(--muted);
+}
+
+/*
+ * Entrance: in place of the page's block rise (ProjectPage.vue), the ledger
+ * fills in row by row, from where the block would have arrived (the third
+ * block, 310ms), each sliding in from its label, so it reads as being
+ * written up rather than dropped in. The stack's marks pop in one after
+ * another as their row lands.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .ledger__row {
+    --row-start: calc(310ms + var(--row) * 70ms);
+    --lift-from: calc(-1 * var(--space-4)) 0;
+    animation:
+      400ms var(--ease-out) var(--row-start) backwards vt-develop,
+      var(--arrive-duration) var(--ease-arrive) var(--row-start) backwards vt-lift;
+  }
+
+  .ledger__mark {
+    animation: var(--pop-duration) var(--ease-pop) calc(var(--row-start) + 200ms + var(--i) * 50ms) backwards ledger-pop;
+  }
+}
+
+@keyframes ledger-pop {
+  from {
+    scale: 0;
+  }
 }
 
 .ledger__link {

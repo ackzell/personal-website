@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { animate, useMotionValue, useMotionValueEvent, type Transition } from 'motion-v'
+
 /**
  * A project's mark as a metallic sticker: a silhouette (black in the dark
  * scheme, silver in the light one) with a hairline edge and the mark's own
@@ -9,25 +11,50 @@
  * Driven by state, not :hover, so a finger dragged on it does the same; a
  * touch keeps reporting to it after leaving it, so the position is clamped to
  * its edges. Decorative: whatever it sits beside names the project.
+ *
+ * The tilt rides springs: it follows the pointer closely, and let go it
+ * swings back to flat with the speed it was moving at, overshooting and
+ * rocking to rest like a card set down. Pressed or hovered it lifts a little
+ * toward you, and drops back with a bounce.
  */
 defineProps<{ src: string }>()
 
 const root = useTemplateRef<HTMLElement>('root')
 const active = ref(false)
+const reducedMotion = usePreferredReducedMotion()
 
+const FOLLOW: Transition = { type: 'spring', bounce: 0, visualDuration: 0.18 }
+const ROCK: Transition = { type: 'spring', bounce: 0.45, visualDuration: 0.7 }
+const LIFT: Transition = { type: 'spring', bounce: 0.4, visualDuration: 0.35 }
+const LIFTED = 1.04
+
+// Where the pointer is across it, 0 to 1 each way, and how far it's lifted.
+const x = useMotionValue(0.5)
+const y = useMotionValue(0.5)
+const lift = useMotionValue(1)
+const write = (name: string) => (now: number) => root.value?.style.setProperty(name, String(now))
+useMotionValueEvent(x, 'change', write('--x'))
+useMotionValueEvent(y, 'change', write('--y'))
+useMotionValueEvent(lift, 'change', write('--lift'))
+
+const spring = (transition: Transition) => reducedMotion.value === 'reduce' ? { duration: 0 } : transition
 const clamp = (value: number) => Math.min(1, Math.max(0, value))
 
 function tilt(event: PointerEvent) {
   const el = root.value
   if (!el) return
   const box = el.getBoundingClientRect()
-  el.style.setProperty('--x', String(clamp((event.clientX - box.left) / box.width)))
-  el.style.setProperty('--y', String(clamp((event.clientY - box.top) / box.height)))
+  animate(x, clamp((event.clientX - box.left) / box.width), spring(FOLLOW))
+  animate(y, clamp((event.clientY - box.top) / box.height), spring(FOLLOW))
+  if (!active.value) animate(lift, LIFTED, spring(LIFT))
   active.value = true
 }
 
 function rest() {
   active.value = false
+  animate(x, 0.5, spring(ROCK))
+  animate(y, 0.5, spring(ROCK))
+  animate(lift, 1, spring(LIFT))
 }
 
 // A mouse button let go over it still hovers; a lifted finger doesn't.
@@ -51,6 +78,7 @@ function release(event: PointerEvent) {
 .sticker {
   --x: 0.5;
   --y: 0.5;
+  --lift: 1;
   --edge: #3a3a3a;
   --face: brightness(0);
   --detail: 0.25;
@@ -66,7 +94,8 @@ function release(event: PointerEvent) {
   /* The outline follows the mark's shape: four hairline shadows of the
      silhouette, one per side. */
   filter: drop-shadow(1.5px 0 0 var(--edge)) drop-shadow(-1.5px 0 0 var(--edge)) drop-shadow(0 1.5px 0 var(--edge)) drop-shadow(0 -1.5px 0 var(--edge));
-  transition: transform 400ms var(--ease-out);
+  /* --x, --y and --lift come from the springs (script); flat at rest. */
+  transform: perspective(900px) rotateX(calc((0.5 - var(--y)) * 16deg)) rotateY(calc((var(--x) - 0.5) * 16deg)) scale(var(--lift));
   /* A drag that starts on it tilts it instead of scrolling the page; there's
      room either side to scroll from. No callout or selection on a long press. */
   touch-action: none;
@@ -87,11 +116,6 @@ function release(event: PointerEvent) {
   --streak: 0.14;
   --grain: rgb(0 0 0 / 0.04);
   --glint: 0.8;
-}
-
-.sticker[data-active] {
-  transform: perspective(900px) rotateX(calc((0.5 - var(--y)) * 14deg)) rotateY(calc((var(--x) - 0.5) * 14deg));
-  transition-duration: 120ms;
 }
 
 .sticker__face {
@@ -165,7 +189,7 @@ function release(event: PointerEvent) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sticker[data-active] {
+  .sticker {
     transform: none;
   }
 
