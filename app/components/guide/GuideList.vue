@@ -200,6 +200,38 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   text-underline-offset: 0.2em;
 }
 
+/* A press answers the moment the finger lands: the still sinks a little and
+   dims, the words dim, and they come back as it lifts. */
+.list__thumb,
+.list__title,
+.list__orders button,
+.list__more,
+.list__project,
+.list > p:last-child a {
+  transition: scale 0.25s var(--ease-out), filter 0.25s var(--ease-out), opacity 0.25s var(--ease-out);
+}
+
+.list__item:active .list__thumb {
+  scale: 0.97;
+  filter: brightness(0.8);
+  transition-duration: 0s;
+}
+
+.list__item:active .list__title,
+.list__orders button:active,
+.list__more:active,
+.list__project:active,
+.list > p:last-child a:active {
+  opacity: 0.55;
+  transition-duration: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .list__item:active .list__thumb {
+    scale: none;
+  }
+}
+
 /* Under a title, every figure is quiet: the title is the one bright line. */
 .list__meta,
 .list__meta :deep(.figure__value) {

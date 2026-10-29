@@ -8,8 +8,10 @@
  * whatever the dates say) and runs as a reel: cells of one height, each as wide
  * as the video runs, wrapping onto new lines, so a row's length is its runtime. Pointing at or focusing a cell reads out what
  * it is under the row; the name opens the releases to browse, with the way out.
- * On a touch screen a finger scrubs along a strip, and a tap lifts the
- * release into a sheet (GuideSheet) rather than leaving the site.
+ * On a touch screen a finger scrubs along a strip. A tap, a click or Enter
+ * lifts the release into a sheet (GuideSheet), docked at the side on a wide
+ * screen, rather than leaving the site; a click meant for a new tab still
+ * goes to it.
  * The items themselves live on YouTube and mytypeof.dev.
  */
 import type { ListItem } from './GuideList.vue'
@@ -187,6 +189,10 @@ async function aim(x: number, above: number, below: number) {
  */
 const stillOf = (id: string, size = 'mqdefault') => `https://i.ytimg.com/vi/${id}/${size}.jpg`
 const watchUrl = (id: string) => `https://www.youtube.com/watch?v=${id}`
+// The stills come from one host; the handshake is done before the first is asked for.
+useHead(() => ({
+  link: props.series.some((row) => row.kind === 'playlist') ? [{ rel: 'preconnect', href: 'https://i.ytimg.com' }] : [],
+}))
 const ready = new Set<string>()
 const still = ref<string>()
 const wanted = ref<string>()
@@ -306,16 +312,20 @@ function lay(row: Row, cell: Cell) {
   }
 }
 
-// Whatever was last pressed with: a tap is told from a click by it.
+// Whatever was last pressed with: a long press is told from a right click by it.
 let lastPointer = 'mouse'
 useEventListener('pointerdown', (event: PointerEvent) => {
   lastPointer = event.pointerType
 }, { passive: true, capture: true })
 
-// A click or the keyboard follows the link; a tap opens the sheet, unless
-// it ended a scrub (then the card is the way in).
+// A click with a modifier, or the middle button, is asked for a tab of its
+// own, and the link gives it one.
+const elsewhere = (event: MouseEvent) => event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
+
+// A tap, a click or the keyboard opens the sheet, unless the tap ended a
+// scrub (then the card is the way in).
 function tap(event: MouseEvent, row: Row, cell: Cell) {
-  if (lastPointer === 'mouse' || event.detail === 0) return
+  if (elsewhere(event)) return
   event.preventDefault()
   const scrubbed = gesture?.scrubbed
   gesture = undefined
@@ -324,7 +334,7 @@ function tap(event: MouseEvent, row: Row, cell: Cell) {
 
 // One from a row's list, the same way.
 function pick(event: MouseEvent, row: Row, item: ListItem) {
-  if (lastPointer === 'mouse' || event.detail === 0) return
+  if (elsewhere(event)) return
   event.preventDefault()
   lay(row, item)
 }
@@ -459,7 +469,7 @@ onBeforeUnmount(() => watcher?.disconnect())
 
     <!-- A release, tapped: a video plays right here, with its way out to YouTube under it; an episode has its way
          out to mytypeof.dev. -->
-    <GuideSheet v-model:item="sheet" :label="sheet?.title">
+    <GuideSheet v-model:item="sheet" :label="sheet?.title" dock>
       <template #head="{ item }">
         <p m="0" text="sm muted">{{ item.from }}</p>
         <h2 class="guide__sheet-title" m="0">{{ item.title }}</h2>
@@ -877,6 +887,15 @@ onBeforeUnmount(() => watcher?.disconnect())
   display: inline-flex;
   gap: 0.4ch;
   align-items: center;
+}
+
+.guide__sheet-out {
+  transition: opacity 0.25s var(--ease-out);
+}
+
+.guide__sheet-out:active {
+  opacity: 0.55;
+  transition-duration: 0s;
 }
 
 .guide__sheet-out:focus-visible {
