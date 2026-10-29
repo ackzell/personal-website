@@ -35,6 +35,24 @@ const found = computed(() => {
 })
 const shown = computed(() => everything.value ? found.value : found.value.slice(0, PAGE))
 
+// Motion: the list cascades in when it opens, and again from the first new
+// one when it opens out; a re-sort or a narrowing glides what stays to its
+// new place while what's gone fades where it stood (lifted out of the grid,
+// so the rest can close up under it).
+const cascadeFrom = ref(0)
+function showAll() {
+  cascadeFrom.value = PAGE
+  everything.value = true
+}
+watch(query, () => (cascadeFrom.value = 0))
+// A still shows once it's in, or once it won't come (the placeholder stays).
+const arrived = (event: Event) => ((event.target as HTMLElement).dataset.loaded = '')
+function lift(element: Element) {
+  const item = element as HTMLElement
+  const { offsetLeft, offsetTop, offsetWidth } = item
+  Object.assign(item.style, { position: 'absolute', left: `${offsetLeft}px`, top: `${offsetTop}px`, width: `${offsetWidth}px` })
+}
+
 const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
 </script>
 
@@ -49,19 +67,19 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
       <input v-if="big" v-model="query" class="list__find" type="search" :aria-label="t('media.guide.find')"
         :placeholder="t('media.guide.find')">
     </div>
-    <ol class="list__items" list-none p="0" m="0">
-      <li v-for="item in shown" :key="item.release.id">
+    <TransitionGroup tag="ol" name="list" class="list__items" list-none p="0" m="0" appear @before-leave="lift">
+      <li v-for="(item, i) in shown" :key="item.release.id" :style="{ '--i': Math.max(0, i - cascadeFrom) }">
         <a :href="item.release.url" class="list__item" @click="emit('pick', $event, item)">
           <img v-if="row.kind === 'playlist'" class="list__thumb" :src="still(item.release.id)" alt="" width="160"
-            height="90" loading="lazy">
+            height="90" loading="lazy" @load="arrived" @error="arrived">
           <span class="list__title">{{ item.release.title }}</span>
           <GuideFigures class="list__meta" text="sm" :figures="item.figures" />
         </a>
       </li>
-    </ol>
+    </TransitionGroup>
     <p v-if="!found.length" m="0" text="sm muted">{{ t('media.guide.none') }}</p>
     <p v-else-if="shown.length < found.length" m="0" text="sm">
-      <button type="button" class="list__more" @click="everything = true">
+      <button type="button" class="list__more" @click="showAll">
         {{ t('media.guide.showAll', { count: n(found.length) }) }}
       </button>
     </p>
@@ -172,6 +190,45 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
   gap: var(--gap-block) var(--gap-group);
+}
+
+/*
+ * The cascade: each item rises in a beat after the one before (--i counts
+ * from the first new one), capped so a long list doesn't keep you waiting.
+ * Moves glide; what leaves fades in place. Without motion all of it is
+ * instant, and Vue skips the classes.
+ */
+.list__items {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .list-enter-active {
+    transition: opacity 0.5s var(--ease-out), translate 0.6s var(--ease-out);
+    transition-delay: min(calc(var(--i, 0) * 40ms), 480ms);
+  }
+
+  .list-enter-from {
+    opacity: 0;
+    translate: 0 var(--space-4);
+  }
+
+  .list-leave-active {
+    transition: opacity 0.2s var(--ease-out);
+  }
+
+  .list-leave-to {
+    opacity: 0;
+  }
+
+  .list-move {
+    transition: transform 0.55s var(--ease-out);
+  }
+
+  /* A still fades up over its placeholder as it arrives, rather than popping. */
+  .list__thumb:not([data-loaded]) {
+    opacity: 0;
+  }
 }
 
 .list__item {
