@@ -45,11 +45,15 @@ defineProps<{ crumbs: { label: string, to?: string, lang?: string }[] }>()
  * Entrance: the entry's blocks rise one after another, as the lexicon's
  * entries do, on every visit. Only blocks move: the word, plate and part
  * names inside them travel as their own snapshots, which a block's rise
- * doesn't reach, so a traveling word never fades on its way.
+ * doesn't reach, so a traveling word never fades on its way. They develop
+ * and land on the section's spring (vt-develop, vt-lift: main.css). A block
+ * that brings its own entrance (the ledger) opts out with data-own-entrance.
  */
 @media (prefers-reduced-motion: no-preference) {
-  .project > :slotted(*) {
-    animation: 500ms var(--ease-out) var(--enter-delay, 390ms) both vt-rise;
+  .project > :slotted(:not([data-own-entrance])) {
+    animation:
+      400ms var(--ease-out) var(--enter-delay, 390ms) backwards vt-develop,
+      var(--arrive-duration) var(--ease-arrive) var(--enter-delay, 390ms) backwards vt-lift;
   }
 
   .project > :slotted(:nth-child(1)) {

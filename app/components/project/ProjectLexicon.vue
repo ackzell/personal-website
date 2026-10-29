@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { animate, useMotionValue, useMotionValueEvent, type Transition } from 'motion-v'
+
 /**
  * Projects as lexicon entries: the Nahuatl word is the headword, then its
  * pronunciation and meaning, then what the project is. Everything stays
@@ -23,6 +25,38 @@ const props = defineProps<{
  */
 const riseDelay = (i: number) => `${150 + Math.min(i, 8) * 60}ms`
 
+/*
+ * The glimpse drifts after the pointer across its entry, a little and a beat
+ * behind, as if it lay deeper than the text; it turns a hair with the drift.
+ * One drift for the whole list, since only the hovered entry's glimpse
+ * shows: crossing to the next entry, the next glimpse picks up where the
+ * last one was. Springs, so a quick pass carries on and settles. A mouse
+ * only: on touch the glimpse just stays.
+ */
+const lexicon = useTemplateRef<HTMLElement>('lexicon')
+const reducedMotion = usePreferredReducedMotion()
+const DRIFT: Transition = { type: 'spring', bounce: 0.25, visualDuration: 0.6 }
+const REACH = { x: 40, y: 18, turn: 4 }
+const gx = useMotionValue(0)
+const gy = useMotionValue(0)
+useMotionValueEvent(gx, 'change', (now) => lexicon.value?.style.setProperty('--gx', String(now)))
+useMotionValueEvent(gy, 'change', (now) => lexicon.value?.style.setProperty('--gy', String(now)))
+
+function drift(event: PointerEvent) {
+  if (event.pointerType !== 'mouse' || reducedMotion.value === 'reduce') return
+  const entry = (event.target as Element).closest('.lexicon__entry')
+  if (!entry) return
+  const box = entry.getBoundingClientRect()
+  // -1 at one edge of the entry to 1 at the other.
+  animate(gx, ((event.clientX - box.left) / box.width) * 2 - 1, DRIFT)
+  animate(gy, ((event.clientY - box.top) / box.height) * 2 - 1, DRIFT)
+}
+
+function still() {
+  animate(gx, 0, DRIFT)
+  animate(gy, 0, DRIFT)
+}
+
 useHead({
   style: [{
     key: 'lexicon-stagger',
@@ -38,7 +72,9 @@ useHead({
   <!-- No gaps between entries, down or across: spacing is padding inside
        each one, so the pointer never falls between entries and the spotlight
        never drops. Block, not grid, so a parent can set it in columns. -->
-  <dl class="lexicon" :class="{ 'lexicon--stagger': stagger }">
+  <dl ref="lexicon" class="lexicon" :class="{ 'lexicon--stagger': stagger }"
+    :style="{ '--reach-x': REACH.x, '--reach-y': REACH.y, '--reach-turn': REACH.turn }" @pointermove="drift"
+    @pointerleave="still">
     <div v-for="(project, i) in projects" :key="project.slug" class="lexicon__entry" relative grid gap="tight" py="12"
       :style="stagger ? { '--rise-delay': riseDelay(i) } : undefined">
       <WordLine as="dt" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status">
@@ -90,9 +126,12 @@ useHead({
   isolation: isolate;
 }
 
-/* Same rise as a page arriving (vt-rise, main.css), one entry after another. */
+/* One entry after another, each developing and landing on the section's
+   spring (vt-develop, vt-lift: main.css), as a project page's blocks do. */
 .lexicon--stagger .lexicon__entry {
-  animation: 500ms var(--ease-out) var(--rise-delay) both vt-rise;
+  animation:
+    400ms var(--ease-out) var(--rise-delay) backwards vt-develop,
+    var(--arrive-duration) var(--ease-arrive) var(--rise-delay) backwards vt-lift;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -119,8 +158,11 @@ useHead({
   inline-size: 18rem;
   block-size: auto;
   max-inline-size: none;
-  translate: 0 -50%;
-  rotate: -8deg;
+  /* --gx/--gy: the drift, -1 to 1 across the entry (set from the script). */
+  translate:
+    calc(var(--gx, 0) * var(--reach-x) * 1px)
+    calc(-50% + var(--gy, 0) * var(--reach-y) * 1px);
+  rotate: calc(-8deg + var(--gx, 0) * var(--reach-turn) * 1deg);
   filter: saturate(0.6);
   opacity: 0.16;
 }
@@ -194,6 +236,16 @@ useHead({
   }
 }
 
+/* Touch has no hover to write the word, so a press does: it starts writing
+   the moment the finger lands, and a held press finishes it. */
+@media (hover: none) {
+  .lexicon__entry:active .lexicon__headword {
+    --slnt: -15;
+    --casl: 1;
+    --crsv: 1;
+  }
+}
+
 /* Leaving: quick and light; letters return to upright forms right away. */
 .lexicon__char {
   font-variation-settings: 'CASL' var(--casl), 'CRSV' var(--crsv), 'slnt' var(--slnt);
@@ -207,7 +259,7 @@ useHead({
 /* Arriving: the lean starts at once and settles slowly (ease-out), so the
    hover answers right away. The cursive swap lands early in each letter's
    lean, where ease-out moves fastest. */
-.lexicon__entry:hover .lexicon__char,
+.lexicon__entry:is(:hover, :active) .lexicon__char,
 .lexicon__headword:focus-visible .lexicon__char {
   transition:
     --slnt 600ms var(--ease-out),
@@ -223,7 +275,7 @@ useHead({
 
   /* Same end state, no ripple. */
   .lexicon__char,
-  .lexicon__entry:hover .lexicon__char,
+  .lexicon__entry:is(:hover, :active) .lexicon__char,
   .lexicon__headword:focus-visible .lexicon__char {
     transition-duration: 150ms, 150ms, 0ms;
     transition-delay: 0ms;

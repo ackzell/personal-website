@@ -102,6 +102,24 @@ defineProps<{
   .parts__item::after {
     animation: 240ms var(--ease-out) calc(var(--row-start) + 120ms) both branch-grow;
   }
+
+  /* Once the branch is out, what it holds comes along it: the description
+     slides off the branch and lands on the section's spring, and the arrow
+     shoots out after it. The name travels as its own snapshot, so it's left
+     alone. */
+  .parts__desc {
+    --lift-from: calc(-1 * var(--space-3)) 0;
+    animation:
+      400ms var(--ease-out) calc(var(--row-start) + 200ms) backwards vt-develop,
+      var(--arrive-duration) var(--ease-arrive) calc(var(--row-start) + 200ms) backwards vt-lift;
+  }
+
+  .parts__arrow {
+    --lift-from: -0.8em 0;
+    animation:
+      200ms var(--ease-out) calc(var(--row-start) + 280ms) backwards vt-fade-in,
+      var(--pop-duration) var(--ease-pop) calc(var(--row-start) + 280ms) backwards vt-lift;
+  }
 }
 
 .parts__item:is(:hover, :focus-within)::after {
