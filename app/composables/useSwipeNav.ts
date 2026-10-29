@@ -14,7 +14,10 @@ const EDGE = 24
  * way a page turns. Stops at either end.
  *
  * A swipe that starts in something that scrolls sideways (the band's own
- * stops, a carousel) scrolls that instead. Mostly-vertical moves are scrolls.
+ * stops, a carousel) scrolls that instead, and one that starts in something
+ * that takes sideways moves for itself (touch-action without pan-x: a media
+ * strip scrubbed by finger, a sheet's grip) is left to it. Mostly-vertical
+ * moves are scrolls.
  * While a modal is up (a lightbox), its swipes are its own.
  */
 export function useSwipeNav() {
@@ -49,6 +52,15 @@ export function useSwipeNav() {
     return false
   }
 
+  /** Whether something under the finger has the sideways moves to itself (its touch-action leaves out pan-x). */
+  function claimsSideways(el: Element | null) {
+    for (; el && el !== document.body; el = el.parentElement) {
+      const { touchAction } = getComputedStyle(el)
+      if (touchAction !== 'auto' && touchAction !== 'manipulation' && !/pan-(x|left|right)/.test(touchAction)) return true
+    }
+    return false
+  }
+
   let start: { x: number; y: number; time: number } | undefined
 
   function onTouchStart(event: TouchEvent) {
@@ -56,7 +68,7 @@ export function useSwipeNav() {
     start = undefined
     if (event.touches.length !== 1 || !touch) return
     if (touch.clientX < EDGE || touch.clientX > window.innerWidth - EDGE) return
-    if (scrollsSideways(event.target as Element)) return
+    if (scrollsSideways(event.target as Element) || claimsSideways(event.target as Element)) return
     if (document.querySelector(':modal')) return
     start ={ x: touch.clientX, y: touch.clientY, time: event.timeStamp }
   }
