@@ -33,6 +33,16 @@ export function useProjectParts(slug: MaybeRefOrGetter<string>) {
   )
 }
 
+/** Every project's parts, sorted by `order` within each project. */
+export function useAllProjectParts() {
+  const { locale } = useI18n()
+
+  return useAsyncData(
+    () => `project-parts-${locale.value}`,
+    () => fetchParts(locale.value),
+  )
+}
+
 /** The body of one part's page, in the current locale. */
 export function useProjectPartPage(slug: MaybeRefOrGetter<string>, part: MaybeRefOrGetter<string>) {
   const { locale } = useI18n()
@@ -84,26 +94,30 @@ async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
     .sort((a, b) => a.order - b.order)
 }
 
-async function fetchParts(locale: 'en' | 'es', parent: string): Promise<ProjectPart[]> {
+/** A project's parts, or every project's when no `parent` is given. */
+async function fetchParts(locale: 'en' | 'es', parent?: string): Promise<ProjectPart[]> {
   const [meta, copy] = await Promise.all([
     queryCollection('partsMeta').all(),
     queryCollection(`parts_${locale}`).select('stem', 'title', 'description').all(),
   ])
 
-  const inParent = (stem: string) => stem.split('/').at(-2) === parent
-  const copyBySlug = new Map(copy.filter((page) => inParent(page.stem)).map((page) => [slugOf(page.stem), page]))
+  const parentOf = (stem: string) => stem.split('/').at(-2)!
+  const inParent = (stem: string) => !parent || parentOf(stem) === parent
+  // Keyed by parent and slug: two projects may each have a part of one name.
+  const keyOf = (stem: string) => `${parentOf(stem)}/${slugOf(stem)}`
+  const copyByKey = new Map(copy.filter((page) => inParent(page.stem)).map((page) => [keyOf(page.stem), page]))
 
   return meta
     .filter((item) => inParent(item.stem))
     .map((item): ProjectPart => {
       const slug = slugOf(item.stem)
-      const page = copyBySlug.get(slug)
+      const page = copyByKey.get(keyOf(item.stem))
       if (!page) {
-        throw new Error(`Part "${parent}/${slug}" has no ${locale} copy in content/${locale}/projects/${parent}/`)
+        throw new Error(`Part "${keyOf(item.stem)}" has no ${locale} copy in content/${locale}/projects/${parentOf(item.stem)}/`)
       }
 
       return {
-        parent,
+        parent: parentOf(item.stem),
         slug,
         title: page.title,
         description: page.description,

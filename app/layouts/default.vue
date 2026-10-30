@@ -7,6 +7,8 @@ useHead({ htmlAttrs: { 'data-section': section } })
 usePageArrival()
 // Touch: swipe sideways to walk the flag band's stops.
 useSwipeNav()
+// Keys: ← and → walk them too.
+useKeyNav()
 
 const isDev = import.meta.dev
 </script>
@@ -18,6 +20,7 @@ const isDev = import.meta.dev
     <SiteHeader />
     <main id="main" tabindex="-1">
       <slot />
+      <SiteNextStop />
     </main>
     <SiteFooter />
     <DevGridOverlay v-if="isDev" />

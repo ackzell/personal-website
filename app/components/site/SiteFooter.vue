@@ -97,12 +97,32 @@ const letGo = () => (touched.value = undefined)
         </a>
       </li>
     </ul>
+    <!-- The stops either side along the band, in reach from anywhere on a
+         wide screen (below that they sit at the page's foot). -->
+    <SiteNextStop bar class="site-footer__stops" />
     <!-- The header's lang="en" sits top right; its twin sits bottom right. -->
-    <SiteSchemeSwitch ml="auto" />
+    <SiteSchemeSwitch ml="auto" class="site-footer__scheme" />
   </footer>
 </template>
 
 <style scoped>
+/* Wide: the stops in the middle, the socials and the switch at either side. */
+@media (width >=64rem) {
+  .site-footer {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .site-footer__stops {
+    grid-column: 2;
+  }
+
+  .site-footer__scheme {
+    grid-column: 3;
+    justify-self: end;
+  }
+}
+
 /*
  * Dock wave: the hovered icon grows most, its neighbors less, the next ones
  * a touch. Scale the icon, not the <li>, which the FLIP above animates.
