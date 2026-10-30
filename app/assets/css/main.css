@@ -317,7 +317,7 @@ body,
  * only thing in the chrome that moves: project to project, word to word.
  */
 /* The word's lean, one registered property per axis so each can be timed on
-   its own (ProjectLexicon, MediaDoors). */
+   its own (ProjectLexicon, MediaTimeline). */
 @property --slnt {
   syntax: '<number>';
   inherits: true;
