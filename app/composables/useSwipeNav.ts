@@ -1,5 +1,5 @@
 import { animate, attachSpring, motionValue, type AnimationPlaybackControls, type MotionValue } from 'motion-v'
-import { mainNav } from '~/config/nav'
+import { blocksOf, distanceTo, land, pressAt } from '~/utils/pageArrival'
 
 /** Fast enough (px/s) toward a stop as it lets go, once it's past SLIP px, to go. */
 const FLICK = 400
@@ -16,27 +16,14 @@ const GIVE = 32
  * The page moves as its blocks, not as one slab: the ones by the finger keep
  * up with it (TIGHT, in s), the ones REACH of the screen away or more fall
  * behind it by LAG more and go SAG less far, so the page bends after the finger and comes straight
- * again once it holds still. A block is anything on screen up to TALL of it
- * high; taller ones split into what they're made of.
+ * again once it holds still. Blocks are the page arrival's (utils/pageArrival).
  */
 const TIGHT = 0.06
 const REACH = 0.5
 const LAG = 0.24
 const SAG = 0.3
-const TALL = 0.4
 // Back into place, carrying their own speed, the nearest first; no overshoot.
 const HOME = 0.28
-/*
- * The next page comes in the same way, block by block from the side it was
- * swiped in from, ARRIVE of the screen out, once the old one is on its way
- * (AFTER, in s): the ones by where the finger let go first, the ones REACH
- * away up to WAIT later and a little slower.
- */
-const ARRIVE = 0.12
-const AFTER = 0.08
-const WAIT = 0.12
-const LAND = 0.45
-
 /**
  * Swipe sideways on a touch screen to step through the flag band in order:
  * each section, then the pages under it (projects under Work, the children
@@ -48,8 +35,9 @@ const LAND = 0.45
  * and gives. It goes block by block, the ones nearest the finger first. Let
  * go short, it springs back. Let go past a quarter of the screen, or flicked,
  * the page transition carries it on from where the finger left it
- * (--swipe-out, main.css), at about the finger's speed, and the next page's
- * blocks follow it in from the other side.
+ * (--swipe-out, main.css), at about the finger's speed, and the next page
+ * comes in after it from the other side, as every page change does
+ * (usePageArrival), starting by the finger.
  * Under reduced motion the page stays put and the swipe just goes.
  *
  * A swipe that starts in something that scrolls sideways (the band's own
@@ -64,22 +52,12 @@ export function useSwipeNav() {
   const router = useRouter()
   const localePath = useLocalePath()
   const nuxtApp = useNuxtApp()
-  const { data: projects } = useProjects()
+  const { stops, indexOf } = useNavStops()
   const reducedMotion = usePreferredReducedMotion()
   const root = import.meta.client ? document.documentElement : undefined
 
-  const stops = computed(() =>
-    mainNav.flatMap((item) => [
-      item.to,
-      ...(item.section === 'work' ? (projects.value ?? []).map((project) => `/projects/${project.slug}`) : []),
-      ...('children' in item ? item.children.map((child) => child.to) : []),
-    ]),
-  )
-
-  const stripSlash = (path: string) => (path.length > 1 ? path.replace(/\/$/, '') : path)
   const at = (by: 1 | -1) => {
-    const here = stripSlash(route.path)
-    const i = stops.value.findIndex((to) => stripSlash(localePath(to)) === here)
+    const i = indexOf(route.path)
     return i === -1 ? undefined : stops.value[i + by]
   }
 
@@ -102,24 +80,6 @@ export function useSwipeNav() {
       if (touchAction !== 'auto' && touchAction !== 'manipulation' && !/pan-(x|left|right)/.test(touchAction)) return true
     }
     return false
-  }
-
-  /** The page's blocks on screen: split down until each is short enough to move on its own. */
-  function blocksOf(main: Element) {
-    const found: HTMLElement[] = []
-    const visit = (el: Element) => {
-      const box = el.getBoundingClientRect()
-      if (box.bottom < 0 || box.top > window.innerHeight || !(el instanceof HTMLElement)) return
-      const parts = [...el.children]
-      // Only into boxes: an inline part, or text of its own, moves with what holds it.
-      const splits = (box.height > window.innerHeight * TALL || !box.height) && parts.length
-        && parts.every((part) => getComputedStyle(part).display !== 'inline')
-        && ![...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim())
-      if (splits) parts.forEach(visit)
-      else if (box.height) found.push(el)
-    }
-    ;[...main.children].forEach(visit)
-    return found
   }
 
   /*
@@ -181,8 +141,7 @@ export function useSwipeNav() {
 
   /** How far, from 0 to 1, a block is from a finger at `y`: REACH of the screen or more is 1. */
   function farFrom(el: Element, y: number) {
-    const box = el.getBoundingClientRect()
-    return Math.min(Math.abs(y - Math.min(Math.max(y, box.top), box.bottom)) / (window.innerHeight * REACH), 1)
+    return Math.min(distanceTo(el, { x: 0, y }, true) / (window.innerHeight * REACH), 1)
   }
 
   /** Where the page sits for a finger `dx` along: half its pace, or giving at an end. */
@@ -253,72 +212,21 @@ export function useSwipeNav() {
   /*
    * A swipe that goes hands the page over to the view transition: the old
    * page's snapshot is taken with its blocks held where the finger left them,
-   * then they go back into place before the new one's is taken.
+   * then they go back into place before the new one's is taken, and the new
+   * page comes in after it (usePageArrival).
    * Without a view transition it just goes back once the new page is in.
-   *
-   * Within a section, the new page's snapshot doesn't move (main.css): it's
-   * live, so its blocks come in under it on their own springs, starting
-   * hidden (data-arriving) until the transition has scrolled and measured
-   * them. Its words and plates with no partner on the old page are layers of
-   * their own by then, and come in the same way in CSS.
    */
-  type Handoff = { cleanUp: () => void; way: 1 | -1; y: number }
-  let handing: Handoff | undefined
-  let arriving: { el: HTMLElement; controls: AnimationPlaybackControls }[] = []
-
-  /** Every arriving block where it belongs, at once. */
-  function land() {
-    for (const { el, controls } of arriving) {
-      controls.stop()
-      el.style.translate = el.style.opacity = ''
-    }
-    arriving = []
-  }
-
-  function arrive({ way, y }: Handoff) {
-    const main = document.querySelector('main')
-    const from = way * ARRIVE * window.innerWidth
-    if (main) {
-      arriving = blocksOf(main).map((el) => {
-        const far = farFrom(el, y)
-        const p = motionValue(0)
-        p.on('change', (now) => {
-          el.style.translate = now < 1 ? `${(1 - now) * from}px 0` : ''
-          el.style.opacity = now < 1 ? String(Math.min(now * 1.6, 1)) : ''
-        })
-        p.jump(0)
-        return { el, controls: animate(p, 1, { type: 'spring', bounce: 0, visualDuration: LAND + 0.15 * far, delay: AFTER + WAIT * far }) }
-      })
-      // Coming in from off the side: nothing there to scroll to either, and
-      // a page that grew wider would cut the view transition short.
-      root!.dataset.swiping = ''
-      const landing = arriving
-      Promise.all(landing.map(({ controls }) => controls)).then(() => {
-        if (arriving !== landing) return
-        arriving = []
-        if (!blocks.size) delete root!.dataset.swiping
-      })
-    }
-    delete root!.dataset.arriving
-  }
+  let handing: (() => void) | undefined
 
   nuxtApp.hook('page:view-transition:start', (transition) => {
-    const handoff = handing
-    if (!handoff) return
+    const cleanUp = handing
+    if (!cleanUp) return
     handing = undefined
-    const arrives = transition.types?.has('section-same')
-    transition.updateCallbackDone.finally(() => {
-      release()
-      if (arrives) root!.dataset.arriving = ''
-    })
-    if (arrives) transition.ready.then(() => arrive(handoff), () => {})
-    transition.finished.finally(() => {
-      delete root!.dataset.arriving
-      handoff.cleanUp()
-    })
+    transition.updateCallbackDone.finally(release)
+    transition.finished.finally(cleanUp)
   })
 
-  function go(to: string, way: 1 | -1, speed: number, y: number) {
+  function go(to: string, way: 1 | -1, speed: number, { x, y }: { x: number; y: number }) {
     const cleanUp = () => {
       release()
       root!.style.removeProperty('--swipe-out')
@@ -334,12 +242,14 @@ export function useSwipeNav() {
       const time = Math.min(Math.max((rest / Math.max(speed, 1)) * 1000, 160), 320)
       root!.style.setProperty('--swipe-out', `${Math.round(time)}ms`)
       root!.dataset.swipe = way > 0 ? 'forward' : 'back'
-      handing = { cleanUp, way, y }
+      handing = cleanUp
     }
+    // The next page comes in from the finger.
+    pressAt({ x, y })
     router.push(localePath(to)).finally(() => {
       // No view transition took it (none in this browser, or the navigation
       // didn't happen): the page goes back into place.
-      if (handing?.cleanUp !== cleanUp) return
+      if (handing !== cleanUp) return
       handing = undefined
       cleanUp()
     })
@@ -359,7 +269,7 @@ export function useSwipeNav() {
       (Math.abs(dx) >= distance() && speed > -FLICK)
       || (Math.abs(dx) >= SLIP && speed > FLICK)
     )
-    if (goes) go(next, way, speed, touch.clientY)
+    if (goes) go(next, way, speed, { x: touch.clientX, y: touch.clientY })
     else if (held.follows) settle()
     swipe = undefined
   }

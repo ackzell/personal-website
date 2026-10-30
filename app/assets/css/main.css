@@ -189,6 +189,12 @@ pre code {
   font: inherit;
 }
 
+/* Highlighted code in the light scheme a step heavier: the light gems' inks
+   are soft, and a thin stroke thins them further. */
+:root:not(.dark) .shiki {
+  --code-weight: 380;
+}
+
 /* Highlighted code is colored by its tlapalli gem (tlapalli.css), straight
    on the stage: no panel of its own (The Stage Rule). */
 pre.shiki {
@@ -369,23 +375,26 @@ main {
   translate: 0 var(--page-shift, 0px);
 }
 
-/* While a swipe has the page out of place, there's nothing off the side to
-   scroll to. */
-:root[data-swiping] .site {
+/* While a swipe or an arrival has the page out of place, there's nothing off
+   the side to scroll to. */
+:root:is([data-swiping], [data-landing]) .site {
   overflow-x: clip;
 }
 
-/* Same section: chrome holds still, the page hands over. */
+/* Same section: chrome holds still, the page hands over. The old one steps
+   off the way the pages go (--swipe-way, data-way), or just fades when they
+   go neither way; the new one's snapshot is live and holds still while its
+   blocks come in under it (usePageArrival). */
 :root:active-view-transition-type(section-same) {
   &::view-transition-old(root),
   &::view-transition-new(root) {
     animation: none;
   }
   &::view-transition-old(page) {
-    animation: 180ms var(--ease-out) both vt-fade-out;
+    animation: 180ms var(--ease-out) both vt-step-out;
   }
   &::view-transition-new(page) {
-    animation: 500ms var(--ease-out) 150ms both vt-rise;
+    animation: none;
   }
 
   /* The page draws above the root, so the header and footer get their own
@@ -409,35 +418,38 @@ main {
   }
 }
 
-/* Swiped within a section: the old page carries on the way the finger sent
-   it, at about its speed (--swipe-out). Its snapshot was taken with its
-   blocks where the finger left them, each its own way along, so it leaves in
-   that shape. The new one comes in after it from the other side, block by
-   block on its own springs (useSwipeNav), so its snapshot, which is live,
-   holds still. --swipe-way is the direction the pages move. */
-:root[data-swipe='forward'] {
+/* --swipe-way is the direction the pages move: set for every page change
+   that goes along the band (data-way, usePageArrival), and for a swipe
+   (data-swipe) from the moment it lets go. */
+:root:is([data-way='forward'], [data-swipe='forward']) {
   --swipe-way: -1;
 }
-:root[data-swipe='back'] {
+:root:is([data-way='back'], [data-swipe='back']) {
   --swipe-way: 1;
 }
-:root[data-swipe]:active-view-transition-type(section-same) {
+
+/* Words and plates with no partner come in on their own layer, the way the
+   blocks do and on their block's beat (--arrive-delay, utils/pageArrival). */
+:root[data-way]:active-view-transition-type(section-same) {
+  &::view-transition-new(*.word):only-child,
+  &::view-transition-new(*.plate):only-child {
+    animation: 600ms var(--ease-out) calc(var(--arrive-delay, 80ms) + 20ms) both vt-swipe-arrive;
+  }
+}
+
+/* Swiped: the old page carries on the way the finger sent it, at about its
+   speed (--swipe-out), into the next section too. Its snapshot was taken with
+   its blocks where the finger left them, each its own way along, so it
+   leaves in that shape. */
+:root[data-swipe]:active-view-transition-type(section-same, section-forward, section-back) {
   &::view-transition-old(page) {
     animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
-  }
-  &::view-transition-new(page) {
-    animation: none;
   }
   /* Words and plates with no partner go with their page. Their snapshot was
      taken already out to the side too, so they only add the rest of the way. */
   &::view-transition-old(*.word):only-child,
   &::view-transition-old(*.plate):only-child {
     animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-along;
-  }
-  /* And the new page's come in on their own the way its blocks do. */
-  &::view-transition-new(*.word):only-child,
-  &::view-transition-new(*.plate):only-child {
-    animation: 600ms var(--ease-out) 100ms both vt-swipe-arrive;
   }
 }
 
@@ -451,6 +463,12 @@ main {
   to {
     opacity: 0;
     translate: calc(var(--swipe-way) * 33vw) var(--page-shift, 0px);
+  }
+}
+@keyframes vt-step-out {
+  to {
+    opacity: 0;
+    translate: calc(var(--swipe-way, 0) * 4vw) var(--page-shift, 0px);
   }
 }
 @keyframes vt-swipe-arrive {
@@ -548,6 +566,11 @@ main {
       --tile-ox: var(--tile-old-x);
       --tile-oy: var(--tile-old-y);
     }
+    /* Unless a swipe sent it: it carries on, as within a section. */
+    &[data-swipe]::view-transition-old(page) {
+      animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
+      mask-image: none;
+    }
   }
 }
 
@@ -575,14 +598,15 @@ main {
 ::view-transition-new(*.word) {
   animation: none;
 }
-/* Words with no partner leave and arrive with their page. */
+/* Words with no partner leave and arrive with their page: on their block's
+   beat (--arrive-delay, utils/pageArrival), or a staggered list's
+   (--rise-delay, ProjectLexicon). */
 ::view-transition-old(*.word):only-child {
   opacity: 1;
   animation: 180ms var(--ease-out) both vt-fade-out;
 }
-/* --rise-delay: a staggered list sets it per word (ProjectLexicon). */
 ::view-transition-new(*.word):only-child {
-  animation: 500ms var(--ease-out) var(--rise-delay, 150ms) both vt-rise;
+  animation: 500ms var(--ease-out) var(--arrive-delay, var(--rise-delay, 150ms)) both vt-rise;
 }
 
 /*
@@ -611,7 +635,7 @@ main {
   animation: 180ms var(--ease-out) both vt-fade-out;
 }
 ::view-transition-new(*.plate):only-child {
-  animation: 500ms var(--ease-out) var(--rise-delay, 150ms) both vt-rise;
+  animation: 500ms var(--ease-out) var(--arrive-delay, var(--rise-delay, 150ms)) both vt-rise;
 }
 
 /* The marker moves on screen, so it eases both ways, like the word. Under
