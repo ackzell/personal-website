@@ -18,5 +18,28 @@
     "i18n",
     "i18n/locales"
   ],
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "nested",
+  "yaml.schemas": {
+    "./.vscode/schemas/experience.json": [
+      "content/experience/*.yml"
+    ],
+    "./.vscode/schemas/recognition.json": [
+      "content/recognition/*.yml"
+    ],
+    "./.vscode/schemas/contributions.json": [
+      "content/contributions.yml"
+    ],
+    "./.vscode/schemas/media.json": [
+      "content/media.yml"
+    ],
+    "./.vscode/schemas/uses.json": [
+      "content/uses.yml"
+    ],
+    "./.vscode/schemas/projectsMeta.json": [
+      "content/projects/*.yml"
+    ],
+    "./.vscode/schemas/partsMeta.json": [
+      "content/projects/*/*.yml"
+    ]
+  }
 }
