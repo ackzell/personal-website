@@ -369,6 +369,12 @@ main {
   translate: 0 var(--page-shift, 0px);
 }
 
+/* While a swipe has the page out of place, there's nothing off the side to
+   scroll to. */
+:root[data-swiping] .site {
+  overflow-x: clip;
+}
+
 /* Same section: chrome holds still, the page hands over. */
 :root:active-view-transition-type(section-same) {
   &::view-transition-old(root),
@@ -400,6 +406,51 @@ main {
   &::view-transition-old(site-footer),
   &::view-transition-new(site-footer) {
     animation: none;
+  }
+}
+
+/* Swiped within a section: the old page carries on the way the finger sent
+   it, at about its speed (--swipe-out), and the new one comes in after it
+   from the other side. Its snapshot is taken with its blocks where the finger
+   left them, each its own way along (useSwipeNav), so it leaves in that
+   shape. --swipe-way is the direction the pages move. */
+:root[data-swipe='forward'] {
+  --swipe-way: -1;
+}
+:root[data-swipe='back'] {
+  --swipe-way: 1;
+}
+:root[data-swipe]:active-view-transition-type(section-same) {
+  &::view-transition-old(page) {
+    animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
+  }
+  &::view-transition-new(page) {
+    animation: 450ms var(--ease-out) 60ms both vt-swipe-in;
+  }
+  /* Words and plates with no partner go with their page. Their snapshot was
+     taken already out to the side too, so they only add the rest of the way. */
+  &::view-transition-old(*.word):only-child,
+  &::view-transition-old(*.plate):only-child {
+    animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-along;
+  }
+}
+
+@keyframes vt-swipe-along {
+  to {
+    opacity: 0;
+    translate: calc(var(--swipe-way) * 33vw) 0;
+  }
+}
+@keyframes vt-swipe-out {
+  to {
+    opacity: 0;
+    translate: calc(var(--swipe-way) * 33vw) var(--page-shift, 0px);
+  }
+}
+@keyframes vt-swipe-in {
+  from {
+    opacity: 0;
+    translate: calc(var(--swipe-way) * -12vw) 0;
   }
 }
 
