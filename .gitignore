@@ -29,3 +29,7 @@ node_modules
 # Impeccable: keep the design tokens, ignore sessions, caches and references
 .impeccable/*
 !.impeccable/design.json
+
+# OpenCode
+.opencode/
+opencode.jsonc
