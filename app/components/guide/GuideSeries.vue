@@ -493,6 +493,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
          with the strip's own cell styles, so key and strip can't drift. -->
     <aside class="guide__legend" :aria-label="t('media.guide.legend.label')">
       <p class="guide__legend-in" :class="{ 'guide__legend-in--away': listed.size }" m="0" text="xs muted">
+        <SiteMarkLayer clipped />
         <template v-if="hasBars">
           <span class="guide__key">
             <span class="guide__swatch" :class="podcast ? 'guide__swatch--bars' : 'guide__swatch--runs'"
@@ -623,19 +624,26 @@ onBeforeUnmount(() => arrivals?.disconnect())
    leaves of the screen, while the guide passes through the middle, and
    scrolls away with it. Sticking the anchor itself there (rather than under
    the header) keeps the key centered before the guide's top reaches the
-   header too. */
+   header too. The key centers on it as a flex item, which overflows the
+   zero height evenly both ways: no translate, which would pull the key's
+   copy of the mark (SiteMarkLayer) out of line with the one behind. */
 .guide__legend {
   position: sticky;
   inset-block-start: calc(var(--header-height, 0px) + (100svh - var(--header-height, 0px)) / 2);
   z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   block-size: 0;
 }
 
+/* Solid, so the strips don't read through it; its copy of the mark carries
+   the stage across it. */
 .guide__legend-in {
-  position: absolute;
-  inset-block-start: 0;
-  translate: 0 -50%;
-  inset-inline-end: -2rem;
+  position: relative;
+  isolation: isolate;
+  flex: none;
+  margin-inline-end: -2rem;
   display: grid;
   gap: 0.25rem;
   inline-size: 12rem;
