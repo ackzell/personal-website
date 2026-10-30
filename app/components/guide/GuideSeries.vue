@@ -223,6 +223,9 @@ async function aim(x: number, above: number, below: number) {
  */
 const stillOf = (id: string, size = 'mqdefault') => `https://i.ytimg.com/vi/${id}/${size}.jpg`
 const watchUrl = (id: string) => `https://www.youtube.com/watch?v=${id}`
+// The host's own player, held to one episode by the name of its page there,
+// so a play here counts as a download.
+const playerUrl = (episode: string) => `https://mytypeof.dev/embed/player?image-display=true&title-display=false&type=podcast&podcast-slug=my-typeof-radio&episode-slug=${episode}`
 // The stills come from one host; the handshake is done before the first is asked for.
 useHead(() => ({
   link: props.series.some((row) => row.kind === 'playlist') ? [{ rel: 'preconnect', href: 'https://i.ytimg.com' }] : [],
@@ -333,12 +336,13 @@ function abandon(row: string) {
 }
 
 // What a tap on a touch screen lifts into a sheet.
-interface Lifted { video?: string, title: string, from: string, figures: Figure[], url: string }
+interface Lifted { video?: string, episode?: string, title: string, from: string, figures: Figure[], url: string }
 const sheet = shallowRef<Lifted | null>(null)
 function lay(row: Row, cell: Cell) {
   hide()
   sheet.value = {
     video: row.kind === 'playlist' ? cell.release.id : undefined,
+    episode: row.kind === 'podcast' ? cell.release.url.split('/episode/')[1] : undefined,
     title: cell.release.title,
     from: row.title,
     figures: cell.figures,
@@ -569,12 +573,12 @@ onBeforeUnmount(() => arrivals?.disconnect())
       </component>
     </Teleport>
 
-    <!-- A release, tapped: a video plays right here, with its way out to YouTube under it; an episode has its way
-         out to mytypeof.dev. -->
+    <!-- A release, tapped: a video plays right here, with its way out to YouTube under it; an episode plays in the player
+         of mytypeof.dev (which names it, so the title here steps aside), with its way out there. -->
     <GuideSheet v-model:item="sheet" :label="sheet?.title" dock>
       <template #head="{ item }">
         <p m="0" text="sm muted">{{ item.from }}</p>
-        <h2 class="guide__sheet-title" m="0">{{ item.title }}</h2>
+        <h2 v-if="!item.episode" class="guide__sheet-title" m="0">{{ item.title }}</h2>
         <p m="0" text="sm">
           <GuideFigures :figures="item.figures" />
         </p>
@@ -583,7 +587,9 @@ onBeforeUnmount(() => arrivals?.disconnect())
         <MediaVideo v-if="item.video" :key="item.video" class="guide__sheet-video"
           :src="watchUrl(item.video)" :title="item.title"
           :poster="stillOf(item.video, 'hqdefault')" />
-        <p v-else m="0">
+        <iframe v-else-if="item.episode" :key="item.episode" class="guide__sheet-player"
+          :src="playerUrl(item.episode)" :title="item.title" allow="autoplay; encrypted-media" loading="lazy" />
+        <p v-if="!item.video" m="0">
           <a :href="item.url" class="guide__sheet-out">{{ t('media.guide.openPodcast') }}<span
               class="i-iconoir-arrow-up-right" aria-hidden="true" /></a>
         </p>
@@ -1099,6 +1105,28 @@ onBeforeUnmount(() => arrivals?.disconnect())
 
 .guide__sheet-video {
   margin: 0;
+}
+
+.guide__sheet-player {
+  box-sizing: content-box;
+  display: block;
+  /* Its navy is not the section's: a mat, a step from the panel toward it,
+     sits between the two. */
+  --mat: 0.75rem;
+  width: calc(100% - 2 * var(--mat));
+  /* The player's own, which it keeps at any width: art, title, controls. */
+  height: 274px;
+  padding: var(--mat);
+  border: 0;
+  background: color-mix(in srgb, var(--fg) 9%, var(--bg));
+}
+
+/* Narrower than the player, as off the dock, it scrolls sideways: room for
+   the bar. */
+@media (width < 64rem) {
+  .guide__sheet-player {
+    height: 292px;
+  }
 }
 
 .guide__sheet-out {
