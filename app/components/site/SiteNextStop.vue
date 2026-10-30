@@ -132,18 +132,13 @@ const ways = computed(() =>
   color: color-mix(in srgb, var(--fg) 80%, var(--bg));
 }
 
-/* The name in the band's own type, a step down on a phone, as the band's
-   section labels are. */
+/* The name in the folders' own type and size, set apart only by weight. */
 .stop__name {
-  font-family: var(--font-body);
-  font-size: 1rem;
+  font-family: var(--font-code);
+  font-weight: 600;
+  font-variation-settings: 'CASL' 0;
+  font-size: 0.75rem;
   line-height: 1.4;
-}
-
-@media (width < 40rem) {
-  .stop__name {
-    font-size: 0.875rem;
-  }
 }
 
 .stop__arrow {
