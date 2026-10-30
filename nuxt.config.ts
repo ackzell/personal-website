@@ -11,6 +11,18 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css', '~/assets/css/tlapalli.css'],
 
+  hooks: {
+    // Schemas for the YAML in content/, so VS Code checks it while editing
+    // (scripts/content-schemas.mjs).
+    async 'modules:done'() {
+      const [{ writeContentSchemas }, { default: config }] = await Promise.all([
+        import('./scripts/content-schemas.mjs'),
+        import('./content.config'),
+      ])
+      writeContentSchemas(config)
+    },
+  },
+
   experimental: {
     // Route changes run as view transitions (skipped under reduced motion).
     // Styles in main.css, direction tagging in plugins/section-transition.client.ts.

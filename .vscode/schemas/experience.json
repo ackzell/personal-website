@@ -1,0 +1,75 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "experience",
+  "type": "object",
+  "properties": {
+    "company": {
+      "type": "string"
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "start": {
+      "type": "string",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+    },
+    "end": {
+      "type": "string",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+    },
+    "role": {
+      "type": "object",
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "es": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "en",
+        "es"
+      ],
+      "additionalProperties": false
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "en": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "es": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "en",
+        "es"
+      ],
+      "additionalProperties": false
+    },
+    "stack": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    }
+  },
+  "required": [
+    "company",
+    "start",
+    "end",
+    "role",
+    "summary"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "media",
+  "type": "object",
+  "properties": {
+    "podcast": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "note": {
+          "type": "object",
+          "properties": {
+            "en": {
+              "type": "string"
+            },
+            "es": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "en",
+            "es"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "title",
+        "note"
+      ],
+      "additionalProperties": false
+    },
+    "series": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "playlist": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "note": {
+            "type": "object",
+            "properties": {
+              "en": {
+                "type": "string"
+              },
+              "es": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "en",
+              "es"
+            ],
+            "additionalProperties": false
+          },
+          "project": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "playlist",
+          "title",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    }
+  },
+  "additionalProperties": false
+}
