@@ -196,10 +196,13 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Rows:** Stage color only, no rules between them. The name opens the latest releases and the way out to YouTube or mytypeof.dev.
 - **Mobile:** The name, stats and note stack above the strip.
 
-### Media Doors
-- **Character:** The media hub is two doors, side by side, with no gap between them: the headword (Videos, Podcast) at the project headword size, one line on what it is, and what's behind it in data (count, years, hours). The headword link covers the whole door, and the word travels into the section's heading as a project's word does (same size on both ends, so a pure move).
-- **Hover / Focus:** As in the lexicon, the pointed-at door's word leans and its arrow steps forward while the other door steps back to 40%. Reduced motion keeps the end state without the transition.
-- **Mobile:** The doors stack.
+### Media Timeline
+- **Character:** The media hub is one timeline: every release on a shared calendar, a column per month (a quarter on phones), videos stacked up from the axis and episodes hanging below it. A column is the time published that month, against the busiest month on either side; both halves share one scale. A month of videos is one bar (short videos made blocks thinner than their gaps, which shimmered on scroll); episodes stack a block each, as tall as it runs. Without lengths in a feed, a release counts as one. Videos sit at 78%, episodes full, as on their guides.
+- **Doors:** Each half is a door: its headword (Videos, Podcast) at the project headword size, one line on what it is, and its totals, on the left of its half. The link covers the name and the bars, and the word travels into the section's heading as a project's word does.
+- **Readout:** Pointing along the timeline, or scrubbing it with a finger, reads the column out in the line over it (month, then each side's count and hours) and steps the other columns back to 40%. At rest the line gives the first and last months. A visually hidden table by year carries the same for screen readers.
+- **Hover / Focus:** The pointed-at half's word leans as in the lexicon and its arrow steps forward.
+- **Arrival:** Columns grow out of the axis, oldest first, left to right. Reduced motion fades them in.
+- **Mobile:** One column: the readout, Videos and its bars, the axis (every other year marked), the podcast's bars, then its name.
 
 ### Links
 - **Style:** Accent colored, underlined by default; navigation links drop the underline and rely on the band.
