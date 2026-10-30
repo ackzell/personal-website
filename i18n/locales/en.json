@@ -53,6 +53,9 @@
       "openSite": "Open in a new tab",
       "watch": "Watch on YouTube",
       "expand": "View larger",
+      "fullscreen": "Full screen",
+      "shrink": "Exit full screen",
+      "seek": "Position in the video",
       "lightbox": {
         "close": "Close",
         "previous": "Previous",
