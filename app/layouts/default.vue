@@ -3,6 +3,8 @@ const section = useSection()
 
 useHead({ htmlAttrs: { 'data-section': section } })
 
+// Every page change brings the new page in block by block, from its side.
+usePageArrival()
 // Touch: swipe sideways to walk the flag band's stops.
 useSwipeNav()
 
