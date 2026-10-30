@@ -1,11 +1,31 @@
+import { animate, attachSpring, motionValue, type AnimationPlaybackControls, type MotionValue } from 'motion-v'
 import { mainNav } from '~/config/nav'
 
-/** How far the finger travels sideways before a swipe counts, in px. */
-const DISTANCE = 60
-/** Longer than this it's a slow drag or a read, not a swipe, in ms. */
-const DURATION = 600
+/** Fast enough (px/s) toward a stop as it lets go, once it's past SLIP px, to go. */
+const FLICK = 400
+const SLIP = 20
+/** How far it moves before it's clearly a swipe or a scroll, in px. */
+const LOCK = 10
 /** Presses this close to a screen edge belong to the browser's own back/forward. */
 const EDGE = 24
+/** The page moves this much of the finger's way while there's a stop to go to. */
+const FOLLOW = 0.5
+/** At either end it gives at most this far, in px. */
+const GIVE = 32
+/*
+ * The page moves as its blocks, not as one slab: the ones by the finger keep
+ * up with it (TIGHT, in s), the ones REACH of the screen away or more fall
+ * behind it by LAG more and go SAG less far, so the page bends after the finger and comes straight
+ * again once it holds still. A block is anything on screen up to TALL of it
+ * high; taller ones split into what they're made of.
+ */
+const TIGHT = 0.06
+const REACH = 0.5
+const LAG = 0.24
+const SAG = 0.3
+const TALL = 0.4
+// Back into place, carrying their own speed, the nearest first; no overshoot.
+const HOME = 0.28
 
 /**
  * Swipe sideways on a touch screen to step through the flag band in order:
@@ -13,18 +33,29 @@ const EDGE = 24
  * under Media). Finger to the left goes forward, to the right goes back, the
  * way a page turns. Stops at either end.
  *
+ * The page follows the finger, at half its pace, so a swipe shows it's being
+ * taken and can be taken back before letting go; at either end it strains
+ * and gives. It goes block by block, the ones nearest the finger first. Let
+ * go short, it springs back. Let go past a quarter of the screen, or flicked,
+ * the page transition carries it on from where the finger left it
+ * (--swipe-out, main.css), at about the finger's speed.
+ * Under reduced motion the page stays put and the swipe just goes.
+ *
  * A swipe that starts in something that scrolls sideways (the band's own
  * stops, a carousel) scrolls that instead, and one that starts in something
  * that takes sideways moves for itself (touch-action without pan-x: a media
  * strip scrubbed by finger, a sheet's grip) is left to it. Mostly-vertical
- * moves are scrolls.
+ * moves are scrolls; once a move is a swipe, the page doesn't scroll under it.
  * While a modal is up (a lightbox), its swipes are its own.
  */
 export function useSwipeNav() {
   const route = useRoute()
   const router = useRouter()
   const localePath = useLocalePath()
+  const nuxtApp = useNuxtApp()
   const { data: projects } = useProjects()
+  const reducedMotion = usePreferredReducedMotion()
+  const root = import.meta.client ? document.documentElement : undefined
 
   const stops = computed(() =>
     mainNav.flatMap((item) => [
@@ -35,13 +66,14 @@ export function useSwipeNav() {
   )
 
   const stripSlash = (path: string) => (path.length > 1 ? path.replace(/\/$/, '') : path)
-
-  function step(by: 1 | -1) {
+  const at = (by: 1 | -1) => {
     const here = stripSlash(route.path)
     const i = stops.value.findIndex((to) => stripSlash(localePath(to)) === here)
-    const next = i === -1 ? undefined : stops.value[i + by]
-    if (next) router.push(localePath(next))
+    return i === -1 ? undefined : stops.value[i + by]
   }
+
+  /** How far the finger goes before letting go commits, in px. */
+  const distance = () => Math.min(window.innerWidth / 4, 120)
 
   function scrollsSideways(el: Element | null) {
     for (; el && el !== document.body; el = el.parentElement) {
@@ -61,32 +93,211 @@ export function useSwipeNav() {
     return false
   }
 
-  let start: { x: number; y: number; time: number } | undefined
+  /** The page's blocks on screen: split down until each is short enough to move on its own. */
+  function blocksOf(main: Element) {
+    const found: HTMLElement[] = []
+    const visit = (el: Element) => {
+      const box = el.getBoundingClientRect()
+      if (box.bottom < 0 || box.top > window.innerHeight || !(el instanceof HTMLElement)) return
+      const parts = [...el.children]
+      // Only into boxes: an inline part, or text of its own, moves with what holds it.
+      const splits = (box.height > window.innerHeight * TALL || !box.height) && parts.length
+        && parts.every((part) => getComputedStyle(part).display !== 'inline')
+        && ![...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim())
+      if (splits) parts.forEach(visit)
+      else if (box.height) found.push(el)
+    }
+    ;[...main.children].forEach(visit)
+    return found
+  }
+
+  /*
+   * Where the page is, sideways, in px (`place`), and its blocks on their way
+   * there: following, settling back, or left for the page transition to take.
+   * Written straight to each block, outside Vue.
+   */
+  let place = 0
+  type Block = { v: MotionValue<number>; target: MotionValue<number>; share: number; lag: number; detach?: () => void; stop: () => void; settling?: AnimationPlaybackControls }
+  let blocks = new Map<HTMLElement, Block>()
+
+  /** Takes the blocks on screen to follow a finger at `y`, picking up any still on their way back. */
+  function take(y: number) {
+    const main = document.querySelector('main')
+    if (!main) return
+    const kept = new Map<HTMLElement, Block>()
+    for (const el of blocksOf(main)) {
+      const box = el.getBoundingClientRect()
+      const far = Math.min(Math.abs(y - Math.min(Math.max(y, box.top), box.bottom)) / (window.innerHeight * REACH), 1)
+      let block = blocks.get(el)
+      if (block) {
+        block.settling?.stop()
+        block.detach?.()
+        blocks.delete(el)
+      }
+      else {
+        const v = motionValue(0)
+        block = { v, target: motionValue(0), share: 1, lag: 0, stop: v.on('change', (now) => { el.style.translate = now ? `${now}px 0` : '' }) }
+      }
+      block.share = 1 - SAG * far
+      block.lag = TIGHT + LAG * far
+      block.target.jump(place * block.share)
+      block.detach = attachSpring(block.v, block.target, { bounce: 0, visualDuration: block.lag })
+      kept.set(el, block)
+    }
+    release()
+    blocks = kept
+    // Nothing to scroll to off the side while the page is out of place.
+    root!.dataset.swiping = ''
+  }
+
+  function moveTo(now: number) {
+    place = now
+    for (const block of blocks.values()) block.target.set(now * block.share)
+  }
+
+  /** Puts every block straight back in place at once. */
+  function release() {
+    for (const block of blocks.values()) {
+      block.settling?.stop()
+      block.detach?.()
+      block.v.jump(0)
+      block.stop()
+    }
+    blocks.clear()
+    place = 0
+    delete root!.dataset.swiping
+  }
+
+  /** Where the page sits for a finger `dx` along: half its pace, or giving at an end. */
+  function placeFor(dx: number) {
+    if (at(dx < 0 ? 1 : -1)) return dx * FOLLOW
+    return Math.sign(dx) * GIVE * (1 - 1 / (Math.abs(dx) / (GIVE * 4) + 1))
+  }
+
+  let start: { x: number; y: number } | undefined
+  /** The finger's last move, and its speed sideways then (px/s). */
+  let last = { x: 0, time: 0, speed: 0 }
+  /** Once the move is clearly sideways; `follows` when the page moves with it. */
+  let swipe: { follows: boolean } | undefined
+
+  function settle() {
+    const settling = blocks
+    place = 0
+    const back = [...settling.values()].map((block) => {
+      block.detach?.()
+      block.detach = undefined
+      block.settling = animate(block.v, 0, { type: 'spring', bounce: 0, visualDuration: HOME + block.lag, velocity: block.v.getVelocity() })
+      return block.settling
+    })
+    // Once they're all home, unless a new swipe took them up on the way.
+    Promise.all(back).then(() => {
+      if (blocks === settling) release()
+    })
+  }
+
+  function reset() {
+    if (swipe?.follows) settle()
+    start = swipe = undefined
+  }
 
   function onTouchStart(event: TouchEvent) {
     const touch = event.touches[0]
-    start = undefined
+    reset()
     if (event.touches.length !== 1 || !touch) return
     if (touch.clientX < EDGE || touch.clientX > window.innerWidth - EDGE) return
     if (scrollsSideways(event.target as Element) || claimsSideways(event.target as Element)) return
     if (document.querySelector(':modal')) return
-    start ={ x: touch.clientX, y: touch.clientY, time: event.timeStamp }
+    start = { x: touch.clientX, y: touch.clientY }
+    last = { x: touch.clientX, time: event.timeStamp, speed: 0 }
+  }
+
+  function onTouchMove(event: TouchEvent) {
+    const touch = event.touches[0]
+    if (!start || !touch) return
+    const dx = touch.clientX - start.x
+    const dy = touch.clientY - start.y
+    const elapsed = event.timeStamp - last.time
+    if (elapsed > 0) last = { x: touch.clientX, time: event.timeStamp, speed: ((touch.clientX - last.x) / elapsed) * 1000 }
+    if (!swipe) {
+      if (Math.max(Math.abs(dx), Math.abs(dy)) < LOCK) return
+      // Mostly vertical, or a selection being dragged out: not ours.
+      if (Math.abs(dx) < Math.abs(dy) * 2 || !document.getSelection()?.isCollapsed) {
+        start = undefined
+        return
+      }
+      swipe = { follows: reducedMotion.value !== 'reduce' }
+      if (swipe.follows) take(touch.clientY)
+    }
+    // A swipe, not a scroll: the page holds still the other way.
+    if (event.cancelable) event.preventDefault()
+    if (swipe.follows) moveTo(placeFor(dx))
+  }
+
+  /*
+   * A swipe that goes hands the page over to the view transition: the old
+   * page's snapshot is taken with its blocks held where the finger left them,
+   * then they go back into place before the new one's is taken.
+   * Without a view transition it just goes back once the new page is in.
+   */
+  let handing: { cleanUp: () => void } | undefined
+
+  nuxtApp.hook('page:view-transition:start', (transition) => {
+    const handoff = handing
+    if (!handoff) return
+    handing = undefined
+    transition.updateCallbackDone.finally(release)
+    transition.finished.finally(handoff.cleanUp)
+  })
+
+  function go(to: string, way: 1 | -1, speed: number) {
+    const cleanUp = () => {
+      release()
+      root!.style.removeProperty('--swipe-out')
+      delete root!.dataset.swipe
+    }
+    // Only when the page followed: under reduced motion it never left its place.
+    if (place) {
+      // Held where they are for the snapshot.
+      for (const block of blocks.values()) block.detach?.()
+      // Off the way it was headed, at about the finger's pace: the rest of a
+      // third of the screen, in no less than 160ms or more than 320.
+      const rest = window.innerWidth / 3 - Math.abs(place)
+      const time = Math.min(Math.max((rest / Math.max(speed, 1)) * 1000, 160), 320)
+      root!.style.setProperty('--swipe-out', `${Math.round(time)}ms`)
+      root!.dataset.swipe = way > 0 ? 'forward' : 'back'
+      handing = { cleanUp }
+    }
+    router.push(localePath(to)).finally(() => {
+      // No view transition took it (none in this browser, or the navigation
+      // didn't happen): the page goes back into place.
+      if (handing?.cleanUp !== cleanUp) return
+      handing = undefined
+      cleanUp()
+    })
   }
 
   function onTouchEnd(event: TouchEvent) {
     const touch = event.changedTouches[0]
-    if (!start || !touch) return
+    const held = swipe
+    if (!start || !held || !touch) return reset()
     const dx = touch.clientX - start.x
-    const dy = touch.clientY - start.y
-    const quick = event.timeStamp - start.time < DURATION
     start = undefined
-    // Mostly sideways, far enough, and not while text is being selected.
-    if (!quick || Math.abs(dx) < DISTANCE || Math.abs(dx) < Math.abs(dy) * 2) return
-    if (!document.getSelection()?.isCollapsed) return
-    step(dx < 0 ? 1 : -1)
+    const way = dx < 0 ? 1 : -1
+    // Toward the stop it's headed for; a finger that paused before lifting isn't moving.
+    const speed = event.timeStamp - last.time < 50 ? -last.speed * way : 0
+    const next = at(way)
+    const goes = next && (
+      (Math.abs(dx) >= distance() && speed > -FLICK)
+      || (Math.abs(dx) >= SLIP && speed > FLICK)
+    )
+    if (goes) go(next, way, speed)
+    else if (held.follows) settle()
+    swipe = undefined
   }
 
   useEventListener(document, 'touchstart', onTouchStart, { passive: true })
+  // Not passive: once a move is a swipe, it keeps the page from scrolling.
+  useEventListener(document, 'touchmove', onTouchMove, { passive: false })
   useEventListener(document, 'touchend', onTouchEnd, { passive: true })
-  useEventListener(document, 'touchcancel', () => (start = undefined), { passive: true })
+  useEventListener(document, 'touchcancel', reset, { passive: true })
 }
