@@ -90,6 +90,9 @@ async function drop() {
     await animate(el, { x: '100%' }, motion(SLIDE_OUT))
     el.close()
     el.style.transform = ''
+    // A swap it cut short leaves nothing half faded for the next time.
+    turn++
+    if (panel.value) Object.assign(panel.value.style, { opacity: '', transform: '' })
     showing.value = null
     return
   }
@@ -110,12 +113,15 @@ watch(item, async (now) => {
     drop()
     return
   }
+  if (el.open && docked.value) {
+    swap(now)
+    return
+  }
   showing.value = { item: now }
   if (el.open) {
-    // Docked, the next pick takes the last one's place, from its top. Caught
-    // on its way down, the sheet comes back up from there.
+    // Caught on its way down, the sheet comes back up from there.
     panel.value?.scrollTo(0, 0)
-    if (!docked.value && y.get() > 0) slide(0, SETTLE)
+    if (y.get() > 0) slide(0, SETTLE)
     return
   }
   panel.value?.scrollTo(0, 0)
@@ -126,19 +132,43 @@ watch(item, async (now) => {
   rise()
 })
 
+// Docked, the next pick takes the last one's place where it stands: the
+// panel stays, and only what's in it turns over, the old fading off and the
+// new drifting in from its top. Picks in quick succession cut in on each
+// other, and only the last one comes in.
+const SWAP_OUT: Transition = { duration: 0.12, ease: 'easeIn' }
+const SWAP_IN: Transition = { type: 'spring', bounce: 0, visualDuration: 0.3 }
+let turn = 0
+async function swap(next: T) {
+  const box = panel.value
+  if (!box) return
+  const mine = ++turn
+  await animate(box, { opacity: 0, x: -8 }, motion(SWAP_OUT))
+  if (mine !== turn || !dialog.value?.open) return
+  showing.value = { item: next }
+  await nextTick()
+  box.scrollTo(0, 0)
+  animate(box, { opacity: [0, 1], x: [12, 0] }, motion(SWAP_IN))
+}
+
 // A panel that isn't modal gets no cancel from Escape; it's listened for.
 useEventListener('keydown', (event: KeyboardEvent) => {
   if (event.key === 'Escape' && docked.value && item.value !== null) item.value = null
 })
 
-// Nor a click outside it; that's listened for too. It's heard on the way
-// down, before what was clicked has its say, so a click on another release
-// puts that one up in its place rather than closing it after.
+// Nor a click outside it; that's listened for too. What was clicked has its
+// say first: if it put another release up, that one takes this one's place,
+// and only a click that changed nothing puts the panel away. What the panel
+// held is noted on the click's way down, and looked at again once it has
+// come back up, by when what was clicked has run and Vue has caught up.
+let before: T | null = null
 useEventListener('click', (event: MouseEvent) => {
-  if (!docked.value || item.value === null || event.button !== 0) return
-  if (dialog.value?.contains(event.target as Node)) return
-  item.value = null
+  before = docked.value && event.button === 0 && !dialog.value?.contains(event.target as Node) ? item.value : null
 }, { capture: true })
+useEventListener('click', () => {
+  if (before !== null && docked.value && item.value === before) item.value = null
+  before = null
+})
 
 // Escape goes the same way down as the close button.
 function cancel(event: Event) {
