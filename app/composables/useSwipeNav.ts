@@ -25,9 +25,9 @@ const SAG = 0.3
 // Back into place, carrying their own speed, the nearest first; no overshoot.
 const HOME = 0.28
 /**
- * Swipe sideways on a touch screen to step through the flag band in order:
- * each section, then the pages under it (projects under Work, the children
- * under Media). Finger to the left goes forward, to the right goes back, the
+ * Swipe sideways on a touch screen to step through the flag band in order
+ * (useNavStops): each section, then the pages under it, a project's parts
+ * right after it. Finger to the left goes forward, to the right goes back, the
  * way a page turns. Stops at either end.
  *
  * The page follows the finger, at half its pace, so a swipe shows it's being
@@ -52,26 +52,14 @@ export function useSwipeNav() {
   const router = useRouter()
   const localePath = useLocalePath()
   const nuxtApp = useNuxtApp()
-  const { stops, indexOf } = useNavStops()
+  const { from } = useNavStops()
   const reducedMotion = usePreferredReducedMotion()
   const root = import.meta.client ? document.documentElement : undefined
 
-  const at = (by: 1 | -1) => {
-    const i = indexOf(route.path)
-    return i === -1 ? undefined : stops.value[i + by]
-  }
+  const at = (by: 1 | -1) => from(route.path, by)?.to
 
   /** How far the finger goes before letting go commits, in px. */
   const distance = () => Math.min(window.innerWidth / 4, 120)
-
-  function scrollsSideways(el: Element | null) {
-    for (; el && el !== document.body; el = el.parentElement) {
-      if (el.scrollWidth <= el.clientWidth) continue
-      const { overflowX } = getComputedStyle(el)
-      if (overflowX === 'auto' || overflowX === 'scroll') return true
-    }
-    return false
-  }
 
   /** Whether something under the finger has the sideways moves to itself (its touch-action leaves out pan-x). */
   function claimsSideways(el: Element | null) {
