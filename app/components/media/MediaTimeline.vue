@@ -101,14 +101,16 @@ function read(event: PointerEvent) {
 
 // A finger reads only once it's scrubbing, moving sideways more than down.
 // Until then it may be scrolling the page, and reading would flash every
-// other column back and forth with each swipe.
+// other column back and forth with each swipe. It reads only from the bars;
+// set down anywhere else, a sideways drag swipes to the next page.
 const SLOP = 8
 let touch: { x: number, y: number, scrubbing: boolean } | null = null
 function press(event: PointerEvent) {
   if (event.pointerType !== 'touch') return read(event)
-  touch = { x: event.clientX, y: event.clientY, scrubbing: false }
+  touch = (event.target as Element).closest('.timeline__bars') ? { x: event.clientX, y: event.clientY, scrubbing: false } : null
 }
 function move(event: PointerEvent) {
+  if (event.pointerType === 'touch' && !touch) return
   if (touch && !touch.scrubbing) {
     const dx = Math.abs(event.clientX - touch.x)
     if (dx < SLOP || dx < Math.abs(event.clientY - touch.y)) return
@@ -162,7 +164,9 @@ const readout = computed(() => {
         <p class="timeline__stats" m="0" text="sm muted">{{ half.stats }}</p>
       </div>
 
-      <div class="timeline__bars" aria-hidden="true">
+      <!-- The bars are a door to the same page, over the half's link, so a
+           finger on them is told apart from one on the label. -->
+      <NuxtLinkLocale :to="`/${half.slug}`" class="timeline__bars" decoration="none" tabindex="-1" aria-hidden="true">
         <div
           v-for="column in columns"
           :key="column.index"
@@ -176,7 +180,7 @@ const readout = computed(() => {
           <span v-if="half.slug === 'videos'" class="timeline__block" />
           <span v-for="release in column.episodes" v-else :key="release.id" class="timeline__block" :style="{ flexGrow: weightOf(release) }" />
         </div>
-      </div>
+      </NuxtLinkLocale>
     </section>
 
     <div ref="axis" class="timeline__axis" aria-hidden="true">
@@ -218,7 +222,6 @@ const readout = computed(() => {
   display: grid;
   grid-template-columns: minmax(12rem, 18rem) minmax(0, 1fr);
   column-gap: var(--gap-block);
-  touch-action: pan-y;
 }
 
 .timeline__half {
@@ -286,12 +289,21 @@ const readout = computed(() => {
   transition: translate 250ms var(--ease-out), color 250ms var(--ease-out);
 }
 
+/* Sideways along the bars is the finger's to read with; up and down still
+   scrolls the page. Anywhere else in the timeline, it swipes between pages. */
+.timeline__bars {
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+}
+
 /*
  * The bars: a column per month, as tall as its count against the busiest,
  * its blocks split evenly in it. Videos stand on the axis; episodes hang
  * from it. Videos sit at 78% as on their guide, so the halves read apart.
  */
 .timeline__bars {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
   align-items: end;
@@ -409,7 +421,7 @@ const readout = computed(() => {
   color: var(--fg);
 }
 
-.timeline__half:has(.timeline__link:active) {
+.timeline__half:has(.timeline__link:active, .timeline__bars:active) {
   opacity: 0.7;
 }
 
