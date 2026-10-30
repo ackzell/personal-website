@@ -572,6 +572,21 @@ main {
       mask-image: none;
     }
   }
+
+  /* The Deeper stages are all near night, so green slabs on red differ in hue
+     alone and shimmer at their edges. The old stage dims as they come in: the
+     new section lands as color on dark, not against the other color. Not
+     into work: its stage is night itself, and its slabs would vanish into
+     the dimmed one. */
+  :root.dark.has-tile-wipe:active-view-transition-type(section-forward, section-back):not(:active-view-transition-type(to-work))::view-transition-old(root) {
+    animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-dim;
+  }
+}
+
+@keyframes vt-dim {
+  to {
+    filter: brightness(0.4);
+  }
 }
 
 @keyframes vt-tiles {
