@@ -121,6 +121,9 @@ const rows = computed(() => {
 })
 
 const items = useTemplateRef<HTMLElement[]>('items')
+// Each run prints a new list, but Vue refills the same rows array in place:
+// the list itself is what changes, and what tells the observer to look again.
+const log = useTemplateRef<HTMLElement>('log')
 
 const hovered = ref<string>()
 const reading = ref<string>()
@@ -136,14 +139,20 @@ useEventListener('scroll', () => {
   if (travelling.value) arrive()
 }, { passive: true })
 
-// The project whose rows cross a thin line a third of the way down. Years
-// belong to no project and leave the reading as it was.
-useIntersectionObserver(items, (records) => {
-  if (travelling.value) return
-  for (const record of records) {
-    const repo = (record.target as HTMLElement).dataset.repo
-    if (record.isIntersecting && repo) reading.value = repo
-  }
+// The project whose rows reach a thin line a third of the way down: the last
+// one to start above it. Years belong to no project and leave the reading as
+// it was. Read from where the rows are rather than from which one crossed: a
+// flick to the top carries the first project past the line between two
+// looks, and on phones it sits below the line at the top of the page.
+useIntersectionObserver(() => log.value && items.value, (records) => {
+  if (travelling.value || !items.value) return
+  const line = records[0]?.rootBounds?.bottom ?? window.innerHeight * 0.34
+  const tops = items.value
+    .filter((el) => el.dataset.repo)
+    .map((el) => ({ repo: el.dataset.repo, top: el.getBoundingClientRect().top }))
+    .sort((a, b) => a.top - b.top)
+  const reached = tops.findLast(({ top }) => top <= line) ?? tops[0]
+  if (reached) reading.value = reached.repo
 }, { rootMargin: '-33% 0px -66% 0px' })
 
 function go(event: MouseEvent, repo?: string) {
@@ -298,7 +307,7 @@ const name = (repo: string) => repo.split('/')[1]
 
     <div ref="frame" class="log-frame" @animationend="printed">
     <Transition mode="out-in" :css="reducedMotion !== 'reduce'">
-      <ol :key="runs" class="log" :class="{ 'log--printing': runs > 0 }" m="0" px="0" pt="0" list="none">
+      <ol ref="log" :key="runs" class="log" :class="{ 'log--printing': runs > 0 }" m="0" px="0" pt="0" list="none">
         <li v-for="(row, i) in rows" ref="items" :key="row.key" class="log__row"
           :class="[`log__row--${row.kind}`, { 'is-lit': row.repo && lit === row.repo }]"
           :style="{ '--i': i, '--batch': batch[row.key] ?? 0 }" :data-key="row.key" :data-repo="row.repo"
