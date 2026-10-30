@@ -31,19 +31,26 @@ const ENTRANCES = new Set(['vt-develop', 'vt-lift', 'vt-rise', 'vt-fade-in'])
 
 export type Point = { x: number; y: number }
 
-/** The page's blocks on screen: split down until each is short enough to move on its own. */
+/**
+ * The page's blocks on screen: split down until each is short enough to move on its own.
+ * A bar that holds a copy of the mark (SiteMarkLayer) never moves: a transform
+ * would make it the box its fixed copy is placed in, and the mark would ride
+ * off with it. Its parts move instead, or, if it can't split, it holds still.
+ */
 export function blocksOf(main: Element) {
   const found: HTMLElement[] = []
   const visit = (el: Element) => {
+    if (el.classList.contains('site-mark-clip')) return
     const box = el.getBoundingClientRect()
     if (box.bottom < 0 || box.top > window.innerHeight || !(el instanceof HTMLElement)) return
     const parts = [...el.children]
+    const holdsMark = !!el.querySelector('.site-mark-clip')
     // Only into boxes: an inline part, or text of its own, moves with what holds it.
-    const splits = (box.height > window.innerHeight * TALL || !box.height) && parts.length
+    const splits = (holdsMark || box.height > window.innerHeight * TALL || !box.height) && parts.length
       && parts.every((part) => getComputedStyle(part).display !== 'inline')
       && ![...el.childNodes].some((node) => node.nodeType === Node.TEXT_NODE && node.textContent?.trim())
     if (splits) parts.forEach(visit)
-    else if (box.height) found.push(el)
+    else if (box.height && !holdsMark) found.push(el)
   }
   ;[...main.children].forEach(visit)
   return found

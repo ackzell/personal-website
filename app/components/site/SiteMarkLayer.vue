@@ -10,6 +10,11 @@
  * so they line up exactly. Any other bar that paints the stage color (sticky
  * headings, pinned trails) takes a clipped copy the same way; it must be a
  * stacking context. Spans, so it can sit inside a heading.
+ *
+ * The bar itself must never be transformed or filtered, nor anything around
+ * it: that makes it the box fixed descendants are placed in, and the copy
+ * slides off the mark behind. Move what's inside the bar instead (page
+ * arrival and swipes already do, utils/pageArrival).
  */
 defineProps<{ clipped?: boolean }>()
 
