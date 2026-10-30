@@ -165,13 +165,18 @@ function flow(force = false) {
   layer.classList.toggle('is-centered', placed.some(p => p.split))
 
   for (const [i, p] of placed.entries()) {
+    // Each line sits in a holder of no height that takes its place, so a
+    // page arrival or a swipe, which move blocks on their own transform and
+    // translate, take up the line inside it instead (utils/pageArrival).
     let span = pool[i]
     if (!span) {
       span = document.createElement('span')
+      span.append(document.createElement('span'))
       layer.append(span)
       pool[i] = span
     }
-    if (span.textContent !== p.text) span.textContent = p.text
+    const line = span.firstElementChild!
+    if (line.textContent !== p.text) line.textContent = p.text
     Object.assign(span.style, p.block.style)
     span.style.lineHeight = `${p.block.lineHeight}px`
     span.style.setProperty('--x', `${p.x}px`)
@@ -353,13 +358,18 @@ onBeforeUnmount(() => {
   pointer-events: none;
 }
 
-.home-intro__lines :deep(span) {
+.home-intro__lines > :deep(span) {
   position: absolute;
   inset-block-start: 0;
   inset-inline-start: 0;
+  block-size: 0;
   white-space: pre;
-  pointer-events: auto;
   translate: calc(var(--x, 0px) + var(--centered) * var(--dx, 0px)) 0;
+}
+
+.home-intro__lines > :deep(span > span) {
+  display: block;
+  pointer-events: auto;
 }
 
 /* Registered so it can transition: 0 at the start, 1 centered. */
