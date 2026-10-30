@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackControls, type Transition } from 'motion-v'
+
 /**
  * Experience as a band of fields, like the flag band in the header but
  * standing up: one field per role, newest on top, each as tall as the time
@@ -7,14 +9,15 @@
  *
  * The field of the role being read lights up: the one holding focus,
  * otherwise the one passing the upper part of the viewport. The other roles
- * step back, as lexicon entries do, so the lit role reads alone. The lit field
- * fills with the accent from the top; every field keeps its share of the
+ * step back, as lexicon entries do, so the lit role reads alone. One light
+ * travels the band from field to field; every field keeps its share of the
  * career. Pointing at a role only previews it, so the light stays with the
  * role being read: its field brightens, and if it had stepped back it comes
  * part of the way forward.
  *
  * Roles and fields are both links to the role: following one brings the role
- * to the top, under the heading.
+ * to the top, under the heading. The band can also be scrubbed: run a finger
+ * (or drag the pointer) along it and the page reads the career at that pace.
  *
  * Awards and certifications are footnotes to the role held when they were
  * earned, each marked with a small square, and the same square, smaller, marks
@@ -29,6 +32,11 @@ const props = defineProps<{ title: string, roles: Role[], recognition: Recogniti
 const monthIndex = (month: string) => {
   const [year, m] = month.split('-').map(Number)
   return year! * 12 + m!
+}
+
+const monthAt = (index: number) => {
+  const year = Math.floor((index - 1) / 12)
+  return `${year}-${String(index - year * 12).padStart(2, '0')}`
 }
 
 // Each role's awards and certifications, oldest first, with where each one
@@ -51,7 +59,8 @@ const entries = useTemplateRef<HTMLElement[]>('entries')
 const hovered = ref<string>()
 const reading = ref<string>()
 const focused = ref<string>()
-const lit = computed(() => focused.value ?? reading.value)
+const scrubbed = ref<string>()
+const lit = computed(() => focused.value ?? scrubbed.value ?? reading.value)
 // pending: hidden, waiting to scroll in. drawn: fields grown to full.
 const state = ref<'drawn' | 'pending'>('drawn')
 
@@ -127,23 +136,175 @@ onMounted(async () => {
 })
 
 const reducedMotion = usePreferredReducedMotion()
+const spring = (transition: Transition) => reducedMotion.value === 'reduce' ? { duration: 0 } : transition
+
+/*
+ * The light rides between two edges, each on its own spring. The edge heading
+ * the move leads and the other trails, so the light stretches over the fields
+ * it passes and gathers onto the one it lands on. Both keep their speed when
+ * the reading changes mid-run, so a quick scroll turns the light around
+ * rather than restarting it. It first comes on filling its field from the top.
+ */
+const LEAD: Transition = { type: 'spring', bounce: 0, visualDuration: 0.35 }
+const TRAIL: Transition = { type: 'spring', bounce: 0.15, visualDuration: 0.6 }
+
+const light = useTemplateRef<HTMLElement>('light')
+const lightOn = ref(false)
+const lightTop = useMotionValue(0)
+const lightBottom = useMotionValue(0)
+useMotionValueEvent(lightTop, 'change', (now) => light.value?.style.setProperty('--top', `${now}px`))
+useMotionValueEvent(lightBottom, 'change', (now) => light.value?.style.setProperty('--bottom', `${now}px`))
+
+function placeLight(jump = false) {
+  const field = band.value?.querySelector<HTMLElement>(`[data-slug="${lit.value}"]`)
+  if (!field) return
+  const top = field.offsetTop
+  const bottom = top + field.offsetHeight
+  if (jump) {
+    lightTop.jump(top)
+    lightBottom.jump(bottom)
+    return
+  }
+  if (!lightOn.value) {
+    lightTop.jump(top)
+    lightBottom.jump(top)
+    lightOn.value = true
+  }
+  const down = top >= lightTop.get()
+  animate(lightTop, top, spring(down ? TRAIL : LEAD))
+  animate(lightBottom, bottom, spring(down ? LEAD : TRAIL))
+}
+
+watch(lit, () => placeLight())
+// The band takes what height the viewport leaves it: the light follows at once.
+useResizeObserver(band, () => lightOn.value && placeLight(true))
 
 /* Bring a role to the top, just under the sticky heading (its scroll margin),
    and keep the hash so the role can be linked to. */
 function go(event: MouseEvent, slug: string) {
+  if (bring(slug)) event.preventDefault()
+}
+
+function bring(slug: string) {
   const el = document.getElementById(`role-${slug}`)
-  if (!el) return
-  event.preventDefault()
+  if (!el) return false
   reading.value = slug
   travelling.value = true
   // Already in place: no scroll comes to release it.
   arrive()
   el.scrollIntoView({ block: 'start', behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth' })
   history.replaceState(history.state, '', `#role-${slug}`)
+  return true
+}
+
+/*
+ * Scrubbing the band. Past a small slop the band takes the pointer, and the
+ * page follows on a quick spring: the finger's place within a field puts the
+ * same share of that role on the reading line. The light steps with the
+ * finger from field to field, with a tick on phones that can. A readout beside
+ * the finger names the month, and what was earned there when it passes a
+ * square. Let go, the role under the finger comes to the top, as a tap on its
+ * field would. Anything shorter than the slop is still a tap.
+ */
+const SCRUB: Transition = { type: 'spring', bounce: 0, visualDuration: 0.25 }
+const SLOP = 6
+// How near a square the finger has to pass to read it.
+const CATCH = 10
+
+const readout = ref<{ y: number, month: string, item?: Recognition }>()
+const pageY = useMotionValue(0)
+useMotionValueEvent(pageY, 'change', (now) => window.scrollTo({ top: now, behavior: 'instant' }))
+
+let scrub: { id: number, from: number, active: boolean, top: number } | undefined
+let paging: AnimationPlaybackControls | undefined
+let swallowClick = false
+
+function scrubStart(event: PointerEvent) {
+  // A drag on touch often ends without any click to swallow: the flag mustn't
+  // outlive it and eat this press's tap.
+  swallowClick = false
+  if (event.button !== 0) return
+  scrub = { id: event.pointerId, from: event.clientY, active: false, top: 0 }
+}
+
+function scrubMove(event: PointerEvent) {
+  const el = band.value
+  if (!el || event.pointerId !== scrub?.id) return
+  if (!scrub.active) {
+    if (Math.abs(event.clientY - scrub.from) < SLOP) return
+    scrub.active = true
+    el.setPointerCapture(event.pointerId)
+    pageY.jump(window.scrollY)
+    // Read from where the band stood when the scrub began: near the end the
+    // section runs out and the rail scrolls on, which mustn't feed back.
+    scrub.top = el.getBoundingClientRect().top
+    // The page passes every role on the way: none waits to arrive.
+    waiting.value = new Set()
+  }
+
+  const y = Math.min(Math.max(event.clientY - scrub.top, 0), el.offsetHeight)
+  const fields = [...el.querySelectorAll<HTMLElement>('.experience__field')]
+  const field = fields.find((field) => y <= field.offsetTop + field.offsetHeight) ?? fields.at(-1)
+  const role = props.roles.find((role) => role.slug === field?.dataset.slug)
+  const entry = role && document.getElementById(`role-${role.slug}`)
+  if (!field || !role || !entry) return
+  const share = Math.min(Math.max((y - field.offsetTop) / field.offsetHeight, 0), 1)
+
+  if (scrubbed.value !== role.slug) {
+    if (scrubbed.value) navigator.vibrate?.(4)
+    scrubbed.value = role.slug
+  }
+
+  const near = earned.value[role.slug]
+    ?.map(({ item, at }) => ({ item, off: Math.abs(field.offsetTop + at * field.offsetHeight - y) }))
+    .filter(({ off }) => off <= CATCH)
+    .sort((a, b) => a.off - b.off)[0]
+  readout.value = {
+    y,
+    month: near?.item.start ?? monthAt(Math.round(monthIndex(role.end) - share * (role.months - 1))),
+    item: near?.item,
+  }
+
+  const to = entry.getBoundingClientRect().top + window.scrollY + share * entry.offsetHeight - window.innerHeight / 3
+  if (reducedMotion.value === 'reduce') pageY.jump(to)
+  else paging = animate(pageY, to, SCRUB)
+}
+
+function scrubEnd(event: PointerEvent) {
+  if (event.pointerId !== scrub?.id) return
+  const active = scrub.active
+  scrub = undefined
+  if (!active) return
+  swallowClick = true
+  paging?.stop()
+  readout.value = undefined
+  const slug = scrubbed.value
+  scrubbed.value = undefined
+  if (slug && event.type === 'pointerup') bring(slug)
+}
+
+// The click that ends a scrub isn't a tap on whatever it ended over.
+function scrubClick(event: MouseEvent) {
+  if (!swallowClick) return
+  swallowClick = false
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+// Touch has no hover: a finger enters as it presses and leaves as it lifts,
+// which would flash the preview on every tap.
+function point(event: PointerEvent, slug: string) {
+  if (event.pointerType !== 'touch') hovered.value = slug
 }
 
 function leave(slug: string) {
   if (hovered.value === slug) hovered.value = undefined
+}
+
+// Only keyboard focus holds the light. A tapped link keeps focus too, and
+// would hold it where the tap left it while the page scrolls on.
+function focus(event: FocusEvent, slug: string) {
+  if ((event.target as HTMLElement).matches(':focus-visible')) focused.value = slug
 }
 
 function blur(slug: string) {
@@ -161,15 +322,17 @@ function blur(slug: string) {
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
         text="sm muted">
         <span class="tabular-nums">{{ lastYear }}</span>
-        <div ref="band" class="experience__band" :data-state="state" flex="~ col 1">
+        <div ref="band" class="experience__band" :data-state="state"
+          flex="~ col 1" @pointerdown="scrubStart" @pointermove="scrubMove" @pointerup="scrubEnd"
+          @pointercancel="scrubEnd" @click.capture="scrubClick">
           <!-- Pointer shortcuts to the roles' own links, so kept out of the tab
                order and the accessibility tree. -->
-          <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1"
+          <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1" draggable="false"
             class="experience__field" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
-            :style="{ '--months': role.months, '--i': i }" @click="go($event, role.slug)"
-            @pointerenter="hovered = role.slug" @pointerleave="leave(role.slug)">
+            :style="{ '--months': role.months, '--i': i }" :data-slug="role.slug" @click="go($event, role.slug)"
+            @pointerenter="point($event, role.slug)" @pointerleave="leave(role.slug)">
             <span v-for="{ item, at } in earned[role.slug]" :key="item.slug" class="experience__tick"
-              :style="{ '--at': at }">
+              :class="{ 'is-read': readout?.item === item }" :style="{ '--at': at }">
               <!-- The band is out of the accessibility tree, and the note
                    under the role says the same: pointer only. -->
               <SiteTooltip pointer-only>
@@ -179,6 +342,12 @@ function blur(slug: string) {
               </SiteTooltip>
             </span>
           </a>
+          <span ref="light" class="experience__light" :class="{ 'is-on': lightOn }" />
+          <span v-if="readout" class="experience__readout" :style="{ '--y': `${readout.y}px` }" typeset="code"
+            text="xs">
+            <span class="tabular-nums">{{ formatMonth(readout.month) }}</span>
+            <span v-if="readout.item">{{ readout.item.short }}</span>
+          </span>
         </div>
         <span class="tabular-nums">{{ firstYear }}</span>
       </div>
@@ -187,8 +356,8 @@ function blur(slug: string) {
         <li v-for="role in roles" :id="`role-${role.slug}`" ref="entries" :key="role.slug" :data-slug="role.slug"
           class="experience__entry" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
           :data-state="waiting.has(role.slug) ? 'pending' : undefined" :style="{ '--batch': batch[role.slug] ?? 0 }"
-          relative grid gap="x-group y-tight" pb="block" @pointerenter="hovered = role.slug"
-          @pointerleave="leave(role.slug)" @focusin="focused = role.slug" @focusout="blur(role.slug)">
+          relative grid gap="x-group y-tight" pb="block" @pointerenter="point($event, role.slug)"
+          @pointerleave="leave(role.slug)" @focusin="focus($event, role.slug)" @focusout="blur(role.slug)">
           <p class="experience__dates experience__piece tabular-nums" style="--j: 0" typeset="code" text="xs muted">
             <time :datetime="role.start">{{ formatMonth(role.start) }}</time>
             <span aria-hidden="true">&ensp;–&ensp;</span>
@@ -265,7 +434,8 @@ function blur(slug: string) {
 .experience__heading {
   position: sticky;
   top: var(--stick-top);
-  z-index: 1;
+  /* Over the rail too, which scrolls up under it once the section runs out. */
+  z-index: 2;
 }
 
 .experience__body {
@@ -276,15 +446,25 @@ function blur(slug: string) {
    viewport above the footer, up to a comfortable reading height. */
 .experience__rail {
   position: sticky;
+  /* Sticky makes it a stacking context: lifted, the scrub readout in it
+     shows over the roles. */
+  z-index: 1;
   top: calc(var(--stick-top) + var(--heading-height, 0px));
   align-self: start;
   block-size: min(32rem, calc(100svh - var(--stick-top) - var(--heading-height, 0px) - var(--footer-height, 0px) - var(--gap-block)));
 }
 
-/* Same build as the flag band: bars with the stage showing between them. */
+/* Built like the flag band, bars with the stage showing between them, set
+   closer. It takes vertical drags for scrubbing, so the page doesn't scroll
+   under a finger on it (and swiping between pages leaves it alone). */
 .experience__band {
-  gap: var(--space-1);
+  --band-gap: 2px;
+  position: relative;
+  gap: var(--band-gap);
   inline-size: var(--space-1);
+  touch-action: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 .experience__field {
@@ -308,36 +488,66 @@ function blur(slug: string) {
 .experience__field::before {
   content: '';
   position: absolute;
-  inset: calc(-0.5 * var(--space-1)) calc(-1 * var(--space-3));
+  inset: calc(-0.5 * var(--band-gap)) calc(-1 * var(--space-3));
 }
 
-/* Lighting fills the field with the accent from the top, as the flag band's
-   marker fills a field; the field itself keeps its share of the career.
-   Emptying is quicker than filling. */
-.experience__field::after {
-  content: '';
+/* A thumb gets a wider strip to land on. */
+@media (pointer: coarse) {
+  .experience__field::before {
+    inset-inline: calc(-1 * var(--space-4));
+  }
+}
+
+/* What's under the finger while scrubbing: beside the band, and lifted
+   clear of a thumb on touch. */
+.experience__readout {
   position: absolute;
-  inset: 0;
-  background-color: var(--accent);
-  transform-origin: top;
-  scale: 1 0;
-  transition: scale 250ms var(--ease-out);
+  z-index: 2;
+  inset-block-start: var(--y);
+  inset-inline-start: calc(100% + var(--space-4));
+  translate: 0 -50%;
+  display: grid;
+  gap: 2px;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+  white-space: nowrap;
+  pointer-events: none;
 }
 
-.experience__field.is-lit::after {
-  scale: 1 1;
-  transition-duration: 500ms;
+@media (pointer: coarse) {
+  .experience__readout {
+    translate: 0 calc(-100% - var(--space-8));
+  }
 }
 
 /*
- * The lit field glows like a neon tube (--glow, see main.css). It comes on
- * steady: a strike flicker read as dizzying, so the light just moves.
+ * The light, laid over the fields between its two edges (--top, --bottom,
+ * from the springs). It glows like a neon tube (--glow, see main.css) and
+ * comes on steady: a strike flicker read as dizzying, so the light just moves.
  */
-.experience__field.is-lit::after {
+.experience__light {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: var(--top, 0px);
+  block-size: calc(var(--bottom, 0px) - var(--top, 0px));
   background-color: var(--hot);
   border: 1px solid var(--accent);
   box-shadow: var(--glow);
   mix-blend-mode: plus-lighter;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms var(--ease-out);
+}
+
+.experience__light.is-on {
+  opacity: 1;
+}
+
+.experience__band[data-state='pending'] .experience__light {
+  opacity: 0;
+  transition: none;
 }
 
 .experience__band[data-state='pending'] .experience__field {
@@ -467,6 +677,24 @@ function blur(slug: string) {
   padding-inline-start: var(--space-4);
 }
 
+/* Each one answers across its whole line, square and years included, not
+   just its short name: a tap anywhere on it opens the tooltip, and the
+   pointer previews it. The lines meet halfway across the gap between them. */
+.experience__earned li {
+  position: relative;
+}
+
+.experience__earned :deep(.site-tooltip__name) {
+  position: static;
+}
+
+.experience__earned :deep(.site-tooltip__name)::before {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: calc(-0.5 * var(--space-1)) 0;
+}
+
 /* Each one's mark, and its month on the band: a square of the band's
    width, smaller beside the field so it reads as a point in time, not a
    bullet for the text across from it. Both light with the role. */
@@ -502,7 +730,7 @@ function blur(slug: string) {
 
 /* Activated: the square under the pointer, or the one beside the name being
    read, burns hotter than its lit role and swells a little. */
-.experience__field .experience__tick:hover,
+.experience__field .experience__tick:is(:hover, .is-read),
 .experience__earned li:has(.site-tooltip__name:hover, .site-tooltip__name:focus-visible) .experience__square {
   background-color: color-mix(in oklab, var(--accent), white 75%);
   box-shadow: var(--glow), 0 0 8px 2px color-mix(in oklab, var(--accent) 80%, transparent);
@@ -510,7 +738,7 @@ function blur(slug: string) {
   transition-duration: 200ms;
 }
 
-.experience__field .experience__tick:hover {
+.experience__field .experience__tick:is(:hover, .is-read) {
   scale: 1.8;
 }
 
@@ -620,18 +848,6 @@ function blur(slug: string) {
     transition:
       opacity 200ms var(--ease-out),
       background-color 150ms var(--ease-out);
-  }
-
-  /* The fill fades in place instead of running down the field. */
-  .experience__field::after,
-  .experience__field.is-lit::after {
-    scale: 1 1;
-    opacity: 0;
-    transition: opacity 150ms var(--ease-out);
-  }
-
-  .experience__field.is-lit::after {
-    opacity: 1;
   }
 
   .experience__band[data-state='pending'] .experience__field {
