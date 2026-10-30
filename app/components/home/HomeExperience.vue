@@ -322,10 +322,9 @@ function blur(slug: string) {
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
         text="sm muted">
         <span class="tabular-nums">{{ lastYear }}</span>
-        <div ref="band" class="experience__band" :data-state="state"
-          flex="~ col 1" @pointerdown="scrubStart" @pointermove="scrubMove" @pointerup="scrubEnd"
-          @pointercancel="scrubEnd" @click.capture="scrubClick">
-          <!-- Pointer shortcuts to the roles' own links, so kept out of the tab
+        <div ref="band" class="experience__band" :data-state="state" flex="~ col 1" @pointerdown="scrubStart"
+          @pointermove="scrubMove" @pointerup="scrubEnd" @pointercancel="scrubEnd" @click.capture="scrubClick">
+          <!-- Pointer shortcuts to the links on the roles themselves, so kept out of the tab
                order and the accessibility tree. -->
           <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1" draggable="false"
             class="experience__field" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
@@ -383,8 +382,7 @@ function blur(slug: string) {
             <p v-for="(line, i) in role.summary" :key="i" class="experience__piece" :style="{ '--j': i + 2 }" m="0">{{
               line }}</p>
             <ul v-if="role.stack.length" class="experience__stack experience__piece"
-              :style="{ '--j': role.summary.length + 2 }" m="0" mt="tight" p="0" list="none" typeset="code"
-              text="sm muted">
+              :style="{ '--j': role.summary.length + 2 }" my="tight" p="0" list="none" typeset="code" text="sm muted">
               <li v-for="tool in role.stack" :key="tool">{{ tool }}</li>
             </ul>
             <ul v-if="earned[role.slug]" class="experience__earned experience__piece"
