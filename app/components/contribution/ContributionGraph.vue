@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { animate, scrambleText } from 'animejs'
+import { animate as spring, useMotionValue, useMotionValueEvent, type Transition } from 'motion-v'
 
 /**
  * Contributions as a commit log, newest on top. The main line is the
@@ -22,6 +23,9 @@ import { animate, scrambleText } from 'animejs'
  *
  * Tapping a project's rows (not its links) brings the project to that reading
  * line, and the log runs on past its end so the last project can reach it.
+ *
+ * The lit project wears HEAD, as git log decorates the commit checked out,
+ * and the tag travels the log to the next one lit.
  */
 const props = defineProps<{ projects: ContributedProject[] }>()
 
@@ -70,6 +74,7 @@ function toggleErrata() {
   // The run prints every row itself; nothing waits to scroll in after it.
   waiting.value = new Set()
   stopArriving?.()
+  printedTo.value = reducedMotion.value === 'reduce' ? Infinity : -1
   if (reducedMotion.value === 'reduce') {
     shownFlag.value = to
     return
@@ -152,6 +157,18 @@ function go(event: MouseEvent, repo?: string) {
   el.scrollIntoView({ block: 'start', behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth' })
 }
 
+// Touch has no hover: a finger enters as it presses and leaves as it lifts,
+// which would flash the preview on every tap.
+function point(event: PointerEvent, repo?: string) {
+  if (event.pointerType !== 'touch') hovered.value = repo
+}
+
+// Only keyboard focus lights a project. A tapped link keeps focus too, and
+// would hold the light where the tap left it while the log scrolls on.
+function focus(event: FocusEvent, repo?: string) {
+  if ((event.target as HTMLElement).matches(':focus-visible')) hovered.value = repo
+}
+
 function leave(repo?: string) {
   if (hovered.value === repo) hovered.value = undefined
 }
@@ -184,6 +201,72 @@ onMounted(async () => {
 })
 onBeforeUnmount(() => stopArriving?.())
 
+/*
+ * HEAD sits after the lit project's name, where every project row keeps room
+ * for it, and moves to the next on a spring that keeps its speed if the light
+ * moves on mid-way. It waits for its row to print (on arrival and on each
+ * run) or scroll in, and comes on in place rather than travelling there.
+ */
+const HEAD: Transition = { type: 'spring', bounce: 0.15, visualDuration: 0.45 }
+
+const frame = useTemplateRef<HTMLElement>('frame')
+const headX = useMotionValue(0)
+const headY = useMotionValue(0)
+useMotionValueEvent(headX, 'change', (now) => frame.value?.style.setProperty('--head-x', `${now}px`))
+useMotionValueEvent(headY, 'change', (now) => frame.value?.style.setProperty('--head-y', `${now}px`))
+
+// The last row printed in this run, top down. Without the printing (reduced
+// motion), every row is there at once.
+const printedTo = ref(-1)
+onMounted(() => {
+  if (reducedMotion.value === 'reduce') printedTo.value = Infinity
+})
+
+function printed(event: AnimationEvent) {
+  // Keyframe names carry the scoped suffix.
+  if (!event.animationName.startsWith('log-print')) return
+  const key = (event.target as HTMLElement).dataset.key
+  printedTo.value = Math.max(printedTo.value, rows.value.findIndex((row) => row.key === key))
+}
+
+const headRow = computed(() => rows.value.findIndex((row) => row.kind === 'project' && row.repo === lit.value))
+const headOn = computed(() => headRow.value >= 0 && headRow.value <= printedTo.value && !waiting.value.has(lit.value!))
+let headPlaced = false
+// Going from one row to the next, the pointer leaves one before it enters the
+// other: HEAD only counts as gone once it has faded out.
+const forgetHead = useTimeoutFn(() => {
+  headPlaced = false
+}, 200, { immediate: false })
+
+function placeHead(jump: boolean) {
+  const row = items.value?.find((item) => item.dataset.key === lit.value)
+  const slot = row?.querySelector<HTMLElement>('.log__head-slot')
+  if (!row || !slot) return
+  // Offsets, not boxes: they leave out the rows' own print and arrival moves.
+  const x = row.offsetLeft + slot.offsetLeft
+  const y = row.offsetTop + slot.offsetTop
+  // The slot's size follows the heading it sits in; the tag takes it.
+  frame.value?.style.setProperty('--head-size', getComputedStyle(slot).fontSize)
+  if (jump || reducedMotion.value === 'reduce') {
+    headX.jump(x)
+    headY.jump(y)
+    return
+  }
+  spring(headX, x, HEAD)
+  spring(headY, y, HEAD)
+}
+
+watch([lit, headOn], () => {
+  if (!headOn.value) {
+    forgetHead.start()
+    return
+  }
+  forgetHead.stop()
+  placeHead(!headPlaced)
+  headPlaced = true
+}, { flush: 'post' })
+useResizeObserver(frame, () => headPlaced && placeHead(true))
+
 const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric', timeZone: 'UTC' }))
 const formatDate = (date: string) => monthFormat.value.format(new Date(`${date}T00:00:00Z`))
 
@@ -213,13 +296,14 @@ const name = (repo: string) => repo.split('/')[1]
       </p>
     </div>
 
+    <div ref="frame" class="log-frame" @animationend="printed">
     <Transition mode="out-in" :css="reducedMotion !== 'reduce'">
       <ol :key="runs" class="log" :class="{ 'log--printing': runs > 0 }" m="0" px="0" pt="0" list="none">
         <li v-for="(row, i) in rows" ref="items" :key="row.key" class="log__row"
           :class="[`log__row--${row.kind}`, { 'is-lit': row.repo && lit === row.repo }]"
           :style="{ '--i': i, '--batch': batch[row.key] ?? 0 }" :data-key="row.key" :data-repo="row.repo"
-          :data-state="waiting.has(row.key) ? 'pending' : undefined" @pointerenter="hovered = row.repo"
-          @pointerleave="leave(row.repo)" @focusin="hovered = row.repo" @focusout="leave(row.repo)"
+          :data-state="waiting.has(row.key) ? 'pending' : undefined" @pointerenter="point($event, row.repo)"
+          @pointerleave="leave(row.repo)" @focusin="focus($event, row.repo)" @focusout="leave(row.repo)"
           @click="go($event, row.repo)"
           :data-erratum="(row.kind === 'merge' && row.merge.erratum) || (row.kind === 'project' && row.erratum) || undefined"
           :data-gap="(row.kind === 'year' && row.gap) || undefined">
@@ -237,6 +321,7 @@ const name = (repo: string) => repo.split('/')[1]
             <a :href="row.project.url" target="_blank" rel="noopener" class="log__repo decoration-none">
               <span class="text-muted">{{ owner(row.project.repo) }}/</span>{{ name(row.project.repo) }}
             </a>
+            <span class="log__head-slot" typeset="code" text="sm" aria-hidden="true">(HEAD)</span>
           </h2>
 
           <div v-else class="log__merge" grid gap="1">
@@ -249,6 +334,9 @@ const name = (repo: string) => repo.split('/')[1]
         </li>
       </ol>
     </Transition>
+      <span class="log__head" :class="{ 'is-on': headOn }" typeset="code" text="sm muted" aria-hidden="true">(<span
+          class="log__head-ref">HEAD</span>)</span>
+    </div>
   </div>
 </template>
 
@@ -286,6 +374,55 @@ const name = (repo: string) => repo.split('/')[1]
 
   /* Room past the oldest project, so it can scroll up to the reading line. */
   padding-block-end: 60svh;
+}
+
+/* The log prints in the frame; HEAD rides over it, from the top corner to
+   its slot (--head-x, --head-y, from the springs). It keeps the stage color
+   under it as it crosses the rows, and scrolls under the sticky switch. */
+.log-frame {
+  position: relative;
+}
+
+.log__head-slot,
+.log__head {
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.log__head-slot {
+  display: inline-block;
+  margin-inline-start: 1ch;
+  visibility: hidden;
+}
+
+.log__head {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  translate: var(--head-x, 0) var(--head-y, 0);
+  font-size: var(--head-size);
+  background: var(--bg);
+  pointer-events: none;
+  opacity: 0;
+  filter: blur(4px);
+  transition:
+    opacity 200ms var(--ease-out),
+    filter 200ms var(--ease-out);
+}
+
+/* It comes on as its row arrives, out of the same soft blur, a beat after. */
+.log__head.is-on {
+  opacity: 1;
+  filter: none;
+  transition-duration: 500ms;
+  transition-delay: 150ms;
+}
+
+/* As git colors it. */
+.log__head-ref {
+  color: var(--accent);
+  font-weight: 700;
 }
 
 /* A tapped project comes to the reading line, a third of the way down. */
@@ -588,6 +725,10 @@ const name = (repo: string) => repo.split('/')[1]
   .log__row {
     transition: opacity 300ms var(--ease-out);
     transition-delay: calc(var(--batch, 0) * 40ms);
+  }
+
+  .log__head {
+    filter: none;
   }
 }
 
