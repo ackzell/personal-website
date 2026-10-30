@@ -1122,8 +1122,10 @@ onBeforeUnmount(() => arrivals?.disconnect())
      sits between the two. */
   --mat: 0.75rem;
   width: calc(100% - 2 * var(--mat));
-  /* The player's own, which it keeps at any width: art, title, controls. */
-  height: 274px;
+  /* The player's own, which it keeps at any width (art, title, controls),
+     and room for two more lines: a long title runs to three. */
+  --player: calc(274px + 2.5rem);
+  height: var(--player);
   padding: var(--mat);
   border: 0;
   background: color-mix(in srgb, var(--fg) 9%, var(--bg));
@@ -1133,7 +1135,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
    the bar. */
 @media (width < 64rem) {
   .guide__sheet-player {
-    height: 292px;
+    height: calc(var(--player) + 18px);
   }
 }
 
