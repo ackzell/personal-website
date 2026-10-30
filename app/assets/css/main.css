@@ -754,6 +754,19 @@ a {
   color: var(--accent);
 }
 
+/*
+ * Selection turns the section inside out: in light, the flag's text becomes
+ * the field (paper on green reads green on paper); in dark, the section's
+ * glow becomes the field with the stage as ink. Glow drops while selected,
+ * or the halo smears the inverted letters. Highlighted code is left to its
+ * gem (tlapalli.css), which keeps each token's color.
+ */
+:not(.shiki, .shiki *)::selection {
+  background-color: var(--accent);
+  color: var(--bg);
+  text-shadow: none;
+}
+
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;

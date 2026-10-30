@@ -19,6 +19,13 @@ defineProps<{ status: ProjectStatus }>()
   color: var(--bg);
 }
 
+/* The solid stamp is already the page inside out, so its selection turns it
+   back. */
+.project-status[data-status='shipped']::selection {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
 /* Three steps of one ink, so the state reads by weight alone: shipped is the
    solid stamp, active a half-set field, experiment barely inked. The lighter
    two carry the foreground as their label. No outlines: no borders here. */
