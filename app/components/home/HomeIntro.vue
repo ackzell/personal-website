@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { layout, layoutNextLine, prepareWithSegments } from '@chenglou/pretext'
 import type { LayoutCursor, PreparedTextWithSegments } from '@chenglou/pretext'
+import { animate, frame, mapValue, motionValue, svgEffect, type AnimationPlaybackControls } from 'motion-v'
 
 /*
  * The landing intro: the whole ax mark, set apart above the name and the
@@ -44,7 +45,7 @@ let lead = 0
 let pool: HTMLSpanElement[] = []
 let lastTop = Number.NaN
 let lastWidth = Number.NaN
-let frame = 0
+let pending = 0
 
 type Placed = {
   block: Block
@@ -181,9 +182,9 @@ function flow(force = false) {
 }
 
 function schedule() {
-  if (frame || !flowing.value) return
-  frame = requestAnimationFrame(() => {
-    frame = 0
+  if (pending || !flowing.value) return
+  pending = requestAnimationFrame(() => {
+    pending = 0
     flow()
   })
 }
@@ -194,12 +195,84 @@ function relayout() {
   measure()
 }
 
+/* Entrance: the top arc is inked left to right and the bottom right to
+   left; as they glide into the gaps the A is drawn, its angle in one stroke
+   up and over, then the stroke across flicked out to its tip, and the flick
+   carries the A with it: it rocks toward the tip on its feet and springs
+   back upright; once it's still, it glows a moment. Hidden by CSS
+   until it starts, so the whole mark never flashes first. */
+const live = ref(false)
+let effects: VoidFunction[] = []
+let entrance: AnimationPlaybackControls[] = []
+
+/* A tight halo and a wide one, sized to the mark so a small one on a phone
+   glows as much as a large one; `strength` 0 is none. */
+function halo(glyph: SVGSVGElement, strength: number) {
+  const size = glyph.clientWidth
+  const [r, g, b] = getComputedStyle(glyph).color.match(/[\d.]+/g)!.map(Number)
+  const ring = (blur: number, alpha: number) => `drop-shadow(0 0 ${(size * blur).toFixed(1)}px rgba(${r}, ${g}, ${b}, ${alpha * strength}))`
+  return `${ring(0.012, 0.7)} ${ring(0.045, 0.45)}`
+}
+
+function glow(glyph: SVGSVGElement) {
+  const strength = motionValue(0)
+  strength.on('change', now => glyph.style.filter = halo(glyph, now))
+  return animate(strength, [0, 1, 0], {
+    duration: 1.5,
+    times: [0, 0.25, 1],
+    ease: [[0.22, 1, 0.36, 1], [0.45, 0, 0.55, 1]],
+  })
+}
+
+function drawIn() {
+  const glyph = mark.value?.querySelector('svg')
+  if (!glyph) return
+  const ring = motionValue(0)
+  // One stroke over both legs: the left one draws through the first half.
+  const angle = motionValue(0)
+  const cross = motionValue(0)
+  const rock = motionValue(0)
+  effects = [
+    svgEffect(glyph.querySelectorAll('.glyph-pen-ring'), { pathLength: ring }),
+    svgEffect(glyph.querySelector('.glyph-pen-left')!, { pathLength: mapValue(angle, [0, 0.5], [0, 1]) }),
+    svgEffect(glyph.querySelector('.glyph-pen-right')!, { pathLength: mapValue(angle, [0.5, 1], [0, 1]) }),
+    svgEffect(glyph.querySelector('.glyph-pen-cross')!, { pathLength: cross }),
+    svgEffect(glyph.querySelector('.glyph-a')!, { rotate: rock }),
+  ]
+  frame.render(() => live.value = true)
+  entrance = [
+    // A gentle start and a long glide into the gaps.
+    animate(ring, 1, { delay: 0.15, duration: 1.2, ease: [0.45, 0, 0.15, 1] }),
+    animate(angle, 1, { delay: 0.95, duration: 0.7, ease: [0.65, 0, 0.35, 1] }),
+    animate(cross, 1, { delay: 1.6, duration: 0.3, ease: [0.22, 1, 0.36, 1] }),
+  ]
+  // Tipped quickly as the flick reaches the tip, then let go on a spring that
+  // rocks it past upright once and settles; it picks up whatever speed the
+  // tip still has. (A spring from 0 to 0 with a kick alone doesn't run.)
+  const tip = animate(rock, 1, { delay: 1.75, duration: 0.14, ease: [0.22, 1, 0.36, 1] })
+  entrance.push(tip)
+  tip.then(() => {
+    if (!entrance.length) return
+    const settle = animate(rock, 0, { type: 'spring', bounce: 0.2, visualDuration: 0.5, velocity: rock.getVelocity() })
+    entrance.push(settle)
+    // Once it's still, it glows: a halo in its own color blooms and fades,
+    // and the mark is left flat, with no filter on it.
+    settle.then(() => {
+      if (!entrance.length) return
+      const glowing = glow(glyph)
+      entrance.push(glowing)
+      glowing.then(() => glyph.style.removeProperty('filter'))
+    })
+  })
+}
+
 useEventListener(window, 'scroll', schedule, { passive: true })
 useResizeObserver(root, relayout)
 watch(() => [props.title, props.text], relayout)
 
 onMounted(async () => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  drawIn()
   await document.fonts.ready
   if (!body.value) return
   flowing.value = true
@@ -207,14 +280,19 @@ onMounted(async () => {
   relayout()
 })
 
-onBeforeUnmount(() => cancelAnimationFrame(frame))
+onBeforeUnmount(() => {
+  cancelAnimationFrame(pending)
+  for (const stop of effects) stop()
+  for (const animation of entrance) animation.stop()
+  entrance = []
+})
 </script>
 
 <template>
   <div ref="root" class="home-intro" :class="{ 'is-flowing': flowing }"
     :style="flowing && height ? { blockSize: `${height}px` } : undefined">
     <div ref="mark" class="home-intro__mark" aria-hidden="true">
-      <SiteMarkGlyph class="home-intro__glyph" />
+      <SiteMarkGlyph class="home-intro__glyph" :class="{ 'is-live': live }" drawn />
     </div>
     <h1 ref="heading" :class="{ 'sr-only': flowing }">{{ title }}</h1>
     <p ref="body" :class="{ 'sr-only': flowing }">{{ text }}</p>
@@ -299,40 +377,26 @@ onBeforeUnmount(() => cancelAnimationFrame(frame))
   --centered: 1;
 }
 
-/*
- * Entrance: the ring turns into place as it develops, then the A rises up
- * through it. Plays on every visit to the page; skipped under reduced motion.
- */
-@media (prefers-reduced-motion: no-preference) {
-  .home-intro__glyph :deep(.glyph-ring) {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: home-mark-ring 1100ms var(--ease-out) 150ms both;
-  }
+/* The A rocks on its feet. */
+.home-intro__glyph :deep(.glyph-a) {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
 
-  .home-intro__glyph :deep(.glyph-a) {
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
-    animation: home-mark-a 800ms var(--ease-out) 650ms both;
+/* Until the entrance starts (the script draws it), the mark stays hidden;
+   if the script never comes, it shows anyway after a moment. Not under
+   reduced motion, where the mark is simply there. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  .home-intro__glyph:not(.is-live) {
+    animation: home-mark-wait 2.5s;
   }
 }
 
-@keyframes home-mark-ring {
-  from {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.86);
-  }
-}
+@keyframes home-mark-wait {
 
-@keyframes home-mark-a {
-  from {
-    opacity: 0;
-    clip-path: inset(100% 0 0 0);
-    transform: translateY(12%);
-  }
-
+  from,
   to {
-    clip-path: inset(0 0 0 0);
+    visibility: hidden;
   }
 }
 </style>
