@@ -7,9 +7,12 @@ import { animate, useMotionValue, useMotionValueEvent, type Transition } from 'm
  * visible; hovering or focusing an entry only spotlights it.
  * A project with a logo shows a glimpse of it behind the entry, like a print
  * developing: large, washed out, revealed with the spotlight.
- * Headwords and glimpses carry view-transition names (see utils/viewTransition.ts;
- * the glimpse travels as the plate into the project heading's logo), so a page
- * must not list the same project twice.
+ * Headwords carry view-transition names (see utils/viewTransition.ts), so a
+ * page must not list the same project twice. Only the glimpse of the project
+ * being opened or just left carries one, to travel as the plate into the
+ * project heading's logo: a named glimpse is lifted out of its entry for the
+ * transition, without the entry's clip and mask, and snaps back into them
+ * after.
  */
 const props = defineProps<{
   projects: Project[]
@@ -17,11 +20,13 @@ const props = defineProps<{
   stagger?: boolean
 }>()
 
+const traveling = useTravelingProject()
+
 /*
- * The stagger runs on each entry, but a headword and its glimpse arrive as
- * their own view-transition snapshots, outside the entry's animation: give
- * those the same delay (--rise-delay, main.css). A word traveling from a
- * project page has a partner and isn't affected.
+ * The stagger runs on each entry, but a headword arrives as its own
+ * view-transition snapshot, outside the entry's animation: give it the same
+ * delay (--rise-delay, main.css). A word traveling from a project page has a
+ * partner and isn't affected.
  */
 const riseDelay = (i: number) => `${150 + Math.min(i, 8) * 60}ms`
 
@@ -57,12 +62,47 @@ function still() {
   animate(gy, 0, DRIFT)
 }
 
+/*
+ * Where the glimpses show at rest (touch), each one is slipped in under its
+ * entry once the entry has risen: along its own tilt from the right, a turn
+ * further and a little larger, settling on a soft spring as it develops out
+ * of a blur. One after another, on the entries' stagger. They wait hidden
+ * (CSS) until then; the one that traveled in from a project page is already
+ * there. Under reduced motion they only fade in.
+ */
+const SLIP: Transition = { type: 'spring', bounce: 0.15, visualDuration: 0.8 }
+
+onMounted(() => {
+  if (!props.stagger || !lexicon.value) return
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) return
+  const calm = reducedMotion.value === 'reduce'
+  lexicon.value.querySelectorAll<HTMLElement>('.lexicon__entry').forEach((entry, i) => {
+    // Both scheme images, if it has two: the hidden one is display:none.
+    const glimpse = entry.querySelectorAll<HTMLElement>('.lexicon__glimpse:not([data-traveling]) .lexicon__glimpse-img')
+    if (!glimpse.length) return
+    const delay = calm ? 0 : (parseFloat(riseDelay(i)) + 250) / 1000
+    animate(glimpse, calm
+      ? { opacity: [0, 0.16] }
+      : {
+          opacity: [0, 0.16],
+          filter: ['blur(10px) saturate(0.6)', 'blur(0px) saturate(0.6)'],
+          transform: ['translateX(4rem) rotate(-6deg) scale(1.1)', 'translateX(0) rotate(0deg) scale(1)'],
+        }, {
+      delay,
+      duration: 0.6,
+      ease: 'easeOut',
+      filter: { delay, duration: 0.8, ease: 'easeOut' },
+      transform: { ...SLIP, delay },
+    })
+  })
+})
+
 useHead({
   style: [{
     key: 'lexicon-stagger',
     textContent: computed(() => (props.stagger
       ? props.projects.map((project, i) =>
-        `::view-transition-new(word-${project.slug}),::view-transition-new(plate-${project.slug}){--rise-delay:${riseDelay(i)}}`).join('')
+        `::view-transition-new(word-${project.slug}){--rise-delay:${riseDelay(i)}}`).join('')
       : '')),
   }],
 })
@@ -94,11 +134,14 @@ useHead({
       </dd>
       <!-- Decorative: the headword already names the project. A glimpse of
            the logo, large and washed out behind the entry. -->
-      <span v-if="project.logo" class="lexicon__glimpse" aria-hidden="true">
+      <span v-if="project.logo" class="lexicon__glimpse" aria-hidden="true"
+        :data-traveling="traveling === project.slug || undefined">
         <img class="lexicon__glimpse-img" :src="project.logo" alt="" width="288" height="288" loading="lazy"
-          decoding="async" :data-scheme="project.logoLight ? 'dark' : undefined" :style="plateTransition(project.slug)">
+          decoding="async" :data-scheme="project.logoLight ? 'dark' : undefined"
+          :style="traveling === project.slug ? plateTransition(project.slug) : undefined">
         <img v-if="project.logoLight" class="lexicon__glimpse-img" :src="project.logoLight" alt="" width="288"
-          height="288" loading="lazy" decoding="async" data-scheme="light" :style="plateTransition(project.slug)">
+          height="288" loading="lazy" decoding="async" data-scheme="light"
+          :style="traveling === project.slug ? plateTransition(project.slug) : undefined">
       </span>
     </div>
   </dl>
@@ -165,6 +208,13 @@ useHead({
   rotate: calc(-8deg + var(--gx, 0) * var(--reach-turn) * 1deg);
   filter: saturate(0.6);
   opacity: 0.16;
+}
+
+/* Waiting to be slipped in as the list arrives (the script). */
+@media (hover: none), (pointer: coarse) {
+  .lexicon--stagger .lexicon__glimpse:not([data-traveling]) .lexicon__glimpse-img {
+    opacity: 0;
+  }
 }
 
 /*

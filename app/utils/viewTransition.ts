@@ -40,3 +40,11 @@ export const mediaTransition = (slug: 'videos' | 'podcast') => ({
   viewTransitionName: `var(--travel-name, media-${slug})`,
   viewTransitionClass: 'word',
 })
+
+/**
+ * The project at the other end of the navigation in progress (or the last
+ * one): the one being opened, or the one just left. A list of many projects
+ * names only that project's plate (ProjectLexicon), so the plate that travels
+ * is the only one lifted out of its entry. Kept by plugins/project-travel.
+ */
+export const useTravelingProject = () => useState<string | null>('traveling-project', () => null)
