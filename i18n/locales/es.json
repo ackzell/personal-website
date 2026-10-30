@@ -122,5 +122,14 @@
     "yes": "sí",
     "no": "no"
   },
+  "uses": {
+    "title": "Uses",
+    "intro": "",
+    "tool": "Herramienta",
+    "years": "Años",
+    "note": "Nota",
+    "now": "hoy",
+    "rows": "({n} fila) | ({n} filas)"
+  },
   "placeholder": "Próximamente."
 }

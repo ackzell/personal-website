@@ -204,6 +204,13 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Arrival:** Columns grow out of the axis, oldest first, left to right. Reduced motion fades them in.
 - **Mobile:** One column: the readout, Videos and its bars, the axis (every other year marked), the podcast's bars, then its name.
 
+### Uses Tables
+- **Character:** What I use, as a psql session answers it: per category (following what uses.tech suggests a uses page covers), a query on two lines (`ackzell=> SELECT * FROM uses`, then `WHERE category = 'Editor';` under SELECT), highlighted as an editor would: prompt muted, keywords foreground, the names (`*`, `uses`, `category`) the accent 70% into the stage, a shade apart in either scheme (light has no accent of its own, so there it is the only highlight), the string literal accent, the SQL itself untranslated), the result as a table drawn in type, box-drawing glyphs in muted code (┌─┬─┐ │ ├─┼─┤ └─┴─┘), no CSS borders, and the count under it as psql prints it, "(2 rows)". Columns: Tool (foreground; a link to the product, with a muted ↗, when it has one), Years (from the first to the last, or to "now" while still in use, accent, tabular), Note (muted, wrapping, its bars repeating line by line). Every table shares its column widths, so the frames line up down the page. The years carry the experience.
+- **Structure:** A grid with table roles; the frame is aria-hidden glyphs. The typed query is hidden from assistive tech, and the category name alone labels the table. The header rows (top rule, labels, separator) stick under the site header on the stage color while their table scrolls.
+- **Motion:** When a query comes into view (on arrival for those on screen, the rest as scrolled to), it is typed a character at a time under a block cursor, which then blinks at the end of the line a few times while its table draws row by row as a terminal prints: rules left to right, bars downward, then the words come into focus from a slight blur; then the count. The tables skip the page rise. Without script, or with reduced motion, they are simply there.
+- **Layout:** On the wide track; from 64rem the tables sit two side by side.
+- **Mobile:** Two columns, Tool and Years; the note drops under its tool inside the same frame, and its header is read, not shown.
+
 ### Links
 - **Style:** Accent colored, underlined by default; navigation links drop the underline and rely on the band.
 - **Focus:** 2px accent outline, 2px offset.

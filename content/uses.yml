@@ -1,0 +1,71 @@
+# What I work with, for the uses page, shown there as a table per category:
+# each tool, the year I started using it (`since`), the last year I used it
+# (`until`, left out while I still do), and optionally a `note` (both
+# languages) and a `url` to the product, which the tool name links to. The
+# categories follow what uses.tech suggests a /uses page covers.
+#
+# TODO(owner): every tool below except tlapalli is a placeholder, and so are
+# the years; the Spanish names marked TODO are still the English ones.
+
+categories:
+  - slug: editor
+    name: { en: Editor, es: Editor }
+    tools:
+      - name: TODO editor
+        since: 2016
+        # TODO(owner): placeholder range and url, to show both on the page.
+        until: 2023
+        url: https://example.com
+        note:
+          en: TODO
+          es: TODO
+      - name: TODO second editor
+        since: 2023
+
+  - slug: terminal
+    name: { en: Terminal, es: Terminal }
+    tools:
+      - name: TODO terminal
+        since: 2021
+      - name: TODO shell
+        since: 2015
+
+  - slug: hardware
+    # TODO(owner): name in Spanish.
+    name: { en: Hardware, es: Hardware }
+    tools:
+      - name: TODO computer
+        since: 2024
+      - name: TODO keyboard
+        since: 2018
+
+  - slug: tools
+    # TODO(owner): name in Spanish.
+    name: { en: Tools, es: Tools }
+    tools:
+      - name: TODO tool
+        since: 2019
+
+  - slug: frameworks
+    # TODO(owner): name in Spanish.
+    name: { en: Frameworks, es: Frameworks }
+    tools:
+      - name: TODO framework
+        since: 2016
+
+  - slug: software
+    # TODO(owner): name in Spanish.
+    name: { en: Software, es: Software }
+    tools:
+      - name: TODO app
+        since: 2020
+
+  - slug: config
+    # TODO(owner): name in Spanish.
+    name: { en: Fonts & themes, es: Fonts & themes }
+    tools:
+      - name: TODO font
+        since: 2022
+      - name: tlapalli
+        # TODO(owner): the year; and a url once the marketplace one is out.
+        since: 2022

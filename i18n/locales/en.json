@@ -122,5 +122,14 @@
     "yes": "yes",
     "no": "no"
   },
+  "uses": {
+    "title": "Uses",
+    "intro": "",
+    "tool": "Tool",
+    "years": "Years",
+    "note": "Note",
+    "now": "now",
+    "rows": "({n} row) | ({n} rows)"
+  },
   "placeholder": "Coming soon."
 }
