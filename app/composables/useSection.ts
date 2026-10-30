@@ -7,6 +7,7 @@ export const sectionOrder: readonly Section[] = ['about', 'work', 'media']
 const sectionByRoute: Record<string, Section> = {
   index: 'about',
   contributions: 'about',
+  uses: 'about',
   projects: 'work',
   'projects-slug': 'work',
   'projects-slug-part': 'work',

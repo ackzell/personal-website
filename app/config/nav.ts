@@ -5,7 +5,10 @@ export const mainNav = [
     key: 'about',
     to: '/',
     section: 'about',
-    children: [{ key: 'contributions', to: '/contributions' }],
+    children: [
+      { key: 'contributions', to: '/contributions' },
+      { key: 'uses', to: '/uses' },
+    ],
   },
   { key: 'work', to: '/projects', section: 'work' },
   {

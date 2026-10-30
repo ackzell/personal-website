@@ -113,6 +113,35 @@ export default defineContentConfig({
       }),
     }),
 
+    /**
+     * What I work with (`content/uses.yml`), shown on the uses page as a
+     * table per category: each tool, the year I started using it, and a note.
+     */
+    uses: defineCollection({
+      type: 'data',
+      source: 'uses.yml',
+      schema: z.object({
+        categories: z
+          .array(
+            z.object({
+              slug: z.string(),
+              name: localized(z.string()),
+              tools: z.array(
+                z.object({
+                  name: z.string(),
+                  since: z.number().int(),
+                  // The last year I used it; none while I still do.
+                  until: z.number().int().optional(),
+                  url: z.string().url().optional(),
+                  note: localized(z.string()).optional(),
+                }),
+              ),
+            }),
+          )
+          .default([]),
+      }),
+    }),
+
     projectsMeta: defineCollection({
       type: 'data',
       source: 'projects/*.yml',
