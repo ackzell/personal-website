@@ -276,7 +276,7 @@ const name = (repo: string) => repo.split('/')[1]
 
 <template>
   <div class="contributions" grid gap="block" :data-booting="booting || undefined" :style="{ '--typed': typed }">
-    <!-- The switch as the log's own command and the question it asks: the
+    <!-- The switch as a command of the log itself and the question it asks: the
          answer picks the flag on the git log below it. -->
     <div class="errata-switch">
       <SiteMarkLayer clipped />
