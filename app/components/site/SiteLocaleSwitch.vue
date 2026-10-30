@@ -36,6 +36,19 @@ const next = computed(() => {
   font-variation-settings: 'CASL' 0;
   font-size: 0.75rem;
   color: var(--muted);
+  opacity: 0.65;
+  transition: opacity 200ms var(--ease-out);
+}
+
+/* Held back like the stops beside a page, until reached for. */
+.locale-switch:is(:active, :has(:focus-visible)) {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .locale-switch:hover {
+    opacity: 1;
+  }
 }
 
 .locale-switch__value {
