@@ -1,10 +1,11 @@
-import { sectionOf, sectionOrder } from '~/composables/useSection'
+import { sectionOf, sectionOrder, type Section } from '~/composables/useSection'
 import { changeOrigin } from '~/utils/pageArrival'
 
 /**
  * Tags each page view transition with where it travels along the flag:
  * `section-forward` / `section-back` when the section changes, `section-same`
- * otherwise. The CSS in main.css picks the animation from the type.
+ * otherwise, plus `to-<section>` for where it lands. The CSS in main.css
+ * picks the animation from the types.
  * Nuxt already skips view transitions under prefers-reduced-motion.
  *
  * Section changes get the tiled reveal where the CSS Paint API runs
@@ -26,9 +27,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   const routeBaseName = useRouteBaseName()
   const root = document.documentElement
   let type = 'section-same'
+  let target: Section = 'about'
 
   router.beforeEach((to, from) => {
-    const target = sectionOf(routeBaseName(to))
+    target = sectionOf(routeBaseName(to))
     const delta = sectionOrder.indexOf(target) - sectionOrder.indexOf(sectionOf(routeBaseName(from)))
     type = delta > 0 ? 'section-forward' : delta < 0 ? 'section-back' : 'section-same'
   })
@@ -70,6 +72,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     // ViewTransition.types is missing in browsers without VT types; those get
     // the default crossfade.
     transition.types?.add(type)
+    transition.types?.add(`to-${target}`)
     if (
       type !== 'section-same' &&
       root.classList.contains('has-tile-wipe') &&
