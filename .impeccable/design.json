@@ -247,11 +247,11 @@
   ],
   "narrative": {
     "northStar": "The Flag Atlas",
-    "overview": "The site is a map you cross, not a stack of pages. Its three sections follow the colors of a flag, left to right: about (green), work (white), media (red). The whole stage takes the color of the section you are in, and a thin band of flag fields in the sticky header shows where you stand and where you can go. Moving between sections is a wipe along the flag, in the direction of travel.\n\nThe voice is casual, rigorous and quiet, \"engineer, not tinkerer\". The casual lives in the type: monospace throughout, with a variable axis that softens letterforms toward handwriting. The rigor lives in the structure: one grid, one spacing scale, one semantic color set that resolves per section.",
+    "overview": "The site is a map you cross, not a stack of pages. Its three sections follow the colors of a flag, left to right: about (green), work (white), media (red). The whole stage takes the color of the section you are in, and a thin band of flag fields in the sticky header shows where you stand and where you can go. Moving between sections is a wipe along the flag, cut into tiles: they open from where you pressed and run ahead in the direction of travel, and the old page clears just ahead of them. Where tiles can't run, it is a plain wipe in the direction of travel.\n\nThe voice is casual, rigorous and quiet, \"engineer, not tinkerer\". The casual lives in the type: monospace throughout, with a variable axis that softens letterforms toward handwriting. The rigor lives in the structure: one grid, one spacing scale, one semantic color set that resolves per section.",
     "keyCharacteristics": [
       "Stage color is the navigation state: green, paper or red fills the page, tinted near-black in dark scheme.",
       "Monospace everywhere, two families, three roles.",
-      "Flat and borderless. Depth is never simulated.",
+      "Flat and borderless. Depth is never simulated at rest; the one exception is the section change, whose tiles fly in from depth and land flat.",
       "One marker (the accent bar in the flag band) is the only chrome element that moves within a section.",
       "Every motion has a reduced-motion answer; content degrades to plain readable routes."
     ],
