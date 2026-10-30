@@ -1,24 +1,30 @@
 import { sectionOf, sectionOrder, type Section } from '~/composables/useSection'
-import { createTileFlip, readColor, TILE_SIZE, type Rgb, type TileField, type TileFlip } from '~/utils/tileFlip'
-
 /**
  * Tags each page view transition with where it travels along the flag:
  * `section-forward` / `section-back` when the section changes, `section-same`
  * otherwise. The CSS in main.css picks the animation from the type.
  * Nuxt already skips view transitions under prefers-reduced-motion.
  *
- * Section changes get the tiled reveal where it can run: the CSS Paint API
- * (Chromium) for the masks and WebGL2 for the light (utils/tileFlip.ts). The
- * `has-tile-wipe` class turns it on only once both are ready; anywhere else,
- * or under forced colors, the straight clip-path wipe stays.
+ * Section changes get the tiled reveal where the CSS Paint API runs
+ * (Chromium): masks cut by public/worklets/tile-wipe.js, spreading from where
+ * the change started. The `has-tile-wipe` class turns it on once the worklet
+ * is ready; anywhere else, or under forced colors, the straight clip-path
+ * wipe stays.
  */
+const TILE_SIZE = 32
+/**
+ * Shares of the linear progress, read by the worklet: SPREAD is how scattered
+ * the starts are, FLIP a tile's run, LAND the part of it spent flying in.
+ * BOUNCE is the spring a tile lands on.
+ */
+const TILE_TIMING = { spread: 0.45, flip: 0.32, land: 0.7, bounce: 0.25 }
+
 export default defineNuxtPlugin((nuxtApp) => {
   const router = useRouter()
   const routeBaseName = useRouteBaseName()
   const root = document.documentElement
   let type = 'section-same'
   let target: Section = 'about'
-  let tiles: TileFlip | null = null
 
   router.beforeEach((to, from) => {
     target = sectionOf(routeBaseName(to))
@@ -54,48 +60,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   }
 
   if ('paintWorklet' in CSS) {
-    const canvas = document.createElement('canvas')
-    canvas.className = 'tile-fx'
-    canvas.setAttribute('aria-hidden', 'true')
-    canvas.width = canvas.height = 1
-    tiles = createTileFlip(canvas)
-    if (tiles) {
-      document.body.append(canvas)
-      canvas.addEventListener('webglcontextlost', () => {
-        tiles = null
-        root.classList.remove('has-tile-wipe')
-      })
-      const worklet = (CSS as unknown as { paintWorklet: { addModule: (url: string) => Promise<void> } }).paintWorklet
-      worklet
-        .addModule(`${useRuntimeConfig().app.baseURL}worklets/tile-wipe.js`)
-        .then(() => root.classList.add('has-tile-wipe'))
-        .catch(() => {})
-    }
-  }
-
-  /**
-   * The new stage color, once the new section is on <html>. useHead can apply
-   * data-section a frame or two after the new page is captured, so reading
-   * the body right away would still give the old section.
-   */
-  function stageColor(section: Section) {
-    let cached: { css: string; rgb: Rgb } | undefined
-    return () => {
-      if (root.dataset.section !== section) return null
-      const css = getComputedStyle(document.body).backgroundColor
-      if (cached?.css !== css) cached = { css, rgb: readColor(css) }
-      return cached.rgb
-    }
-  }
-
-  /** The section's flag field color; it doesn't depend on the current section. */
-  function fieldColor(section: Section) {
-    const probe = document.createElement('span')
-    probe.style.color = `var(--field-${section})`
-    document.body.append(probe)
-    const css = getComputedStyle(probe).color
-    probe.remove()
-    return readColor(css)
+    const worklet = (CSS as unknown as { paintWorklet: { addModule: (url: string) => Promise<void> } }).paintWorklet
+    worklet
+      .addModule(`${useRuntimeConfig().app.baseURL}worklets/tile-wipe.js`)
+      .then(() => root.classList.add('has-tile-wipe'))
+      .catch(() => {})
   }
 
   function setOffset(name: string) {
@@ -104,43 +73,24 @@ export default defineNuxtPlugin((nuxtApp) => {
     root.style.setProperty(`--tile-${name}-y`, String(box?.top ?? 0))
   }
 
-  async function revealTiles(transition: ViewTransition, flip: TileFlip) {
-    const section = target
-    const from = origin(section)
-    const field: TileField = {
-      width: root.clientWidth,
-      height: root.clientHeight,
-      tile: TILE_SIZE,
-      originX: from.x,
-      originY: from.y,
-    }
+  async function revealTiles(transition: ViewTransition) {
+    const from = origin(target)
     lastClick = undefined
-    root.style.setProperty('--tile-size', String(field.tile))
-    root.style.setProperty('--tile-vw', String(field.width))
-    root.style.setProperty('--tile-vh', String(field.height))
-    root.style.setProperty('--tile-from-x', String(field.originX))
-    root.style.setProperty('--tile-from-y', String(field.originY))
+    root.style.setProperty('--tile-size', String(TILE_SIZE))
+    for (const [name, value] of Object.entries(TILE_TIMING)) root.style.setProperty(`--tile-${name}`, String(value))
+    root.style.setProperty('--tile-vw', String(root.clientWidth))
+    root.style.setProperty('--tile-vh', String(root.clientHeight))
+    root.style.setProperty('--tile-from-x', String(from.x))
+    root.style.setProperty('--tile-from-y', String(from.y))
+    root.style.setProperty('--tile-way', type === 'section-back' ? '-1' : '1')
+    // The old page is still in place: its snapshot shows where it was read.
+    setOffset('old')
     try {
       await transition.ready
     } catch {
       return
     }
     setOffset('new')
-    const animation = document
-      .getAnimations()
-      .find(
-        (a) =>
-          (a.effect as KeyframeEffect | null)?.pseudoElement === '::view-transition-new(root)' &&
-          (a as CSSAnimation).animationName === 'vt-tiles',
-      )
-    if (!animation) return
-    flip.play({
-      field,
-      stage: stageColor(section),
-      light: fieldColor(section),
-      progress: () => animation.effect?.getComputedTiming().progress ?? null,
-      done: transition.finished,
-    })
   }
 
   nuxtApp.hook('page:view-transition:start', (transition) => {
@@ -148,12 +98,11 @@ export default defineNuxtPlugin((nuxtApp) => {
     // the default crossfade.
     transition.types?.add(type)
     if (
-      tiles &&
       type !== 'section-same' &&
       root.classList.contains('has-tile-wipe') &&
       !matchMedia('(forced-colors: active)').matches
     ) {
-      revealTiles(transition, tiles)
+      revealTiles(transition)
     }
   })
 })
