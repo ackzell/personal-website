@@ -17,8 +17,9 @@ import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackCon
  *
  * `dock` makes it a panel at the side on a wide screen instead: it slides in
  * from the right over the page's edge, with nothing darkened, so the guide
- * stays in use beside it (holding still) and another pick takes its place. Only
- * Escape or the close button put it away; it isn't dragged.
+ * stays in use beside it (holding still) and another pick takes its place.
+ * Escape, the close button or a click anywhere else put it away; it isn't
+ * dragged.
  */
 const props = defineProps<{ label?: string, tall?: boolean, dock?: boolean }>()
 const item = defineModel<T | null>('item', { required: true })
@@ -129,6 +130,15 @@ watch(item, async (now) => {
 useEventListener('keydown', (event: KeyboardEvent) => {
   if (event.key === 'Escape' && docked.value && item.value !== null) item.value = null
 })
+
+// Nor a click outside it; that's listened for too. It's heard on the way
+// down, before what was clicked has its say, so a click on another release
+// puts that one up in its place rather than closing it after.
+useEventListener('click', (event: MouseEvent) => {
+  if (!docked.value || item.value === null || event.button !== 0) return
+  if (dialog.value?.contains(event.target as Node)) return
+  item.value = null
+}, { capture: true })
 
 // Escape goes the same way down as the close button.
 function cancel(event: Event) {
@@ -366,6 +376,9 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
   inline-size: 100%;
   block-size: 100%;
   max-block-size: none;
+  /* What it holds sits in the middle of the column, unless it's taller than
+     the column; then it starts at the top and scrolls. */
+  align-content: safe center;
   padding: 0 var(--gap-block) var(--gap-block);
   box-shadow: none;
 }
