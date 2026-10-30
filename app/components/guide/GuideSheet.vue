@@ -16,8 +16,10 @@ import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackCon
  * at nearly the screen's height, so a list that narrows doesn't make it jump.
  *
  * `dock` makes it a panel at the side on a wide screen instead: it slides in
- * from the right over the page's edge, with nothing darkened, so the guide
- * stays in use beside it (holding still) and another pick takes its place.
+ * from the right over the page's edge, between the header and the footer,
+ * with nothing darkened, so the guide stays in use beside it (holding still)
+ * and another pick takes its place. It carries its own copy of the mark, so
+ * the stage reads on under it.
  * Escape, the close button or a click anywhere else put it away; it isn't
  * dragged.
  */
@@ -47,6 +49,7 @@ const FLICK = 500
 
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const panel = useTemplateRef<HTMLElement>('panel')
+const edge = useTemplateRef<HTMLElement>('edge')
 
 // The one on screen. It lags `item` on the way out, so it can drop away
 // with its contents.
@@ -72,9 +75,27 @@ function slide(to: number, transition: Transition, velocity = y.getVelocity()) {
   return moving
 }
 
+// Docked, the panel's hairline draws out from its middle once it's in, and
+// draws back in before it goes. `sliding` is the panel's last move, so a
+// line held for a slide in that was cut short isn't drawn.
+const EDGE_IN: Transition = { type: 'spring', bounce: 0, visualDuration: 0.4 }
+const EDGE_OUT: Transition = { duration: 0.16, ease: 'easeIn' }
+let sliding: AnimationPlaybackControls | undefined
+let drawing: AnimationPlaybackControls | undefined
+let leaving = false
+
 function rise() {
   if (docked.value) {
-    animate(dialog.value!, { x: ['100%', 0] }, motion(DROP))
+    // By its edge, not a transform: a transformed panel would carry the
+    // mark's copy along with it (SiteMarkLayer).
+    const el = dialog.value!
+    // From off screen, or from wherever it was caught on its way out.
+    const back = leaving
+    const run = sliding = animate(el, { right: back ? 0 : [-el.offsetWidth, 0] }, motion(DROP))
+    leaving = false
+    run.then(() => {
+      if (run === sliding && edge.value) drawing = animate(edge.value, { scaleY: back ? 1 : [0, 1] }, motion(EDGE_IN))
+    })
     return
   }
   span = panel.value?.offsetHeight || span
@@ -87,9 +108,19 @@ async function drop() {
   const el = dialog.value
   if (!el?.open) return
   if (docked.value) {
-    await animate(el, { x: '100%' }, motion(SLIDE_OUT))
+    leaving = true
+    drawing?.stop()
+    sliding?.stop()
+    const run = sliding = edge.value ? animate(edge.value, { scaleY: 0 }, motion(EDGE_OUT)) : undefined
+    await run
+    // Another pick brought it back while the line drew in.
+    if (run !== sliding) return
+    const out = sliding = animate(el, { right: -el.offsetWidth }, motion(SLIDE_OUT))
+    await out
+    if (out !== sliding) return
+    leaving = false
     el.close()
-    el.style.transform = ''
+    el.style.right = ''
     // A swap it cut short leaves nothing half faded for the next time.
     turn++
     if (panel.value) Object.assign(panel.value.style, { opacity: '', transform: '' })
@@ -115,6 +146,8 @@ watch(item, async (now) => {
   }
   if (el.open && docked.value) {
     swap(now)
+    // Caught on its way out, it comes back with the new pick.
+    if (leaving) rise()
     return
   }
   showing.value = { item: now }
@@ -257,24 +290,30 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
 </script>
 
 <template>
-  <dialog ref="dialog" class="sheet" :aria-label="label"
-    :class="{ 'sheet--docked': docked }"
-    @cancel="cancel" @click="tapAbove">
-    <div ref="panel" class="sheet__panel" :class="{ 'is-holding': holding, 'sheet__panel--tall': tall }" @touchstart.passive="touchDown"
-      @touchend="touchUp" @touchcancel="touchUp">
-      <template v-if="showing">
-        <div class="sheet__grab" @pointerdown="grab" @pointermove="pull" @pointerup="letGo" @pointercancel="letGo">
-          <span class="sheet__handle" aria-hidden="true" />
-          <slot name="head" :item="showing.item" />
-          <button type="button" class="sheet__close" :aria-label="t('projects.media.lightbox.close')"
-            @click="item = null">
-            <span class="i-iconoir-xmark" aria-hidden="true" />
-          </button>
-        </div>
-        <slot :item="showing.item" />
-      </template>
-    </div>
-  </dialog>
+  <!-- Out of the page, so nothing in it (a block arriving) holds it under the
+       header or moves the mark's copy. -->
+  <Teleport to="#teleports">
+    <dialog ref="dialog" class="sheet" :aria-label="label"
+      :class="{ 'sheet--docked': docked }"
+      @cancel="cancel" @click="tapAbove">
+      <SiteMarkLayer v-if="docked" clipped />
+      <span v-if="docked" ref="edge" class="sheet__edge" aria-hidden="true" />
+      <div ref="panel" class="sheet__panel" :class="{ 'is-holding': holding, 'sheet__panel--tall': tall }" @touchstart.passive="touchDown"
+        @touchend="touchUp" @touchcancel="touchUp">
+        <template v-if="showing">
+          <div class="sheet__grab" @pointerdown="grab" @pointermove="pull" @pointerup="letGo" @pointercancel="letGo">
+            <span class="sheet__handle" aria-hidden="true" />
+            <slot name="head" :item="showing.item" />
+            <button type="button" class="sheet__close" :aria-label="t('projects.media.lightbox.close')"
+              @click="item = null">
+              <span class="i-iconoir-xmark" aria-hidden="true" />
+            </button>
+          </div>
+          <slot :item="showing.item" />
+        </template>
+      </div>
+    </dialog>
+  </Teleport>
 </template>
 
 <style scoped>
@@ -385,17 +424,27 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
 }
 
 /* Docked: a column at the right, between the header and the footer, over
-   nothing darkened. It isn't in the top layer, so it's lifted above the page,
-   and a shadow sets it off from what it covers. */
+   nothing darkened. It isn't in the top layer, so it's lifted above the
+   page. Like the header and footer it's the stage color with the mark's copy
+   showing through, so the page seems to run on behind it; only a hairline
+   marks its edge. */
 .sheet--docked {
   inset: var(--header-height, 0px) 0 var(--footer-height, 0px) auto;
   z-index: 20;
   inline-size: min(30rem, 36vw);
   block-size: auto;
   background: var(--bg);
-  box-shadow:
-    -1px 0 0 color-mix(in oklab, var(--fg) 12%, transparent),
-    -1.5rem 0 3rem -1rem color-mix(in oklab, black 25%, transparent);
+}
+
+/* The hairline down its edge, drawn out from the middle (script). */
+.sheet__edge {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 1px;
+  background: color-mix(in oklab, var(--fg) 12%, transparent);
+  transform: scaleY(0);
+  pointer-events: none;
 }
 
 .sheet--docked[open] {
@@ -410,6 +459,7 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
      the column; then it starts at the top and scrolls. */
   align-content: safe center;
   padding: 0 var(--gap-block) var(--gap-block);
+  background: none;
   box-shadow: none;
 }
 
