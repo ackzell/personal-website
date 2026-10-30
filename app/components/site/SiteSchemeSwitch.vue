@@ -97,6 +97,24 @@ function toggle() {
   color: var(--muted);
 }
 
+/* Held back like the stops beside a page, until reached for. The text only:
+   on phones the switch stands on its own patch of stage, which stays solid. */
+.scheme-switch__name,
+.scheme-switch__value {
+  opacity: 0.65;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.scheme-switch:is(:active, :has(:focus-visible)) :is(.scheme-switch__name, .scheme-switch__value) {
+  opacity: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .scheme-switch:hover :is(.scheme-switch__name, .scheme-switch__value) {
+    opacity: 1;
+  }
+}
+
 .scheme-switch__value {
   padding: var(--space-1) 0.15em;
   border: 0;

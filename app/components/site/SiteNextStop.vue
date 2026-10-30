@@ -102,10 +102,18 @@ const ways = computed(() =>
   text-align: end;
 }
 
+/* Held back until reached for, so it doesn't stand level with the page:
+   hover, focus or a press bring it up. */
 .stop__route {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
+  opacity: 0.65;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.stop:is(:focus-visible, :active) .stop__route {
+  opacity: 1;
 }
 
 /* The folders and the name share a baseline, and wrap between them when
@@ -182,6 +190,10 @@ const ways = computed(() =>
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .stop:hover .stop__route {
+    opacity: 1;
+  }
+
   .stop:hover .stop__field::after {
     transform: scaleX(1);
   }
