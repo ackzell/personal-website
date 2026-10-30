@@ -26,6 +26,16 @@ const SAG = 0.3
 const TALL = 0.4
 // Back into place, carrying their own speed, the nearest first; no overshoot.
 const HOME = 0.28
+/*
+ * The next page comes in the same way, block by block from the side it was
+ * swiped in from, ARRIVE of the screen out, once the old one is on its way
+ * (AFTER, in s): the ones by where the finger let go first, the ones REACH
+ * away up to WAIT later and a little slower.
+ */
+const ARRIVE = 0.12
+const AFTER = 0.08
+const WAIT = 0.12
+const LAND = 0.45
 
 /**
  * Swipe sideways on a touch screen to step through the flag band in order:
@@ -38,7 +48,8 @@ const HOME = 0.28
  * and gives. It goes block by block, the ones nearest the finger first. Let
  * go short, it springs back. Let go past a quarter of the screen, or flicked,
  * the page transition carries it on from where the finger left it
- * (--swipe-out, main.css), at about the finger's speed.
+ * (--swipe-out, main.css), at about the finger's speed, and the next page's
+ * blocks follow it in from the other side.
  * Under reduced motion the page stays put and the swipe just goes.
  *
  * A swipe that starts in something that scrolls sideways (the band's own
@@ -122,12 +133,12 @@ export function useSwipeNav() {
 
   /** Takes the blocks on screen to follow a finger at `y`, picking up any still on their way back. */
   function take(y: number) {
+    land()
     const main = document.querySelector('main')
     if (!main) return
     const kept = new Map<HTMLElement, Block>()
     for (const el of blocksOf(main)) {
-      const box = el.getBoundingClientRect()
-      const far = Math.min(Math.abs(y - Math.min(Math.max(y, box.top), box.bottom)) / (window.innerHeight * REACH), 1)
+      const far = farFrom(el, y)
       let block = blocks.get(el)
       if (block) {
         block.settling?.stop()
@@ -166,6 +177,12 @@ export function useSwipeNav() {
     blocks.clear()
     place = 0
     delete root!.dataset.swiping
+  }
+
+  /** How far, from 0 to 1, a block is from a finger at `y`: REACH of the screen or more is 1. */
+  function farFrom(el: Element, y: number) {
+    const box = el.getBoundingClientRect()
+    return Math.min(Math.abs(y - Math.min(Math.max(y, box.top), box.bottom)) / (window.innerHeight * REACH), 1)
   }
 
   /** Where the page sits for a finger `dx` along: half its pace, or giving at an end. */
@@ -238,18 +255,70 @@ export function useSwipeNav() {
    * page's snapshot is taken with its blocks held where the finger left them,
    * then they go back into place before the new one's is taken.
    * Without a view transition it just goes back once the new page is in.
+   *
+   * Within a section, the new page's snapshot doesn't move (main.css): it's
+   * live, so its blocks come in under it on their own springs, starting
+   * hidden (data-arriving) until the transition has scrolled and measured
+   * them. Its words and plates with no partner on the old page are layers of
+   * their own by then, and come in the same way in CSS.
    */
-  let handing: { cleanUp: () => void } | undefined
+  type Handoff = { cleanUp: () => void; way: 1 | -1; y: number }
+  let handing: Handoff | undefined
+  let arriving: { el: HTMLElement; controls: AnimationPlaybackControls }[] = []
+
+  /** Every arriving block where it belongs, at once. */
+  function land() {
+    for (const { el, controls } of arriving) {
+      controls.stop()
+      el.style.translate = el.style.opacity = ''
+    }
+    arriving = []
+  }
+
+  function arrive({ way, y }: Handoff) {
+    const main = document.querySelector('main')
+    const from = way * ARRIVE * window.innerWidth
+    if (main) {
+      arriving = blocksOf(main).map((el) => {
+        const far = farFrom(el, y)
+        const p = motionValue(0)
+        p.on('change', (now) => {
+          el.style.translate = now < 1 ? `${(1 - now) * from}px 0` : ''
+          el.style.opacity = now < 1 ? String(Math.min(now * 1.6, 1)) : ''
+        })
+        p.jump(0)
+        return { el, controls: animate(p, 1, { type: 'spring', bounce: 0, visualDuration: LAND + 0.15 * far, delay: AFTER + WAIT * far }) }
+      })
+      // Coming in from off the side: nothing there to scroll to either, and
+      // a page that grew wider would cut the view transition short.
+      root!.dataset.swiping = ''
+      const landing = arriving
+      Promise.all(landing.map(({ controls }) => controls)).then(() => {
+        if (arriving !== landing) return
+        arriving = []
+        if (!blocks.size) delete root!.dataset.swiping
+      })
+    }
+    delete root!.dataset.arriving
+  }
 
   nuxtApp.hook('page:view-transition:start', (transition) => {
     const handoff = handing
     if (!handoff) return
     handing = undefined
-    transition.updateCallbackDone.finally(release)
-    transition.finished.finally(handoff.cleanUp)
+    const arrives = transition.types?.has('section-same')
+    transition.updateCallbackDone.finally(() => {
+      release()
+      if (arrives) root!.dataset.arriving = ''
+    })
+    if (arrives) transition.ready.then(() => arrive(handoff), () => {})
+    transition.finished.finally(() => {
+      delete root!.dataset.arriving
+      handoff.cleanUp()
+    })
   })
 
-  function go(to: string, way: 1 | -1, speed: number) {
+  function go(to: string, way: 1 | -1, speed: number, y: number) {
     const cleanUp = () => {
       release()
       root!.style.removeProperty('--swipe-out')
@@ -265,7 +334,7 @@ export function useSwipeNav() {
       const time = Math.min(Math.max((rest / Math.max(speed, 1)) * 1000, 160), 320)
       root!.style.setProperty('--swipe-out', `${Math.round(time)}ms`)
       root!.dataset.swipe = way > 0 ? 'forward' : 'back'
-      handing = { cleanUp }
+      handing = { cleanUp, way, y }
     }
     router.push(localePath(to)).finally(() => {
       // No view transition took it (none in this browser, or the navigation
@@ -290,7 +359,7 @@ export function useSwipeNav() {
       (Math.abs(dx) >= distance() && speed > -FLICK)
       || (Math.abs(dx) >= SLIP && speed > FLICK)
     )
-    if (goes) go(next, way, speed)
+    if (goes) go(next, way, speed, touch.clientY)
     else if (held.follows) settle()
     swipe = undefined
   }
