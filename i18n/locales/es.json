@@ -53,6 +53,9 @@
       "openSite": "Abrir en una pestaña nueva",
       "watch": "Ver en YouTube",
       "expand": "TODO(owner)",
+      "fullscreen": "Pantalla completa",
+      "shrink": "Salir de pantalla completa",
+      "seek": "Posición en el video",
       "lightbox": {
         "close": "TODO(owner)",
         "previous": "TODO(owner)",
