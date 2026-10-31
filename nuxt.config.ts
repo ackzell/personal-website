@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import tlapalliJson from './shiki/tlapalli.json'
 
 // JSON widens `type` to string; Shiki wants to know it's a dark or light theme.
@@ -20,6 +21,11 @@ export default defineNuxtConfig({
         import('./content.config'),
       ])
       writeContentSchemas(config)
+    },
+    // Dev only: every sound in every set, side by side (app/dev/sounds.vue).
+    'pages:extend'(pages) {
+      if (process.env.NODE_ENV === 'production') return
+      pages.push({ name: 'dev-sounds', path: '/dev/sounds', file: fileURLToPath(new URL('./app/dev/sounds.vue', import.meta.url)) })
     },
   },
 

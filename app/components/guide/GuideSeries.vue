@@ -315,6 +315,8 @@ function scrub(event: PointerEvent, row: Row, cells: Cell[]) {
   if (!cell || cell.release.id === reading.value[row.id]?.id) return
   gesture.scrubbed = true
   clearTimeout(gesture.timer)
+  // Heard at its length, as its bar is drawn.
+  haptic('tick', cell.release.duration && cell.release.duration / longest.value)
   stepTo(event.currentTarget as HTMLElement, row, cell)
 }
 

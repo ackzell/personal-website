@@ -76,6 +76,21 @@ function follow(event: PointerEvent) {
   touched.value = index === -1 ? undefined : index
 }
 const letGo = () => (touched.value = undefined)
+
+/*
+ * Each icon is a key with a note of its own; run along them, left to right,
+ * and they play C♯ A C♯ D E G♯, the guitar line that opens In My Life (the
+ * A a sixth above the first C♯). A finger plays each one it reaches (the
+ * same tracking as the wave), a mouse each one it comes over.
+ */
+const NOTES = [277.18, 440, 277.18, 293.66, 329.63, 415.3]
+const strike = (i: number) => soundNote(NOTES[i % NOTES.length]!)
+watch(touched, (i) => {
+  if (i !== undefined) strike(i)
+})
+function enter(event: PointerEvent, i: number) {
+  if (event.pointerType === 'mouse') strike(i)
+}
 </script>
 
 <template>
@@ -92,7 +107,8 @@ const letGo = () => (touched.value = undefined)
          color is kept for the band, where it marks where you are. -->
     <ul class="site-footer__links" flex="~ wrap" p="0" m="-1.5" list="none" @pointerdown="follow" @pointermove="follow"
       @pointerup="letGo" @pointercancel="letGo">
-      <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined">
+      <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined"
+        @pointerenter="enter($event, i)">
         <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label"
           class="text-[1.125rem] text-fg site-footer__land" :style="{ '--i': i }" inline-flex p="1.5">
           <span :class="link.icon" aria-hidden="true" />

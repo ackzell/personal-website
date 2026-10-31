@@ -107,6 +107,7 @@ function rise() {
 async function drop() {
   const el = dialog.value
   if (!el?.open) return
+  sound('close')
   if (docked.value) {
     leaving = true
     drawing?.stop()
@@ -147,10 +148,16 @@ watch(item, async (now) => {
   if (el.open && docked.value) {
     swap(now)
     // Caught on its way out, it comes back with the new pick.
-    if (leaving) rise()
+    if (leaving) {
+      sound('open')
+      rise()
+    } else {
+      sound('step')
+    }
     return
   }
   showing.value = { item: now }
+  sound('open')
   if (el.open) {
     // Caught on its way down, the sheet comes back up from there.
     panel.value?.scrollTo(0, 0)
@@ -223,10 +230,14 @@ function grab(event: PointerEvent) {
 
 // A finger catches the sheet wherever it is, mid-rise or mid-drop.
 let start = 0
+// Whether it's pulled far enough down to go away when let go: the finger
+// feels it get there, and come back short.
+let past = false
 function hold(from: number) {
   moving?.stop()
   holding.value = true
   start = from - y.get()
+  past = y.get() > AWAY_PX
 }
 
 // Down it follows the finger; up it gives a little and no more.
@@ -237,6 +248,9 @@ function pull(event: PointerEvent) {
 function follow(finger: number) {
   const dy = finger - start
   y.set(dy > 0 ? dy : dy / 6)
+  if (dy > AWAY_PX === past) return
+  past = !past
+  haptic(past ? 'detent' : 'undo')
 }
 
 function letGo() {

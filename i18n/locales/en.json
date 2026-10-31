@@ -6,7 +6,8 @@
     "scheme": "Color scheme",
     "schemeSystem": "System",
     "schemeLight": "Light",
-    "schemeDark": "Dark"
+    "schemeDark": "Dark",
+    "sound": "Sound"
   },
   "nav": {
     "label": "Main",

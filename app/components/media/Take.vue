@@ -320,7 +320,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
         </template>
       </div>
 
-      <div class="take__screen">
+      <div class="take__screen" data-stick>
         <div class="media__frame">
           <video ref="video" :poster="poster" :width="width" :height="height" :aria-label="label"
             :controls="!mounted" muted loop playsinline preload="none" @play="playing = true"

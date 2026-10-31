@@ -96,6 +96,8 @@ function jump() {
 async function show(follow: boolean) {
   clearTimeout(hideTimer)
   const moving = shown.value && following.value === follow
+  // Heard coming out, not moving along or switching where it sits.
+  if (!shown.value) sound('peek')
   following.value = follow
   shown.value = true
   await place()

@@ -121,7 +121,11 @@ function showCurrent() {
   measure()
 }
 
-watch(() => route.fullPath, () => nextTick(showCurrent))
+watch(() => route.fullPath, () => {
+  fingered = false
+  passed = -1
+  nextTick(showCurrent)
+})
 // Opening a section mounts its list after the route has changed.
 watch(stopsList, showCurrent, { flush: 'post' })
 
@@ -135,6 +139,31 @@ const { reveal, rippleOrigin } = useSubmenuReveal({
 
 // Mouse users drag the stops sideways, as touch already scrolls them.
 useDragScroll(nav, '.flag-nav__stops')
+
+/*
+ * A finger running the stops sideways feels each one go by, as it passes the
+ * list's start edge (where they snap). Only once a finger has been on the
+ * list: keeping the current page in view (showCurrent) scrolls it too.
+ */
+let fingered = false
+let passed = -1
+useEventListener(stopsList, 'touchstart', () => (fingered = true), { passive: true })
+useEventListener(stopsList, 'scroll', () => {
+  const list = stopsList.value
+  if (!list) return
+  const edge = list.getBoundingClientRect().left
+  const now = [...list.children].filter((item) => {
+    const { left, right } = item.getBoundingClientRect()
+    return (left + right) / 2 < edge
+  }).length
+  if (fingered && passed !== -1 && now !== passed) haptic('tick')
+  passed = now
+}, { passive: true })
+
+// A tap that goes somewhere is felt; the page already shown goes nowhere.
+function tap(to: string) {
+  if (!isPage(to)) haptic('go')
+}
 
 // The band resizes with the window, so whether the stops overflow can change
 // without a scroll.
@@ -181,7 +210,7 @@ onMounted(() => {
              smaller and dimmed until current or hovered.
              The section's own link sits outside the children's scroller, so
              it stays in view however far they scroll. -->
-        <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current"
+        <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current" @click="tap(segment.to)"
           class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
           flex flex-col gap="2" pb="1" min-w="28" decoration="none">
           <span class="flag-nav__field" relative block aria-hidden="true">
@@ -197,7 +226,7 @@ onMounted(() => {
           :style="{ '--children': segment.stops.length - 1 }">
           <li v-for="(stop, i) in segment.stops.slice(1)" :key="stop.key" class="flag-nav__stop" flex="auto" data-child
             :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
-            <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child
+            <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child @click="tap(stop.to)"
               class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
