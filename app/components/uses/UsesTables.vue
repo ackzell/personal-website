@@ -49,12 +49,19 @@ let observer: IntersectionObserver | undefined
 
 onMounted(() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  // The tables on screen when the page arrives draw unfelt; each one scrolled
+  // to draws with a short run under the thumb.
+  let arriving = true
   observer = new IntersectionObserver((entries) => {
+    let drew = false
     for (const entry of entries) {
       if (!entry.isIntersecting) continue
       drawn.add((entry.target as HTMLElement).dataset.slug!)
       observer!.unobserve(entry.target)
+      drew = true
     }
+    if (drew && !arriving) haptic('draw')
+    arriving = false
   }, { rootMargin: '0px 0px -10% 0px' })
   root.value?.querySelectorAll<HTMLElement>(':scope > section').forEach((box) => observer!.observe(box))
   armed.value = true
@@ -90,7 +97,7 @@ onBeforeUnmount(() => observer?.disconnect())
       <!-- A table drawn in type, like a CLI prints one. The frame is aria-hidden glyphs;
            the roles carry the structure for assistive tech. -->
       <div class="box" role="table" :aria-labelledby="`uses-${category.slug}`">
-        <div class="box__group box__head" role="rowgroup">
+        <div class="box__group box__head" role="rowgroup" data-stick>
           <UsesTablesRule :glyphs="rules.top" />
           <div class="box__row" role="row">
             <span class="box__bar box__bar--l" aria-hidden="true" />

@@ -51,6 +51,7 @@ function toggle() {
   const from = shown.value
   const to = next.value
   colorMode.preference = to
+  haptic('toggle')
   if (reduceMotion.value === 'reduce') return
 
   running?.cancel()

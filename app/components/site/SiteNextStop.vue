@@ -32,6 +32,9 @@ const ways = computed(() =>
     return [{ rel, ...stop, folders: stop.to.slice(0, stop.to.lastIndexOf('/') + 1) }]
   }),
 )
+
+// Taken, it's felt and heard as a tap on the flag band is.
+const go = () => haptic('go')
 </script>
 
 <template>
@@ -39,7 +42,7 @@ const ways = computed(() =>
     <div class="next-stop__row">
       <NuxtLinkLocale v-for="way in ways" :key="way.rel" :to="way.to" :rel="way.rel" :data-way="way.rel"
         :data-crossing="way.section !== section || undefined" :style="{ '--field': `var(--field-${way.section})` }"
-        class="stop">
+        class="stop" @click="go">
         <span class="stop__route">
           <span v-if="way.rel === 'prev'" class="stop__arrow i-iconoir-arrow-left" aria-hidden="true" />
           <span class="stop__path">

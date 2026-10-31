@@ -1,5 +1,6 @@
 import { sectionOf, sectionOrder, type Section } from '~/composables/useSection'
 import { changeOrigin } from '~/utils/pageArrival'
+import { sound, soundSlide } from '~/utils/sounds'
 
 /**
  * Tags each page view transition with where it travels along the flag:
@@ -28,8 +29,16 @@ export default defineNuxtPlugin((nuxtApp) => {
   const root = document.documentElement
   let type = 'section-same'
   let target: Section = 'about'
+  // Where the band's marker stood as the navigation began, across the screen
+  // (-1 left to 1 right), so its slide can be heard going from there.
+  let markerFrom: number | undefined
+  const markerAt = () => {
+    const box = document.querySelector('.flag-nav__marker')?.getBoundingClientRect()
+    return box?.width ? ((box.left + box.width / 2) / root.clientWidth) * 2 - 1 : undefined
+  }
 
   router.beforeEach((to, from) => {
+    markerFrom = markerAt()
     target = sectionOf(routeBaseName(to))
     const delta = sectionOrder.indexOf(target) - sectionOrder.indexOf(sectionOf(routeBaseName(from)))
     type = delta > 0 ? 'section-forward' : delta < 0 ? 'section-back' : 'section-same'
@@ -68,11 +77,25 @@ export default defineNuxtPlugin((nuxtApp) => {
     setOffset('new')
   }
 
+  // Once the new page is in, the marker stands where it's sliding to.
+  async function slideMarker(transition: ViewTransition) {
+    const from = markerFrom
+    try {
+      await transition.ready
+    } catch {
+      return
+    }
+    const to = markerAt()
+    if (from !== undefined && to !== undefined && Math.abs(to - from) > 0.01) soundSlide(from, to)
+  }
+
   nuxtApp.hook('page:view-transition:start', (transition) => {
     // ViewTransition.types is missing in browsers without VT types; those get
     // the default crossfade.
     transition.types?.add(type)
     transition.types?.add(`to-${target}`)
+    if (type !== 'section-same') sound(type === 'section-forward' ? 'forward' : 'back')
+    slideMarker(transition)
     if (
       type !== 'section-same' &&
       root.classList.contains('has-tile-wipe') &&

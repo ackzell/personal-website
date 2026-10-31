@@ -96,7 +96,13 @@ const axis = useTemplateRef<HTMLElement>('axis')
 function read(event: PointerEvent) {
   const box = axis.value?.getBoundingClientRect()
   if (!box || event.clientX < box.left || event.clientX > box.right) return (reading.value = null)
-  reading.value = Math.min(columns.value.length - 1, Math.floor(((event.clientX - box.left) / box.width) * columns.value.length))
+  const column = Math.min(columns.value.length - 1, Math.floor(((event.clientX - box.left) / box.width) * columns.value.length))
+  // A finger feels each column it passes, and hears how busy it was.
+  if (touch?.scrubbing && reading.value !== null && column !== reading.value) {
+    const { videos, episodes } = columns.value[column]!
+    haptic('tick', Math.max(weigh(videos), weigh(episodes)) / busiest.value)
+  }
+  reading.value = column
 }
 
 // A finger reads only once it's scrubbing, moving sideways more than down.
@@ -187,7 +193,7 @@ const readout = computed(() => {
       <span v-for="mark in years" :key="mark.year" class="timeline__year" :style="{ insetInlineStart: `${mark.at}%` }">{{ mark.year }}</span>
     </div>
 
-    <p class="timeline__readout" m="0" text="sm muted" aria-hidden="true">
+    <p class="timeline__readout" data-stick m="0" text="sm muted" aria-hidden="true">
       <span class="timeline__line" text="[var(--fg)]">{{ readout.when }}</span>
       <span class="timeline__line">{{ readout.videos ? `${readout.videos} · ${readout.episodes}` : '' }}</span>
     </p>

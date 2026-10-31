@@ -65,6 +65,21 @@ const booting = ref(true)
 const runs = ref(0)
 let scrambling: ReturnType<typeof animate> | undefined
 
+/*
+ * The arrival is heard as it's seen, off the animations themselves: a key as
+ * the cursor reaches it, enter as the cursor leaves the end of the line, and
+ * each row of the log as it prints. Not a later run, for now. Keyframe names
+ * carry the scoped suffix. Without the motion there's nothing to hear.
+ */
+function typing(event: AnimationEvent) {
+  if (event.animationName.startsWith('key-cursor') && !event.pseudoElement) sound('key')
+  else if (event.animationName.startsWith('log-print') && booting.value) sound('print')
+}
+
+function entered(event: AnimationEvent) {
+  if (event.animationName.startsWith('key-cursor') && event.pseudoElement) sound('enter')
+}
+
 function toggleErrata() {
   const from = shownFlag.value
   showErrata.value = !showErrata.value
@@ -154,6 +169,12 @@ useIntersectionObserver(() => log.value && items.value, (records) => {
   const reached = tops.findLast(({ top }) => top <= line) ?? tops[0]
   if (reached) reading.value = reached.repo
 }, { rootMargin: '-33% 0px -66% 0px' })
+
+// Each project reaching the line is felt, as the log is scrolled through:
+// not the first one read, nor the one a tap sends it to.
+watch(reading, (now, was) => {
+  if (now && was && !travelling.value) haptic('commit')
+})
 
 function go(event: MouseEvent, repo?: string) {
   if (!repo || (event.target as HTMLElement).closest('a, button')) return
@@ -284,10 +305,11 @@ const name = (repo: string) => repo.split('/')[1]
 </script>
 
 <template>
-  <div class="contributions" grid gap="block" :data-booting="booting || undefined" :style="{ '--typed': typed }">
+  <div class="contributions" grid gap="block" :data-booting="booting || undefined" :style="{ '--typed': typed }"
+    @animationstart="typing" @animationend="entered">
     <!-- The switch as a command of the log itself and the question it asks: the
          answer picks the flag on the git log below it. -->
-    <div class="errata-switch">
+    <div class="errata-switch" data-stick>
       <SiteMarkLayer clipped />
       <p class="errata-switch__command" m="0" aria-hidden="true">$ <span v-for="(key, c) in command" :key="c"
           class="key" :style="{ '--c': c }">{{ key }}</span> <span class="errata-switch__flag"><span

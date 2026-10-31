@@ -9,6 +9,8 @@ usePageArrival()
 useSwipeNav()
 // Keys: ← and → walk them too.
 useKeyNav()
+// Touch: bars that stick to the top catch with a tick.
+useStickFeel()
 
 const isDev = import.meta.dev
 </script>

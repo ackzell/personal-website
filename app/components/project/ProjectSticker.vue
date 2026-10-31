@@ -40,18 +40,49 @@ useMotionValueEvent(lift, 'change', write('--lift'))
 const spring = (transition: Transition) => reducedMotion.value === 'reduce' ? { duration: 0 } : transition
 const clamp = (value: number) => Math.min(1, Math.max(0, value))
 
+/*
+ * Tilted about under a finger, it gives a grain every GRAIN px the finger
+ * travels, no closer than GAP ms, firmer the further it leans from flat.
+ */
+const GRAIN = 14
+const GAP = 45
+let travel: { x: number, y: number, run: number, at: number } | undefined
+
+function feel(event: PointerEvent, toX: number, toY: number) {
+  if (event.pointerType === 'mouse') return
+  // A finger picking it up feels it come off the page.
+  if (event.type === 'pointerdown') {
+    if (!active.value) haptic('lift')
+    travel = { x: event.clientX, y: event.clientY, run: 0, at: event.timeStamp }
+    return
+  }
+  if (!travel) return
+  travel.run += Math.hypot(event.clientX - travel.x, event.clientY - travel.y)
+  travel.x = event.clientX
+  travel.y = event.clientY
+  if (travel.run < GRAIN || event.timeStamp - travel.at < GAP) return
+  travel.run = 0
+  travel.at = event.timeStamp
+  // 0 flat in the middle, 1 at a corner.
+  haptic('tilt', Math.min(Math.hypot(toX - 0.5, toY - 0.5) * 2, 1))
+}
+
 function tilt(event: PointerEvent) {
   const el = root.value
   if (!el) return
   const box = el.getBoundingClientRect()
-  animate(x, clamp((event.clientX - box.left) / box.width), spring(FOLLOW))
-  animate(y, clamp((event.clientY - box.top) / box.height), spring(FOLLOW))
+  const toX = clamp((event.clientX - box.left) / box.width)
+  const toY = clamp((event.clientY - box.top) / box.height)
+  feel(event, toX, toY)
+  animate(x, toX, spring(FOLLOW))
+  animate(y, toY, spring(FOLLOW))
   if (!active.value) animate(lift, LIFTED, spring(LIFT))
   active.value = true
 }
 
 function rest() {
   active.value = false
+  travel = undefined
   animate(x, 0.5, spring(ROCK))
   animate(y, 0.5, spring(ROCK))
   animate(lift, 1, spring(LIFT))

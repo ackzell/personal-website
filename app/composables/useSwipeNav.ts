@@ -141,8 +141,11 @@ export function useSwipeNav() {
   let start: { x: number; y: number } | undefined
   /** The finger's last move, and its speed sideways then (px/s). */
   let last = { x: 0, time: 0, speed: 0 }
-  /** Once the move is clearly sideways; `follows` when the page moves with it. */
-  let swipe: { follows: boolean } | undefined
+  /**
+   * Once the move is clearly sideways; `follows` when the page moves with it,
+   * `past` while it's far enough along that letting go would go.
+   */
+  let swipe: { follows: boolean; past: boolean } | undefined
 
   function settle() {
     const settling = blocks
@@ -189,12 +192,27 @@ export function useSwipeNav() {
         start = undefined
         return
       }
-      swipe = { follows: reducedMotion.value !== 'reduce' }
+      swipe = { follows: reducedMotion.value !== 'reduce', past: false }
       if (swipe.follows) take(touch.clientY)
     }
     // A swipe, not a scroll: the page holds still the other way.
     if (event.cancelable) event.preventDefault()
     if (swipe.follows) moveTo(placeFor(dx))
+    feel(dx)
+  }
+
+  /*
+   * The finger feels the point where letting go goes, as it gets there and
+   * as it comes back short. At an end there's nowhere to go: getting as far
+   * is a knock against it instead.
+   */
+  function feel(dx: number) {
+    const past = Math.abs(dx) >= distance()
+    if (!swipe || past === swipe.past) return
+    swipe.past = past
+    const goes = !!at(dx < 0 ? 1 : -1)
+    if (past) haptic(goes ? 'detent' : 'edge')
+    else if (goes) haptic('undo')
   }
 
   /*

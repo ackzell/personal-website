@@ -23,11 +23,15 @@ useResizeObserver(header, () => {
 
 <template>
   <!-- The stage color behind it, so the page scrolls under, not through. -->
-  <header ref="header" class="site-header" sticky z="10" bg="bg" flex="~ wrap" items="center" gap="y-group x-6"
+  <header ref="header" class="site-header" data-stick sticky z="10" bg="bg" flex="~ wrap" items="center" gap="y-group x-6"
     px="track-wide" pt="3" pb="2 sm:4" border="none">
     <SiteMarkLayer clipped />
     <NuxtLinkLocale to="/" class="text-fg" typeset="code" decoration="none">{{ $t('site.name') }}</NuxtLinkLocale>
-    <SiteLocaleSwitch ml="auto" />
+    <!-- The settings, as attributes in a row. -->
+    <div ml="auto" flex items="baseline" gap="4">
+      <SiteSoundSwitch />
+      <SiteLocaleSwitch />
+    </div>
     <!-- Its own row: the band spans the wide track, fields edge to edge.
          Less padding under it on small screens: the links' tap height
          already leaves room below the labels. -->

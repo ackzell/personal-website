@@ -171,6 +171,10 @@ function placeLight(jump = false) {
     lightOn.value = true
   }
   const down = top >= lightTop.get()
+  // Felt and heard as it goes, fuller the farther it has to: on a scroll, a
+  // tap, a key. Not while the band is scrubbed (it ticks for itself).
+  const travel = Math.abs(top - lightTop.get()) / (band.value?.offsetHeight || 1)
+  if (travel && !scrubbed.value) haptic('role', travel)
   animate(lightTop, top, spring(down ? TRAIL : LEAD))
   animate(lightBottom, bottom, spring(down ? LEAD : TRAIL))
 }
@@ -251,7 +255,8 @@ function scrubMove(event: PointerEvent) {
   const share = Math.min(Math.max((y - field.offsetTop) / field.offsetHeight, 0), 1)
 
   if (scrubbed.value !== role.slug) {
-    if (scrubbed.value) navigator.vibrate?.(4)
+    // Heard at its length: a long role rings lower than a short one.
+    if (scrubbed.value) haptic('tick', role.months / Math.max(...props.roles.map((role) => role.months)))
     scrubbed.value = role.slug
   }
 
@@ -314,7 +319,7 @@ function blur(slug: string) {
 
 <template>
   <div class="experience" :style="{ '--heading-height': `${headingHeight}px` }">
-    <h2 id="timeline-heading" ref="heading" class="experience__heading running-head" m="0" py="group" bg="bg">
+    <h2 id="timeline-heading" ref="heading" class="experience__heading running-head" data-stick m="0" py="group" bg="bg">
       <SiteMarkLayer clipped />{{ title }}
     </h2>
 

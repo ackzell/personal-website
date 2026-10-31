@@ -142,6 +142,7 @@ function go(step: number) {
   switches.value++
   const total = props.items.length
   index.value = (index.value + step + total) % total
+  sound('step')
 }
 
 /** Jumps to the one at `i`, from the strip. */
@@ -151,6 +152,7 @@ function jump(i: number) {
   stepping.value = true
   switches.value++
   index.value = i
+  sound('step')
 }
 
 // The strip's line is placed under the one showing, and travels from there.
@@ -223,6 +225,7 @@ async function closeOut(i: number) {
   const el = dialog.value
   if (!el) return
   closing.value = true
+  sound('close')
   // It leaves from where it is, zoomed or dragged: noted, set back to fit at
   // once, and flown from there.
   const held = media.value?.getBoundingClientRect()
@@ -253,6 +256,7 @@ watch(index, async (now, before) => {
   empty(now)
   if (before === null) {
     stepping.value = false
+    sound('open')
     el.showModal()
     await nextTick()
     fly(now, 'in')
@@ -298,6 +302,14 @@ let press: { x: number, y: number, panX: number, panY: number, moved: boolean, b
 // Not zoomed, a drag takes the picture with it: sideways to step, up or down
 // to put it away. The way is settled by its first few pixels.
 let drag: 'side' | 'away' | undefined
+// Whether the drag is far enough along that letting go would act: the finger
+// feels it get there, and come back short.
+let past = false
+function reach(now: boolean) {
+  if (now === past) return
+  past = now
+  haptic(now ? 'detent' : 'undo')
+}
 // The pointer's speed in px/ms, from its last move.
 let speed = { x: 0, y: 0 }
 let lastMove: { x: number, y: number, at: number } | undefined
@@ -324,6 +336,7 @@ function onPointerdown(event: PointerEvent) {
     // Captured, every later event targets the view: note now what was pressed.
     press = { x: event.clientX, y: event.clientY, panX: x.value, panY: y.value, moved: false, beside: event.target === view.value }
     drag = undefined
+    past = false
     speed = { x: 0, y: 0 }
     lastMove = { x: event.clientX, y: event.clientY, at: event.timeStamp }
   }
@@ -357,6 +370,7 @@ function onPointermove(event: PointerEvent) {
   drag ??= Math.abs(dy) > Math.abs(dx) ? 'away' : 'side'
   if (drag === 'side') {
     x.value = dx
+    reach(Math.abs(dx) > SWIPE_PX)
     return
   }
   // Away: it trails the pointer, and shrinks as the dark lifts.
@@ -365,6 +379,7 @@ function onPointermove(event: PointerEvent) {
   y.value = dy
   scale.value = 1 - far * 0.25
   dragged.value = far
+  reach(Math.abs(dy) > AWAY_PX)
 }
 
 function onPointerup(event: PointerEvent) {
