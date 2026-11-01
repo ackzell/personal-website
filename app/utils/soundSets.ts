@@ -15,7 +15,7 @@ export type SoundKind =
   | 'tick' | 'detent' | 'undo' | 'edge' | 'toggle' | 'go' | 'lift'
   | 'role' | 'draw' | 'type' | 'key' | 'enter' | 'print' | 'forward' | 'back'
   | 'open' | 'close' | 'line' | 'erase' | 'swap' | 'peek' | 'point' | 'on' | 'off'
-  | 'ink' | 'cross' | 'glow'
+  | 'ink' | 'angle' | 'cross' | 'glow' | 'part'
 
 /*
  * Each kind, plus the set's voice for a single note at any pitch, for what
@@ -292,8 +292,10 @@ const modular: SoundSet = {
   on: [...ping(0, 330, 0.05), ...ping(0.06, 440, 0.08, 0.1, 0.2)],
   off: [...ping(0, 440, 0.05), ...ping(0.06, 330, 0.08)],
   ink: [noise(0, { f: 300, f2: 900, glide: 1.1, q: 6, a: 0.5, d: 0.6, peak: 0.03 })],
+  angle: [noise(0, { f: 400, f2: 1000, glide: 0.35, q: 6, a: 0.35, d: 0.35, peak: 0.02 })],
   cross: ping(0, 880, 0.02, 0.04),
   glow: [tone(0, 110, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.04 })],
+  part: ping(0, 660, 0.3, 0.015),
 }
 
 /*
@@ -321,6 +323,65 @@ const HUM = 120
 const LIGHT_HUM = 100
 const SLIDER_HUM = 180
 const GLOW_HUM = 110
+
+/* A pen stroke of the landing mark heard as a small hum on `f`: a sine with
+   a triangle a hair sharp, swelling to the stroke's middle, where the pen is
+   quickest, and fading through its end, a little past it. */
+const hum = (f: number, seconds: number): Spec => [
+  tone(0, f, { a: seconds / 2, d: seconds / 2 + 0.15, peak: 0.018 }),
+  tone(0, f * 1.004, { a: seconds / 2, d: seconds / 2 + 0.15, wave: 'triangle', peak: 0.005 }),
+]
+
+/** The landing mark's ring: each half inking in, and how long the bottom one waits after the top (HomeIntro.vue). */
+/* A pen stroke of the landing mark heard as a felt tip on paper around `f`:
+   a soft, low brush that never brightens (a rising, filtered hiss reads as
+   chalk on a board), swelling to the stroke's middle, where the pen is
+   quickest, and fading through its end. */
+const marker = (f: number, seconds: number): Spec => [
+  noise(0, { filter: 'lowpass', f, q: 0.7, a: seconds / 2, d: seconds / 2 + 0.1, peak: 0.02 }),
+]
+
+/* A pen stroke of the landing mark heard as a pencil on paper: graphite's
+   soft dry hiss around `f` (high, but steady: it never brightens, which read
+   as chalk), a little of the pressure under it, and the paper's tooth, a
+   fine grain of tiny catches, thickest where the pencil is quickest. Under
+   the same swell as the others. The grain is seeded, so a stroke is drawn
+   the same each time and rendered once. */
+const pencil = (f: number, seconds: number, seed: number): Spec => {
+  const swell = { a: seconds / 2, d: seconds / 2 + 0.08 }
+  const random = seeded(seed)
+  const grains = Math.round(seconds * 50)
+  const tooth = Array.from({ length: grains }, (_, i) => {
+    const at = (i + random()) / grains * seconds
+    const speed = Math.sin(Math.PI * at / seconds)
+    return noise(at, { f: f * (0.7 + random() * 0.8), q: 3, d: 0.003, peak: 0.007 * speed * (0.5 + random() * 0.5) })
+  })
+  return [
+    noise(0, { f, q: 0.9, ...swell, peak: 0.007 }),
+    noise(0, { filter: 'lowpass', f: 500, q: 0.7, ...swell, peak: 0.005 }),
+    ...tooth,
+  ]
+}
+
+const seeded = (seed: number) => () => {
+  seed = (seed + 0x6D2B79F5) | 0
+  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+  return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+}
+
+/* Which the mark's strokes are heard as, while they're tried. */
+const PEN: 'hum' | 'marker' | 'pencil' = 'pencil'
+const stroke = (hz: number, f: number, seconds: number, seed: number) =>
+  PEN === 'hum' ? hum(hz, seconds) : PEN === 'marker' ? marker(f, seconds) : pencil(f * 7, seconds, seed)
+
+export const INK_SECONDS = 1.2
+export const INK_STAGGER = 0.35
+/** The A's angle, up one leg and down the other, in one stroke (HomeIntro.vue). */
+export const ANGLE = 0.7
+
+/** The intro's lines easing over as the text parts (HomeIntro.vue's --centered). */
+const PART = 0.6
 
 const panel: SoundSet = {
   note: (hz) => [...relay(0, 0.04), beep(0, hz, 0.12, 0.06)],
@@ -468,16 +529,21 @@ const panel: SoundSet = {
     : noise(at, { f: 1100 + Math.random() * 700, q: 4, d: 0.004 + Math.random() * 0.002, peak: 0.028 * loud }), CLOCK),
   on: [beep(0, 1000, 0.05), beep(0.08, 2000, 0.06)],
   off: [beep(0, 2000, 0.05), beep(0.08, 1000, 0.06)],
-  // The mark drawing itself in on the landing page (HomeIntro.vue). Its
-  // ring's two halves inked at once (1.2s, eased in and out): a soft brush
-  // of pen on paper for each, brightening a little as it goes, swelling
-  // as the pens speed up mid-way, and heard travelling the way each half
-  // is drawn: the top left to right, the bottom right to left. A hair
-  // apart in color, so the two are heard as two and not one in the middle.
-  ink: () => [
-    { spec: [noise(0, { f: 700, f2: 1100, glide: 1.1, q: 1.5, a: 0.5, d: 0.6, peak: 0.015 })], pan: -0.5, travel: { to: 0.5, seconds: 1.2 } },
-    { spec: [noise(0, { f: 620, f2: 980, glide: 1.1, q: 1.5, a: 0.5, d: 0.6, peak: 0.015 })], pan: 0.5, travel: { to: -0.5, seconds: 1.2 } },
-  ],
+  // The mark drawing itself in on the landing page (HomeIntro.vue). Each
+  // of its ring's two halves inked (1.2s, eased in and out; the bottom one
+  // INK_STAGGER after the top, sized 1): a pen stroke (stroke, above),
+  // swelling as the pen speeds up mid-way and fading as it slows into the
+  // gap, and heard travelling a little the way the half is drawn: the top
+  // left to right, the bottom right to left. The two a little apart, as
+  // hums on two notes of the glow's A, as markers one a touch duller.
+  ink: (half = 0) => {
+    const [hz, f, from] = half < 0.5 ? [GLOW_HUM * 2, 480, -0.25] : [GLOW_HUM * 4 / 3, 380, 0.25]
+    return [{ spec: stroke(hz, f, INK_SECONDS, half < 0.5 ? 1 : 2), pan: from, travel: { to: -from, seconds: INK_SECONDS } }]
+  },
+  // The A's angle drawn in one stroke (0.7s, eased in and out): the pen
+  // again, swelling to the apex and fading down the other leg, moving a
+  // little left to right with it; as a hum, a fifth above the glow's.
+  angle: [{ spec: stroke(GLOW_HUM * 1.5, 430, ANGLE, 3), pan: -0.2, travel: { to: 0.2, seconds: ANGLE } }],
   // The stroke across passing over the A's right leg: a nib's small dry
   // tick, with a touch of body under it.
   cross: [
@@ -490,6 +556,15 @@ const panel: SoundSet = {
   glow: [
     tone(0, GLOW_HUM, { a: 0.375, d: 1.125, peak: 0.03 }),
     tone(0, GLOW_HUM * 1.004, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.009 }),
+  ],
+  // The intro's text parting around the ring as the page scrolls it up
+  // into the mark (the lines easing over, 600ms): the hairline's two sines
+  // (line, above), one centered sound that comes apart, the low one going
+  // left and the high one right, as the text opens round the mark. Its
+  // closing again above it is left quiet.
+  part: () => [
+    { spec: [tone(0, 200, { a: 0.2, d: 0.4, peak: 0.003 })], pan: 0, travel: { to: -0.3, seconds: PART } },
+    { spec: [tone(0, 500, { a: 0.2, d: 0.4, peak: 0.002 })], pan: 0, travel: { to: 0.3, seconds: PART } },
   ],
 }
 
@@ -550,8 +625,10 @@ const film: SoundSet = {
   on: [...glass(0, 440, 0.1, 0.05, 0.4), ...glass(0.08, 660, 0.2, 0.05, 0.4)],
   off: [...glass(0, 660, 0.1, 0.05, 0.4), ...glass(0.08, 330, 0.2, 0.05, 0.4)],
   ink: [air(0, 1200, 3000, 1.1, 0.03)],
+  angle: [air(0, 1500, 3500, 0.7, 0.02)],
   cross: glass(0, 1320, 0.03, 0.015, 0.2),
   glow: [tone(0, 220, { a: 0.375, d: 1.125, peak: 0.03, send: 0.4 })],
+  part: glass(0, 1320, 0.3, 0.01, 0.4),
 }
 
 export const SOUND_SETS = { modular, panel, film }

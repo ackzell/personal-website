@@ -2,6 +2,7 @@
 import { layout, layoutNextLine, prepareWithSegments } from '@chenglou/pretext'
 import type { LayoutCursor, PreparedTextWithSegments } from '@chenglou/pretext'
 import { animate, frame, mapValue, motionValue, svgEffect, type AnimationPlaybackControls } from 'motion-v'
+import { ANGLE, INK_SECONDS, INK_STAGGER } from '~/utils/soundSets'
 
 /*
  * The landing intro: the whole ax mark, set apart above the name and the
@@ -46,6 +47,9 @@ let pool: HTMLSpanElement[] = []
 let lastTop = Number.NaN
 let lastWidth = Number.NaN
 let pending = 0
+let parted = false
+let lastParting = Number.NEGATIVE_INFINITY
+const PARTING_GAP = 300
 
 type Placed = {
   block: Block
@@ -162,7 +166,17 @@ function flow(force = false) {
   // Each line only knows how far it would move; the layer eases one shared
   // amount (--centered), so flipping back and forth mid-move reverses
   // smoothly and lines rewrapping on scroll never fly across.
-  layer.classList.toggle('is-centered', placed.some(p => p.split))
+  const split = placed.some(p => p.split)
+  // Heard as the text parts, when scrolling does it (a relayout or the
+  // first lay-out stays quiet; closing again is too); a scroll that flips
+  // it back and forth on the edge is heard once.
+  if (split !== parted) {
+    parted = split
+    const now = performance.now()
+    if (split && !force && now - lastParting > PARTING_GAP) sound('part')
+    lastParting = now
+  }
+  layer.classList.toggle('is-centered', split)
 
   for (const [i, p] of placed.entries()) {
     // Each line sits in a holder of no height that takes its place, so a
@@ -231,6 +245,12 @@ function glow(glyph: SVGSVGElement) {
   })
 }
 
+// Each arc of the ring inks in INK seconds, the bottom one STAGGER after the
+// top: shared with the ink sound, which follows each (utils/soundSets).
+const INK = INK_SECONDS
+const STAGGER = INK_STAGGER
+const INKING: [number, number, number, number] = [0.45, 0, 0.15, 1]
+
 // How far along the stroke across it passes over the A's right leg.
 const CROSSING = 0.53
 
@@ -238,42 +258,53 @@ function drawIn() {
   const glyph = mark.value?.querySelector('svg')
   if (!glyph) return
   const current = ++run
-  const ring = motionValue(0)
+  // The top arc, then the bottom one a beat after it, so the two are seen,
+  // and heard, as two strokes rather than one.
+  const top = motionValue(0)
+  const bottom = motionValue(0)
   // One stroke over both legs: the left one draws through the first half.
   const angle = motionValue(0)
   const cross = motionValue(0)
   const rock = motionValue(0)
   effects = [
-    svgEffect(glyph.querySelectorAll('.glyph-pen-ring'), { pathLength: ring }),
+    ...[top, bottom].map((half, i) => svgEffect(glyph.querySelectorAll('.glyph-pen-ring')[i]!, { pathLength: half })),
     svgEffect(glyph.querySelector('.glyph-pen-left')!, { pathLength: mapValue(angle, [0, 0.5], [0, 1]) }),
     svgEffect(glyph.querySelector('.glyph-pen-right')!, { pathLength: mapValue(angle, [0.5, 1], [0, 1]) }),
     svgEffect(glyph.querySelector('.glyph-pen-cross')!, { pathLength: cross }),
     svgEffect(glyph.querySelector('.glyph-a')!, { rotate: rock }),
   ]
   frame.render(() => live.value = true)
-  // Heard on the drawing's own frames: the ring's halves as they set off,
-  // and a tick as the stroke across passes over the A's right leg (a little
+  // Heard on the drawing's own frames: each of the ring's halves and the
+  // A's angle as they set off, and a tick as the stroke across passes over the A's right leg (a little
   // past half way along it).
-  const inked = ring.on('change', () => {
-    inked()
-    sound('ink')
+  const inked = [top, bottom].map((half, i) => {
+    const off = half.on('change', () => {
+      off()
+      sound('ink', i)
+    })
+    return off
+  })
+  const angled = angle.on('change', () => {
+    angled()
+    sound('angle')
   })
   const crossed = cross.on('change', (now) => {
     if (now < CROSSING) return
     crossed()
     sound('cross')
   })
-  effects.push(inked, crossed)
+  effects.push(...inked, angled, crossed)
   entrance = [
     // A gentle start and a long glide into the gaps.
-    animate(ring, 1, { delay: 0.15, duration: 1.2, ease: [0.45, 0, 0.15, 1] }),
-    animate(angle, 1, { delay: 0.95, duration: 0.7, ease: [0.65, 0, 0.35, 1] }),
-    animate(cross, 1, { delay: 1.6, duration: 0.3, ease: [0.22, 1, 0.36, 1] }),
+    animate(top, 1, { delay: 0.15, duration: INK, ease: INKING }),
+    animate(bottom, 1, { delay: 0.15 + STAGGER, duration: INK, ease: INKING }),
+    animate(angle, 1, { delay: 0.95 + STAGGER, duration: ANGLE, ease: [0.65, 0, 0.35, 1] }),
+    animate(cross, 1, { delay: 1.6 + STAGGER, duration: 0.3, ease: [0.22, 1, 0.36, 1] }),
   ]
   // Tipped quickly as the flick reaches the tip, then let go on a spring that
   // rocks it past upright once and settles; it picks up whatever speed the
   // tip still has. (A spring from 0 to 0 with a kick alone doesn't run.)
-  const tip = animate(rock, 1, { delay: 1.75, duration: 0.14, ease: [0.22, 1, 0.36, 1] })
+  const tip = animate(rock, 1, { delay: 1.75 + STAGGER, duration: 0.14, ease: [0.22, 1, 0.36, 1] })
   entrance.push(tip)
   tip.then(() => {
     if (current !== run) return

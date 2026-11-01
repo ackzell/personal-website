@@ -32,9 +32,11 @@ import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, typ
  * - peek: a tooltip coming out.
  * - point: the pointer (or keyboard focus) lighting another item in a graph.
  * - on / off: sound itself switched (the switch is heard, not muted).
- * - ink / cross / glow: the mark drawing itself in on the landing page:
- *   its ring's two halves inked, the stroke across passing over the A, and
- *   the glow once it's still.
+ * - ink / angle / cross / glow: the mark drawing itself in on the landing
+ *   page: its ring's two halves inked, the A's angle drawn, the stroke
+ *   across passing over the A, and the glow once it's still.
+ * - part: the landing intro's text parting around the mark as it scrolls
+ *   up into it (closing again is quiet).
  * And the language switch, heard as the page's text turning over like a
  * departures board as it scrambles (soundBoard), and the color scheme's
  * word as a flip clock on a desk (soundClock); and a picture or clip
