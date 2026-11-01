@@ -87,14 +87,16 @@ export function isHapticClick(event: Event) {
 // Every moment that's felt is heard too, on any screen (utils/sounds.ts),
 // but these: the sticker's tilt, which has no sound yet, a bar sticking and
 // a project in the log reaching the line, too much to hear on every scroll;
-// and the language and color scheme, heard as their text turning over
-// instead (plugins/locale-scramble.client.ts, SiteSchemeSwitch.vue).
-const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'language', 'scheme'])
+// a uses table drawing in, heard as it types and prints instead
+// (UsesTables.vue); and the language and color scheme, heard as their text
+// turning over instead (plugins/locale-scramble.client.ts,
+// SiteSchemeSwitch.vue).
+const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'draw', 'language', 'scheme'])
 
 // `size` is what a scrub's tick passed over (0 to 1).
 export function haptic(kind: Haptic, size?: number) {
   if (!import.meta.client) return
   const input = KINDS[kind]
   instance()?.trigger(typeof input === 'function' ? input(size) : input)
-  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'language' | 'scheme'>, size)
+  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'draw' | 'language' | 'scheme'>, size)
 }

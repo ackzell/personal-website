@@ -29,8 +29,18 @@ const prompt = 'ackzell=> '
 const select = 'SELECT * FROM uses\nWHERE category = '
 const indent = ' '.repeat(prompt.length)
 const query = (category: UsesCategory) => `${select}'${category.name}';`
-// How long the typing takes, so the table waits for it.
-const typed = (category: UsesCategory) => ({ '--typed': `${query(category).length * 22 + 240}ms` })
+// Every query types at once and quickly, the longest in TYPING ms (the
+// others at the same pace, done sooner), then a breath before enter: all
+// the tables print together from then, so nobody waits on a show.
+const TYPING = 450
+const PAUSE = 120
+const longest = computed(() => Math.max(...props.categories.map((category) => query(category).length)))
+const timing = computed(() => ({
+  '--key': `${TYPING / longest.value}ms`,
+  '--pause': `${PAUSE}ms`,
+  '--typed': `${TYPING + PAUSE}ms`,
+  '--row-step': `${STEP}ms`,
+}))
 // Highlighted as an editor would: the names (*, the table, the column) a
 // shade apart from the keywords, and the string literal as a value.
 const names = new Set([...select.matchAll(/\*|uses|category/g)].flatMap((match) => [...match[0]].map((_, i) => match.index + i)))
@@ -47,6 +57,24 @@ const drawn = reactive(new Set<string>())
 const root = useTemplateRef<HTMLElement>('root')
 let observer: IntersectionObserver | undefined
 
+/*
+ * Heard in two parts, each one sound for every table drawing together: the
+ * typing, a short run of keys as they start, then the tables drawing, held
+ * for as long as the longest one's rules take (its top rule and a rule per
+ * row), set off by the first top rule to start. Keyframe names carry the
+ * scoped suffix.
+ */
+const STEP = 70
+let pending = 0
+
+function heard(event: AnimationEvent) {
+  if (event.pseudoElement || !pending || !event.animationName.startsWith('uses-rule')) return
+  const rule = event.target as HTMLElement
+  if (!rule.parentElement?.classList.contains('box__head') || rule.previousElementSibling) return
+  soundTable(pending, STEP / 1000)
+  pending = 0
+}
+
 onMounted(() => {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
   // The tables on screen when the page arrives draw unfelt; each one scrolled
@@ -56,11 +84,17 @@ onMounted(() => {
     let drew = false
     for (const entry of entries) {
       if (!entry.isIntersecting) continue
-      drawn.add((entry.target as HTMLElement).dataset.slug!)
+      const slug = (entry.target as HTMLElement).dataset.slug!
+      drawn.add(slug)
       observer!.unobserve(entry.target)
       drew = true
+      const rows = props.categories.find((category) => category.slug === slug)?.tools.length ?? 0
+      pending = Math.max(pending, rows + 2)
     }
-    if (drew && !arriving) haptic('draw')
+    if (drew) {
+      sound('type')
+      if (!arriving) haptic('draw')
+    }
     arriving = false
   }, { rootMargin: '0px 0px -10% 0px' })
   root.value?.querySelectorAll<HTMLElement>(':scope > section').forEach((box) => observer!.observe(box))
@@ -71,10 +105,13 @@ onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
-  <div ref="root" class="uses" :class="{ 'is-armed': armed }" :style="widths" data-own-entrance>
+  <div
+    ref="root" class="uses" :class="{ 'is-armed': armed }" :style="{ ...widths, ...timing }" data-own-entrance
+    @animationstart="heard"
+  >
     <section
       v-for="category in categories" :key="category.slug" :aria-labelledby="`uses-${category.slug}`"
-      :class="{ 'is-drawn': drawn.has(category.slug) }" :data-slug="category.slug" :style="typed(category)"
+      :class="{ 'is-drawn': drawn.has(category.slug) }" :data-slug="category.slug"
     >
       <!-- The query is typed a character at a time, so it is hidden from assistive tech;
            the category name alone labels the table. -->
@@ -354,8 +391,8 @@ onBeforeUnmount(() => observer?.disconnect())
 
 .is-armed .query__char::before {
   color: var(--fg);
-  animation: uses-caret 22ms step-end paused;
-  animation-delay: calc((var(--c) - 1) * 22ms);
+  animation: uses-caret var(--key) step-end paused;
+  animation-delay: calc((var(--c) - 1) * var(--key));
 }
 
 .is-armed .query__caret {
@@ -365,7 +402,7 @@ onBeforeUnmount(() => observer?.disconnect())
 .is-armed .query__caret::before {
   animation: uses-blink 1060ms step-end 3 paused;
   /* Right as the last character lands. */
-  animation-delay: calc(var(--typed) - 240ms);
+  animation-delay: calc(var(--typed) - var(--pause));
 }
 
 /* Armed, each query waits unwritten; in view, it is typed, and then its
@@ -375,14 +412,14 @@ onBeforeUnmount(() => observer?.disconnect())
   /* step-start: shown as its turn begins. Waiting on the end left late
      characters hidden, the finish landing a float short of it. */
   animation: uses-type 1ms step-start both paused;
-  animation-delay: calc(var(--c) * 22ms);
+  animation-delay: calc(var(--c) * var(--key));
 }
 
 .is-armed .box :deep(.box__rule),
 .is-armed .box__bar,
 .is-armed .box__cell,
 .is-armed .query__count {
-  --delay: calc(var(--typed) + var(--step, 0) * 110ms);
+  --delay: calc(var(--typed) + var(--step, 0) * var(--row-step));
   animation-duration: 380ms;
   animation-timing-function: var(--ease-out);
   animation-fill-mode: both;
