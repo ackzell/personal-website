@@ -209,6 +209,8 @@ function relayout() {
 const live = ref(false)
 let effects: VoidFunction[] = []
 let entrance: AnimationPlaybackControls[] = []
+// Which drawing is current, so a stopped one's follow-ups never run into the next.
+let run = 0
 
 /* A tight halo and a wide one, sized to the mark so a small one on a phone
    glows as much as a large one; `strength` 0 is none. */
@@ -229,9 +231,13 @@ function glow(glyph: SVGSVGElement) {
   })
 }
 
+// How far along the stroke across it passes over the A's right leg.
+const CROSSING = 0.53
+
 function drawIn() {
   const glyph = mark.value?.querySelector('svg')
   if (!glyph) return
+  const current = ++run
   const ring = motionValue(0)
   // One stroke over both legs: the left one draws through the first half.
   const angle = motionValue(0)
@@ -245,6 +251,19 @@ function drawIn() {
     svgEffect(glyph.querySelector('.glyph-a')!, { rotate: rock }),
   ]
   frame.render(() => live.value = true)
+  // Heard on the drawing's own frames: the ring's halves as they set off,
+  // and a tick as the stroke across passes over the A's right leg (a little
+  // past half way along it).
+  const inked = ring.on('change', () => {
+    inked()
+    sound('ink')
+  })
+  const crossed = cross.on('change', (now) => {
+    if (now < CROSSING) return
+    crossed()
+    sound('cross')
+  })
+  effects.push(inked, crossed)
   entrance = [
     // A gentle start and a long glide into the gaps.
     animate(ring, 1, { delay: 0.15, duration: 1.2, ease: [0.45, 0, 0.15, 1] }),
@@ -257,13 +276,14 @@ function drawIn() {
   const tip = animate(rock, 1, { delay: 1.75, duration: 0.14, ease: [0.22, 1, 0.36, 1] })
   entrance.push(tip)
   tip.then(() => {
-    if (!entrance.length) return
+    if (current !== run) return
     const settle = animate(rock, 0, { type: 'spring', bounce: 0.2, visualDuration: 0.5, velocity: rock.getVelocity() })
     entrance.push(settle)
     // Once it's still, it glows: a halo in its own color blooms and fades,
     // and the mark is left flat, with no filter on it.
     settle.then(() => {
-      if (!entrance.length) return
+      if (current !== run) return
+      sound('glow')
       const glowing = glow(glyph)
       entrance.push(glowing)
       glowing.then(() => glyph.style.removeProperty('filter'))
@@ -271,7 +291,28 @@ function drawIn() {
   })
 }
 
+function stopEntrance() {
+  for (const stop of effects) stop()
+  for (const animation of entrance) animation.stop()
+  effects = []
+  entrance = []
+  run++
+}
+
+/* Sound switched on: if the mark is on screen, it draws itself in again from
+   nothing, so the press is answered by the mark's own sound. */
+function replay() {
+  const glyph = mark.value?.querySelector('svg')
+  if (!glyph || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+  const { top, bottom } = glyph.getBoundingClientRect()
+  if (bottom <= 0 || top >= window.innerHeight) return
+  stopEntrance()
+  glyph.style.removeProperty('filter')
+  drawIn()
+}
+
 useEventListener(window, 'scroll', schedule, { passive: true })
+onMounted(() => onBeforeUnmount(onSoundOn(replay)))
 useResizeObserver(root, relayout)
 watch(() => [props.title, props.text], relayout)
 
@@ -287,9 +328,7 @@ onMounted(async () => {
 
 onBeforeUnmount(() => {
   cancelAnimationFrame(pending)
-  for (const stop of effects) stop()
-  for (const animation of entrance) animation.stop()
-  entrance = []
+  stopEntrance()
 })
 </script>
 
