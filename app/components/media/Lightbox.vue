@@ -143,7 +143,7 @@ function go(step: number) {
   const total = props.items.length
   index.value = (index.value + step + total) % total
   // Its line sweeps the way the strip goes: left to the next, right back.
-  soundScan(forward.value ? 'left' : 'right', 0.05)
+  soundScan(forward.value ? 'left' : 'right', 0.02)
 }
 
 /** Jumps to the one at `i`, from the strip. */
@@ -153,7 +153,7 @@ function jump(i: number) {
   stepping.value = true
   switches.value++
   index.value = i
-  soundScan(forward.value ? 'left' : 'right', 0.05)
+  soundScan(forward.value ? 'left' : 'right', 0.02)
 }
 
 // The strip's line is placed under the one showing, and travels from there.
