@@ -64,16 +64,18 @@ const typed = command.length + 1 + shownFlag.value.length
 const booting = ref(true)
 const runs = ref(0)
 let scrambling: ReturnType<typeof animate> | undefined
+const flagText = useTemplateRef<HTMLElement>('flagText')
 
 /*
  * The arrival is heard as it's seen, off the animations themselves: a key as
  * the cursor reaches it, enter as the cursor leaves the end of the line, and
- * each row of the log as it prints. Not a later run, for now. Keyframe names
- * carry the scoped suffix. Without the motion there's nothing to hear.
+ * each row of the log as it prints, on arrival and on every run after.
+ * Keyframe names carry the scoped suffix. Without the motion there's nothing
+ * to hear.
  */
 function typing(event: AnimationEvent) {
   if (event.animationName.startsWith('key-cursor') && !event.pseudoElement) sound('key')
-  else if (event.animationName.startsWith('log-print') && booting.value) sound('print')
+  else if (event.animationName.startsWith('log-print')) sound('print')
 }
 
 function entered(event: AnimationEvent) {
@@ -92,8 +94,22 @@ function toggleErrata() {
   printedTo.value = reducedMotion.value === 'reduce' ? Infinity : -1
   if (reducedMotion.value === 'reduce') {
     shownFlag.value = to
+    sound('toggle')
     return
   }
+
+  // A run is entered, as the arrival's was, and its flag turns over like the
+  // locale switch's text: a one-row departures board on the scramble's own
+  // timing, leaning a little toward the flag. The rows print heard (typing).
+  sound('enter')
+  const rect = flagText.value?.getBoundingClientRect()
+  soundBoard([{
+    at: 0,
+    chars: Math.max(from.length, to.length),
+    step: 1 / 40,
+    settle: 0.3,
+    pan: rect ? ((rect.left + rect.right) / window.innerWidth - 1) * 0.5 : 0,
+  }])
 
   scrambling?.cancel()
   const proxy = document.createElement('span')
@@ -326,7 +342,7 @@ const name = (repo: string) => repo.split('/')[1]
     <div class="errata-switch" data-stick>
       <SiteMarkLayer clipped />
       <p class="errata-switch__command" m="0" aria-hidden="true">$ <span v-for="(key, c) in command" :key="c"
-          class="key" :style="{ '--c': c }">{{ key }}</span> <span class="errata-switch__flag"><span
+          class="key" :style="{ '--c': c }">{{ key }}</span> <span ref="flagText" class="errata-switch__flag"><span
             v-for="(key, c) in shownFlag" :key="c" class="key" :style="{ '--c': command.length + 1 + c }">{{ key
             }}</span></span></p>
       <p class="errata-switch__prompt" m="0" role="group" :aria-label="t('contributions.prompt', { count: errataCount })">
