@@ -377,7 +377,8 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   .take__screen {
     order: -1;
     position: sticky;
-    top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
+    /* Under the band, and the section row where a page has one (SiteSectionIndex). */
+    top: calc(var(--header-height, 0px) - var(--header-tuck, 0px) + var(--section-index-height, 0px));
     z-index: 1;
     padding-block-end: var(--space-2);
     background: var(--bg);

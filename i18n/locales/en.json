@@ -7,7 +7,8 @@
     "schemeSystem": "System",
     "schemeLight": "Light",
     "schemeDark": "Dark",
-    "sound": "Sound"
+    "sound": "Sound",
+    "sectionIndex": "On this page"
   },
   "nav": {
     "label": "Main",
@@ -16,6 +17,7 @@
     "media": "Content"
   },
   "home": {
+    "bio": "About me",
     "title": "Axel Martínez",
     "intro": "Senior Frontend Engineer with 11+ years building scalable web applications and leading technical innovation. JS and TypeScript specialist with proven experience in large-scale application architecture, successful technology migrations across multiple organizations, and cross-functional team participation, particularly in remote-first environments. Passionate about emerging technologies, software development tooling, and knowledge sharing through content creation and mentoring.",
     "featured": "Currently working on",
@@ -30,6 +32,11 @@
     "related": "Related projects",
     "parts": "In this project",
     "alsoIn": "Also in {word}",
+    "index": {
+      "overview": "Overview",
+      "details": "Details",
+      "story": "Story"
+    },
     "status": {
       "shipped": "Shipped",
       "active": "Active",

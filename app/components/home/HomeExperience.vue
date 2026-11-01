@@ -4,8 +4,9 @@ import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackCon
 /**
  * Experience as a band of fields, like the flag band in the header but
  * standing up: one field per role, newest on top, each as tall as the time
- * spent there. The heading sticks under the header, and the band sticks under
- * the heading, beside the roles as they scroll by.
+ * spent there. The band sticks under the header (and the page's section row,
+ * SiteSectionIndex, where it shows), beside the roles as they scroll by. The
+ * heading is for assistive tech: the section index names the section.
  *
  * The field of the role being read lights up: the one holding focus,
  * otherwise the one passing the upper part of the viewport. The other roles
@@ -16,7 +17,7 @@ import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackCon
  * part of the way forward.
  *
  * Roles and fields are both links to the role: following one brings the role
- * to the top, under the heading. The band can also be scrubbed: run a finger
+ * to the top, under the header. The band can also be scrubbed: run a finger
  * (or drag the pointer) along it and the page reads the career at that pace.
  *
  * Awards and certifications are footnotes to the role held when they were
@@ -52,7 +53,6 @@ const earned = computed(() => {
   return byRole
 })
 
-const heading = useTemplateRef<HTMLElement>('heading')
 const band = useTemplateRef<HTMLElement>('band')
 const entries = useTemplateRef<HTMLElement[]>('entries')
 
@@ -63,8 +63,6 @@ const scrubbed = ref<string>()
 const lit = computed(() => focused.value ?? scrubbed.value ?? reading.value)
 // pending: hidden, waiting to scroll in. drawn: fields grown to full.
 const state = ref<'drawn' | 'pending'>('drawn')
-
-const { height: headingHeight } = useElementSize(heading, undefined, { box: 'border-box' })
 
 const lastYear = computed(() => props.roles[0]?.end.slice(0, 4))
 const firstYear = computed(() => props.roles.at(-1)?.start.slice(0, 4))
@@ -183,7 +181,7 @@ watch(lit, () => placeLight())
 // The band takes what height the viewport leaves it: the light follows at once.
 useResizeObserver(band, () => lightOn.value && placeLight(true))
 
-/* Bring a role to the top, just under the sticky heading (its scroll margin),
+/* Bring a role to the top, just under the header (the page's scroll padding),
    and keep the hash so the role can be linked to. */
 function go(event: MouseEvent, slug: string) {
   if (bring(slug)) event.preventDefault()
@@ -318,10 +316,8 @@ function blur(slug: string) {
 </script>
 
 <template>
-  <div class="experience" :style="{ '--heading-height': `${headingHeight}px` }">
-    <h2 id="timeline-heading" ref="heading" class="experience__heading running-head" data-stick m="0" py="group" bg="bg">
-      <SiteMarkLayer clipped />{{ title }}
-    </h2>
+  <div class="experience">
+    <h2 id="timeline-heading" class="sr-only">{{ title }}</h2>
 
     <div class="experience__body" grid gap="x-block" mb-60>
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
@@ -432,29 +428,22 @@ function blur(slug: string) {
   }
 }
 
-/* The heading carries the stage color so roles scroll under it, as they do
-   under the header. */
-.experience__heading {
-  position: sticky;
-  top: var(--stick-top);
-  /* Over the rail too, which scrolls up under it once the section runs out. */
-  z-index: 2;
-}
-
 .experience__body {
   grid-template-columns: auto minmax(0, 1fr);
 }
 
-/* The rail sticks just under the heading and fills what's left of the
-   viewport above the footer, up to a comfortable reading height. */
+/* The rail sticks a group's space under the header (and the section row,
+   where it shows) and fills what's left of the viewport above the footer,
+   up to a comfortable reading height. */
 .experience__rail {
   position: sticky;
   /* Sticky makes it a stacking context: lifted, the scrub readout in it
      shows over the roles. */
   z-index: 1;
-  top: calc(var(--stick-top) + var(--heading-height, 0px));
+  --rail-top: calc(var(--stick-top) + var(--section-index-height, 0px) + var(--gap-group));
+  top: var(--rail-top);
   align-self: start;
-  block-size: min(32rem, calc(100svh - var(--stick-top) - var(--heading-height, 0px) - var(--footer-height, 0px) - var(--gap-block)));
+  block-size: min(32rem, calc(100svh - var(--rail-top) - var(--footer-height, 0px) - var(--gap-block)));
 }
 
 /* Built like the flag band, bars with the stage showing between them, set
@@ -559,10 +548,11 @@ function blur(slug: string) {
 }
 
 .experience__entry {
-  scroll-margin-top: var(--heading-height, 0px);
+  /* A role brought to the top lands level with the rail's sticky line. */
+  scroll-margin-top: var(--gap-group);
   transition: opacity 250ms var(--ease-out);
   /* Keeps the company link's z-index inside its entry, so it scrolls under
-     the sticky heading like the rest of the role. */
+     the header like the rest of the role. */
   isolation: isolate;
 }
 

@@ -29,6 +29,21 @@ const TALL = 0.4
 /** Component entrances that the arrival stands in for during a page change. */
 const ENTRANCES = new Set(['vt-develop', 'vt-lift', 'vt-rise', 'vt-fade-in'])
 
+/*
+ * A block marked `data-arrives-itself` keeps its own entrance instead (the
+ * section index's names, one after another): it isn't moved, and its
+ * entrances replay from the start on the block's beat, given to it as
+ * --arrive-delay for its CSS to start from.
+ */
+function replay(el: HTMLElement, delay: number) {
+  el.style.setProperty('--arrive-delay', `${Math.round(delay * 1000)}ms`)
+  for (const animation of el.getAnimations({ subtree: true })) {
+    if (!(animation instanceof CSSAnimation) || !ENTRANCES.has(animation.animationName)) continue
+    animation.currentTime = 0
+    animation.play()
+  }
+}
+
 export type Point = { x: number; y: number }
 
 /**
@@ -159,9 +174,13 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
   const dy = way ? 0 : LIFT
   const names: string[] = []
 
-  arriving = blocksOf(main).map((el) => {
+  arriving = blocksOf(main).flatMap((el) => {
     const far = Math.min((tiles ? frontDistance(el, from, way) : distanceTo(el, from, true)) / farthest, 1)
     const delay = tiles ? TILE_RUN * TILE_FRONT * far : AFTER + WAIT * far
+    if (el.hasAttribute('data-arrives-itself')) {
+      replay(el, delay)
+      return []
+    }
     for (const animation of el.getAnimations({ subtree: true })) {
       if (animation instanceof CSSAnimation && ENTRANCES.has(animation.animationName)) animation.finish()
     }
@@ -176,7 +195,7 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
       el.style.opacity = now < 1 ? String(Math.min(now * 1.6, 1)) : ''
     })
     p.jump(0)
-    return { el, controls: animate(p, 1, { type: 'spring', bounce: 0, visualDuration: LAND + 0.15 * far, delay }) }
+    return [{ el, controls: animate(p, 1, { type: 'spring', bounce: 0, visualDuration: LAND + 0.15 * far, delay }) }]
   })
 
   if (wordDelays) {
