@@ -464,7 +464,7 @@ function onClose() {
         {{ t('projects.media.lightbox.counter', { index: (index ?? 0) + 1, total: items.length }) }}
       </span>
       <div v-if="items.length > 1" ref="strip" class="lightbox__strip">
-        <button v-for="(item, i) in items" ref="thumbs" :key="item.src" type="button" class="lightbox__thumb"
+        <button v-for="(item, i) in items" ref="thumbs" :key="item.src" type="button" class="lightbox__thumb" data-press="sink"
           :aria-label="item.alt" :aria-current="i === showing || undefined" @click="jump(i)">
           <img :src="item.thumb ?? item.poster ?? item.src" alt="" :width="item.width" :height="item.height"
             loading="lazy" decoding="async" draggable="false">
@@ -473,34 +473,34 @@ function onClose() {
       </div>
       <div class="lightbox__controls">
         <span class="lightbox__zoom" :class="{ 'is-shown': zoomed }" aria-hidden="true">{{ scale.toFixed(1) }}×</span>
-        <button v-if="isClip" type="button" class="lightbox__button"
+        <button v-if="isClip" type="button" data-press="key" class="lightbox__button"
           :aria-label="playing ? t('projects.media.pause') : t('projects.media.play')" @click="togglePlay">
           <span :class="playing ? 'i-iconoir-pause-solid' : 'i-iconoir-play-solid'" aria-hidden="true" />
         </button>
-        <button type="button" class="lightbox__button" :aria-label="t('projects.media.lightbox.zoomOut')"
+        <button type="button" data-press="key" class="lightbox__button" :aria-label="t('projects.media.lightbox.zoomOut')"
           :disabled="!zoomed" @click="zoomTo(scale / STEP)">
           <span class="i-iconoir-zoom-out" aria-hidden="true" />
         </button>
-        <button type="button" class="lightbox__button" :aria-label="t('projects.media.lightbox.fit')"
+        <button type="button" data-press="key" class="lightbox__button" :aria-label="t('projects.media.lightbox.fit')"
           :disabled="!zoomed" @click="fit">
           <span class="i-iconoir-collapse" aria-hidden="true" />
         </button>
-        <button type="button" class="lightbox__button" :aria-label="t('projects.media.lightbox.zoomIn')"
+        <button type="button" data-press="key" class="lightbox__button" :aria-label="t('projects.media.lightbox.zoomIn')"
           :disabled="scale >= MAX" @click="zoomTo(scale * STEP)">
           <span class="i-iconoir-zoom-in" aria-hidden="true" />
         </button>
-        <button type="button" class="lightbox__button" :aria-label="t('projects.media.lightbox.close')" autofocus
+        <button type="button" data-press="key" class="lightbox__button" :aria-label="t('projects.media.lightbox.close')" autofocus
           @click="index = null">
           <span class="i-iconoir-xmark" aria-hidden="true" />
         </button>
       </div>
     </div>
 
-    <button type="button" class="lightbox__button lightbox__step lightbox__step--back"
+    <button type="button" data-press="key" class="lightbox__button lightbox__step lightbox__step--back"
       :aria-label="t('projects.media.lightbox.previous')" @click="go(-1)">
       <span class="i-iconoir-nav-arrow-left" aria-hidden="true" />
     </button>
-    <button type="button" class="lightbox__button lightbox__step lightbox__step--next"
+    <button type="button" data-press="key" class="lightbox__button lightbox__step lightbox__step--next"
       :aria-label="t('projects.media.lightbox.next')" @click="go(1)">
       <span class="i-iconoir-nav-arrow-right" aria-hidden="true" />
     </button>

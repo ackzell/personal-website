@@ -328,7 +328,7 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
           <div class="sheet__grab" @pointerdown="grab" @pointermove="pull" @pointerup="letGo" @pointercancel="letGo">
             <span class="sheet__handle" aria-hidden="true" />
             <slot name="head" :item="showing.item" />
-            <button type="button" class="sheet__close" :aria-label="t('projects.media.lightbox.close')"
+            <button type="button" class="sheet__close" data-press="key" :aria-label="t('projects.media.lightbox.close')"
               @click="item = null">
               <span class="i-iconoir-xmark" aria-hidden="true" />
             </button>
@@ -431,15 +431,6 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
   block-size: 2.75rem;
   font-size: 1.25rem;
   cursor: pointer;
-}
-
-.sheet__close {
-  transition: opacity 0.25s var(--ease-out);
-}
-
-.sheet__close:active {
-  opacity: 0.55;
-  transition-duration: 0s;
 }
 
 .sheet__close:focus-visible {

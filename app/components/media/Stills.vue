@@ -94,7 +94,7 @@ function show(event: MouseEvent, i: number) {
 <template>
   <ul ref="sheet" class="stills track-wide" :aria-label="label" :data-power="power">
     <li v-for="(item, i) in items" :key="item.src" :style="{ '--i': i }">
-      <a ref="links" :href="full(item.src)" class="stills__link" @click="show($event, i)" @pointermove="lean"
+      <a ref="links" :href="full(item.src)" class="stills__link" data-press="none" @click="show($event, i)" @pointermove="lean"
         @pointerdown="lean" @pointerleave="settle" @pointercancel="settle">
         <img :src="full(item.src)" :srcset="srcset(item.src)" :sizes="SIZES" :alt="item.alt" :width="width"
           :height="height" loading="lazy" decoding="async" :data-scheme="item.light ? 'dark' : undefined">

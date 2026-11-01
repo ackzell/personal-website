@@ -773,6 +773,45 @@ a {
   outline-offset: 2px;
 }
 
+/*
+ * Press: everything you can press answers the moment it's pressed, with no
+ * easing in, and eases back over a quarter second as it's let go. Three
+ * weights, set with data-press on the element:
+ *   (none)  words: they dim.
+ *   key     small controls, an icon or a word in a box: they dim and give
+ *           a little under the finger.
+ *   sink    pictures (thumbnails): they sink and darken, as a print would.
+ *   none    has its own answer (the flag nav's marker, the stills' lean).
+ * filter: opacity() rather than opacity, so a control already resting
+ * dimmed (the switches, the section index) dims from where it is, and no
+ * component's own opacity is overwritten. All in :where(), at zero
+ * specificity, so any component rule wins.
+ */
+:where(a, button, summary, [role='button'], [role='tab']):where(:not([data-press='none'])) {
+  transition: filter 0.25s var(--ease-out), scale 0.25s var(--ease-out);
+}
+
+:where(a, button, summary, [role='button'], [role='tab']):where(:active:not([data-press='none'], :disabled, [aria-disabled='true'])) {
+  filter: opacity(0.55);
+  transition-duration: 0s;
+}
+
+:where([data-press='key']):where(:active:not(:disabled)) {
+  filter: opacity(0.6);
+  scale: 0.92;
+}
+
+:where([data-press='sink']):where(:active:not(:disabled)) {
+  filter: brightness(0.8);
+  scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where([data-press]):where(:active) {
+    scale: none;
+  }
+}
+
 .site {
   display: flex;
   flex-direction: column;

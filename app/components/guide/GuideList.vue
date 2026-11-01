@@ -76,7 +76,7 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
       <motion.li v-for="(item, i) in shown" :key="item.number" layout="position" :transition="glide(i)"
         :initial="{ opacity: 0, y: 16 }" :animate="{ opacity: 1, y: 0, transition: rise(i) }"
         :exit="{ opacity: 0, transition: FADE }">
-        <a :href="item.release.url" class="list__item" @click="emit('pick', $event, item)">
+        <a :href="item.release.url" class="list__item" data-press="none" @click="emit('pick', $event, item)">
           <img v-if="row.kind === 'playlist'" class="list__thumb" :src="still(item.release.id)" alt="" width="160"
             height="90" loading="lazy" @load="arrived" @error="arrived">
           <span class="list__title">{{ item.release.title }}</span>
@@ -91,7 +91,7 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
       </button>
     </p>
     <p m="0" text="sm">
-      <NuxtLinkLocale v-if="row.project" :to="`/projects/${row.project}`" class="list__project">{{ row.project }}
+      <NuxtLinkLocale v-if="row.project" :to="`/projects/${row.project}`" class="list__project" data-press="key">{{ row.project }}
       </NuxtLinkLocale>
       <a :href="row.url">{{ t(row.kind === 'podcast' ? 'media.guide.openPodcast' : 'media.guide.openPlaylist') }}
         ↗</a>
@@ -237,14 +237,10 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   text-underline-offset: 0.2em;
 }
 
-/* A press answers the moment the finger lands: the still sinks a little and
-   dims, the words dim, and they come back as it lifts. */
+/* The row is one link, but its parts answer the press apart (main.css has
+   the rest): the still sinks and dims as a print would, the words dim. */
 .list__thumb,
-.list__title,
-.list__orders button,
-.list__more,
-.list__project,
-.list > p:last-child a {
+.list__title {
   transition: scale 0.25s var(--ease-out), filter 0.25s var(--ease-out), opacity 0.25s var(--ease-out);
 }
 
@@ -254,11 +250,7 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   transition-duration: 0s;
 }
 
-.list__item:active .list__title,
-.list__orders button:active,
-.list__more:active,
-.list__project:active,
-.list > p:last-child a:active {
+.list__item:active .list__title {
   opacity: 0.55;
   transition-duration: 0s;
 }

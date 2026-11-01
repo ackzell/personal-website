@@ -539,7 +539,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
             @contextmenu="lastPointer !== 'mouse' && $event.preventDefault()"
             :class="{ 'guide__strip--bars': bars, 'guide__strip--wrap': row.kind === 'playlist' }"
             :style="{ '--cells': cells.length, 'inline-size': width }" :aria-hidden="big || undefined">
-            <a v-for="(cell, i) in cells" :key="cell.release.id" class="guide__cell"
+            <a v-for="(cell, i) in cells" :key="cell.release.id" class="guide__cell" data-press="sink"
               :class="{ 'guide__cell--on': reading[row.id]?.id === cell.release.id }" :href="cell.release.url"
               :aria-label="cell.label" :tabindex="big ? -1 : undefined"
               :style="{ height: cell.height, '--min': cell.minutes, '--shade': cell.shade, '--i': i }"
@@ -1147,15 +1147,6 @@ onBeforeUnmount(() => arrivals?.disconnect())
   display: inline-flex;
   gap: 0.4ch;
   align-items: center;
-}
-
-.guide__sheet-out {
-  transition: opacity 0.25s var(--ease-out);
-}
-
-.guide__sheet-out:active {
-  opacity: 0.55;
-  transition-duration: 0s;
 }
 
 .guide__sheet-out:focus-visible {
