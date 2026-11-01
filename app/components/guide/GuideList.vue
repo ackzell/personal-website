@@ -138,6 +138,18 @@ const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
   text-underline-offset: 0.25em;
 }
 
+/* all: unset clears the site's press (main.css) with it, so it's put back: they dim while pressed. */
+.list__orders button,
+.list__more {
+  transition: filter 0.25s var(--ease-out);
+}
+
+.list__orders button:active,
+.list__more:active {
+  filter: opacity(0.55);
+  transition-duration: 0s;
+}
+
 .list__orders button {
   color: var(--muted);
 }

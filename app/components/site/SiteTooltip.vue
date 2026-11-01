@@ -204,6 +204,17 @@ onBeforeUnmount(() => {
   text-underline-offset: 0.2em;
 }
 
+/* all: unset clears the site's press (main.css) with it, so it's put back: the word dims while pressed (a tap opens its tip on touch).
+   Not the pointer-only kind, an invisible patch over a band. */
+.site-tooltip__name:not([data-pointer-only]) {
+  transition: filter 0.25s var(--ease-out);
+}
+
+.site-tooltip__name:not([data-pointer-only]):active {
+  filter: opacity(0.55);
+  transition-duration: 0s;
+}
+
 .site-tooltip__name[data-pointer-only] {
   position: absolute;
   inset: -6px;
