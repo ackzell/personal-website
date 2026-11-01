@@ -90,7 +90,7 @@ function toggle() {
 <template>
   <!-- The quotes and property name are decoration; the button reads as what
        it does and where it stands. -->
-  <div ref="root" class="scheme-switch">
+  <div ref="root" class="scheme-switch" data-keeps-panel>
     <!-- Only shown where it leaves the footer bar (phones), so the mark
          carries across its own background too. -->
     <SiteMarkLayer clipped class="scheme-switch__mark" />

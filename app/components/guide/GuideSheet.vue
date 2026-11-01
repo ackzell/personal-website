@@ -20,8 +20,8 @@ import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackCon
  * with nothing darkened, so the guide stays in use beside it (holding still)
  * and another pick takes its place. It carries its own copy of the mark, so
  * the stage reads on under it.
- * Escape, the close button or a click anywhere else put it away; it isn't
- * dragged.
+ * Escape, the close button or a click anywhere else (bar the site's scheme
+ * and sound switches) put it away; it isn't dragged.
  */
 const props = defineProps<{ label?: string, tall?: boolean, dock?: boolean }>()
 const item = defineModel<T | null>('item', { required: true })
@@ -205,9 +205,15 @@ useEventListener('keydown', (event: KeyboardEvent) => {
 // and only a click that changed nothing puts the panel away. What the panel
 // held is noted on the click's way down, and looked at again once it has
 // come back up, by when what was clicked has run and Vue has caught up.
+// The site's own settings (the scheme, sound: [data-keeps-panel]) change
+// nothing in it, so an episode or clip plays on through them.
 let before: T | null = null
 useEventListener('click', (event: MouseEvent) => {
-  before = docked.value && event.button === 0 && !dialog.value?.contains(event.target as Node) ? item.value : null
+  const target = event.target as Element
+  before = docked.value && event.button === 0 && !dialog.value?.contains(target)
+    && !target.closest?.('[data-keeps-panel]')
+    ? item.value
+    : null
 }, { capture: true })
 useEventListener('click', () => {
   if (before !== null && docked.value && item.value === before) item.value = null
