@@ -23,8 +23,8 @@
  * instead (MediaVideo), played in the same window, paused when it's left;
  * it stays out of the lightbox, which can't zoom a player. Picking a name swaps the clip inside the same window: the
  * clips share one cell, so the window keeps the size of the tallest and never
- * jumps. Only the picked clip plays. The new one wipes in from the side the
- * list moved toward, over the old one sinking back, behind a line of light,
+ * jumps. Only the picked clip plays. The new one wipes in the way the list
+ * moved, over the old one sinking back, behind a line of light,
  * so even two near-identical frames read as a change. The list is a tablist:
  * arrows move through it, Home and End jump to its ends. The window switches
  * on the first time it's seen, and the rows fill in after it. A clip opens
@@ -68,8 +68,8 @@ function pick(index: number) {
   leaving.value = active.value
   active.value = index
   switches.value++
-  // Its line sweeps up to a name further down the list, down to one above.
-  soundScan(forward.value ? 'up' : 'down')
+  // Its line sweeps down to a name further down the list, up to one above.
+  soundScan(forward.value ? 'down' : 'up', 0.05)
   clearTimeout(settle)
   settle = setTimeout(() => (leaving.value = null), SWITCH_MS)
 }
@@ -172,8 +172,7 @@ watch(showing, (now, before) => {
   <div class="palette track-wide" :class="{ 'palette--live': mounted }" :data-power="power">
     <div v-if="mounted" ref="list" class="palette__list" role="tablist"
       :data-fade-start="!arrivedState.left || undefined" :data-fade-end="!arrivedState.right || undefined"
-      aria-orientation="vertical" :aria-label="label"
-      @keydown="onKeydown">
+      aria-orientation="vertical" :aria-label="label" @keydown="onKeydown">
       <span v-if="mark" class="palette__mark" :class="{ 'is-placed': marked }" :style="{ ...mark, '--i': active }"
         :data-dir="forward ? 'forward' : 'back'" aria-hidden="true" />
       <button v-for="(item, i) in items" :id="`${uid}-tab-${i}`" ref="tabs" :key="item.id" type="button" role="tab"
@@ -193,8 +192,8 @@ watch(showing, (now, before) => {
         <MediaVideo v-if="item.video" :src="item.video" :title="item.label" :inactive="mounted && i !== active">
           <template v-if="item.caption" #default>{{ item.caption }}</template>
         </MediaVideo>
-        <MediaClip v-else :src="src(item, 'mp4')" :webm="src(item, 'webm')" :poster="src(item, 'webp')" :label="item.label"
-          :width="width" :height="height" :youtube="item.youtube"
+        <MediaClip v-else :src="src(item, 'mp4')" :webm="src(item, 'webm')" :poster="src(item, 'webp')"
+          :label="item.label" :width="width" :height="height" :youtube="item.youtube"
           :inactive="mounted && (i !== active || expanded !== null)" expandable class="media--window"
           @expand="expanded = clips.indexOf(i)">
           <template v-if="item.caption" #default>{{ item.caption }}</template>
@@ -285,19 +284,20 @@ watch(showing, (now, before) => {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* The new clip wipes in from the side the list moved toward: down the list,
-     it comes up from below; back up, down from above. Past the edges, so the
+
+  /* The new clip wipes in the way the list moved: down the list, it comes
+     down from above; back up, up from below. Past the edges, so the
      window's shadow comes with it. */
   .is-entering {
     animation: 450ms var(--ease-out) both palette-wipe;
   }
 
   [data-dir='forward'] .is-entering {
-    --wipe-from: inset(100% -3rem -3rem);
+    --wipe-from: inset(-3rem -3rem 100%);
   }
 
   [data-dir='back'] .is-entering {
-    --wipe-from: inset(-3rem -3rem 100%);
+    --wipe-from: inset(100% -3rem -3rem);
   }
 
   /* The line on the wipe's edge: the scan box is the stage's size, pushed
@@ -333,19 +333,19 @@ watch(showing, (now, before) => {
   }
 
   [data-dir='forward'] .palette__scan {
-    --scan-from: 0 100%;
-  }
-
-  [data-dir='forward'] .palette__scan::before {
-    inset-block-start: 0;
-  }
-
-  [data-dir='back'] .palette__scan {
     --scan-from: 0 -100%;
   }
 
-  [data-dir='back'] .palette__scan::before {
+  [data-dir='forward'] .palette__scan::before {
     inset-block-end: 0;
+  }
+
+  [data-dir='back'] .palette__scan {
+    --scan-from: 0 100%;
+  }
+
+  [data-dir='back'] .palette__scan::before {
+    inset-block-start: 0;
   }
 
   /* The old one sinks back and dims under it. */
@@ -441,6 +441,7 @@ watch(showing, (now, before) => {
   from {
     clip-path: var(--wipe-from);
   }
+
   to {
     clip-path: inset(-3rem);
   }
@@ -450,9 +451,11 @@ watch(showing, (now, before) => {
   from {
     translate: var(--scan-from);
   }
+
   80% {
     opacity: 1;
   }
+
   to {
     translate: 0 0;
     opacity: 0;

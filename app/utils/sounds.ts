@@ -272,9 +272,16 @@ export function soundClock(row: FlapRow, light: number) {
   play(SOUND_SETS[soundSet()].clock(row, light), 'clock')
 }
 
-/** A picture or clip sweeping in behind its line of light (the media palette, the lightbox), the line going `way`. */
-export function soundScan(way: ScanWay) {
+/**
+ * A picture or clip sweeping in behind its line of light (the media palette,
+ * the lightbox), the line going `way`, at `loud` of its set's level.
+ */
+export function soundScan(way: ScanWay, loud = 1) {
   if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
   if (import.meta.dev) set({ muted: !soundIsOn() })
-  play(SOUND_SETS[soundSet()].scan(way), 'scan')
+  const score = SOUND_SETS[soundSet()].scan(way)
+  play(loud === 1 ? score : score.map(part => ({
+    ...part,
+    spec: part.spec.map(layer => ({ ...layer, peak: layer.peak * loud })),
+  })), 'scan')
 }

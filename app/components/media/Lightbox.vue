@@ -143,7 +143,7 @@ function go(step: number) {
   const total = props.items.length
   index.value = (index.value + step + total) % total
   // Its line sweeps the way the strip goes: left to the next, right back.
-  soundScan(forward.value ? 'left' : 'right')
+  soundScan(forward.value ? 'left' : 'right', 0.05)
 }
 
 /** Jumps to the one at `i`, from the strip. */
@@ -153,7 +153,7 @@ function jump(i: number) {
   stepping.value = true
   switches.value++
   index.value = i
-  soundScan(forward.value ? 'left' : 'right')
+  soundScan(forward.value ? 'left' : 'right', 0.05)
 }
 
 // The strip's line is placed under the one showing, and travels from there.
@@ -180,7 +180,7 @@ watch(showing, (now) => {
 function togglePlay() {
   const clip = media.value
   if (!(clip instanceof HTMLVideoElement)) return
-  if (clip.paused) clip.play().catch(() => {})
+  if (clip.paused) clip.play().catch(() => { })
   else clip.pause()
 }
 
@@ -226,7 +226,6 @@ async function closeOut(i: number) {
   const el = dialog.value
   if (!el) return
   closing.value = true
-  sound('close')
   // It leaves from where it is, zoomed or dragged: noted, set back to fit at
   // once, and flown from there.
   const held = media.value?.getBoundingClientRect()
@@ -435,9 +434,10 @@ function onClose() {
 </script>
 
 <template>
-  <dialog ref="dialog" class="lightbox" :class="{ 'is-idle': idle, 'is-closing': closing, 'is-dragging': holding && dragged > 0 }"
-    :style="{ '--dragged': dragged }" :aria-label="current?.alt"
-    @close="onClose" @cancel.prevent="index = null" @keydown="onKeydown" @pointermove="wake" @pointerdown="wake">
+  <dialog ref="dialog" class="lightbox"
+    :class="{ 'is-idle': idle, 'is-closing': closing, 'is-dragging': holding && dragged > 0 }"
+    :style="{ '--dragged': dragged }" :aria-label="current?.alt" @close="onClose" @cancel.prevent="index = null"
+    @keydown="onKeydown" @pointermove="wake" @pointerdown="wake">
     <div ref="view" class="lightbox__view" :class="{ 'is-zoomed': zoomed, 'is-holding': holding }"
       :data-dir="forward ? 'forward' : 'back'" @wheel.prevent="onWheel" @pointerdown="onPointerdown"
       @pointermove="onPointermove" @pointerup="onPointerup" @pointercancel="onPointerup">
@@ -451,7 +451,8 @@ function onClose() {
             <source :src="current.src" type="video/mp4">
           </video>
           <img v-else ref="media" class="lightbox__media" :src="current.src" :alt="current.alt" :width="current.width"
-            :height="current.height" draggable="false" :style="{ '--ratio': ratio, 'translate': `${x}px ${y}px`, scale }">
+            :height="current.height" draggable="false"
+            :style="{ '--ratio': ratio, 'translate': `${x}px ${y}px`, scale }">
         </div>
       </Transition>
       <span v-if="stepping && current" :key="switches" class="lightbox__scan" :style="{ '--ratio': ratio }"
@@ -609,10 +610,8 @@ function onClose() {
    follows the capture's own rounded, transparent corners. */
 .lightbox__media,
 .lightbox__scan {
-  inline-size: min(
-    calc(100vw - 2 * var(--lightbox-gutter)),
-    calc((100dvh - var(--lightbox-bar) - var(--space-6)) * var(--ratio))
-  );
+  inline-size: min(calc(100vw - 2 * var(--lightbox-gutter)),
+      calc((100dvh - var(--lightbox-bar) - var(--space-6)) * var(--ratio)));
 }
 
 .lightbox__media {
@@ -723,7 +722,7 @@ function onClose() {
 
 /* Wide enough, the strip stands in for the count, which stays for screen
    readers. */
-@media (width >= 40rem) {
+@media (width >=40rem) {
   .lightbox__strip {
     display: flex;
   }
@@ -794,6 +793,7 @@ function onClose() {
 }
 
 @media (prefers-reduced-motion: no-preference) {
+
   /* A step: the next one wipes in from the side it came from, past its
      edges so its shadow comes with it, and the last one sinks back under
      it (MediaPalette's swap, sideways). */
@@ -858,6 +858,7 @@ function onClose() {
   from {
     clip-path: var(--wipe-from);
   }
+
   to {
     clip-path: inset(-3rem);
   }
@@ -874,9 +875,11 @@ function onClose() {
   from {
     translate: var(--scan-from);
   }
+
   80% {
     opacity: 1;
   }
+
   to {
     translate: 0 0;
     opacity: 0;
@@ -905,6 +908,7 @@ function onClose() {
 /* Reduced motion: no flight and no line; a step still hands over, in
    place. */
 @media (prefers-reduced-motion: reduce) {
+
   .lightbox,
   .lightbox__bar,
   .lightbox__media,
