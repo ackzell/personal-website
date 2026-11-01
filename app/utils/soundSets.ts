@@ -14,7 +14,7 @@ import type { Layer, NoiseLayer, Spec, ToneLayer } from '@foleyjs/core'
 export type SoundKind =
   | 'tick' | 'detent' | 'undo' | 'edge' | 'toggle' | 'go' | 'lift'
   | 'role' | 'draw' | 'type' | 'key' | 'enter' | 'print' | 'forward' | 'back'
-  | 'open' | 'close' | 'line' | 'erase' | 'swap' | 'peek' | 'point' | 'on' | 'off'
+  | 'open' | 'reveal' | 'conceal' | 'close' | 'swap' | 'peek' | 'point' | 'on' | 'off'
   | 'ink' | 'angle' | 'cross' | 'glow' | 'part'
 
 /*
@@ -72,6 +72,16 @@ const tone = (at: number, f: number, shape: Shape = {}): Layer =>
   ({ kind: 'tone', at, f, wave: 'sine', f2: null, glide: 0.06, a: 0.002, d: 0.05, peak: 0.08, send: 0, ...shape })
 const noise = (at: number, shape: Filtered = {}): Layer =>
   ({ kind: 'noise', at, filter: 'bandpass', f: 2000, f2: null, glide: 0.1, q: 1, a: 0.002, d: 0.03, peak: 0.06, send: 0, ...shape })
+
+// The lightbox opening and closing (Lightbox.vue), the same in every set:
+// the user's cue, a soft lowpass breath whose filter settles as the picture
+// lands. Opening breathes bright (2.6 kHz settling to 1.5); closing, the
+// same breath darker (1.2 kHz down to 600 Hz), a touch quicker to go. Kept
+// low: body under the flight (420ms), not a sound of its own.
+const breath = (f: number, f2: number, a: number, d: number, peak: number): Spec =>
+  [noise(0, { filter: 'lowpass', f, f2, glide: 0.12, q: 1.4, a, d, peak })]
+const REVEAL = breath(2600, 1500, 0.1, 0.32, 0.03)
+const CONCEAL = breath(1200, 600, 0.08, 0.28, 0.035)
 
 const share = (size = 0.5) => Math.min(Math.max(size, 0), 1)
 const pick = <T>(from: T[]) => from[Math.floor(Math.random() * from.length)]!
@@ -268,9 +278,9 @@ const modular: SoundSet = {
   forward: [noise(0, { f: 200, f2: 1600, glide: 0.24, q: 8, a: 0.05, d: 0.22, peak: 0.08, send: 0.15 })],
   back: [noise(0, { f: 1600, f2: 200, glide: 0.24, q: 8, a: 0.05, d: 0.22, peak: 0.08, send: 0.15 })],
   open: [tone(0, 110, { wave: 'triangle', f2: 220, glide: 0.1, a: 0.02, d: 0.12, peak: 0.1 }), ...ping(0.08, 660, 0.08, 0.08, 0.2)],
+  reveal: REVEAL,
+  conceal: CONCEAL,
   close: [...ping(0, 330, 0.05, 0.08), tone(0, 220, { wave: 'triangle', f2: 110, glide: 0.1, d: 0.12, peak: 0.1 })],
-  line: ping(0, 880, 0.2, 0.02),
-  erase: ping(0, 880, 0.06, 0.015),
   scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 })),
   table: (rules, step) => table(rules, step,
     (seconds) => [tone(0, 220, { wave: 'triangle', a: 0.03, d: seconds, peak: 0.02 })],
@@ -321,7 +331,6 @@ function panelDrop(at: number, i: number): Layer {
 
 const HUM = 120
 const LIGHT_HUM = 100
-const SLIDER_HUM = 180
 const GLOW_HUM = 110
 
 /* A pen stroke of the landing mark heard as a small hum on `f`: a sine with
@@ -421,30 +430,15 @@ const panel: SoundSet = {
   draw: [...relay(0, 0.05), ...relay(0.09, 0.05), ...relay(0.18, 0.06), beep(0.18, 1200, 0.02, 0.035)],
   forward: () => rain(1, panelDrop),
   back: () => rain(-1, panelDrop),
-  // A sheet, panel or picture sliding in and away (GuideSheet.vue,
-  // Lightbox.vue): a hum like the marker's and the light's, its own a step
-  // above theirs, holding its pitch, swelling and fading with the speed.
-  // In, a spring: quick off the mark and long to settle (0.28s). Out, eased
-  // in: gathering speed until it's gone (0.26s).
-  open: [
-    tone(0, SLIDER_HUM, { a: 0.05, d: 0.24, peak: 0.02 }),
-    tone(0, SLIDER_HUM * 1.004, { a: 0.05, d: 0.24, wave: 'triangle', peak: 0.007 }),
-  ],
-  close: [
-    tone(0, SLIDER_HUM, { a: 0.2, d: 0.07, peak: 0.02 }),
-    tone(0, SLIDER_HUM * 1.004, { a: 0.2, d: 0.07, wave: 'triangle', peak: 0.007 }),
-  ],
-  // The docked panel's hairline drawing out from the middle once it's in
-  // (0.4s, quick then slowing): two soft sines, low, blooming and fading as
-  // the line settles. Pulled in again (0.16s), the same two, heard short.
-  line: [
-    tone(0, 200, { a: 0.03, d: 0.36, peak: 0.006 }),
-    tone(0, 500, { a: 0.03, d: 0.36, peak: 0.004 }),
-  ],
-  erase: [
-    tone(0, 200, { a: 0.08, d: 0.06, peak: 0.006 }),
-    tone(0, 500, { a: 0.08, d: 0.06, peak: 0.004 }),
-  ],
+  // The media guide's panel (GuideSheet.vue) sliding in and away: the
+  // lightbox's breath, shaped to the panel's own motion. In, a spring
+  // (0.28s): quick off the mark and long to settle. Out, eased in (0.26s):
+  // gathering, and cut as it's gone. In is out's breath a little up, short
+  // and barely sweeping: a long tail or a wide sweep reads as a whoosh.
+  open: breath(1300, 1000, 0.03, 0.14, 0.028),
+  reveal: REVEAL,
+  conceal: CONCEAL,
+  close: breath(1000, 500, 0.18, 0.08, 0.032),
   // A picture or clip sweeping in behind its line of light: a low square
   // gliding, from the Cue Designer (52 to 49 Hz, a 0.3s swell and 0.16s
   // fade), its glide and envelope stretched to the line's crossing. Up or
@@ -456,8 +450,8 @@ const panel: SoundSet = {
     const [from, to] = way === 'up' ? [43, 57] : way === 'down' ? [57, 43] : [52.13285282252254, 49.181317777128314]
     return tone(0.005, from, { wave: 'square', f2: to, glide: SCAN.seconds, ...swell, peak: 0.08 })
   }),
-  // A uses table drawing in: its rules are lines drawing, so the hairline's
-  // two sines (line, above) held under it for as long as they take, a touch
+  // A uses table drawing in: its rules are lines drawing, so two soft
+  // sines (200 and 500 Hz) held under it for as long as they take, a touch
   // fuller, and on each rule as it sets off a relay's tick with a short beep
   // ringing after it, all at one pitch; the bottom rule lands with a duller
   // clack and a lower, longer beep. Mid pitches, so phone speakers carry it.
@@ -558,9 +552,10 @@ const panel: SoundSet = {
     tone(0, GLOW_HUM * 1.004, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.009 }),
   ],
   // The intro's text parting around the ring as the page scrolls it up
-  // into the mark (the lines easing over, 600ms): the hairline's two sines
-  // (line, above), one centered sound that comes apart, the low one going
-  // left and the high one right, as the text opens round the mark. Its
+  // into the mark (the lines easing over, 600ms): two soft sines (200 and
+  // 500 Hz, as the uses tables), one centered sound that comes apart, the
+  // low one going left and the high one right, as the text opens round the
+  // mark. Its
   // closing again above it is left quiet.
   part: () => [
     { spec: [tone(0, 200, { a: 0.2, d: 0.4, peak: 0.003 })], pan: 0, travel: { to: -0.3, seconds: PART } },
@@ -601,9 +596,9 @@ const film: SoundSet = {
   forward: [air(0, 600, 5000, 0.3, 0.07), tone(0, 220, { f2: 330, glide: 0.3, a: 0.1, d: 0.25, peak: 0.03, send: 0.4 })],
   back: [air(0, 5000, 600, 0.3, 0.07), tone(0, 330, { f2: 220, glide: 0.3, a: 0.1, d: 0.25, peak: 0.03, send: 0.4 })],
   open: [air(0, 800, 4000, 0.15, 0.05), ...glass(0.1, 440, 0.25, 0.05, 0.5), ...glass(0.1, 660, 0.2, 0.02, 0.5)],
+  reveal: REVEAL,
+  conceal: CONCEAL,
   close: [...glass(0, 330, 0.2, 0.05, 0.4), air(0, 4000, 800, 0.15, 0.04)],
-  line: [air(0, 3000, 5000, 0.3, 0.015), ...glass(0.05, 1320, 0.3, 0.012, 0.4)],
-  erase: glass(0, 1320, 0.08, 0.01, 0.3),
   scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 220, { ...swell, peak: 0.03, send: 0.3 })),
   table: (rules, step) => table(rules, step,
     (seconds) => [air(0, 1200, 2400, seconds, 0.02)],

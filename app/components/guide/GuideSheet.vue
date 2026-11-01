@@ -95,7 +95,6 @@ function rise() {
     leaving = false
     run.then(() => {
       if (run !== sliding || !edge.value) return
-      sound('line')
       drawing = animate(edge.value, { scaleY: back ? 1 : [0, 1] }, motion(EDGE_IN))
     })
     return
@@ -109,8 +108,9 @@ function rise() {
 async function drop() {
   const el = dialog.value
   if (!el?.open) return
-  // Docked, its hairline draws back first, and it slides away after.
-  sound(docked.value ? 'erase' : 'close')
+  // Docked, its hairline draws back first (quietly), and it slides away
+  // after, heard then.
+  if (!docked.value) sound('close')
   if (docked.value) {
     leaving = true
     drawing?.stop()

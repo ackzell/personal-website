@@ -226,6 +226,7 @@ async function closeOut(i: number) {
   const el = dialog.value
   if (!el) return
   closing.value = true
+  sound('conceal')
   // It leaves from where it is, zoomed or dragged: noted, set back to fit at
   // once, and flown from there.
   const held = media.value?.getBoundingClientRect()
@@ -256,7 +257,7 @@ watch(index, async (now, before) => {
   empty(now)
   if (before === null) {
     stepping.value = false
-    // Silent for now: the panel's slide-in hum didn't suit the flight.
+    sound('reveal')
     el.showModal()
     await nextTick()
     fly(now, 'in')
