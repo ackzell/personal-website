@@ -33,6 +33,10 @@ export default defineNuxtConfig({
     // Route changes run as view transitions (skipped under reduced motion).
     // Styles in main.css, direction tagging in plugins/section-transition.client.ts.
     viewTransition: true,
+    // Its wait for a frame before each navigation lands inside the view
+    // transition, where rendering is held, so no frame comes and every page
+    // change sat out its 100ms fallback on a frozen screen.
+    navigationRepaint: false,
   },
 
   app: {

@@ -454,6 +454,41 @@ main {
   }
 }
 
+/* Swiped within a section, by the swipe's own view transition (useSwipeNav):
+   all it changes is hiding the page it leaves, so the old one carries on out
+   at once and the new one renders under it, live. The chrome stays live on
+   top; the words leave inside their page and the band's marker slides by
+   itself, so neither gets a layer of its own. */
+:root[data-swipe-leave] {
+  & main *,
+  & .flag-nav__marker {
+    view-transition-name: none !important;
+  }
+  & .site-header {
+    view-transition-name: site-header;
+  }
+  & .site-footer {
+    view-transition-name: site-footer;
+  }
+  &::view-transition-group(site-header),
+  &::view-transition-group(site-footer) {
+    animation: none;
+    z-index: 1;
+  }
+  &::view-transition-old(root),
+  &::view-transition-new(root),
+  &::view-transition-new(page),
+  &::view-transition-old(site-header),
+  &::view-transition-new(site-header),
+  &::view-transition-old(site-footer),
+  &::view-transition-new(site-footer) {
+    animation: none;
+  }
+  &::view-transition-old(page) {
+    animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
+  }
+}
+
 @keyframes vt-swipe-along {
   to {
     opacity: 0;

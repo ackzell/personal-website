@@ -190,11 +190,14 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
       if (name && name !== 'none') names.push(`::view-transition-new(${name}){--arrive-delay:${Math.round(delay * 1000)}ms}`)
     }
     const p = motionValue(0)
-    p.on('change', (now) => {
+    const place = (now: number) => {
       el.style.transform = now < 1 ? `translate(${(1 - now) * dx}px, ${(1 - now) * dy}px)` : ''
       el.style.opacity = now < 1 ? String(Math.min(now * 1.6, 1)) : ''
-    })
-    p.jump(0)
+    }
+    p.on('change', place)
+    // Out of sight from the start, not only once its delay is up: a value
+    // already at 0 doesn't change, so the listener alone wouldn't place it.
+    place(0)
     return [{ el, controls: animate(p, 1, { type: 'spring', bounce: 0, visualDuration: LAND + 0.15 * far, delay }) }]
   })
 
