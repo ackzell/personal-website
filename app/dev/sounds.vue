@@ -19,6 +19,7 @@ const KINDS: { kind: SoundKind, what: string }[] = [
   { kind: 'lift', what: 'a sticker picked up' },
   { kind: 'role', what: 'a role reaching the reading line' },
   { kind: 'draw', what: 'a uses table drawing in' },
+  { kind: 'type', what: 'the uses queries typing in together' },
   { kind: 'key', what: 'the contributions command typing in' },
   { kind: 'enter', what: 'and run' },
   { kind: 'print', what: 'a row of its log printed' },
@@ -33,6 +34,9 @@ const KINDS: { kind: SoundKind, what: string }[] = [
   { kind: 'point', what: 'the mouse on another project, release or month' },
   { kind: 'on', what: 'sound switched on' },
   { kind: 'off', what: 'and off' },
+  { kind: 'ink', what: 'the landing mark\'s ring inking in' },
+  { kind: 'cross', what: 'its stroke across passing the A' },
+  { kind: 'glow', what: 'and the mark glowing' },
 ]
 
 const size = ref(0.5)
@@ -129,6 +133,7 @@ function use(set: SoundSetName) {
             <button type="button" @click="clock(set)">scheme</button>
             <button v-for="way in (['up', 'down', 'left', 'right'] as const)" :key="way" type="button"
               @click="playScanFrom(set, way)">scan {{ way }}</button>
+            <button type="button" @click="playTableFrom(set, 4, 0.07)">table</button>
             <button type="button" @click="playSlideFrom(set, -0.7, 0.5)">slide long</button>
             <button type="button" @click="playSlideFrom(set, 0.1, 0.25)">slide short</button>
             <button type="button" :disabled="using === set" @click="use(set)">use on the site</button>

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 /*
- * The header's other attribute, beside lang="en": sound="on" or "off". On
- * unless switched off, and quiet when on (utils/sounds.ts); each press flips
- * it and keeps it. Turning it on is heard, and so is turning it off, as the
- * last sound until it's back.
+ * The header's other attribute, beside lang="en": sound="on" or "off". Off
+ * until switched on (utils/sounds.ts); each press flips it and keeps it.
+ * Turning it on is heard (and on the landing page, the mark draws itself in
+ * again to be heard too), and so is turning it off, as the last sound until
+ * it's back.
  */
-const on = ref(true)
+const on = ref(false)
 // Read after mount: the server can't know, so the value stays hidden till then.
 const mounted = useMounted()
 onMounted(() => (on.value = soundIsOn()))

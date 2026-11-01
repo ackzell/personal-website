@@ -16,11 +16,12 @@ import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, typ
  * - lift: a sticker picked up under the finger.
  * - role: the experience band's light moving to another role, fuller the
  *   farther it goes (`size`).
- * - draw: a uses table drawing in as the page scrolls. Quiet: scrolling
- *   plays them one after another.
+ * - draw: a uses table drawing in, felt only now: it's heard as type, then
+ *   as soundTable while its rules draw (UsesTables.vue).
+ * - type: the uses queries typing in together, one quick run of keys.
  * - key / enter: the contributions' command typing itself in on arrival,
  *   key by key, and run.
- * - print: a row of its log printed then. Many come close together; they
+ * - print: a row of a log or table printed then. Many come close together; they
  *   thin out on their own (below).
  * - forward / back: a page change to the next or an earlier section (the
  *   tiled wipe), moving the way the flag does.
@@ -31,6 +32,9 @@ import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, typ
  * - peek: a tooltip coming out.
  * - point: the pointer (or keyboard focus) lighting another item in a graph.
  * - on / off: sound itself switched (the switch is heard, not muted).
+ * - ink / cross / glow: the mark drawing itself in on the landing page:
+ *   its ring's two halves inked, the stroke across passing over the A, and
+ *   the glow once it's still.
  * And the language switch, heard as the page's text turning over like a
  * departures board as it scrambles (soundBoard), and the color scheme's
  * word as a flip clock on a desk (soundClock); and a picture or clip
@@ -45,8 +49,9 @@ export type Sound = SoundKind
 const SET: SoundSetName = 'panel'
 const AUDITION_KEY = 'sound-set'
 
-// Quiet out of the box: a touch under the surface, not over it.
-const VOLUME = 0.35
+// Full: sound is off until the visitor asks for it, so once they do, it's
+// heard at the levels each sound is set to.
+const VOLUME = 1
 const STORAGE_KEY = 'sound'
 
 let started = false
@@ -58,14 +63,25 @@ function start() {
   set({ theme: 'default', volume: VOLUME, muted: !soundIsOn() })
 }
 
-/** Whether the visitor has sound on: on unless they switched it off. */
+/** Whether the visitor has sound on: off unless they switched it on. */
 export function soundIsOn() {
   try {
-    return localStorage.getItem(STORAGE_KEY) !== 'off'
+    return localStorage.getItem(STORAGE_KEY) === 'on'
   } catch {
-    // Storage blocked (private mode, site data off): on, the default.
-    return true
+    // Storage blocked (private mode, site data off): off, the default.
+    return false
   }
+}
+
+/*
+ * What waits to hear sound being switched on (the landing mark drawing
+ * itself in again, so the press is answered with its sound). Returns the
+ * way to stop waiting.
+ */
+const turnedOn = new Set<VoidFunction>()
+export function onSoundOn(run: VoidFunction) {
+  turnedOn.add(run)
+  return () => void turnedOn.delete(run)
 }
 
 /*
@@ -82,6 +98,7 @@ export function setSoundOn(on: boolean, after = 0) {
   } catch {
     // Remembered for this visit only.
   }
+  if (on) for (const run of turnedOn) run()
 }
 
 /** The set the site plays: SET, or in dev the one /dev/sounds put in its place. */
@@ -198,6 +215,13 @@ export function playScanFrom(name: SoundSetName, way: ScanWay) {
   play(SOUND_SETS[name].scan(way), `${name}:scan`)
 }
 
+/** A table drawing in, from a given set, whatever the switch says (/dev/sounds). */
+export function playTableFrom(name: SoundSetName, rules: number, step: number) {
+  start()
+  set({ muted: false })
+  play(SOUND_SETS[name].table(rules, step), `${name}:table`)
+}
+
 /** A note from a given set, whatever the switch says (/dev/sounds). */
 export function playNoteFrom(name: SoundSetName, hz: number) {
   start()
@@ -270,6 +294,13 @@ export function soundClock(row: FlapRow, light: number) {
   if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
   if (import.meta.dev) set({ muted: !soundIsOn() })
   play(SOUND_SETS[soundSet()].clock(row, light), 'clock')
+}
+
+/** A uses table drawing in: `rules` rules, one every `step` seconds. */
+export function soundTable(rules: number, step: number) {
+  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
+  if (import.meta.dev) set({ muted: !soundIsOn() })
+  play(SOUND_SETS[soundSet()].table(rules, step), 'table')
 }
 
 /**

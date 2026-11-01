@@ -13,8 +13,9 @@ import type { Layer, NoiseLayer, Spec, ToneLayer } from '@foleyjs/core'
  */
 export type SoundKind =
   | 'tick' | 'detent' | 'undo' | 'edge' | 'toggle' | 'go' | 'lift'
-  | 'role' | 'draw' | 'key' | 'enter' | 'print' | 'forward' | 'back'
+  | 'role' | 'draw' | 'type' | 'key' | 'enter' | 'print' | 'forward' | 'back'
   | 'open' | 'close' | 'line' | 'erase' | 'swap' | 'peek' | 'point' | 'on' | 'off'
+  | 'ink' | 'cross' | 'glow'
 
 /*
  * Each kind, plus the set's voice for a single note at any pitch, for what
@@ -38,6 +39,11 @@ export type SoundSet = Record<SoundKind, Spec | ((size?: number) => Spec | Score
   clock: (row: FlapRow, light: number) => Score
   /** A picture or clip sweeping in behind its line of light, the line travelling `way`. */
   scan: (way: ScanWay) => Score
+  /**
+   * A uses table drawing in (UsesTables.vue): `rules` rules, one every
+   * `step` seconds, each taking RULE seconds to draw across.
+   */
+  table: (rules: number, step: number) => Score
 }
 
 export type ScanWay = 'up' | 'down' | 'left' | 'right'
@@ -197,6 +203,34 @@ function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer):
   return [{ spec, pan: from, travel: { to, seconds } }]
 }
 
+/*
+ * Typing in a hurry, in one sound: a spec's eight layers as eight keys over
+ * the uses queries' 0.45s (UsesTables.vue), each a little early or late.
+ */
+const TYPED = { seconds: 0.45, keys: 8 }
+
+function typing(key: (at: number) => Layer): Spec {
+  const { seconds, keys } = TYPED
+  const gap = seconds / keys
+  return Array.from({ length: keys }, (_, i) => key(Math.max(0, i * gap + (Math.random() - 0.5) * gap * 0.6)))
+}
+
+/*
+ * A box-drawn table drawing in: a bed held for as long as its rules take to
+ * draw (the last one finishing RULE after it starts), and a tick on each
+ * rule as it sets off, the last one landing. `bed` is given the length,
+ * `tick` the time and whether it's the last. Parts of 8 layers at most.
+ */
+const RULE = 0.38
+
+function table(rules: number, step: number, bed: (seconds: number) => Layer[], tick: (at: number, last: boolean) => Layer[]): Score {
+  const n = Math.max(rules, 1)
+  const ticks = Array.from({ length: n }, (_, i) => tick(i * step, i === n - 1)).flat()
+  const parts: Score = [{ spec: bed((n - 1) * step + RULE), pan: 0 }]
+  for (let i = 0; i < ticks.length; i += 8) parts.push({ spec: ticks.slice(i, i + 8), pan: 0 })
+  return parts
+}
+
 // A single unit has fewer flaps to turn than a board.
 const CLOCK = { least: 6, most: 10 }
 
@@ -238,10 +272,14 @@ const modular: SoundSet = {
   line: ping(0, 880, 0.2, 0.02),
   erase: ping(0, 880, 0.06, 0.015),
   scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 })),
+  table: (rules, step) => table(rules, step,
+    (seconds) => [tone(0, 220, { wave: 'triangle', a: 0.03, d: seconds, peak: 0.02 })],
+    (at, last) => ping(at, last ? 330 : 440, last ? 0.08 : 0.05, 0.05)),
   swap: ping(0, 440, 0.04, 0.08),
   peek: ping(0, 880, 0.015, 0.03),
   point: ping(0, 660, 0.01, 0.015),
   key: () => [noise(0, { f: 2000 + Math.random() * 1200, q: 3, d: 0.005, peak: 0.03 })],
+  type: () => typing((at) => noise(at, { f: 2000 + Math.random() * 1200, q: 3, d: 0.005, peak: 0.025 })),
   enter: [noise(0, { f: 1600, q: 3, d: 0.01, peak: 0.04 }), ...ping(0.01, 220, 0.04, 0.04)],
   print: () => ping(0, pick([440, 660, 880]), 0.02, 0.02),
   letter: (along) => ping(0, 660 + along * 440, 0.015, 0.0075),
@@ -253,6 +291,9 @@ const modular: SoundSet = {
     : noise(at, { f: pick([880, 1100, 1320]), q: 8, d: 0.008, peak: 0.014 * loud }), CLOCK),
   on: [...ping(0, 330, 0.05), ...ping(0.06, 440, 0.08, 0.1, 0.2)],
   off: [...ping(0, 440, 0.05), ...ping(0.06, 330, 0.08)],
+  ink: [noise(0, { f: 300, f2: 900, glide: 1.1, q: 6, a: 0.5, d: 0.6, peak: 0.03 })],
+  cross: ping(0, 880, 0.02, 0.04),
+  glow: [tone(0, 110, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.04 })],
 }
 
 /*
@@ -279,6 +320,7 @@ function panelDrop(at: number, i: number): Layer {
 const HUM = 120
 const LIGHT_HUM = 100
 const SLIDER_HUM = 180
+const GLOW_HUM = 110
 
 const panel: SoundSet = {
   note: (hz) => [...relay(0, 0.04), beep(0, hz, 0.12, 0.06)],
@@ -353,6 +395,19 @@ const panel: SoundSet = {
     const [from, to] = way === 'up' ? [43, 57] : way === 'down' ? [57, 43] : [52.13285282252254, 49.181317777128314]
     return tone(0.005, from, { wave: 'square', f2: to, glide: SCAN.seconds, ...swell, peak: 0.08 })
   }),
+  // A uses table drawing in: its rules are lines drawing, so the hairline's
+  // two sines (line, above) held under it for as long as they take, a touch
+  // fuller, and on each rule as it sets off a relay's tick with a short beep
+  // ringing after it, all at one pitch; the bottom rule lands with a duller
+  // clack and a lower, longer beep. Mid pitches, so phone speakers carry it.
+  table: (rules, step) => table(rules, step,
+    (seconds) => [
+      tone(0, 200, { a: 0.04, d: seconds, peak: 0.008 }),
+      tone(0, 500, { a: 0.04, d: seconds, peak: 0.006 }),
+    ],
+    (at, last) => last
+      ? [noise(at, { f: 1300, q: 3, d: 0.012, peak: 0.035 }), beep(at, 750, 0.12, 0.016)]
+      : [noise(at, { f: 1800 + Math.random() * 600, q: 4, d: 0.006, peak: 0.03 }), beep(at, 1000, 0.07, 0.012)]),
   // Another pick in the open side panel, as a slide projector advancing
   // (GuideSheet.vue's swap): a lighter ka as the old one fades out, and the
   // chunk of the next dropping into the gate as it comes in (0.13s), a dull
@@ -379,6 +434,11 @@ const panel: SoundSet = {
     noise(0, { f: 2200 + Math.random() * 1400, q: 3, d: 0.003 + Math.random() * 0.003, peak: 0.018 + Math.random() * 0.012 }),
     noise(0.004, { filter: 'lowpass', f: 600, d: 0.008, peak: 0.02 }),
   ],
+  // Uses' queries typing in together, quick (0.45s): one run of the same
+  // soft keys, a few rather than one per character, none alike.
+  type: () => typing((at) => noise(at, {
+    f: 2200 + Math.random() * 1400, q: 3, d: 0.003 + Math.random() * 0.003, peak: 0.016 + Math.random() * 0.01,
+  })),
   enter: [
     noise(0, { f: 1800, q: 3, d: 0.006, peak: 0.035 }),
     noise(0.006, { filter: 'lowpass', f: 500, d: 0.02, peak: 0.04 }),
@@ -408,6 +468,29 @@ const panel: SoundSet = {
     : noise(at, { f: 1100 + Math.random() * 700, q: 4, d: 0.004 + Math.random() * 0.002, peak: 0.028 * loud }), CLOCK),
   on: [beep(0, 1000, 0.05), beep(0.08, 2000, 0.06)],
   off: [beep(0, 2000, 0.05), beep(0.08, 1000, 0.06)],
+  // The mark drawing itself in on the landing page (HomeIntro.vue). Its
+  // ring's two halves inked at once (1.2s, eased in and out): a soft brush
+  // of pen on paper for each, brightening a little as it goes, swelling
+  // as the pens speed up mid-way, and heard travelling the way each half
+  // is drawn: the top left to right, the bottom right to left. A hair
+  // apart in color, so the two are heard as two and not one in the middle.
+  ink: () => [
+    { spec: [noise(0, { f: 700, f2: 1100, glide: 1.1, q: 1.5, a: 0.5, d: 0.6, peak: 0.015 })], pan: -0.5, travel: { to: 0.5, seconds: 1.2 } },
+    { spec: [noise(0, { f: 620, f2: 980, glide: 1.1, q: 1.5, a: 0.5, d: 0.6, peak: 0.015 })], pan: 0.5, travel: { to: -0.5, seconds: 1.2 } },
+  ],
+  // The stroke across passing over the A's right leg: a nib's small dry
+  // tick, with a touch of body under it.
+  cross: [
+    noise(0, { f: 2600, q: 4, d: 0.003, peak: 0.03 }),
+    noise(0.002, { filter: 'lowpass', f: 700, d: 0.008, peak: 0.018 }),
+  ],
+  // The mark glowing once it's still (1.5s: a quarter blooming, the rest
+  // fading): a hum of the marker's, the light's and the slider's family,
+  // the lowest of them, on A, swelling and fading with the halo.
+  glow: [
+    tone(0, GLOW_HUM, { a: 0.375, d: 1.125, peak: 0.03 }),
+    tone(0, GLOW_HUM * 1.004, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.009 }),
+  ],
 }
 
 /*
@@ -447,10 +530,14 @@ const film: SoundSet = {
   line: [air(0, 3000, 5000, 0.3, 0.015), ...glass(0.05, 1320, 0.3, 0.012, 0.4)],
   erase: glass(0, 1320, 0.08, 0.01, 0.3),
   scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 220, { ...swell, peak: 0.03, send: 0.3 })),
+  table: (rules, step) => table(rules, step,
+    (seconds) => [air(0, 1200, 2400, seconds, 0.02)],
+    (at, last) => glass(at, last ? 440 : 660, last ? 0.12 : 0.06, 0.03, 0.3).slice(0, 2)),
   swap: [...glass(0, 440, 0.1, 0.05, 0.4), ...glass(0.08, 660, 0.2, 0.05, 0.4)],
   peek: glass(0, 1320, 0.03, 0.012, 0.2),
   point: glass(0, 990, 0.02, 0.008, 0.2),
   key: () => [noise(0, { f: 3000 + Math.random() * 1500, q: 2, d: 0.004, peak: 0.025 })],
+  type: () => typing((at) => noise(at, { f: 3000 + Math.random() * 1500, q: 2, d: 0.004, peak: 0.02 })),
   enter: [noise(0, { f: 2000, q: 2, d: 0.01, peak: 0.035 }), ...glass(0.01, 440, 0.08, 0.02, 0.3)],
   print: () => glass(0, pick([660, 880, 1320]), 0.03, 0.012, 0.3),
   letter: (along) => glass(0, 880 + along * 440, 0.02, 0.004, 0.3),
@@ -462,6 +549,9 @@ const film: SoundSet = {
     : noise(at, { f: 1800 + Math.random() * 1200, q: 2, d: 0.004, peak: 0.014 * loud, send: 0.2 }), CLOCK),
   on: [...glass(0, 440, 0.1, 0.05, 0.4), ...glass(0.08, 660, 0.2, 0.05, 0.4)],
   off: [...glass(0, 660, 0.1, 0.05, 0.4), ...glass(0.08, 330, 0.2, 0.05, 0.4)],
+  ink: [air(0, 1200, 3000, 1.1, 0.03)],
+  cross: glass(0, 1320, 0.03, 0.015, 0.2),
+  glow: [tone(0, 220, { a: 0.375, d: 1.125, peak: 0.03, send: 0.4 })],
 }
 
 export const SOUND_SETS = { modular, panel, film }
