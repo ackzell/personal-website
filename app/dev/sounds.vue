@@ -35,8 +35,10 @@ const KINDS: { kind: SoundKind, what: string }[] = [
   { kind: 'on', what: 'sound switched on' },
   { kind: 'off', what: 'and off' },
   { kind: 'ink', what: 'the landing mark\'s ring inking in' },
+  { kind: 'angle', what: 'the A\'s angle drawn up and over' },
   { kind: 'cross', what: 'its stroke across passing the A' },
   { kind: 'glow', what: 'and the mark glowing' },
+  { kind: 'part', what: 'the landing text parting around the mark' },
 ]
 
 const size = ref(0.5)
