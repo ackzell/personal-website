@@ -117,12 +117,14 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 </script>
 
 <template>
-  <nav class="section-index" :class="{ 'section-index--auto': layout === 'auto' }" data-stick data-own-entrance :aria-label="t('site.sectionIndex')" :style="{ '--rows': items.length }">
+  <nav class="section-index" :class="{ 'section-index--auto': layout === 'auto' }" data-stick data-own-entrance
+    :aria-label="t('site.sectionIndex')" :style="{ '--rows': items.length }">
     <!-- As a row it paints the stage over the text scrolling under it, so it
          carries a clipped copy of the mark, as the header does. -->
     <div class="section-index__bar">
       <SiteMarkLayer clipped class="section-index__mark" />
-      <ol ref="list" class="section-index__list" data-arrives-itself :class="{ 'is-overflowing': overflowing }" m="0" p="0" list="none">
+      <ol ref="list" class="section-index__list" data-arrives-itself :class="{ 'is-overflowing': overflowing }" m="0"
+        p="0" list="none">
         <li v-for="(item, i) in items" :key="item.id" class="section-index__item" :style="{ '--i': i }">
           <a ref="links" :href="`#${item.id}`"
             class="section-index__link block decoration-none uppercase tracking-[0.08em] text-[0.60rem] leading-[1.4] text-balance text-[var(--index-rest)] transition-colors duration-150 op-60 hover:text-fg active:text-fg current:text-fg current:op-100"
@@ -137,12 +139,10 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 <style scoped>
 /*
  * As a row (the default, and always with layout="row"): right under the
- * band, across the wide track, and stuck there: wide media (a project's
- * video) scroll under all of it, not past its sides. The nav takes no width
- * of its own, so its bar runs from the wide track's start across it, the
+ * band, set over the text column, and stuck there. The nav takes no width of
+ * its own, so its list runs from the text column's start across it, its
  * names centered there while they fit (auto margins, so a row that overflows
- * still scrolls from its first name); the tracks are symmetric, so that is
- * the text column's center too. The page starts lower by the row's
+ * still scrolls from its first name). The page starts lower by the row's
  * height (main.css) and the row lifts back up through that and the page's
  * top space, so it sits on the band while what opens the page keeps its
  * distance below.
@@ -153,7 +153,7 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
   --index-rest: color-mix(in srgb, var(--fg) 60%, var(--bg));
   grid-column: wide-start / content-start;
   grid-row: 1 / span var(--rows);
-  justify-self: start;
+  justify-self: end;
   align-self: start;
   inline-size: 0;
   position: sticky;
@@ -167,8 +167,8 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 .section-index__bar {
   position: relative;
   isolation: isolate;
-  /* The wide track's width, from 100vw: this nav has none to measure. */
-  inline-size: min(var(--wide-width), 100vw - var(--gutter) * 2);
+  /* The text column's width, from 100vw: this nav has none to measure. */
+  inline-size: min(var(--content-width), 100vw - var(--gutter) * 2);
   /* Known ahead (main.css), so nothing shifts once the page wakes up. */
   block-size: var(--section-index-height);
   /* Content scrolls under it, as it does under the header. */
@@ -186,11 +186,11 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
   scrollbar-width: none;
 }
 
-.section-index__list > :first-child {
+.section-index__list> :first-child {
   margin-inline-start: auto;
 }
 
-.section-index__list > :last-child {
+.section-index__list> :last-child {
   margin-inline-end: auto;
 }
 
@@ -230,14 +230,14 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 }
 
 /* Phones: the brand row tucks away and the icon rail takes the inline end
-   (main.css), so the track is narrower by the rail less a gutter. */
+   (main.css), so the text column is narrower by the rail less a gutter. */
 @media (width < 40rem) {
   .section-index {
     --stick-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
   }
 
   .section-index__bar {
-    inline-size: min(var(--wide-width), 100vw - var(--rail-width, 0px) - var(--gutter));
+    inline-size: min(var(--content-width), 100vw - var(--rail-width, 0px) - var(--gutter));
   }
 }
 
@@ -247,12 +247,12 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
  * It paints no stage there, so it carries no mark copy (a second copy would
  * double the mark) and takes no height (main.css).
  */
-@media (width >= 60rem) {
+@media (width >=60rem) {
   .section-index--auto {
     justify-self: stretch;
     inline-size: auto;
     /* Level with the landing mark, which holds at the same line (HomeIntro). */
-    top: calc(var(--header-height, 0px) + var(--gap-section));
+    top: calc(var(--header-height, 0px) + var(--gap-group));
     /* Starts with the first section, under its gap. */
     margin-block-start: var(--gap-section);
     padding-inline-end: var(--gap-group);
@@ -275,7 +275,7 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
     overflow: visible;
   }
 
-  .section-index--auto .section-index__list > * {
+  .section-index--auto .section-index__list>* {
     margin-inline: 0;
   }
 
