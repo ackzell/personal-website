@@ -348,7 +348,7 @@ function blur(slug: string) {
           @pointermove="scrubMove" @pointerup="scrubEnd" @pointercancel="scrubEnd" @click.capture="scrubClick">
           <!-- Pointer shortcuts to the links on the roles themselves, so kept out of the tab
                order and the accessibility tree. -->
-          <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1" draggable="false"
+          <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1" draggable="false" data-press="none"
             class="experience__field" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
             :style="{ '--months': role.months, '--i': i }" :data-slug="role.slug" @click="go($event, role.slug)"
             @pointerenter="point($event, role.slug)" @pointerleave="leave(role.slug)">

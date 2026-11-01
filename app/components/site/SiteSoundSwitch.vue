@@ -48,7 +48,7 @@ function toggle() {
   transition: opacity 200ms var(--ease-out);
 }
 
-.sound-switch:is(:active, :has(:focus-visible)) {
+.sound-switch:has(:focus-visible) {
   opacity: 1;
 }
 

@@ -331,7 +331,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
           </video>
         </div>
         <div v-if="mounted" class="take__transport">
-          <button type="button" class="take__play"
+          <button type="button" class="take__play" data-press="key"
             :aria-label="playing ? t('projects.media.pause') : t('projects.media.play')" @click="toggle">
             <span :class="playing ? 'i-iconoir-pause-solid' : 'i-iconoir-play-solid'" aria-hidden="true" />
           </button>

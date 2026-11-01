@@ -77,10 +77,10 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
         <source v-if="webm" :src="webm" type="video/webm">
         <source :src="src" :type="source(src)">
       </video>
-      <button v-if="mounted" type="button" class="media__toggle" :aria-label="playing ? t('projects.media.pause') : t('projects.media.play')" @click="toggle">
+      <button v-if="mounted" type="button" data-press="key" class="media__toggle" :aria-label="playing ? t('projects.media.pause') : t('projects.media.play')" @click="toggle">
         <span :class="playing ? 'i-iconoir-pause-solid' : 'i-iconoir-play-solid'" aria-hidden="true" />
       </button>
-      <button v-if="mounted && expandable" type="button" class="media__toggle media__expand"
+      <button v-if="mounted && expandable" type="button" data-press="key" class="media__toggle media__expand"
         :aria-label="t('projects.media.expand')" @click="emit('expand')">
         <span class="i-iconoir-expand" aria-hidden="true" />
       </button>

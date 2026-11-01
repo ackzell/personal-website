@@ -127,7 +127,7 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
         p="0" list="none">
         <li v-for="(item, i) in items" :key="item.id" class="section-index__item" :style="{ '--i': i }">
           <a ref="links" :href="`#${item.id}`"
-            class="section-index__link block decoration-none uppercase tracking-[0.08em] text-[0.60rem] leading-[1.4] text-balance text-[var(--index-rest)] transition-colors duration-150 op-60 hover:text-fg active:text-fg current:text-fg current:op-100"
+            class="section-index__link block decoration-none uppercase tracking-[0.08em] text-[0.60rem] leading-[1.4] text-balance text-[var(--index-rest)] transition-colors duration-150 op-60 hover:text-fg current:text-fg current:op-100"
             :aria-current="current === item.id ? 'location' : undefined" @click="go($event, item.id)">{{ item.label
             }}</a>
         </li>

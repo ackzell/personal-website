@@ -255,7 +255,7 @@ function toggle() {
         @pointerup="letGo" @pointercancel="letGo" @keydown="step">
         <span class="video__time" aria-hidden="true">{{ clock(played) }}</span>
       </div>
-      <button v-if="mounted" type="button" class="media__toggle media__expand video__expand"
+      <button v-if="mounted" type="button" data-press="key" class="media__toggle media__expand video__expand"
         :aria-label="large ? t('projects.media.shrink') : t('projects.media.fullscreen')" :aria-pressed="large"
         @click="enlarge">
         <span :class="large ? 'i-iconoir-collapse' : 'i-iconoir-expand'" aria-hidden="true" />

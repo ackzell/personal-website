@@ -110,7 +110,7 @@ function enter(event: PointerEvent, i: number) {
       <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined"
         @pointerenter="enter($event, i)">
         <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label"
-          class="text-[1.125rem] text-fg site-footer__land" :style="{ '--i': i }" inline-flex p="1.5">
+          class="text-[1.125rem] text-fg site-footer__land" data-press="key" :style="{ '--i': i }" inline-flex p="1.5">
           <span :class="link.icon" aria-hidden="true" />
         </a>
       </li>
