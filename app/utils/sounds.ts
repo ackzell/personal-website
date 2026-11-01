@@ -25,9 +25,9 @@ import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, typ
  *   thin out on their own (below).
  * - forward / back: a page change to the next or an earlier section (the
  *   tiled wipe), moving the way the flag does.
- * - open / close: a sheet, panel or picture coming up and going away.
- * - line / erase: the docked panel's hairline drawing in once it's open,
- *   and drawing back before it goes.
+ * - open / close: the media guide's sheet or panel coming up and going away.
+ * - reveal / conceal: the lightbox opening, its picture flying out of the
+ *   page, and closing, flying back (a brighter breath, then a darker one).
  * - swap: another pick taking the open side panel's place.
  * - peek: a tooltip coming out.
  * - point: the pointer (or keyboard focus) lighting another item in a graph.
