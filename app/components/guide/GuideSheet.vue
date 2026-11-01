@@ -94,7 +94,9 @@ function rise() {
     const run = sliding = animate(el, { right: back ? 0 : [-el.offsetWidth, 0] }, motion(DROP))
     leaving = false
     run.then(() => {
-      if (run === sliding && edge.value) drawing = animate(edge.value, { scaleY: back ? 1 : [0, 1] }, motion(EDGE_IN))
+      if (run !== sliding || !edge.value) return
+      sound('line')
+      drawing = animate(edge.value, { scaleY: back ? 1 : [0, 1] }, motion(EDGE_IN))
     })
     return
   }
@@ -107,7 +109,8 @@ function rise() {
 async function drop() {
   const el = dialog.value
   if (!el?.open) return
-  sound('close')
+  // Docked, its hairline draws back first, and it slides away after.
+  sound(docked.value ? 'erase' : 'close')
   if (docked.value) {
     leaving = true
     drawing?.stop()
@@ -116,6 +119,7 @@ async function drop() {
     await run
     // Another pick brought it back while the line drew in.
     if (run !== sliding) return
+    sound('close')
     const out = sliding = animate(el, { right: -el.offsetWidth }, motion(SLIDE_OUT))
     await out
     if (out !== sliding) return
@@ -152,7 +156,7 @@ watch(item, async (now) => {
       sound('open')
       rise()
     } else {
-      sound('step')
+      sound('swap')
     }
     return
   }

@@ -272,6 +272,8 @@ function hover(event: PointerEvent, row: Row, cells: Cell[]) {
   if (event.pointerType !== 'mouse') return
   const cell = cellAt(event, cells)
   if (!cell) return
+  // A slight tick for each release the mouse comes to (a finger's scrub has its own).
+  if (cell.release.id !== reading.value[row.id]?.id) sound('point')
   show(row, cell, false)
   if (preview.value) aim(event.clientX, event.clientY - 8, event.clientY + 20)
 }
@@ -541,7 +543,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
               :class="{ 'guide__cell--on': reading[row.id]?.id === cell.release.id }" :href="cell.release.url"
               :aria-label="cell.label" :tabindex="big ? -1 : undefined"
               :style="{ height: cell.height, '--min': cell.minutes, '--shade': cell.shade, '--i': i }"
-              :data-release="cell.release.id" @focus="read(row.id, cell)" @blur="delete reading[row.id]"
+              :data-release="cell.release.id" @focus="read(row.id, cell); sound('point')" @blur="delete reading[row.id]"
               @click="tap($event, row, cell)" />
           </div>
           <p class="guide__read" m="0" text="sm" aria-hidden="true">

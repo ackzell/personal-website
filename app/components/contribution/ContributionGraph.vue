@@ -203,6 +203,20 @@ function leave(repo?: string) {
   if (hovered.value === repo) hovered.value = undefined
 }
 
+// A slight tick as the pointer or focus lights another project, once per
+// project: crossing from one of its rows to the next leaves and enters again,
+// so a project only counts as left once the pointer has been off it a moment.
+let pointed: string | undefined
+const forgetPointed = useTimeoutFn(() => {
+  pointed = undefined
+}, 200, { immediate: false })
+watch(hovered, (now) => {
+  if (!now) return forgetPointed.start()
+  forgetPointed.stop()
+  if (now !== pointed) sound('point')
+  pointed = now
+})
+
 /* Rows below the fold at mount wait, and arrive as they scroll in; rows
    coming in together follow one another down (--batch). Rows already on
    screen, and every row without JS, are simply there. */

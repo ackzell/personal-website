@@ -1,5 +1,5 @@
-import { playSpec, set, type Spec } from '@foleyjs/core'
-import { SOUND_SETS, type Score, type SoundKind, type SoundSetName } from './soundSets'
+import { get, getAnalyser, playSpec, set, toBufferSpec, unlock, type Spec } from '@foleyjs/core'
+import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, type SoundSetName, type Travel } from './soundSets'
 
 /*
  * What a moment sounds like, in a few kinds. The touch kinds are the same
@@ -25,9 +25,16 @@ import { SOUND_SETS, type Score, type SoundKind, type SoundSetName } from './sou
  * - forward / back: a page change to the next or an earlier section (the
  *   tiled wipe), moving the way the flag does.
  * - open / close: a sheet, panel or picture coming up and going away.
- * - step: the picture in the lightbox turning over to the next one.
+ * - line / erase: the docked panel's hairline drawing in once it's open,
+ *   and drawing back before it goes.
+ * - swap: another pick taking the open side panel's place.
  * - peek: a tooltip coming out.
+ * - point: the pointer (or keyboard focus) lighting another item in a graph.
  * - on / off: sound itself switched (the switch is heard, not muted).
+ * And the language switch, heard as the page's text turning over like a
+ * departures board as it scrambles (soundBoard), and the color scheme's
+ * word as a flip clock on a desk (soundClock); and a picture or clip
+ * sweeping in behind a line of light, the way the line goes (soundScan).
  *
  * How each one sounds is a set's (utils/soundSets.ts); SET is the one the
  * site plays. In dev, /dev/sounds can put another in its place for a while,
@@ -105,7 +112,44 @@ const isScore = (spec: object[]): spec is Score => 'spec' in (spec[0] ?? {})
 function play(spec: Spec | Score, id: string) {
   start()
   if (!isScore(spec)) return playSpec(spec, { id })
-  spec.forEach((part, i) => playSpec(part.spec, { id: `${id}:${i}`, pan: part.pan }))
+  spec.forEach((part, i) => part.travel
+    ? playTravelling(part.spec, part.pan, part.travel)
+    : playSpec(part.spec, { id: `${id}:${i}`, pan: part.pan }))
+}
+
+/*
+ * Foley places a sound once, for the whole of it, and nudges each play's
+ * pitch and level a little (up to 30 cents, 8%) so repeats don't sound
+ * canned. So a sound that travels can't be several plays panned along the
+ * way: they'd land out of tune with each other and beat, heard as two. It's
+ * rendered once instead (foley's renders are never nudged, so each is kept)
+ * and played through a panner of its own, moving eased out, at the site's
+ * volume, into the engine's output.
+ */
+const rendered = new Map<string, Promise<AudioBuffer | null>>()
+
+async function playTravelling(spec: Spec, from: number, { to, seconds }: Travel) {
+  const key = JSON.stringify(spec)
+  if (!rendered.has(key)) rendered.set(key, toBufferSpec(spec))
+  const buffer = await rendered.get(key)!
+  unlock()
+  const out = getAnalyser()
+  const { muted, volume } = get()
+  if (!buffer || !out || muted) return
+  const context = out.context
+  const source = context.createBufferSource()
+  source.buffer = buffer
+  const gain = context.createGain()
+  gain.gain.value = volume
+  const pan = context.createStereoPanner()
+  pan.pan.value = from
+  const when = context.currentTime + 0.01
+  const way = Float32Array.from({ length: 32 }, (_, i) => from + (to - from) * (1 - (1 - i / 31) ** 3))
+  pan.pan.setValueCurveAtTime(way, when, seconds)
+  source.connect(gain).connect(pan).connect(out)
+  source.onended = () => source.disconnect()
+  // A render starts its sound 0.03s in.
+  source.start(when, 0.03)
 }
 
 function playOne(name: SoundSetName, kind: Sound, size: number | undefined, id: string) {
@@ -127,10 +171,31 @@ export function playSlideFrom(name: SoundSetName, from: number, to: number) {
 }
 
 /** A letter from a given set, whatever the switch says (/dev/sounds). */
-export function playLetterFrom(name: SoundSetName, along: number, loud: number) {
+export function playLetterFrom(name: SoundSetName, along: number) {
   start()
   set({ muted: false })
-  play(SOUND_SETS[name].letter(along, loud), `${name}:letter:${letterTurn++ % 3}`)
+  play(SOUND_SETS[name].letter(along), `${name}:letter:${letterTurn++ % 3}`)
+}
+
+/** A board turning over, from a given set, whatever the switch says (/dev/sounds). */
+export function playBoardFrom(name: SoundSetName, rows: FlapRow[]) {
+  start()
+  set({ muted: false })
+  play(SOUND_SETS[name].board(rows), `${name}:board`)
+}
+
+/** A flip clock turning over, from a given set, whatever the switch says (/dev/sounds). */
+export function playClockFrom(name: SoundSetName, row: FlapRow, light: number) {
+  start()
+  set({ muted: false })
+  play(SOUND_SETS[name].clock(row, light), `${name}:clock`)
+}
+
+/** A scan from a given set, whatever the switch says (/dev/sounds). */
+export function playScanFrom(name: SoundSetName, way: ScanWay) {
+  start()
+  set({ muted: false })
+  play(SOUND_SETS[name].scan(way), `${name}:scan`)
 }
 
 /** A note from a given set, whatever the switch says (/dev/sounds). */
@@ -179,11 +244,11 @@ export function soundNote(hz: number) {
   playNote(soundSet(), hz)
 }
 
-/** A letter of a word writing itself (SoundSet's `letter`): where it is in the word, and how big. */
-export function soundLetter(along: number, loud: number) {
+/** A letter of a word writing itself (SoundSet's `letter`): where it is in the word. */
+export function soundLetter(along: number) {
   if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
   if (import.meta.dev) set({ muted: !soundIsOn() })
-  play(SOUND_SETS[soundSet()].letter(along, loud), `letter:${letterTurn++ % 3}`)
+  play(SOUND_SETS[soundSet()].letter(along), `letter:${letterTurn++ % 3}`)
 }
 
 /** The band's marker sliding across the screen, `from` and `to` from -1 (left) to 1 (right). */
@@ -191,4 +256,25 @@ export function soundSlide(from: number, to: number) {
   if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
   if (import.meta.dev) set({ muted: !soundIsOn() })
   play(SOUND_SETS[soundSet()].slide(from, to), 'slide')
+}
+
+/** The page's text scrambling into another language, as a departures board turning over. */
+export function soundBoard(rows: FlapRow[]) {
+  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
+  if (import.meta.dev) set({ muted: !soundIsOn() })
+  play(SOUND_SETS[soundSet()].board(rows), 'board')
+}
+
+/** The color scheme's word scrambling into the next, as a flip clock: landing `light` (1), dark (0), system (0.5). */
+export function soundClock(row: FlapRow, light: number) {
+  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
+  if (import.meta.dev) set({ muted: !soundIsOn() })
+  play(SOUND_SETS[soundSet()].clock(row, light), 'clock')
+}
+
+/** A picture or clip sweeping in behind its line of light (the media palette, the lightbox), the line going `way`. */
+export function soundScan(way: ScanWay) {
+  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
+  if (import.meta.dev) set({ muted: !soundIsOn() })
+  play(SOUND_SETS[soundSet()].scan(way), 'scan')
 }

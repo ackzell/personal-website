@@ -68,6 +68,8 @@ function pick(index: number) {
   leaving.value = active.value
   active.value = index
   switches.value++
+  // Its line sweeps up to a name further down the list, down to one above.
+  soundScan(forward.value ? 'up' : 'down')
   clearTimeout(settle)
   settle = setTimeout(() => (leaving.value = null), SWITCH_MS)
 }

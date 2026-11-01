@@ -11,7 +11,8 @@ import { sound } from './sounds'
  *   the next page, a sheet or picture pulled far enough to put away).
  * - undo: the same drag coming back short of it.
  * - edge: a drag that has nowhere to go (a swipe past the last page).
- * - toggle: a setting switched (the color scheme, the language).
+ * - toggle: a setting switched.
+ * - language / scheme: the language or color scheme switched, felt as a toggle.
  * - go: a tap that takes you to another page (the flag band).
  * - stick: a bar catching at the top of the screen as the page scrolls.
  * - lift: a sticker picked up under the finger.
@@ -53,6 +54,8 @@ const KINDS = {
   undo: [{ duration: 8, intensity: 1 }],
   edge: 'rigid',
   toggle: 'light',
+  language: 'light',
+  scheme: 'light',
   go: 'soft',
   stick: 'light',
   lift: 'medium',
@@ -83,13 +86,15 @@ export function isHapticClick(event: Event) {
 
 // Every moment that's felt is heard too, on any screen (utils/sounds.ts),
 // but these: the sticker's tilt, which has no sound yet, a bar sticking and
-// a project in the log reaching the line, too much to hear on every scroll.
-const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit'])
+// a project in the log reaching the line, too much to hear on every scroll;
+// and the language and color scheme, heard as their text turning over
+// instead (plugins/locale-scramble.client.ts, SiteSchemeSwitch.vue).
+const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'language', 'scheme'])
 
 // `size` is what a scrub's tick passed over (0 to 1).
 export function haptic(kind: Haptic, size?: number) {
   if (!import.meta.client) return
   const input = KINDS[kind]
   instance()?.trigger(typeof input === 'function' ? input(size) : input)
-  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit'>, size)
+  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'language' | 'scheme'>, size)
 }

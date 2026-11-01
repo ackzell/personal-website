@@ -14,7 +14,7 @@ import type { Layer, NoiseLayer, Spec, ToneLayer } from '@foleyjs/core'
 export type SoundKind =
   | 'tick' | 'detent' | 'undo' | 'edge' | 'toggle' | 'go' | 'lift'
   | 'role' | 'draw' | 'key' | 'enter' | 'print' | 'forward' | 'back'
-  | 'open' | 'close' | 'step' | 'peek' | 'on' | 'off'
+  | 'open' | 'close' | 'line' | 'erase' | 'swap' | 'peek' | 'point' | 'on' | 'off'
 
 /*
  * Each kind, plus the set's voice for a single note at any pitch, for what
@@ -26,17 +26,38 @@ export type SoundSet = Record<SoundKind, Spec | ((size?: number) => Spec | Score
   slide: (from: number, to: number) => Score
   /**
    * A letter of a word turning cursive as the word writes itself: `along`
-   * the word from its first letter (0) to its last (1), `loud` as big as it's
-   * set (1 for a headword, less for smaller type).
+   * the word from its first letter (0) to its last (1).
    */
-  letter: (along: number, loud: number) => Spec
+  letter: (along: number) => Spec
+  /** The page's text flipping over to another language, row by row (FlapRow). */
+  board: (rows: FlapRow[]) => Score
+  /**
+   * The color scheme's one word turning over, as a flip clock on a desk:
+   * landing `light` (1), `dark` (0) or the system's (0.5).
+   */
+  clock: (row: FlapRow, light: number) => Score
+  /** A picture or clip sweeping in behind its line of light, the line travelling `way`. */
+  scan: (way: ScanWay) => Score
 }
+
+export type ScanWay = 'up' | 'down' | 'left' | 'right'
+
+/*
+ * A run of text scrambling into another language (plugins/locale-scramble),
+ * as a row of a departures board: `chars` flaps side by side, the first
+ * setting off `at` seconds in, each one `step` after the last, each
+ * flipping for `settle` before it lands. `pan` is where the row sits across
+ * the screen, -1 (left) to 1 (right).
+ */
+export type FlapRow = { at: number, chars: number, step: number, settle: number, pan: number }
 
 /*
  * More than one sound's worth at once (a spec holds at most 8 layers): parts
- * played together, each placed on its own in the stereo field.
+ * played together, each placed on its own in the stereo field. A part with
+ * `travel` moves while it plays, from `pan` to `to` over `seconds`, eased out.
  */
-export type Score = { spec: Spec, pan: number }[]
+export type Score = { spec: Spec, pan: number, travel?: Travel }[]
+export type Travel = { to: number, seconds: number }
 
 type Shape = Partial<Omit<ToneLayer, 'kind' | 'at' | 'f'>>
 type Filtered = Partial<Omit<NoiseLayer, 'kind' | 'at'>>
@@ -65,8 +86,9 @@ const TILE = { seconds: 0.95, spread: 0.45, flip: 0.32, land: 0.7 }
  * (--page-transition, eased in and out: the flag-marker group in main.css).
  * Heard as a run of short grains, each placed where the marker is by then,
  * so the sound travels with it; each grain is as loud and as bright as the
- * marker is fast then (quiet setting off, fullest mid-way, slowing in), and
- * a longer trip is fuller all through. `rail` voices a grain, `land` the
+ * marker is fast then (quiet setting off, fullest mid-way, slowing in). A
+ * long trip is heard as loud as a short one: every sound on the site keeps
+ * one level, whatever it's the sound of. `rail` voices a grain, `land` the
  * stop, and `whole` anything held through the slide in one piece (a
  * sound in grains comes and goes with each one), placed mid-way.
  */
@@ -80,15 +102,14 @@ function slide(
   to: number,
   rail: (at: number, length: number, speed: number, next: number) => Layer[],
   land: (at: number) => Layer[],
-  whole: (seconds: number, far: number) => Layer[] = () => [],
+  whole: (seconds: number) => Layer[] = () => [],
 ): Score {
   const { seconds, grains } = SLIDE
-  const far = 0.4 + 0.6 * Math.min(Math.abs(to - from) / 1.2, 1)
   const length = seconds / grains
   return Array.from({ length: grains }, (_, i) => {
     const t = (i + 0.5) / grains
-    const grain = rail(i * length, length, speedAt(t) * far, speedAt((i + 1.5) / grains) * far)
-    const held = i === Math.floor(grains / 2) ? whole(seconds, far) : []
+    const grain = rail(i * length, length, speedAt(t), speedAt((i + 1.5) / grains))
+    const held = i === Math.floor(grains / 2) ? whole(seconds) : []
     return {
       spec: [...grain, ...held, ...(i === grains - 1 ? land(seconds * 0.92) : [])],
       pan: (from + (to - from) * eased(t)) * 0.8,
@@ -112,6 +133,73 @@ function rain(way: 1 | -1, drop: (at: number, i: number) => Layer): Score {
     pan: way * (part / (PARTS - 1) - 0.5) * 0.9,
   }))
 }
+/*
+ * A departures board turning over: a clatter of flaps, as dense at each
+ * moment as the flaps still turning then (so it swells as rows set off and
+ * thins out as they land, left to right), and a firmer clack as each row's
+ * last flap lands. A bigger switch clatters a little fuller, up to a point.
+ * Each row is heard where it sits; the flaps are drawn fresh every time.
+ */
+const BOARD = { least: 12, most: 48, landings: 12, zones: 4 }
+
+function board(
+  rows: FlapRow[],
+  flap: (at: number, landing: boolean, loud: number) => Layer,
+  { least, most }: { least: number, most: number } = BOARD,
+): Score {
+  const all = rows.reduce((sum, row) => sum + row.chars, 0)
+  if (!all) return []
+  const flips = Math.round(Math.min(Math.max(all * 0.4, least), most))
+  const heard: { layer: Layer, pan: number }[] = []
+  for (let n = 0; n < flips; n++) {
+    // A flap anywhere on the board, so a longer row turns over more of them.
+    let left = Math.random() * all
+    const row = rows.find((one) => (left -= one.chars) < 0) ?? rows.at(-1)!
+    const from = row.at + Math.floor(Math.random() * row.chars) * row.step
+    heard.push({ layer: flap(from + Math.random() * row.settle, false, 0.6 + Math.random() * 0.4), pan: row.pan })
+  }
+  // Landings soften the more rows land together, so a full page isn't louder.
+  const landing = [...rows].sort(() => Math.random() - 0.5).slice(0, BOARD.landings)
+  const loud = Math.min(1, 2 / Math.sqrt(landing.length))
+  for (const row of landing) {
+    heard.push({ layer: flap(row.at + (row.chars - 1) * row.step + row.settle, true, loud), pan: row.pan })
+  }
+  // A part per stretch of the screen, as many as its layers need, heard
+  // where its rows sit on average (a lone row right where it is), and never
+  // all the way to one side: headphones make a hard side sound one-eared.
+  const parts: Score = []
+  for (let zone = 0; zone < BOARD.zones; zone++) {
+    const here = heard.filter(({ pan }) => Math.min(Math.floor(((pan + 1) / 2) * BOARD.zones), BOARD.zones - 1) === zone)
+    if (!here.length) continue
+    const pan = (here.reduce((sum, one) => sum + one.pan, 0) / here.length) * 0.7
+    const layers = here.map(({ layer }) => layer)
+    for (let i = 0; i < layers.length; i += 8) parts.push({ spec: layers.slice(i, i + 8), pan })
+  }
+  return parts
+}
+
+/*
+ * The line of light sweeping a picture or clip in (Palette.vue, Lightbox.vue:
+ * 450ms, eased out), heard for as long as it takes to cross. Going up or
+ * down it's heard in the middle; crossing sideways it travels with the
+ * line, from the side it sets off to the side it lands (a part's `travel`,
+ * utils/sounds.ts). `voice` gives the sound with its envelope; `shape` is
+ * that envelope, as shares of the crossing.
+ */
+const SCAN = { seconds: 0.45 }
+type Envelope = { a: number, d: number }
+
+function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer): Score {
+  const { seconds } = SCAN
+  const spec = [voice({ a: shape.a * seconds, d: shape.d * seconds })]
+  if (way === 'up' || way === 'down') return [{ spec, pan: 0 }]
+  const [from, to] = way === 'left' ? [0.7, -0.7] : [-0.7, 0.7]
+  return [{ spec, pan: from, travel: { to, seconds } }]
+}
+
+// A single unit has fewer flaps to turn than a board.
+const CLOCK = { least: 6, most: 10 }
+
 // A note of `scale` for a size: the biggest gets the first (lowest).
 const noteFor = (scale: number[], size?: number) => scale[Math.round((1 - share(size)) * (scale.length - 1))]!
 
@@ -147,12 +235,22 @@ const modular: SoundSet = {
   back: [noise(0, { f: 1600, f2: 200, glide: 0.24, q: 8, a: 0.05, d: 0.22, peak: 0.08, send: 0.15 })],
   open: [tone(0, 110, { wave: 'triangle', f2: 220, glide: 0.1, a: 0.02, d: 0.12, peak: 0.1 }), ...ping(0.08, 660, 0.08, 0.08, 0.2)],
   close: [...ping(0, 330, 0.05, 0.08), tone(0, 220, { wave: 'triangle', f2: 110, glide: 0.1, d: 0.12, peak: 0.1 })],
-  step: ping(0, 440, 0.04, 0.08),
+  line: ping(0, 880, 0.2, 0.02),
+  erase: ping(0, 880, 0.06, 0.015),
+  scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 })),
+  swap: ping(0, 440, 0.04, 0.08),
   peek: ping(0, 880, 0.015, 0.03),
+  point: ping(0, 660, 0.01, 0.015),
   key: () => [noise(0, { f: 2000 + Math.random() * 1200, q: 3, d: 0.005, peak: 0.03 })],
   enter: [noise(0, { f: 1600, q: 3, d: 0.01, peak: 0.04 }), ...ping(0.01, 220, 0.04, 0.04)],
   print: () => ping(0, pick([440, 660, 880]), 0.02, 0.02),
-  letter: (along, loud) => ping(0, 660 + along * 440, 0.015, 0.015 * loud),
+  letter: (along) => ping(0, 660 + along * 440, 0.015, 0.0075),
+  board: (rows) => board(rows, (at, landing, loud) => landing
+    ? noise(at, { f: 440, q: 12, d: 0.03, peak: 0.03 * loud })
+    : noise(at, { f: pick([1320, 1760, 2640]), q: 8, d: 0.006, peak: 0.012 * loud })),
+  clock: (row, light) => board([row], (at, landing, loud) => landing
+    ? noise(at, { f: 262 + light * 168, q: 12, d: 0.04, peak: 0.035 })
+    : noise(at, { f: pick([880, 1100, 1320]), q: 8, d: 0.008, peak: 0.014 * loud }), CLOCK),
   on: [...ping(0, 330, 0.05), ...ping(0.06, 440, 0.08, 0.1, 0.2)],
   off: [...ping(0, 440, 0.05), ...ping(0.06, 330, 0.08)],
 }
@@ -178,23 +276,24 @@ function panelDrop(at: number, i: number): Layer {
   return noise(at, { f: pick(PANEL_DROPS), q: 4, d: 0.004 + Math.random() * 0.008, peak: (0.04 + Math.random() * 0.03) * fade })
 }
 
-const HUM = 150
+const HUM = 120
 const LIGHT_HUM = 100
+const SLIDER_HUM = 180
 
 const panel: SoundSet = {
   note: (hz) => [...relay(0, 0.04), beep(0, hz, 0.12, 0.06)],
   // The band's marker gliding to the new page: one hum through the whole
   // slide at one pitch, swelling to the middle as it speeds up (a sine for
   // body, a soft triangle a hair off it for the edge), with no landing note:
-  // it fades as the marker settles. Dry.
+  // it fades as the marker settles. Dry, and as loud however far it goes.
   slide: (from, to) => slide(from, to,
     () => [],
     () => [],
-    (seconds, far) => {
+    (seconds) => {
       const swell = { a: seconds / 2, d: seconds * 0.45 }
       return [
-        tone(0, HUM, { ...swell, peak: 0.035 * far }),
-        tone(0, HUM * 1.004, { ...swell, wave: 'triangle', peak: 0.012 * far }),
+        tone(0, HUM, { ...swell, peak: 0.021 }),
+        tone(0, HUM * 1.004, { ...swell, wave: 'triangle', peak: 0.007 }),
       ]
     }),
   tick: (size) => [...relay(0, 0.05), beep(0, 1000, 0.01 + share(size) * 0.06, 0.04)],
@@ -210,27 +309,68 @@ const panel: SoundSet = {
   // The experience band's light moving to the next role: the marker's hum,
   // but the light's own. Lower and grainier, a quiet saw a hair off the sine
   // for its edge, swelling as the light stretches and cut short as it
-  // gathers, on the hum's own note. Fuller the farther it travels (`size`,
-  // against the band's height).
-  role: (size) => {
-    const far = 0.4 + 0.6 * share(size)
-    const swell = { a: 0.12, d: 0.33 }
-    return [
-      tone(0, LIGHT_HUM, { ...swell, peak: 0.05 * far }),
-      tone(0, LIGHT_HUM * 1.006, { ...swell, wave: 'sawtooth', peak: 0.009 * far }),
-      tone(0.4, LIGHT_HUM, { a: 0.006, d: 0.05, peak: 0.015 }),
-    ]
-  },
+  // gathers, on the hum's own note. As loud however far it travels.
+  role: [
+    tone(0, LIGHT_HUM, { a: 0.12, d: 0.33, peak: 0.03 }),
+    tone(0, LIGHT_HUM * 1.006, { a: 0.12, d: 0.33, wave: 'sawtooth', peak: 0.0055 }),
+    tone(0.4, LIGHT_HUM, { a: 0.006, d: 0.05, peak: 0.015 }),
+  ],
   draw: [...relay(0, 0.05), ...relay(0.09, 0.05), ...relay(0.18, 0.06), beep(0.18, 1200, 0.02, 0.035)],
   forward: () => rain(1, panelDrop),
   back: () => rain(-1, panelDrop),
-  open: [...relay(0), beep(0.02, 1200, 0.08)],
-  // Softer than it opens: a lower beep, eased in, and a muffled thunk
-  // rather than the relay's crack, as a lid set down.
-  close: [tone(0, 600, { a: 0.008, d: 0.07, peak: 0.035 }), noise(0.04, { filter: 'lowpass', f: 700, d: 0.012, peak: 0.04 })],
-  step: [...relay(0, 0.05), beep(0, 1100, 0.015, 0.04)],
+  // A sheet, panel or picture sliding in and away (GuideSheet.vue,
+  // Lightbox.vue): a hum like the marker's and the light's, its own a step
+  // above theirs, holding its pitch, swelling and fading with the speed.
+  // In, a spring: quick off the mark and long to settle (0.28s). Out, eased
+  // in: gathering speed until it's gone (0.26s).
+  open: [
+    tone(0, SLIDER_HUM, { a: 0.05, d: 0.24, peak: 0.02 }),
+    tone(0, SLIDER_HUM * 1.004, { a: 0.05, d: 0.24, wave: 'triangle', peak: 0.007 }),
+  ],
+  close: [
+    tone(0, SLIDER_HUM, { a: 0.2, d: 0.07, peak: 0.02 }),
+    tone(0, SLIDER_HUM * 1.004, { a: 0.2, d: 0.07, wave: 'triangle', peak: 0.007 }),
+  ],
+  // The docked panel's hairline drawing out from the middle once it's in
+  // (0.4s, quick then slowing): two soft sines, low, blooming and fading as
+  // the line settles. Pulled in again (0.16s), the same two, heard short.
+  line: [
+    tone(0, 200, { a: 0.03, d: 0.36, peak: 0.006 }),
+    tone(0, 500, { a: 0.03, d: 0.36, peak: 0.004 }),
+  ],
+  erase: [
+    tone(0, 200, { a: 0.08, d: 0.06, peak: 0.006 }),
+    tone(0, 500, { a: 0.08, d: 0.06, peak: 0.004 }),
+  ],
+  // A picture or clip sweeping in behind its line of light: a low square
+  // gliding, from the Cue Designer (52 to 49 Hz, a 0.3s swell and 0.16s
+  // fade), its glide and envelope stretched to the line's crossing. Up or
+  // down the glide widens to a fourth around it, so it's heard to go the
+  // line's way: up as the line rises, down as it falls. Sideways it keeps
+  // the designer's own small fall. Well under the designer's peak (0.4): a
+  // low square is heard by its overtones, so a touch over the sines.
+  scan: (way) => scan(way, { a: 0.3 / 0.46, d: 0.16 / 0.46 }, (swell) => {
+    const [from, to] = way === 'up' ? [43, 57] : way === 'down' ? [57, 43] : [52.13285282252254, 49.181317777128314]
+    return tone(0.005, from, { wave: 'square', f2: to, glide: SCAN.seconds, ...swell, peak: 0.08 })
+  }),
+  // Another pick in the open side panel, as a slide projector advancing
+  // (GuideSheet.vue's swap): a lighter ka as the old one fades out, and the
+  // chunk of the next dropping into the gate as it comes in (0.13s), a dull
+  // body with a glint of metal and a hint of rattle. No air, no notes.
+  swap: [
+    noise(0, { f: 1400, q: 3, d: 0.006, peak: 0.022 }),
+    noise(0, { filter: 'lowpass', f: 500, d: 0.01, peak: 0.016 }),
+    noise(0.13, { filter: 'lowpass', f: 300, d: 0.03, peak: 0.032 }),
+    tone(0.13, 110, { a: 0.002, d: 0.04, peak: 0.016 }),
+    noise(0.13, { f: 2200, q: 5, d: 0.003, peak: 0.012 }),
+    noise(0.146, { f: 1600, q: 4, d: 0.002, peak: 0.007 }),
+  ],
   // A tooltip coming out: one small dry tick, the lightest of the relays.
   peek: [noise(0, { f: 3200, q: 4, d: 0.003, peak: 0.025 }), beep(0, 2000, 0.006, 0.01)],
+  // The mouse coming to another item in a graph (a project in the log, a
+  // release or month in the media strips): slighter than a tooltip's, lower
+  // and with no beep in it, just the tick.
+  point: [noise(0, { f: 1800, q: 5, d: 0.002, peak: 0.014 })],
   // The contributions' command typing itself in: soft keys, none quite like
   // the last (a click up top, a dull bottoming out under it), then a
   // heavier one for enter, and the log printing its rows as quiet ticks off
@@ -248,11 +388,24 @@ const panel: SoundSet = {
     : noise(0, { f: pick(PANEL_DROPS), q: 4, d: 0.003 + Math.random() * 0.004, peak: 0.02 + Math.random() * 0.012 })],
   // A word writing itself, a letter at a time: a trickle of soft thumps,
   // felt more than heard, low and dry, a touch higher along the word, never
-  // twice quite the same.
-  letter: (along, loud) => [
-    tone(0, 140 + along * 40 + Math.random() * 10, { a: 0.002, d: 0.025, peak: 0.012 * loud }),
-    noise(0, { filter: 'lowpass', f: 500, d: 0.006, peak: 0.005 * loud }),
+  // twice quite the same, and as loud whatever size the word is set.
+  letter: (along) => [
+    tone(0, 140 + along * 40 + Math.random() * 10, { a: 0.002, d: 0.025, peak: 0.006 }),
+    noise(0, { filter: 'lowpass', f: 500, d: 0.006, peak: 0.0025 }),
   ],
+  // The departures board in a station hall: each flap a small dry tick of
+  // card on card, never twice the same, and each row landing with a duller
+  // clack, a little lower. No beeps; it's the board, not the panel.
+  board: (rows) => board(rows, (at, landing, loud) => landing
+    ? noise(at, { f: 1300 + Math.random() * 300, q: 3, d: 0.007, peak: 0.028 * loud })
+    : noise(at, { f: 2400 + Math.random() * 1600, q: 5, d: 0.002 + Math.random() * 0.002, peak: 0.016 * loud })),
+  // A flip clock on the desk rather than the board across the hall: one
+  // unit, closer, thicker cards (lower, a touch longer, a dull body under
+  // each), fewer of them, and a soft wooden tock as it lands, a little
+  // brighter landing on light and duller on dark.
+  clock: (row, light) => board([row], (at, landing, loud) => landing
+    ? tone(at, 520 + light * 360, { a: 0.001, d: 0.025, peak: 0.03 })
+    : noise(at, { f: 1100 + Math.random() * 700, q: 4, d: 0.004 + Math.random() * 0.002, peak: 0.028 * loud }), CLOCK),
   on: [beep(0, 1000, 0.05), beep(0.08, 2000, 0.06)],
   off: [beep(0, 2000, 0.05), beep(0.08, 1000, 0.06)],
 }
@@ -291,12 +444,22 @@ const film: SoundSet = {
   back: [air(0, 5000, 600, 0.3, 0.07), tone(0, 330, { f2: 220, glide: 0.3, a: 0.1, d: 0.25, peak: 0.03, send: 0.4 })],
   open: [air(0, 800, 4000, 0.15, 0.05), ...glass(0.1, 440, 0.25, 0.05, 0.5), ...glass(0.1, 660, 0.2, 0.02, 0.5)],
   close: [...glass(0, 330, 0.2, 0.05, 0.4), air(0, 4000, 800, 0.15, 0.04)],
-  step: glass(0, 660, 0.06, 0.025),
+  line: [air(0, 3000, 5000, 0.3, 0.015), ...glass(0.05, 1320, 0.3, 0.012, 0.4)],
+  erase: glass(0, 1320, 0.08, 0.01, 0.3),
+  scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 220, { ...swell, peak: 0.03, send: 0.3 })),
+  swap: [...glass(0, 440, 0.1, 0.05, 0.4), ...glass(0.08, 660, 0.2, 0.05, 0.4)],
   peek: glass(0, 1320, 0.03, 0.012, 0.2),
+  point: glass(0, 990, 0.02, 0.008, 0.2),
   key: () => [noise(0, { f: 3000 + Math.random() * 1500, q: 2, d: 0.004, peak: 0.025 })],
   enter: [noise(0, { f: 2000, q: 2, d: 0.01, peak: 0.035 }), ...glass(0.01, 440, 0.08, 0.02, 0.3)],
   print: () => glass(0, pick([660, 880, 1320]), 0.03, 0.012, 0.3),
-  letter: (along, loud) => glass(0, 880 + along * 440, 0.02, 0.008 * loud, 0.3),
+  letter: (along) => glass(0, 880 + along * 440, 0.02, 0.004, 0.3),
+  board: (rows) => board(rows, (at, landing, loud) => landing
+    ? tone(at, 660, { a: 0.002, d: 0.05, peak: 0.02 * loud, send: 0.3 })
+    : noise(at, { f: 3000 + Math.random() * 2000, q: 2, d: 0.003, peak: 0.012 * loud, send: 0.2 })),
+  clock: (row, light) => board([row], (at, landing, loud) => landing
+    ? glass(at, 440 + light * 220, 0.08, 0.025, 0.3)[0]!
+    : noise(at, { f: 1800 + Math.random() * 1200, q: 2, d: 0.004, peak: 0.014 * loud, send: 0.2 }), CLOCK),
   on: [...glass(0, 440, 0.1, 0.05, 0.4), ...glass(0.08, 660, 0.2, 0.05, 0.4)],
   off: [...glass(0, 660, 0.1, 0.05, 0.4), ...glass(0.08, 330, 0.2, 0.05, 0.4)],
 }

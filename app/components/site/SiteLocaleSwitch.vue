@@ -19,7 +19,7 @@ const next = computed(() => {
   <div class="locale-switch">
     <span aria-hidden="true">lang="</span>
     <NuxtLink class="locale-switch__value" :to="switchLocalePath(next.code)" :lang="next.language"
-      :hreflang="next.language" :title="next.name" @click="haptic('toggle')">
+      :hreflang="next.language" :title="next.name" @click="haptic('language')">
       <span class="sr-only">{{ next.name }}</span>
       <span aria-hidden="true">{{ locale }}</span>
     </NuxtLink>

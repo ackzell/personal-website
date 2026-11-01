@@ -16,9 +16,14 @@
  * the page, the one before at the text's start and the one after at its end.
  * Each copy hides where the other shows. The footer's stays put while pages
  * change under it, so its names decode into the new ones; the page's comes
- * in with its page and just shows them.
+ * in with its page and just shows them, the footer's heard as a departures
+ * board turning over to the next stops (soundBoard), a row per name that
+ * changed, on the scramble's own timing (SiteScrambleText).
  */
-defineProps<{ bar?: boolean }>()
+const props = defineProps<{ bar?: boolean }>()
+const root = useTemplateRef<HTMLElement>('root')
+const reduceMotion = usePreferredReducedMotion()
+const { locale } = useI18n()
 
 const route = useRoute()
 const section = useSection()
@@ -33,12 +38,30 @@ const ways = computed(() =>
   }),
 )
 
+// A language switch turns them over with the rest of the page, and that
+// board is the page's (plugins/locale-scramble.client.ts).
+let spoken = locale.value
+watch(ways, (now, before) => {
+  const switched = spoken !== locale.value
+  spoken = locale.value
+  if (switched || !props.bar || reduceMotion.value === 'reduce' || !root.value?.offsetParent) return
+  const rows = now.flatMap((way) => {
+    const was = before.find((one) => one.rel === way.rel)
+    const rect = root.value!.querySelector(`[data-way="${way.rel}"]`)?.getBoundingClientRect()
+    const pan = rect ? (rect.left + rect.right) / window.innerWidth - 1 : 0
+    return ([[way.folders, was?.folders ?? ''], [way.label, was?.label ?? '']] as const)
+      .filter(([to, from]) => to !== from)
+      .map(([to, from]) => ({ at: 0, chars: Math.max(to.length, from.length), step: 1 / 40, settle: 0.3, pan }))
+  })
+  if (rows.length) soundBoard(rows)
+}, { flush: 'post' })
+
 // Taken, it's felt and heard as a tap on the flag band is.
 const go = () => haptic('go')
 </script>
 
 <template>
-  <div v-if="ways.length" class="next-stop" :class="bar ? 'next-stop--bar' : 'page next-stop--page'">
+  <div v-if="ways.length" ref="root" class="next-stop" :class="bar ? 'next-stop--bar' : 'page next-stop--page'">
     <div class="next-stop__row">
       <NuxtLinkLocale v-for="way in ways" :key="way.rel" :to="way.to" :rel="way.rel" :data-way="way.rel"
         :data-crossing="way.section !== section || undefined" :style="{ '--field': `var(--field-${way.section})` }"
