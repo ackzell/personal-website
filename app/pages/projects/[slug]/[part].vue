@@ -19,6 +19,14 @@ if (!project.value || !part.value || !page.value) {
 
 const siblings = computed(() => parts.value?.filter((p) => p.slug !== partSlug.value) ?? [])
 
+// The same row as the project page, with its family last.
+const sections = computed(() => [
+  { id: 'overview', label: t('projects.index.overview') },
+  { id: 'details', label: t('projects.index.details') },
+  { id: 'story', label: t('projects.index.story') },
+  ...(siblings.value.length ? [{ id: 'also', label: t('projects.alsoIn', { word: project.value?.word }) }] : []),
+])
+
 useSeoMeta({
   title: () => `${part.value?.title} · ${project.value?.title}`,
   description: () => part.value?.description,
@@ -31,11 +39,13 @@ useSeoMeta({
     { label: project.word, to: `/projects/${project.slug}`, lang: 'nah' },
     { label: part.title },
   ]">
+    <SiteSectionIndex :items="sections" layout="row" />
+
     <!-- The family's headword, with its mark, over the part's name, the way a
          sub-entry sits under its headword. Word and mark keep their project
          page size and travel names, so from the project page the word holds
          still while the plate shrinks into the margin beside it. -->
-    <header class="part-head" pt="block">
+    <header id="overview" class="part-head" pt="block">
       <ProjectSticker v-if="project.logo" class="part-head__plate" :src="project.logo"
         :style="plateTransition(project.slug)" />
       <NuxtLinkLocale :to="`/projects/${project.slug}`" class="part-head__family text-headword" typeset="heading"
@@ -50,11 +60,11 @@ useSeoMeta({
 
     <p class="gloss" mt="tight">{{ part.description }}</p>
 
-    <ProjectLedger :project="part" mt="block" />
+    <ProjectLedger id="details" :project="part" mt="block" />
 
-    <ContentRenderer v-if="page" :value="page" class="prose story" />
+    <ContentRenderer v-if="page" id="story" :value="page" class="prose story" />
 
-    <section v-if="siblings.length" aria-labelledby="siblings-heading" mt="section">
+    <section v-if="siblings.length" id="also" aria-labelledby="siblings-heading" mt="section">
       <h2 id="siblings-heading" mb="group" class="running-head">{{ t('projects.alsoIn', { word: project.word }) }}</h2>
       <ProjectParts :parts="siblings" />
     </section>

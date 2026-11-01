@@ -48,6 +48,8 @@ defineProps<{ crumbs: { label: string, to?: string, lang?: string }[] }>()
  * doesn't reach, so a traveling word never fades on its way. They develop
  * and land on the section's spring (vt-develop, vt-lift: main.css). A block
  * that brings its own entrance (the ledger) opts out with data-own-entrance.
+ * The section index comes first and brings its own, so the steps count from
+ * the second child.
  */
 @media (prefers-reduced-motion: no-preference) {
   .project > :slotted(:not([data-own-entrance])) {
@@ -56,15 +58,15 @@ defineProps<{ crumbs: { label: string, to?: string, lang?: string }[] }>()
       var(--arrive-duration) var(--ease-arrive) var(--enter-delay, 390ms) backwards vt-lift;
   }
 
-  .project > :slotted(:nth-child(1)) {
+  .project > :slotted(:nth-child(2)) {
     --enter-delay: 150ms;
   }
 
-  .project > :slotted(:nth-child(2)) {
+  .project > :slotted(:nth-child(3)) {
     --enter-delay: 230ms;
   }
 
-  .project > :slotted(:nth-child(3)) {
+  .project > :slotted(:nth-child(4)) {
     --enter-delay: 310ms;
   }
 }

@@ -24,6 +24,15 @@ const related = computed(() =>
     .filter((p) => p !== undefined),
 )
 
+// The row under the band names the entry's parts: its content can take the
+// whole width, so the index never sits in a margin here.
+const sections = computed(() => [
+  { id: 'overview', label: t('projects.index.overview') },
+  { id: 'details', label: t('projects.index.details') },
+  { id: 'story', label: t('projects.index.story') },
+  ...(related.value.length ? [{ id: 'related', label: t('projects.related') }] : []),
+])
+
 useSeoMeta({
   title: () => project.value?.title,
   description: () => project.value?.description,
@@ -33,6 +42,8 @@ useSeoMeta({
 <template>
   <ProjectPage v-if="project"
     :crumbs="[{ label: t('projects.title'), to: '/projects' }, { label: project.word, lang: 'nah' }]">
+    <SiteSectionIndex :items="sections" layout="row" />
+
     <WordHeading :slug="project.slug" :word="project.word" :pronunciation="project.pronunciation"
       :meaning="project.meaning" :status="project.status" :logo="project.logo" />
 
@@ -42,7 +53,7 @@ useSeoMeta({
          branches into the parts. Each part carries its own page, so this one
          stays an overview. The tree says what it is; the heading is for
          assistive tech. -->
-    <div class="entry" :class="{ 'entry--tree': parts?.length }" track="wide" mt="tight">
+    <div id="overview" class="entry" :class="{ 'entry--tree': parts?.length }" track="wide" mt="tight">
       <p class="project__description gloss" m="0">{{ project.description }}</p>
       <section v-if="parts?.length" aria-labelledby="parts-heading" mt="tight">
         <h2 id="parts-heading" class="sr-only">{{ t('projects.parts') }}</h2>
@@ -52,11 +63,11 @@ useSeoMeta({
 
     <!-- The facts, from metadata: the scan path. The story below is the
          owner's, composed per project from the Media* blocks. -->
-    <ProjectLedger :project="project" mt="block" />
+    <ProjectLedger id="details" :project="project" mt="block" />
 
-    <ContentRenderer v-if="page" :value="page" class="prose story" />
+    <ContentRenderer v-if="page" id="story" :value="page" class="prose story" />
 
-    <section v-if="related.length" aria-labelledby="related-heading" mt="section">
+    <section v-if="related.length" id="related" aria-labelledby="related-heading" mt="section">
       <!-- A running head, like the projects page title: the words below are the content. -->
       <h2 id="related-heading" mb="group" class="running-head">{{ t('projects.related') }}</h2>
       <ProjectIndex :projects="related" />

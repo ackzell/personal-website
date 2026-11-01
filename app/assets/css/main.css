@@ -204,8 +204,9 @@ pre.shiki {
 
 html {
   /* Anchored and focused content stays clear of the sticky header and
-     footer (SiteHeader, SiteFooter). */
-  scroll-padding-top: var(--header-height, 0);
+     footer (SiteHeader, SiteFooter), and of the section row where a page
+     has one (SiteSectionIndex). */
+  scroll-padding-top: calc(var(--header-height, 0px) + var(--section-index-height, 0px));
   scroll-padding-bottom: var(--footer-height, 0);
   /* No browser tap flash; links answer presses with their own :active state. */
   -webkit-tap-highlight-color: transparent;
@@ -233,7 +234,7 @@ html {
   }
 
   html {
-    scroll-padding-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
+    scroll-padding-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px) + var(--section-index-height, 0px));
     scroll-padding-bottom: var(--scheme-height, 0px);
   }
 
@@ -822,6 +823,24 @@ main:focus {
     [wide-end] minmax(var(--gutter), 1fr) [full-end];
   align-content: start;
   padding-block: var(--gap-block) var(--gap-section);
+}
+
+/* A page with its section index as a row starts lower by the row, which sits
+   in that room right under the band (SiteSectionIndex). The row's height is
+   set here, not measured, so anchors, the experience rail and the landing
+   mark clear it from the first paint; in the margin it takes none. */
+:root:has(.section-index) {
+  /* Its line (the names' text-[0.60rem] leading-[1.4]), and room under it:
+     above, the header's own padding is the gap, as between the band's rows. */
+  --section-index-height: calc(0.6rem * 1.4 + var(--gap-tight));
+}
+@media (width >= 60rem) {
+  :root:has(.section-index--auto) {
+    --section-index-height: 0px;
+  }
+}
+.page:has(> .section-index) {
+  padding-block-start: calc(var(--gap-block) + var(--section-index-height, 0px));
 }
 
 /* A section's child page (Videos, Podcast, Contributions): its blocks rise

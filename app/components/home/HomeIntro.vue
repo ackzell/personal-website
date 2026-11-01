@@ -385,10 +385,11 @@ onBeforeUnmount(() => {
   }
 }
 
-/* Laid out by script: the mark holds just under the header. */
+/* Laid out by script: the mark holds just under the header, and under the
+   section row where it shows (SiteSectionIndex). */
 .is-flowing .home-intro__mark {
   position: sticky;
-  inset-block-start: calc(var(--header-height, 0px) + var(--gap-block));
+  inset-block-start: calc(var(--header-height, 0px) + var(--section-index-height, 0px) + var(--gap-block));
 }
 
 .home-intro__lines {

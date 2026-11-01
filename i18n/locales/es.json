@@ -7,7 +7,8 @@
     "schemeSystem": "Sistema",
     "schemeLight": "Claro",
     "schemeDark": "Oscuro",
-    "sound": "Sonido"
+    "sound": "Sonido",
+    "sectionIndex": "En esta página"
   },
   "nav": {
     "label": "Principal",
@@ -16,6 +17,7 @@
     "media": "Contenido"
   },
   "home": {
+    "bio": "Sobre mí",
     "title": "Axel Martínez",
     "intro": "Ingeniero de software mexicano enfocado en el front end. Construyo herramientas para resolver mis propias necesidades y comparto lo que aprendo en el camino.",
     "featured": "En lo que estoy trabajando",
@@ -30,6 +32,11 @@
     "related": "Proyectos relacionados",
     "parts": "En este proyecto",
     "alsoIn": "También en {word}",
+    "index": {
+      "overview": "Resumen",
+      "details": "Detalles",
+      "story": "Historia"
+    },
     "status": {
       "shipped": "Publicado",
       "active": "En desarrollo",
