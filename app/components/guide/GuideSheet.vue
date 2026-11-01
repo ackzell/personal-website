@@ -433,6 +433,24 @@ useEventListener(panel, 'touchmove', touchMove, { passive: false })
   cursor: pointer;
 }
 
+/* all: unset clears the site's press (main.css) with it, so it's put back
+   at the key weight: it dims and gives a little under the finger. */
+.sheet__close {
+  transition: filter 0.25s var(--ease-out), scale 0.25s var(--ease-out);
+}
+
+.sheet__close:active {
+  filter: opacity(0.6);
+  scale: 0.92;
+  transition-duration: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet__close:active {
+    scale: none;
+  }
+}
+
 .sheet__close:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 2px;

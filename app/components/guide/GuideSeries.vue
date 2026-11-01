@@ -751,6 +751,16 @@ onBeforeUnmount(() => arrivals?.disconnect())
   line-height: 1.2;
 }
 
+/* all: unset clears the site's press (main.css) with it, so it's put back: the name dims while pressed. */
+.guide__name button {
+  transition: filter 0.25s var(--ease-out);
+}
+
+.guide__name button:active {
+  filter: opacity(0.55);
+  transition-duration: 0s;
+}
+
 .guide__name button::after {
   content: '+';
   color: var(--muted);
