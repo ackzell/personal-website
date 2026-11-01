@@ -1,5 +1,6 @@
 import { animate, scrambleText } from 'animejs'
 import type { JSAnimation } from 'animejs'
+import type { FlapRow } from '~/utils/soundSets'
 
 /*
  * On a language switch, short text in the page morphs from the old language
@@ -18,10 +19,17 @@ import type { JSAnimation } from 'animejs'
  * Vue owns these text nodes, so they're never replaced: each scramble runs on
  * an offscreen element and only its text is copied into the node's value.
  * The last frame is the text Vue rendered, so nothing drifts from the app.
+ *
+ * It's heard as a departures board turning over (soundBoard), each node a
+ * row of flaps on the scramble's own timing. Under reduced motion nothing
+ * scrambles, so the switch is heard as any other setting's.
  */
 const ROOTS = '.site-header, main, .site-footer'
 const SKIP = '[lang="nah"], script, style, code, pre, .sr-only, [data-no-scramble]'
 const MAX_LENGTH = 60
+// A letter settles every 1/REVEAL_RATE s after the one before, SETTLE ms after it starts scrambling.
+const REVEAL_RATE = 40
+const SETTLE = 300
 
 export default defineNuxtPlugin((nuxtApp) => {
   const i18n = nuxtApp.$i18n as { locale: Ref<string> }
@@ -58,6 +66,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     stop()
     const nodes = textNodes()
     const paired = nodes.length === before.length
+    const rows: FlapRow[] = []
 
     nodes.forEach((node, i) => {
       const text = node.nodeValue!
@@ -69,6 +78,16 @@ export default defineNuxtPlugin((nuxtApp) => {
       // Below the fold it would play unseen.
       if (rect.bottom < 0 || rect.top > window.innerHeight) return
 
+      // A wave down the screen, at most a quarter second end to end.
+      const delay = Math.min(250, Math.max(0, (rect.top / window.innerHeight) * 250))
+      rows.push({
+        at: delay / 1000,
+        chars: Math.max((old ?? text).length, text.length),
+        step: 1 / REVEAL_RATE,
+        settle: SETTLE / 1000,
+        pan: ((rect.left + rect.right) / window.innerWidth) - 1,
+      })
+
       const proxy = document.createElement('span')
       proxy.textContent = old ?? text
       const animation = animate(proxy, {
@@ -78,11 +97,10 @@ export default defineNuxtPlugin((nuxtApp) => {
           from: 'left',
           // Paired: start from the old words as they were. Unpaired: noise.
           override: paired ? false : true,
-          revealRate: 40,
-          settleDuration: 300,
+          revealRate: REVEAL_RATE,
+          settleDuration: SETTLE,
         }),
-        // A wave down the screen, at most a quarter second end to end.
-        delay: Math.min(250, Math.max(0, (rect.top / window.innerHeight) * 250)),
+        delay,
         onUpdate: () => {
           node.nodeValue = proxy.textContent
         },
@@ -94,12 +112,13 @@ export default defineNuxtPlugin((nuxtApp) => {
       node.nodeValue = proxy.textContent
       running.push({ animation, node, text })
     })
+    if (rows.length) soundBoard(rows)
   }
 
   // flush: 'pre' runs before the page re-renders, so this still reads the
   // old language.
   watch(i18n.locale, () => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return sound('toggle')
     stop()
     const before = textNodes().map((node) => node.nodeValue!)
     nuxtApp.hooks.hookOnce('page:finish', () => {

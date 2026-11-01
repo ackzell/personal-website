@@ -101,6 +101,9 @@ function read(event: PointerEvent) {
   if (touch?.scrubbing && reading.value !== null && column !== reading.value) {
     const { videos, episodes } = columns.value[column]!
     haptic('tick', Math.max(weigh(videos), weigh(episodes)) / busiest.value)
+  } else if (event.pointerType === 'mouse' && column !== reading.value) {
+    // A mouse hears a slight tick for each column it comes to.
+    sound('point')
   }
   reading.value = column
 }

@@ -142,7 +142,8 @@ function go(step: number) {
   switches.value++
   const total = props.items.length
   index.value = (index.value + step + total) % total
-  sound('step')
+  // Its line sweeps the way the strip goes: left to the next, right back.
+  soundScan(forward.value ? 'left' : 'right')
 }
 
 /** Jumps to the one at `i`, from the strip. */
@@ -152,7 +153,7 @@ function jump(i: number) {
   stepping.value = true
   switches.value++
   index.value = i
-  sound('step')
+  soundScan(forward.value ? 'left' : 'right')
 }
 
 // The strip's line is placed under the one showing, and travels from there.
@@ -256,7 +257,7 @@ watch(index, async (now, before) => {
   empty(now)
   if (before === null) {
     stepping.value = false
-    sound('open')
+    // Silent for now: the panel's slide-in hum didn't suit the flight.
     el.showModal()
     await nextTick()
     fly(now, 'in')

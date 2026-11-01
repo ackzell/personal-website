@@ -15,7 +15,8 @@ const reduceMotion = usePreferredReducedMotion()
 const { t } = useI18n()
 
 // The phone rail stands on it (main.css), so it needs the height.
-usePublishedHeight(useTemplateRef<HTMLElement>('root'), '--scheme-height')
+const root = useTemplateRef<HTMLElement>('root')
+usePublishedHeight(root, '--scheme-height')
 
 // The stored preference, not the resolved scheme, so "system" can show. Until
 // it is known (prerendered pages, until mount) the text stays hidden. Gated on
@@ -28,6 +29,9 @@ const scheme = computed<Scheme>(() => {
   return order.includes(preference) ? preference : 'system'
 })
 const next = computed<Scheme>(() => order[(order.indexOf(scheme.value) + 1) % order.length]!)
+
+// Where each lands on the flip clock's tock: brighter on light, duller on dark.
+const LIGHT: Record<Scheme, number> = { light: 1, system: 0.5, dark: 0 }
 
 const labels = computed<Record<Scheme, string>>(() => ({
   system: t('site.schemeSystem'),
@@ -51,8 +55,21 @@ function toggle() {
   const from = shown.value
   const to = next.value
   colorMode.preference = to
-  haptic('toggle')
-  if (reduceMotion.value === 'reduce') return
+  haptic('scheme')
+  // Nothing scrambles: heard as any other setting.
+  if (reduceMotion.value === 'reduce') return sound('toggle')
+
+  // Heard as a flip clock turning over, on the scramble's own timing, leaning
+  // a little toward where the switch sits: one word alone off to one side
+  // would sound one-eared in headphones.
+  const rect = root.value?.getBoundingClientRect()
+  soundClock({
+    at: 0,
+    chars: Math.max(from.length, to.length),
+    step: 1 / 40,
+    settle: 0.3,
+    pan: rect ? ((rect.left + rect.right) / window.innerWidth - 1) * 0.35 : 0,
+  }, LIGHT[to])
 
   running?.cancel()
   const proxy = document.createElement('span')

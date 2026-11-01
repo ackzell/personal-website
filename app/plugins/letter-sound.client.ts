@@ -4,10 +4,9 @@
  * each leaning in on its own delay through --slnt, main.css) are heard as
  * they're seen, from one place: each letter thumps as its lean starts. Only
  * on the way in: a letter still near upright when it starts is leaning in;
- * one near -15 is going back. A bigger word is louder, against a headword.
+ * one near -15 is going back. Every word at one level, whatever its size.
  */
 const LEANED = -15
-const HEADWORD = 48
 
 export default defineNuxtPlugin(() => {
   document.addEventListener('transitionstart', (event) => {
@@ -18,6 +17,6 @@ export default defineNuxtPlugin(() => {
     const word = char.parentElement?.children
     if (!word) return
     const along = word.length > 1 ? Array.prototype.indexOf.call(word, char) / (word.length - 1) : 0
-    soundLetter(along, Math.min(Math.max(Number.parseFloat(style.fontSize) / HEADWORD, 0.2), 1))
+    soundLetter(along)
   })
 })

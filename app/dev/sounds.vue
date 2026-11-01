@@ -26,8 +26,11 @@ const KINDS: { kind: SoundKind, what: string }[] = [
   { kind: 'back', what: 'to an earlier section' },
   { kind: 'open', what: 'sheet, panel, lightbox up' },
   { kind: 'close', what: 'and away' },
-  { kind: 'step', what: 'the next picture, the next pick' },
+  { kind: 'line', what: 'the docked panel\'s hairline drawing in' },
+  { kind: 'erase', what: 'and back' },
+  { kind: 'swap', what: 'another pick in the open side panel' },
   { kind: 'peek', what: 'a tooltip coming out' },
+  { kind: 'point', what: 'the mouse on another project, release or month' },
   { kind: 'on', what: 'sound switched on' },
   { kind: 'off', what: 'and off' },
 ]
@@ -63,13 +66,27 @@ function socials(set: SoundSetName) {
   SOCIALS.forEach((hz, i) => timers.push(setTimeout(() => playNoteFrom(set, hz), i * 160)))
   timers.push(setTimeout(() => (playing.value = undefined), SOCIALS.length * 160))
 }
-// A word writing itself under the pointer, as big as the size below.
+// A word writing itself under the pointer.
 function word(set: SoundSetName) {
   stop()
   playing.value = set
   const letters = 8
-  for (let i = 0; i < letters; i++) timers.push(setTimeout(() => playLetterFrom(set, i / (letters - 1), size.value), i * 35))
+  for (let i = 0; i < letters; i++) timers.push(setTimeout(() => playLetterFrom(set, i / (letters - 1)), i * 35))
   timers.push(setTimeout(() => (playing.value = undefined), letters * 35))
+}
+// The header and a page's headings switching language: rows down the screen.
+const BOARD_ROWS = [
+  { at: 0, chars: 6, pan: -0.8 }, { at: 0, chars: 5, pan: 0.2 }, { at: 0, chars: 8, pan: 0.5 },
+  { at: 0.05, chars: 18, pan: -0.4 }, { at: 0.1, chars: 32, pan: -0.2 }, { at: 0.18, chars: 12, pan: -0.5 },
+].map((row) => ({ ...row, step: 1 / 40, settle: 0.3 }))
+// The footer's color-scheme="system" turning to light, then dark.
+const CLOCK_ROW = { at: 0, chars: 6, step: 1 / 40, settle: 0.3, pan: 0.6 }
+function clock(set: SoundSetName) {
+  stop()
+  playing.value = set
+  playClockFrom(set, CLOCK_ROW, 1)
+  timers.push(setTimeout(() => playClockFrom(set, { ...CLOCK_ROW, chars: 5 }, 0), 700))
+  timers.push(setTimeout(() => (playing.value = undefined), 1400))
 }
 const all = (set: SoundSetName) => sequence(set, KINDS.map(({ kind }) => [kind, size.value]), 550)
 
@@ -108,6 +125,10 @@ function use(set: SoundSetName) {
             <button type="button" @click="scrub(set)">scrub</button>
             <button type="button" @click="socials(set)">socials</button>
             <button type="button" @click="word(set)">word</button>
+            <button type="button" @click="playBoardFrom(set, BOARD_ROWS)">language</button>
+            <button type="button" @click="clock(set)">scheme</button>
+            <button v-for="way in (['up', 'down', 'left', 'right'] as const)" :key="way" type="button"
+              @click="playScanFrom(set, way)">scan {{ way }}</button>
             <button type="button" @click="playSlideFrom(set, -0.7, 0.5)">slide long</button>
             <button type="button" @click="playSlideFrom(set, 0.1, 0.25)">slide short</button>
             <button type="button" :disabled="using === set" @click="use(set)">use on the site</button>
