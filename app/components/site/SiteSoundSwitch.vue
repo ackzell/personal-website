@@ -22,7 +22,7 @@ function toggle() {
 
 <template>
   <!-- The quotes are decoration; the button reads as sound, pressed or not. -->
-  <div class="sound-switch">
+  <div class="sound-switch" data-keeps-panel>
     <span aria-hidden="true">sound="</span>
     <button type="button" class="sound-switch__value" :aria-pressed="on" :title="$t('site.sound')" @click="toggle">
       <span class="sr-only">{{ $t('site.sound') }}</span>
