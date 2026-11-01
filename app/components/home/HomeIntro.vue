@@ -3,6 +3,7 @@ import { layout, layoutNextLine, prepareWithSegments } from '@chenglou/pretext'
 import type { LayoutCursor, PreparedTextWithSegments } from '@chenglou/pretext'
 import { animate, frame, mapValue, motionValue, svgEffect, type AnimationPlaybackControls } from 'motion-v'
 import { ANGLE, INK_SECONDS, INK_STAGGER } from '~/utils/soundSets'
+import { localeSwitching } from '~/utils/localeSwitch'
 
 /*
  * The landing intro: the whole ax mark, set apart above the name and the
@@ -209,7 +210,7 @@ function schedule() {
 }
 
 function relayout() {
-  if (!flowing.value) return
+  if (!flowing.value || localeSwitching.value) return
   prepareText()
   measure()
 }
@@ -345,7 +346,9 @@ function replay() {
 useEventListener(window, 'scroll', schedule, { passive: true })
 onMounted(() => onBeforeUnmount(onSoundOn(replay)))
 useResizeObserver(root, relayout)
-watch(() => [props.title, props.text], relayout)
+// A language switch fades the painted lines out still in the old language
+// (plugins/locale-scramble.client.ts): relayout holds off until it's over.
+watch(() => [props.title, props.text, localeSwitching.value], relayout)
 
 onMounted(async () => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -371,7 +374,7 @@ onBeforeUnmount(() => {
     </div>
     <h1 ref="heading" :class="{ 'sr-only': flowing }">{{ title }}</h1>
     <p ref="body" :class="{ 'sr-only': flowing }">{{ text }}</p>
-    <div v-show="flowing" ref="lines" class="home-intro__lines" aria-hidden="true" data-no-scramble />
+    <div v-show="flowing" ref="lines" class="home-intro__lines" aria-hidden="true" data-no-scramble data-switch-fade />
   </div>
 </template>
 
