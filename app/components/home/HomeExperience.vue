@@ -60,7 +60,11 @@ const hovered = ref<string>()
 const reading = ref<string>()
 const focused = ref<string>()
 const scrubbed = ref<string>()
-const lit = computed(() => focused.value ?? scrubbed.value ?? reading.value)
+// The rail stuck under the header, beside the first role: until then the
+// light waits off, so it comes on, and is heard, as the band settles in to
+// be read, not on the scroll after. Focus and a scrub light it regardless.
+const stuck = ref(false)
+const lit = computed(() => focused.value ?? scrubbed.value ?? (stuck.value ? reading.value : undefined))
 // pending: hidden, waiting to scroll in. drawn: fields grown to full.
 const state = ref<'drawn' | 'pending'>('drawn')
 
@@ -78,7 +82,18 @@ const arrive = useDebounceFn(() => {
 }, 150)
 useEventListener('scroll', () => {
   if (travelling.value) arrive()
+  checkStuck()
 }, { passive: true })
+
+// The first role's top reaching the rail's sticky line is when the rail
+// sticks (both start the body's grid row).
+function checkStuck() {
+  const first = entries.value?.[0]
+  const rail = band.value?.parentElement
+  if (!first || !rail) return
+  stuck.value = first.getBoundingClientRect().top <= Number.parseFloat(getComputedStyle(rail).top) + 2
+}
+onMounted(checkStuck)
 
 // The role crossing a thin line a third of the way down the viewport.
 useIntersectionObserver(entries, (records) => {
@@ -154,8 +169,12 @@ useMotionValueEvent(lightTop, 'change', (now) => light.value?.style.setProperty(
 useMotionValueEvent(lightBottom, 'change', (now) => light.value?.style.setProperty('--bottom', `${now}px`))
 
 function placeLight(jump = false) {
-  const field = band.value?.querySelector<HTMLElement>(`[data-slug="${lit.value}"]`)
-  if (!field) return
+  const field = lit.value ? band.value?.querySelector<HTMLElement>(`[data-slug="${lit.value}"]`) : undefined
+  if (!field) {
+    // Scrolled back above the first role: off again, until it sticks again.
+    if (!lit.value) lightOn.value = false
+    return
+  }
   const top = field.offsetTop
   const bottom = top + field.offsetHeight
   if (jump) {
@@ -163,15 +182,17 @@ function placeLight(jump = false) {
     lightBottom.jump(bottom)
     return
   }
-  if (!lightOn.value) {
+  const coming = !lightOn.value
+  if (coming) {
     lightTop.jump(top)
     lightBottom.jump(top)
     lightOn.value = true
   }
   const down = top >= lightTop.get()
   // Felt and heard as it goes, fuller the farther it has to: on a scroll, a
-  // tap, a key. Not while the band is scrubbed (it ticks for itself).
-  const travel = Math.abs(top - lightTop.get()) / (band.value?.offsetHeight || 1)
+  // tap, a key. Coming on, as far as it fills its field. Not while the band
+  // is scrubbed (it ticks for itself).
+  const travel = (coming ? bottom - top : Math.abs(top - lightTop.get())) / (band.value?.offsetHeight || 1)
   if (travel && !scrubbed.value) haptic('role', travel)
   animate(lightTop, top, spring(down ? TRAIL : LEAD))
   animate(lightBottom, bottom, spring(down ? LEAD : TRAIL))
