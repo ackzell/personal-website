@@ -253,55 +253,61 @@ let letterTurn = 0
 const idFor = (kind: Sound) => (TURNS[kind] ? `${kind}:${turn++ % TURNS[kind]}` : kind)
 
 /*
+ * Whether a sound would be heard now. Muted, nothing is played at all: the
+ * first play wakes the audio (an AudioContext, a few dozen ms on a phone),
+ * and a swipe's detent shouldn't stall the page under the finger for a
+ * sound nobody hears.
+ */
+function heard() {
+  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return false
+  if (import.meta.dev) set({ muted: !soundIsOn() })
+  start()
+  return !get().muted
+}
+
+/*
  * Browsers only let audio start after the visitor has pressed or typed
  * something. Until then a sound is left out rather than queued: a role
  * reaching the line on the first scroll isn't worth waking the audio for.
  */
 export function sound(kind: Sound, size?: number) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   playOne(soundSet(), kind, size, idFor(kind))
 }
 
 /** A single note at `hz`, in the set's voice: for what plays a tune. */
 export function soundNote(hz: number) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   playNote(soundSet(), hz)
 }
 
 /** A letter of a word writing itself (SoundSet's `letter`): where it is in the word. */
 export function soundLetter(along: number) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   play(SOUND_SETS[soundSet()].letter(along), `letter:${letterTurn++ % 3}`)
 }
 
 /** The band's marker sliding across the screen, `from` and `to` from -1 (left) to 1 (right). */
 export function soundSlide(from: number, to: number) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   play(SOUND_SETS[soundSet()].slide(from, to), 'slide')
 }
 
 /** The page's text scrambling into another language, as a departures board turning over. */
 export function soundBoard(rows: FlapRow[]) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   play(SOUND_SETS[soundSet()].board(rows), 'board')
 }
 
 /** The color scheme's word scrambling into the next, as a flip clock: landing `light` (1), dark (0), system (0.5). */
 export function soundClock(row: FlapRow, light: number) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   play(SOUND_SETS[soundSet()].clock(row, light), 'clock')
 }
 
 /** A uses table drawing in: `rules` rules, one every `step` seconds. */
 export function soundTable(rules: number, step: number) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   play(SOUND_SETS[soundSet()].table(rules, step), 'table')
 }
 
@@ -310,8 +316,7 @@ export function soundTable(rules: number, step: number) {
  * the lightbox), the line going `way`, at `loud` of its set's level.
  */
 export function soundScan(way: ScanWay, loud = 1) {
-  if (!import.meta.client || navigator.userActivation?.hasBeenActive === false) return
-  if (import.meta.dev) set({ muted: !soundIsOn() })
+  if (!heard()) return
   const score = SOUND_SETS[soundSet()].scan(way)
   play(loud === 1 ? score : score.map(part => ({
     ...part,

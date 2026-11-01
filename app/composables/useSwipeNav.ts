@@ -53,10 +53,36 @@ export function useSwipeNav() {
   const localePath = useLocalePath()
   const nuxtApp = useNuxtApp()
   const { from } = useNavStops()
+  const section = useSection()
   const reducedMotion = usePreferredReducedMotion()
   const root = import.meta.client ? document.documentElement : undefined
 
   const at = (by: 1 | -1) => from(route.path, by)?.to
+
+  /*
+   * The pages either side are fetched ahead (their code and payload, as a
+   * NuxtLink in view would), so a swipe that goes doesn't wait on the network:
+   * the view transition freezes the screen from the old page's snapshot until
+   * the new page has rendered, and the route's code is fetched before even
+   * that, with the page held where the finger left it.
+   */
+  const warmed = new Set<string>()
+  function warm(to: string | undefined) {
+    if (!to) return
+    const path = localePath(to)
+    if (warmed.has(path)) return
+    warmed.add(path)
+    preloadRouteComponents(path).catch(() => {})
+    nuxtApp.callHook('link:prefetch', path)?.catch(() => {})
+  }
+  const warmAround = () => {
+    warm(at(1))
+    warm(at(-1))
+  }
+  if (import.meta.client && matchMedia('(pointer: coarse)').matches) {
+    const idle = window.requestIdleCallback ?? ((then: () => void) => setTimeout(then, 300))
+    watch(() => route.path, () => onNuxtReady(() => idle(warmAround)), { immediate: true })
+  }
 
   /** How far the finger goes before letting go commits, in px. */
   const distance = () => Math.min(window.innerWidth / 4, 120)
@@ -174,6 +200,7 @@ export function useSwipeNav() {
     if (touch.clientX < EDGE || touch.clientX > window.innerWidth - EDGE) return
     if (scrollsSideways(event.target as Element) || claimsSideways(event.target as Element)) return
     if (document.querySelector(':modal')) return
+    warmAround()
     start = { x: touch.clientX, y: touch.clientY }
     last = { x: touch.clientX, time: event.timeStamp, speed: 0 }
   }
@@ -232,7 +259,19 @@ export function useSwipeNav() {
     transition.finished.finally(cleanUp)
   })
 
+  /** How long the page takes to carry on out, at about the finger's pace: the rest of a third of the screen, in 160 to 320ms. */
+  function outTime(speed: number) {
+    const rest = window.innerWidth / 3 - Math.abs(place)
+    return Math.round(Math.min(Math.max((rest / Math.max(speed, 1)) * 1000, 160), 320))
+  }
+
   function go(to: string, way: 1 | -1, speed: number, { x, y }: { x: number; y: number }) {
+    // The next page comes in from the finger.
+    pressAt({ x, y })
+    const path = localePath(to)
+    // Within a section the page leaves on its own (leave); a section change
+    // keeps its tiles, which need the new page in hand before they start.
+    if (place && 'startViewTransition' in document && from(route.path, way)?.section === section.value) return leave(path, way, speed)
     const cleanUp = () => {
       release()
       root!.style.removeProperty('--swipe-out')
@@ -242,22 +281,127 @@ export function useSwipeNav() {
     if (place) {
       // Held where they are for the snapshot.
       for (const block of blocks.values()) block.detach?.()
-      // Off the way it was headed, at about the finger's pace: the rest of a
-      // third of the screen, in no less than 160ms or more than 320.
-      const rest = window.innerWidth / 3 - Math.abs(place)
-      const time = Math.min(Math.max((rest / Math.max(speed, 1)) * 1000, 160), 320)
-      root!.style.setProperty('--swipe-out', `${Math.round(time)}ms`)
+      root!.style.setProperty('--swipe-out', `${outTime(speed)}ms`)
       root!.dataset.swipe = way > 0 ? 'forward' : 'back'
       handing = cleanUp
     }
-    // The next page comes in from the finger.
-    pressAt({ x, y })
-    router.push(localePath(to)).finally(() => {
+    router.push(path).finally(() => {
       // No view transition took it (none in this browser, or the navigation
       // didn't happen): the page goes back into place.
       if (handing !== cleanUp) return
       handing = undefined
       cleanUp()
+    })
+  }
+
+  /*
+   * Within a section, the page never waits on the next one. Nuxt's view
+   * transition holds the old page still from its snapshot until the new page
+   * has rendered, and a phone takes a beat to render one: the swipe would
+   * stop dead there. So the swipe runs a view transition of its own, whose
+   * only change is hiding the page it's leaving (data-arriving), cheap enough
+   * that the old page carries on out at once, on the compositor, and keeps
+   * going while the new page renders under it (data-swipe-leave, main.css).
+   * Only then does the route change, without Nuxt's transition; the rest of
+   * the site (the arrival, the scroll, the band's sounds) is told of it as
+   * one that starts now and is ready once the new page is in.
+   *
+   * Words and the band's marker don't get layers of their own for it: the
+   * words leave inside their page, and the marker, part of the live band,
+   * slides to its new stop by itself (slideMarker).
+   */
+  let handoff: { to: string; transition: ViewTransition; marker?: DOMRect } | undefined
+
+  function leave(path: string, way: 1 | -1, speed: number) {
+    // Read before anything is written, so it doesn't make the browser work
+    // the whole page's style out an extra time just as the finger lets go.
+    const marker = document.querySelector('.flag-nav__marker')?.getBoundingClientRect()
+    // The old page is drawn in <main>'s place as it is now: if the page
+    // scrolls under it (router.options), it keeps where it was read.
+    const top = window.scrollY
+    // Held where the finger left them for the snapshot.
+    for (const block of blocks.values()) block.detach?.()
+    root!.style.setProperty('--swipe-out', `${outTime(speed)}ms`)
+    root!.dataset.swipe = way > 0 ? 'forward' : 'back'
+    root!.dataset.swipeLeave = ''
+    const onScroll = () => root!.style.setProperty('--page-shift', `${window.scrollY - top}px`)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    const transition = document.startViewTransition(() => {
+      release()
+      root!.dataset.arriving = ''
+    })
+    const own = { to: router.resolve(path).fullPath, transition, marker }
+    handoff = own
+    transition.finished.finally(() => {
+      window.removeEventListener('scroll', onScroll)
+      root!.style.removeProperty('--page-shift')
+      delete root!.dataset.swipeLeave
+      root!.style.removeProperty('--swipe-out')
+      delete root!.dataset.swipe
+    })
+    // Once it's moving, so the new page's render doesn't hold up its start.
+    transition.ready.catch(() => {}).finally(() => {
+      router.push(path).then((failure) => {
+        if (handoff !== own) return
+        // It didn't go: the page it hid comes back.
+        handoff = undefined
+        if (failure) delete root!.dataset.arriving
+      }, () => {
+        if (handoff === own) handoff = undefined
+        delete root!.dataset.arriving
+      })
+    })
+  }
+
+  // Not through Nuxt's view transition: the swipe's own is already under way.
+  router.beforeEach((to) => {
+    if (handoff?.to === to.fullPath) to.meta.viewTransition = false
+  })
+
+  router.beforeResolve((to) => {
+    const own = handoff
+    if (!own || own.to !== to.fullPath) return
+    handoff = undefined
+    let cancel = () => {}
+    const rendered = new Promise<void>((resolve, reject) => {
+      const off = nuxtApp.hook('page:finish', () => {
+        off()
+        resolve()
+      })
+      cancel = () => {
+        off()
+        reject(new Error('navigation cancelled'))
+      }
+    })
+    rendered.catch(() => {
+      delete root!.dataset.arriving
+    })
+    const stop = router.afterEach((_, __, failure) => {
+      stop()
+      if (failure) cancel()
+    })
+    rendered.then(() => slideMarker(own.marker), () => {})
+    const standIn = {
+      types: new Set<string>(),
+      updateCallbackDone: rendered,
+      ready: rendered,
+      finished: Promise.allSettled([own.transition.finished, rendered]).then(() => {}),
+      skipTransition: () => {},
+    } as unknown as ViewTransition
+    return nuxtApp.callHook('page:view-transition:start', standIn)
+  })
+
+  /** The band's marker, now on the new stop, slides there from where it was. */
+  function slideMarker(was?: DOMRect) {
+    const el = document.querySelector<HTMLElement>('.flag-nav__marker')
+    const now = el?.getBoundingClientRect()
+    if (!el || !was || !now) return
+    const dx = was.left - now.left
+    const dy = was.top - now.top
+    if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return
+    el.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], {
+      duration: parseFloat(getComputedStyle(root!).getPropertyValue('--page-transition')) || 550,
+      easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
     })
   }
 
