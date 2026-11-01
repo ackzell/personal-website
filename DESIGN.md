@@ -222,7 +222,7 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Do** use semantic color tokens and spacing roles (`gap-group`, `mt-section`) from the UnoCSS preset, not raw values.
 - **Do** give every motion a reduced-motion answer: the color change still reads, the movement goes.
 - **Do** keep icon-only controls labelled via aria-label and title, with touch targets at least 30px.
-- **Do** answer every press at once and ease back over 250ms as it lifts, at one of three weights set with `data-press` (main.css): words dim, small controls (`key`) dim and give a little, pictures (`sink`) sink and darken. Something with its own press answer opts out with `data-press="none"`. A control reset with `all: unset` loses the press with it, so it puts its press back in its own styles.
+- **Do** answer every press at once and ease back over 250ms as it lifts, at one of three weights set with `data-press` (main.css): words dim, small controls (`key`) dim and give a little, pictures (`sink`) sink and darken; a link stretched over its row (`cover`) dims by opacity, never filter or scale, which would shrink its target. Something with its own press answer opts out with `data-press="none"`. A control reset with `all: unset` loses the press with it, so it puts its press back in its own styles.
 - **Do** use `ease-out` (cubic-bezier(0.16, 1, 0.3, 1)) for entrances and `ease-in-out` (cubic-bezier(0.65, 0, 0.35, 1)) for things that move across the screen.
 
 ### Don't:

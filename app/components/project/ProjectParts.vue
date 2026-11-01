@@ -17,7 +17,7 @@ defineProps<{
 <template>
   <ul class="parts" :class="{ 'parts--rooted': rooted }" m="0" p="0" list="none">
     <li v-for="(part, i) in parts" :key="part.slug" class="parts__item" :style="{ '--row': i }">
-      <NuxtLinkLocale :to="`/projects/${part.parent}/${part.slug}`" class="parts__name" typeset="heading">
+      <NuxtLinkLocale :to="`/projects/${part.parent}/${part.slug}`" class="parts__name" data-press="cover" typeset="heading">
         <!-- One span per letter so the lean ripples through the name.
              Assistive tech gets the whole name from the hidden copy. -->
         <span class="sr-only">{{ part.title }}</span>

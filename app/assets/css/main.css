@@ -781,6 +781,10 @@ a {
  *   key     small controls, an icon or a word in a box: they dim and give
  *           a little under the finger.
  *   sink    pictures (thumbnails): they sink and darken, as a print would.
+ *   cover   a link stretched over its row by an absolute ::after: dims
+ *           with opacity, as a filter (or scale) on the link would make it
+ *           the ::after's box, shrinking the target to the words under
+ *           the press, and the release would land outside it, no click.
  *   none    has its own answer (the flag nav's marker, the stills' lean).
  * filter: opacity() rather than opacity, so a control already resting
  * dimmed (the switches, the section index) dims from where it is, and no
@@ -788,7 +792,7 @@ a {
  * specificity, so any component rule wins.
  */
 :where(a, button, summary, [role='button'], [role='tab']):where(:not([data-press='none'])) {
-  transition: filter 0.25s var(--ease-out), scale 0.25s var(--ease-out);
+  transition: filter 0.25s var(--ease-out), scale 0.25s var(--ease-out), opacity 0.25s var(--ease-out);
 }
 
 :where(a, button, summary, [role='button'], [role='tab']):where(:active:not([data-press='none'], :disabled, [aria-disabled='true'])) {
@@ -799,6 +803,11 @@ a {
 :where([data-press='key']):where(:active:not(:disabled)) {
   filter: opacity(0.6);
   scale: 0.92;
+}
+
+:where([data-press='cover']):where(:active) {
+  filter: none;
+  opacity: 0.55;
 }
 
 :where([data-press='sink']):where(:active:not(:disabled)) {

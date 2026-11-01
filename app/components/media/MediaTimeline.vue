@@ -157,7 +157,7 @@ const readout = computed(() => {
     <section v-for="half in halves" :key="half.slug" class="timeline__half" :class="`timeline__half--${half.slug}`" :aria-labelledby="`half-${half.slug}`">
       <div class="timeline__label">
         <h2 :id="`half-${half.slug}`" class="timeline__word text-headword" m="0" typeset="heading">
-          <NuxtLinkLocale :to="`/${half.slug}`" class="timeline__link" decoration="none">
+          <NuxtLinkLocale :to="`/${half.slug}`" class="timeline__link" data-press="cover" decoration="none">
             <span :style="mediaTransition(half.slug)">
               <!-- One span per letter so the hover can ripple through the word.
                    Assistive tech gets the whole word from the hidden copy. -->
@@ -183,11 +183,10 @@ const readout = computed(() => {
           :class="{ 'is-read': column.index === reading }"
           :style="{ '--t': column.index / Math.max(1, columns.length - 1), 'block-size': `${(weigh(column[sideOf(half.slug)]) / busiest) * 100}%` }"
         >
-          <!-- A month of videos is one bar: a short video would be a block
-               thinner than its gap, and dozens of them shimmered as the page
-               scrolled. Episodes run long enough to stay apart. -->
-          <span v-if="half.slug === 'videos'" class="timeline__block" />
-          <span v-for="release in column.episodes" v-else :key="release.id" class="timeline__block" :style="{ flexGrow: weightOf(release) }" />
+          <!-- A month is one bar on both halves: a short video would be a
+               block thinner than its gap, and dozens of them shimmered as the
+               page scrolled. Episodes are told apart on the podcast's own page. -->
+          <span class="timeline__block" />
         </div>
       </NuxtLinkLocale>
     </section>
@@ -327,10 +326,6 @@ const readout = computed(() => {
 .timeline__column {
   display: flex;
   flex-direction: column;
-  gap: 1px;
-  /* A month of many short videos has more gaps than height; it never spills
-     over the axis. */
-  overflow: clip;
   transform-origin: bottom;
   transition: opacity 200ms var(--ease-out);
   /* Backwards, not both: once grown, a column drops its animation and its

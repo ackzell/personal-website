@@ -348,8 +348,9 @@ function blur(slug: string) {
           @pointermove="scrubMove" @pointerup="scrubEnd" @pointercancel="scrubEnd" @click.capture="scrubClick">
           <!-- Pointer shortcuts to the links on the roles themselves, so kept out of the tab
                order and the accessibility tree. -->
-          <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1" draggable="false" data-press="none"
-            class="experience__field" :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
+          <a v-for="(role, i) in roles" :key="role.slug" :href="`#role-${role.slug}`" tabindex="-1" draggable="false"
+            data-press="none" class="experience__field"
+            :class="{ 'is-lit': lit === role.slug, 'is-hovered': hovered === role.slug }"
             :style="{ '--months': role.months, '--i': i }" :data-slug="role.slug" @click="go($event, role.slug)"
             @pointerenter="point($event, role.slug)" @pointerleave="leave(role.slug)">
             <span v-for="{ item, at } in earned[role.slug]" :key="item.slug" class="experience__tick"
@@ -387,9 +388,9 @@ function blur(slug: string) {
           </p>
           <div grid gap="tight">
             <h3 class="experience__piece" style="--j: 1" m="0">
-              <a :href="`#role-${role.slug}`" class="experience__target text-fg decoration-none"
+              <a :href="`#role-${role.slug}`" class="experience__target text-fg decoration-none" data-press="cover"
                 @click="go($event, role.slug)">{{ role.role }}</a>
-              <span text="muted" font="normal">·
+              <div text="muted" font="normal">
                 <a v-if="role.url" :href="role.url" class="experience__company" target="_blank" rel="noopener"
                   :aria-label="role.company">
                   <span aria-hidden="true">
@@ -399,10 +400,11 @@ function blur(slug: string) {
                   <span class="experience__out i-iconoir-arrow-up-right" aria-hidden="true" />
                 </a>
                 <template v-else>{{ role.company }}</template>
-              </span>
+              </div>
             </h3>
-            <p v-for="(line, i) in role.summary" :key="i" class="experience__piece" :style="{ '--j': i + 2 }" m="0">{{
-              line }}</p>
+            <p v-for="(line, i) in role.summary" :key="i" class="experience__piece" op-80 :style="{ '--j': i + 2 }"
+              m="0">{{
+                line }}</p>
             <ul v-if="role.stack.length" class="experience__stack experience__piece"
               :style="{ '--j': role.summary.length + 2 }" my="tight" p="0" list="none" typeset="code" text="sm muted">
               <li v-for="tool in role.stack" :key="tool">{{ tool }}</li>
@@ -575,6 +577,7 @@ function blur(slug: string) {
   /* Keeps the company link's z-index inside its entry, so it scrolls under
      the header like the rest of the role. */
   isolation: isolate;
+  margin-block-end: var(--gap-block);
 }
 
 /* The role's link covers its whole entry, so the entry is one target; the
