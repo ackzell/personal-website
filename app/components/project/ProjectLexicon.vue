@@ -118,7 +118,7 @@ useHead({
     <div v-for="(project, i) in projects" :key="project.slug" class="lexicon__entry" relative grid gap="tight" py="12"
       :style="stagger ? { '--rise-delay': riseDelay(i) } : undefined">
       <WordLine as="dt" :pronunciation="project.pronunciation" :meaning="project.meaning" :status="project.status">
-        <NuxtLinkLocale :to="`/projects/${project.slug}`" class="lexicon__headword text-fg text-headword" lang="nah"
+        <NuxtLinkLocale :to="`/projects/${project.slug}`" class="lexicon__headword text-fg text-headword" data-press="cover" lang="nah"
           typeset="heading" leading="none" decoration="none" :style="wordTransition(project.slug)">
           <!-- One span per letter so the hover can ripple through the word.
                Assistive tech gets the whole word from the hidden copy. -->

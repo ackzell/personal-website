@@ -25,7 +25,7 @@ const filled = (value: string) => value && value !== 'TODO'
             loading="lazy" decoding="async" data-scheme="light" :style="plateTransition(project.slug)">
         </template>
         <span v-else class="index__plate" aria-hidden="true" />
-        <NuxtLinkLocale :to="`/projects/${project.slug}`" class="index__word" lang="nah"
+        <NuxtLinkLocale :to="`/projects/${project.slug}`" class="index__word" data-press="cover" lang="nah"
           :style="wordTransition(project.slug)">
           <!-- One span per letter so the hover ripples through the word, as in
                the lexicon. Assistive tech gets the whole word from the hidden copy. -->
