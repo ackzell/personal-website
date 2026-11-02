@@ -58,6 +58,14 @@ defineProps<{ crumbs: { label: string, to?: string, lang?: string }[] }>()
       var(--arrive-duration) var(--ease-arrive) var(--enter-delay, 390ms) backwards vt-lift;
   }
 
+  /* The story only fades as it lifts. It can be many screens of code and
+     playing clips, and re-blurring all of that every frame dropped frames
+     on moliniani and amoxtli; a block that tall is mostly below the fold,
+     where nobody would see it develop anyway. */
+  .project > :slotted(.story) {
+    animation-name: vt-fade-in, vt-lift;
+  }
+
   .project > :slotted(:nth-child(2)) {
     --enter-delay: 150ms;
   }
