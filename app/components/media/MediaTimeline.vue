@@ -269,7 +269,7 @@ const readout = computed(() => {
   --slnt: 0;
   --casl: var(--heading-casual);
   --crsv: 0;
-  color: var(--fg);
+  color: var(--heading);
 }
 
 /* The link covers its whole half, so a half is one target. */

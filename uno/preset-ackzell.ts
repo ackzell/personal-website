@@ -80,6 +80,8 @@ export const presetAckzell = definePreset(() => ({
       fg: 'var(--fg)',
       accent: 'var(--accent)',
       muted: 'var(--muted)',
+      heading: 'var(--heading)',
+      'heading-muted': 'var(--heading-muted)',
       line: 'var(--line)',
     },
     // The text scale in em, so it follows body: phones set body a step
@@ -106,7 +108,7 @@ export const presetAckzell = definePreset(() => ({
   shortcuts: {
     // A quiet label over content that speaks for itself, like a dictionary's
     // running head: Projects, Experience, Content.
-    'running-head': 'typeset-body text-sm text-muted uppercase tracking-[0.08em]',
+    'running-head': 'typeset-body text-sm text-heading-muted uppercase tracking-[0.08em]',
     // What an entry is, under its word, the way a dictionary sets a
     // definition: muted, so the word leads. Entries (the lexicon, a project or
     // part heading) at body size; sub-entries (parts, related projects) a

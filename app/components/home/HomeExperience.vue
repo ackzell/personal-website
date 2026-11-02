@@ -388,7 +388,7 @@ function blur(slug: string) {
           </p>
           <div grid gap="tight">
             <h3 class="experience__piece" style="--j: 1" m="0">
-              <a :href="`#role-${role.slug}`" class="experience__target text-fg decoration-none" data-press="cover"
+              <a :href="`#role-${role.slug}`" class="experience__target text-heading decoration-none" data-press="cover"
                 @click="go($event, role.slug)">{{ role.role }}</a>
               <div text="muted" font="normal">
                 <a v-if="role.url" :href="role.url" class="experience__company" target="_blank" rel="noopener"
@@ -550,7 +550,7 @@ function blur(slug: string) {
   background-color: var(--hot);
   border: 1px solid var(--accent);
   box-shadow: var(--glow);
-  mix-blend-mode: plus-lighter;
+  mix-blend-mode: var(--glow-blend);
   pointer-events: none;
   opacity: 0;
   transition: opacity 300ms var(--ease-out);
@@ -741,7 +741,7 @@ function blur(slug: string) {
 .experience__entry.is-lit .experience__square {
   background-color: var(--hot);
   box-shadow: var(--glow);
-  mix-blend-mode: plus-lighter;
+  mix-blend-mode: var(--glow-blend);
   transition-duration: 500ms;
 }
 
@@ -749,9 +749,9 @@ function blur(slug: string) {
    read, burns hotter than its lit role and swells a little. */
 .experience__field .experience__tick:is(:hover, .is-read),
 .experience__earned li:has(.site-tooltip__name:hover, .site-tooltip__name:focus-visible) .experience__square {
-  background-color: color-mix(in oklab, var(--accent), white 75%);
+  background-color: var(--hotter);
   box-shadow: var(--glow), 0 0 8px 2px color-mix(in oklab, var(--accent) 80%, transparent);
-  mix-blend-mode: plus-lighter;
+  mix-blend-mode: var(--glow-blend);
   transition-duration: 200ms;
 }
 
@@ -793,7 +793,7 @@ function blur(slug: string) {
   scale: 1 1;
   background-color: var(--hot);
   box-shadow: var(--glow);
-  mix-blend-mode: plus-lighter;
+  mix-blend-mode: var(--glow-blend);
   transition-duration: 500ms;
   transition-delay: calc(var(--k) * 80ms);
 }
@@ -843,7 +843,7 @@ function blur(slug: string) {
 .experience__entry.is-lit .experience__dates>* {
   color: var(--hot);
   text-shadow: var(--glow);
-  mix-blend-mode: plus-lighter;
+  mix-blend-mode: var(--glow-blend);
   transition-duration: 500ms;
 }
 

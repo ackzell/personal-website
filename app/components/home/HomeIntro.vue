@@ -35,6 +35,8 @@ type Block = {
   before: number
   /** Typography copied onto each painted line. */
   style: Partial<CSSStyleDeclaration>
+  /** Painted in the heading color rather than the body's. */
+  heading: boolean
 }
 
 const flowing = ref(false)
@@ -64,7 +66,7 @@ type Placed = {
 
 /* Measure each element's own font, so the canvas measurements match what
    the browser paints. Rerun when the text or the type scale changes. */
-function prepareBlock(el: HTMLElement, text: string): Block {
+function prepareBlock(el: HTMLElement, text: string, heading = false): Block {
   const cs = getComputedStyle(el)
   const size = parseFloat(cs.fontSize)
   return {
@@ -81,11 +83,12 @@ function prepareBlock(el: HTMLElement, text: string): Block {
       fontVariationSettings: cs.fontVariationSettings,
       letterSpacing: cs.letterSpacing,
     },
+    heading,
   }
 }
 
 function prepareText() {
-  blocks = [prepareBlock(heading.value!, props.title), prepareBlock(body.value!, props.text)]
+  blocks = [prepareBlock(heading.value!, props.title, true), prepareBlock(body.value!, props.text)]
   const cs = getComputedStyle(body.value!)
   fontSize = parseFloat(cs.fontSize)
   const markStyle = getComputedStyle(mark.value!)
@@ -193,6 +196,7 @@ function flow(force = false) {
     const line = span.firstElementChild!
     if (line.textContent !== p.text) line.textContent = p.text
     Object.assign(span.style, p.block.style)
+    span.toggleAttribute('data-heading', p.block.heading)
     span.style.lineHeight = `${p.block.lineHeight}px`
     span.style.setProperty('--x', `${p.x}px`)
     span.style.setProperty('--dx', p.split ? '0px' : `${cx - p.width / 2 - p.x}px`)
@@ -439,6 +443,10 @@ onBeforeUnmount(() => {
   block-size: 0;
   white-space: pre;
   translate: calc(var(--x, 0px) + var(--centered) * var(--dx, 0px)) 0;
+}
+
+.home-intro__lines > :deep([data-heading]) {
+  color: var(--heading);
 }
 
 .home-intro__lines > :deep(span > span) {

@@ -202,7 +202,7 @@ onBeforeUnmount(() => observer?.disconnect())
 
 .query {
   margin: 0;
-  color: var(--fg);
+  color: var(--heading);
 }
 
 .query__prompt {

@@ -7,7 +7,8 @@
  *    section (data-section on <html>, set by the layout) and per scheme.
  *
  * Sections follow the flag: about (green) · work (white) · media (red).
- * Light = "Soft flag", the whole page takes the section color.
+ * Light = "Soft flag" on paper: every section reads ink on paper, and the
+ *   section's flag color carries the accents (headings, marks, the band).
  * Dark = "Deeper", near-black tinted toward the section color.
  */
 :root {
@@ -83,35 +84,39 @@
 /* Per-section inputs. About is also the default when no section is set. */
 :root,
 :root[data-section='about'] {
-  --light-fill: var(--softflag-green);
-  --light-text: var(--softflag-paper);
+  --light-accent: var(--softflag-green);
+  /* How far light's paper leans toward the section's flag: under what the
+     eye names as a color, so it reads as paper that belongs to the section. */
+  --paper-tint: 3%;
   --dark-fill: var(--deeper-green);
   --dark-accent: var(--deeper-glow-green);
 }
 
 :root[data-section='work'] {
-  --light-fill: var(--softflag-paper);
-  --light-text: var(--softflag-ink);
+  --light-accent: var(--softflag-ink);
+  /* The flag's white: plain paper. */
+  --paper-tint: 0%;
   /* Neutral section: tinting night toward night leaves it plain black. */
   --dark-fill: var(--deeper-night);
   --dark-accent: var(--deeper-paper);
 }
 
 :root[data-section='media'] {
-  --light-fill: var(--softflag-red);
-  --light-text: var(--softflag-paper);
+  --light-accent: var(--softflag-red);
+  --paper-tint: 3%;
   --dark-fill: var(--deeper-red);
   --dark-accent: var(--deeper-glow-red);
 }
 
 /*
  * Flag band fields (SiteFlagNav): one per section, whatever the stage.
- * Light shows the soft flag itself. Dark uses each section's glow, since the
- * deeper fills would all read as near-black against the night stage.
+ * Light shows the soft flag, its white as ink so it shows on the paper stage.
+ * Dark uses each section's glow, since the deeper fills would all read as
+ * near-black against the night stage.
  */
 :root {
   --field-about: var(--softflag-green);
-  --field-work: var(--softflag-paper);
+  --field-work: var(--softflag-ink);
   --field-media: var(--softflag-red);
 }
 
@@ -129,28 +134,51 @@
 
 /* Semantic tokens. */
 :root {
-  --bg: var(--light-fill);
-  --fg: var(--light-text);
-  --accent: var(--fg);
+  /* Mixed for the hue, then set back to the paper's own lightness (0.962 is
+     --softflag-paper's): a dark flag would otherwise only gray it. */
+  --bg: oklch(from color-mix(in oklab, var(--softflag-paper), var(--light-accent) var(--paper-tint)) 0.962 c h);
+  --fg: var(--softflag-ink);
+  --accent: var(--light-accent);
   --muted: color-mix(in srgb, var(--fg) 70%, var(--bg));
   --line: color-mix(in srgb, var(--fg) 20%, var(--bg));
+  /* Headings carry the section's flag on light's paper; running heads the
+     same, a step quieter. */
+  --heading: var(--accent);
+  --heading-muted: color-mix(in srgb, var(--accent) 88%, var(--bg));
 }
 
 :root.dark {
   --bg: color-mix(in srgb, var(--dark-fill) 35%, var(--deeper-night));
   --fg: var(--deeper-paper);
   --accent: var(--dark-accent);
+  /* On the night stage the glow is for what's lit, so headings stay paper. */
+  --heading: var(--fg);
+  --heading-muted: var(--muted);
 }
 
 /*
  * Glow marks what's lit: the role being read, the page you're on. Glow is
  * light, so it's built like light: a core hotter than the accent, then halos
  * of growing radius and falling strength (the bloom falloff), added onto the
- * stage with plus-lighter instead of painted over it. --glow-near drops the
- * wide halos, for bars inside a clipping box.
+ * stage with plus-lighter (--glow-blend) instead of painted over it.
+ * --glow-near drops the wide halos, for bars inside a clipping box.
+ *
+ * Light adds nothing onto paper, so there lit is ink: the accent itself,
+ * --hotter a step deeper, with a faint bleed instead of a bloom.
  */
 :root {
+  --hot: var(--accent);
+  --hotter: color-mix(in oklab, var(--accent), black 25%);
+  --glow-blend: normal;
+  --glow-near: 0 0 1px color-mix(in oklab, var(--accent) 60%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);
+  --glow: var(--glow-near);
+}
+
+:root.dark {
   --hot: color-mix(in oklab, var(--accent), white 45%);
+  --hotter: color-mix(in oklab, var(--accent), white 75%);
+  --glow-blend: plus-lighter;
   --glow-near: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
     0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
     0 0 10px color-mix(in oklab, var(--accent) 45%, transparent);
@@ -168,6 +196,7 @@ h1,
 h2,
 h3,
 h4 {
+  color: var(--heading);
   font-family: var(--font-heading);
   font-weight: var(--heading-weight);
   font-variation-settings: 'CASL' var(--heading-casual);
