@@ -619,7 +619,7 @@ const name = (repo: string) => repo.split('/')[1]
 }
 
 .log__repo {
-  color: var(--fg);
+  color: var(--heading);
 }
 
 /* Errata: the same shape, stepped back. */

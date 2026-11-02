@@ -88,7 +88,7 @@ useSeoMeta({
 
 .part-head__family {
   justify-self: start;
-  color: var(--fg);
+  color: var(--heading);
   text-decoration: none;
   transition: color 200ms var(--ease-out);
 }
