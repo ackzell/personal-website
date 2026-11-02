@@ -3,12 +3,13 @@ import { animate, scrambleText } from 'animejs'
 
 /*
  * The footer's twin of the header's lang="en": the switch as the CSS it sets,
- * color-scheme="system", "light" or "dark". It starts on the system's scheme;
- * each press moves to the next one and keeps it.
+ * color-scheme="vivid", "light" or "dark". Until a press it shows the light or
+ * dark the system resolved to; each press moves to the next one and keeps it.
+ * Vivid, the whole page in its section's flag color, is only ever picked.
  */
-type Scheme = 'system' | 'light' | 'dark'
+type Scheme = 'vivid' | 'light' | 'dark'
 
-const order: Scheme[] = ['system', 'light', 'dark']
+const order: Scheme[] = ['vivid', 'light', 'dark']
 
 const colorMode = useColorMode()
 const reduceMotion = usePreferredReducedMotion()
@@ -26,15 +27,17 @@ const mounted = useMounted()
 const known = computed(() => mounted.value && !colorMode.unknown)
 const scheme = computed<Scheme>(() => {
   const preference = colorMode.preference as Scheme
-  return order.includes(preference) ? preference : 'system'
+  if (order.includes(preference)) return preference
+  // No pick yet ("system"): the scheme the system resolved to.
+  return colorMode.value === 'dark' ? 'dark' : 'light'
 })
 const next = computed<Scheme>(() => order[(order.indexOf(scheme.value) + 1) % order.length]!)
 
 // Where each lands on the flip clock's tock: brighter on light, duller on dark.
-const LIGHT: Record<Scheme, number> = { light: 1, system: 0.5, dark: 0 }
+const LIGHT: Record<Scheme, number> = { light: 1, vivid: 0.5, dark: 0 }
 
 const labels = computed<Record<Scheme, string>>(() => ({
-  system: t('site.schemeSystem'),
+  vivid: t('site.schemeVivid'),
   light: t('site.schemeLight'),
   dark: t('site.schemeDark'),
 }))

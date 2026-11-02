@@ -7,7 +7,8 @@
  *    section (data-section on <html>, set by the layout) and per scheme.
  *
  * Sections follow the flag: about (green) · work (white) · media (red).
- * Light = "Soft flag" on paper: every section reads ink on paper, and the
+ * Vivid = "Soft flag": the whole page takes the section color.
+ * Light = the soft flag on paper: every section reads ink on paper, and the
  *   section's flag color carries the accents (headings, marks, the band).
  * Dark = "Deeper", near-black tinted toward the section color.
  */
@@ -15,11 +16,16 @@
   /* Follows the system until the footer switch picks one (SiteSchemeSwitch). */
   color-scheme: light dark;
 
-  /* Soft flag (light) */
+  /* Soft flag (vivid, and light's accents) */
   --softflag-green: #00573c;
   --softflag-paper: #f6f2ea;
   --softflag-red: #a51e2c;
   --softflag-ink: #141312;
+  /* Vivid's white field: the flag halfway to night, as dark as its green
+     and red so the three read as one band; silver on graphite. Warm toward
+     red, not yellow: a yellowish gray this dark reads olive beside the green. */
+  --softflag-graphite: #404040;
+  --softflag-silver: #c7c5c5;
 
   /* Deeper (dark) */
   --deeper-green: #0a2a20;
@@ -85,6 +91,8 @@
 :root,
 :root[data-section='about'] {
   --light-accent: var(--softflag-green);
+  --vivid-fill: var(--softflag-green);
+  --vivid-text: var(--softflag-paper);
   /* How far light's paper leans toward the section's flag: under what the
      eye names as a color, so it reads as paper that belongs to the section. */
   --paper-tint: 3%;
@@ -94,6 +102,8 @@
 
 :root[data-section='work'] {
   --light-accent: var(--softflag-ink);
+  --vivid-fill: var(--softflag-graphite);
+  --vivid-text: var(--softflag-silver);
   /* The flag's white: plain paper. */
   --paper-tint: 0%;
   /* Neutral section: tinting night toward night leaves it plain black. */
@@ -103,6 +113,8 @@
 
 :root[data-section='media'] {
   --light-accent: var(--softflag-red);
+  --vivid-fill: var(--softflag-red);
+  --vivid-text: var(--softflag-paper);
   --paper-tint: 3%;
   --dark-fill: var(--deeper-red);
   --dark-accent: var(--deeper-glow-red);
@@ -110,8 +122,8 @@
 
 /*
  * Flag band fields (SiteFlagNav): one per section, whatever the stage.
- * Light shows the soft flag, its white as ink so it shows on the paper stage.
- * Dark uses each section's glow, since the deeper fills would all read as
+ * Vivid shows the soft flag itself; light the same, its white as ink so it
+ * shows on the paper stage. Dark uses each section's glow, since the deeper fills would all read as
  * near-black against the night stage.
  */
 :root {
@@ -120,9 +132,21 @@
   --field-media: var(--softflag-red);
 }
 
-/* Scheme classes come from @nuxtjs/color-mode: the system's, or the one picked. */
-:root.light {
+/* Scheme classes come from @nuxtjs/color-mode: the system's, or the one picked.
+   Vivid's fields are dark, but it's the flag in daylight: native controls and
+   scrollbars stay light, as they were when it was the light scheme. */
+:root:is(.light, .vivid) {
   color-scheme: light;
+}
+
+:root.vivid {
+  --field-work: var(--softflag-silver);
+}
+
+/* Vivid's work is a dark stage: dark controls, and the dark variants of
+   code (tlapalli.css), marks and stickers wherever a scheme picks one. */
+:root.vivid[data-section='work'] {
+  color-scheme: dark;
 }
 
 :root.dark {
@@ -156,6 +180,15 @@
   --heading-muted: var(--muted);
 }
 
+/* The stage is the flag, so the text is all one paper (silver, on work). */
+:root.vivid {
+  --bg: var(--vivid-fill);
+  --fg: var(--vivid-text);
+  --accent: var(--fg);
+  --heading: var(--fg);
+  --heading-muted: var(--muted);
+}
+
 /*
  * Glow marks what's lit: the role being read, the page you're on. Glow is
  * light, so it's built like light: a core hotter than the accent, then halos
@@ -164,7 +197,8 @@
  * --glow-near drops the wide halos, for bars inside a clipping box.
  *
  * Light adds nothing onto paper, so there lit is ink: the accent itself,
- * --hotter a step deeper, with a faint bleed instead of a bloom.
+ * --hotter a step deeper, with a faint bleed instead of a bloom. Vivid's
+ * fields are all dark enough to glow on, as dark does.
  */
 :root {
   --hot: var(--accent);
@@ -175,7 +209,7 @@
   --glow: var(--glow-near);
 }
 
-:root.dark {
+:root:is(.dark, .vivid) {
   --hot: color-mix(in oklab, var(--accent), white 45%);
   --hotter: color-mix(in oklab, var(--accent), white 75%);
   --glow-blend: plus-lighter;
@@ -220,7 +254,7 @@ pre code {
 
 /* Highlighted code in the light scheme a step heavier: the light gems' inks
    are soft, and a thin stroke thins them further. */
-:root:not(.dark) .shiki {
+:root:not(.dark, .vivid[data-section='work']) .shiki {
   --code-weight: 380;
 }
 
@@ -694,8 +728,8 @@ main {
  * current scheme shows. The hidden one is display:none, so a view transition
  * never captures it and the plate's transition name stays unique.
  */
-:root.dark img[data-scheme='light'],
-:root:not(.dark) img[data-scheme='dark'] {
+:root:is(.dark, .vivid[data-section='work']) img[data-scheme='light'],
+:root:not(.dark, .vivid[data-section='work']) img[data-scheme='dark'] {
   display: none;
 }
 
