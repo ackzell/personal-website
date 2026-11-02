@@ -88,7 +88,7 @@ The voice is casual, rigorous and quiet, "engineer, not tinkerer". The casual li
 There are no borders, shadows or cards. Color fields, opacity and type weight do all the separating. Nahuatl lives in project naming only, never as a visual motif.
 
 **Key Characteristics:**
-- Stage color is the navigation state: green, paper or red fills the page, tinted near-black in dark scheme.
+- Stage color is the navigation state: in vivid, green, graphite or red fills the page; in light, paper leans a few percent toward the section and its color carries the headings; in dark, the page is near-black tinted toward it.
 - Monospace everywhere, two families, three roles.
 - Flat and borderless. Depth is never simulated at rest; the one exception is the section change, whose tiles fly in from depth and land flat.
 - One marker (the accent bar in the flag band) is the only chrome element that moves within a section.
@@ -96,14 +96,15 @@ There are no borders, shadows or cards. Color fields, opacity and type weight do
 
 ## Colors
 
-A three-field flag palette with a near-black twin. Light takes the colors straight ("Soft flag"); dark pulls each section toward black and lets a glow color carry accents ("Deeper").
+A three-field flag palette in three schemes, picked on the footer switch (`color-scheme="vivid"`, `"light"`, `"dark"`; a first visit follows the system's light or dark, vivid is only ever picked). Vivid takes the colors straight ("Soft flag"); light sets ink on paper and lets the flag carry headings and accents; dark pulls each section toward black and lets a glow color carry accents ("Deeper").
 
 ### Primary
-- **Flag Green** (#00573c): About stage in light scheme. Page background, with paper text on it.
-- **Flag Red** (#a51e2c): Media stage in light scheme. Same role as green; paper text.
+- **Flag Green** (#00573c): About stage in vivid, with paper text; About's headings, accent and paper tint in light.
+- **Flag Red** (#a51e2c): Media stage in vivid; Media's headings, accent and paper tint in light.
 
 ### Secondary
-- **Soft Paper** (#f6f2ea): Work stage in light scheme (ink text), and the text color on green and red stages.
+- **Soft Paper** (#f6f2ea): The light stage (tinted 3% toward green or red on About and Media, held at its own lightness), and the text on vivid's green and red.
+- **Graphite** (#454140) and **Silver** (#dbd6d5): Vivid's work stage and its text: the flag's white halfway to night, as dark as the green and red. Warm toward red, since a yellowish gray this dark reads olive. A dark stage for code and marks.
 
 ### Neutral
 - **Ink** (#141312): Text on the paper stage.
@@ -113,11 +114,11 @@ A three-field flag palette with a near-black twin. Light takes the colors straig
 - **Glow Green** (#4a9273) and **Glow Red** (#b84c4c): Dark-scheme accents and the flag band fields for about and media, since the deeper fills would all read near-black.
 
 ### Named Rules
-**The Stage Rule.** The page background is the section. Never introduce a second background color for cards, panels or code blocks; surfaces are the stage itself.
+**The Stage Rule.** The page background is the section. Never introduce a second background color for cards, panels or code blocks; surfaces are the stage itself. The one exception: in vivid, code under a gem picker sits on that gem's own editor background (`--code-bg`), since the full-color stage is too loud to read code on.
 
 **The Semantic Only Rule.** Components use `--bg`, `--fg`, `--accent`, `--muted`, `--line`, never the raw palette. The raw names exist to define the semantic layer and nothing else.
 
-**The Accent Is Foreground Rule.** In light scheme the accent is the text color; the marker is paper-on-green, paper-on-red, ink-on-paper. Only in dark does the accent become a hue (the glow).
+**The Accent Is Foreground Rule.** In vivid the accent is the text color; the marker is paper-on-green, silver-on-graphite, paper-on-red. In light the accent is the section's flag (ink on work), and headings take it (`--heading`). In dark it becomes a hue (the glow).
 
 ## Typography
 
@@ -156,7 +157,7 @@ Flat, with no drop shadows. Depth is conveyed by tonal separation and motion: th
 The one exception is light, not depth: what's lit glows like a neon tube. A core hotter than the accent (`--hot`, the accent mixed 45% toward white), then zero-offset halos of growing radius and falling strength (`--glow`, five layers out to 56px; `--glow-near`, the first three, for bars inside a clipping box), added onto the stage with `plus-lighter`. It comes on steady, never with a strike flicker. Tokens live in `main.css`.
 
 ### Named Rules
-**The Lit Rule.** Glow marks what's lit, and nothing else: the experience role being read, the page you're on in the flag band. Hover and focus preview without light (a field brightens, a marker fills faintly); chrome such as the footer icons never glows. Light only adds onto a darker stage, so it stays off the ink marker on light work's paper.
+**The Lit Rule.** Glow marks what's lit, and nothing else: the experience role being read, the page you're on in the flag band. Hover and focus preview without light (a field brightens, a marker fills faintly); chrome such as the footer icons never glows. Light only adds onto a darker stage (dark, and all of vivid), so on light's paper what's lit is the plain accent with a faint bleed instead (`--glow-blend: normal`).
 
 **The No Border Rule.** No borders, rules or outlines as decoration. The stage shows through the gaps between fields. The only outline is the 2px accent focus ring.
 

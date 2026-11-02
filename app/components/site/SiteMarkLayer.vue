@@ -61,6 +61,11 @@ const resting = useState('site-mark-resting', () => false)
   color: color-mix(in oklab, var(--bg) 60%, black);
 }
 
+/* On vivid's fields, a lighter shade of the field. */
+:root.vivid .site-mark {
+  color: color-mix(in oklab, var(--bg) 90%, white);
+}
+
 /* Work flips to contrast on dark: a light mark on the night stage. */
 :root.dark[data-section='work'] .site-mark {
   color: color-mix(in oklab, var(--dark-accent) 20%, var(--bg));

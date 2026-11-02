@@ -310,12 +310,16 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
         <template v-for="(block, i) in blocks()" :key="i">
           <!-- Without JS there are no tabs: each file is named over its code. -->
           <p v-if="!mounted && blocks().length > 1" class="take__file take__file--static">{{ fileOf(block, i) }}</p>
-          <div :id="`${uid}-panel-${i}`" ref="panels" class="take__panel" :data-file="fileOf(block, i)"
-            :data-more="overflowing[fileOf(block, i)] || undefined"
-            :role="mounted && blocks().length > 1 ? 'tabpanel' : undefined"
-            :aria-labelledby="mounted && blocks().length > 1 ? `${uid}-tab-${i}` : undefined"
-            :hidden="mounted && tab !== i" @scroll.passive="measure" @click="onPanelClick($event, fileOf(block, i))">
-            <component :is="block" />
+          <!-- The sheet holds vivid's gem background, so the panel's edge fade
+               takes only the code with it. -->
+          <div class="take__sheet" :hidden="mounted && tab !== i">
+            <div :id="`${uid}-panel-${i}`" ref="panels" class="take__panel" :data-file="fileOf(block, i)"
+              :data-more="overflowing[fileOf(block, i)] || undefined"
+              :role="mounted && blocks().length > 1 ? 'tabpanel' : undefined"
+              :aria-labelledby="mounted && blocks().length > 1 ? `${uid}-tab-${i}` : undefined"
+              @scroll.passive="measure" @click="onPanelClick($event, fileOf(block, i))">
+              <component :is="block" />
+            </div>
           </div>
         </template>
       </div>
@@ -527,9 +531,22 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 }
 
 /* The code, straight on the stage. */
+.take__sheet {
+  margin-block-start: var(--space-2);
+}
+
 .take__panel {
   overflow-x: auto;
-  margin-block-start: var(--space-2);
+}
+
+/* Except in vivid: the stage is too loud to read code on, so the code sits
+   in its gem's own editor, the background following a pick with the wash
+   (the one exception to The Stage Rule, DESIGN.md). On the sheet, not the
+   panel, so the panel's edge fade leaves it solid. */
+:root.vivid .take__sheet {
+  padding-block: var(--space-3);
+  background-color: var(--code-bg);
+  transition: background-color 240ms var(--ease-out);
 }
 
 .take__panel[data-more] {
@@ -573,7 +590,8 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 }
 
 /* The line the clip is on is lit (The Lit Rule): a bar of the accent, and in
-   dark a neon one, with --glow-near since the panel clips. */
+   dark and vivid's dark panels a neon one, with --glow-near since the panel
+   clips. */
 .take__panel :deep(.line.take__cued) {
   background-color: color-mix(in srgb, var(--accent) 8%, transparent);
 }
@@ -582,7 +600,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   background-color: var(--accent);
 }
 
-:root.dark .take__panel :deep(.line.take__cued)::before {
+:root:is(.dark, .vivid) .take__panel :deep(.line.take__cued)::before {
   background-color: var(--hot);
   box-shadow: var(--glow-near);
   mix-blend-mode: plus-lighter;

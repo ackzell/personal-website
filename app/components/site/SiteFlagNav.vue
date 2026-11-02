@@ -264,13 +264,20 @@ onMounted(() => {
 }
 
 /*
- * Children are tinted toward their section's flag: the field is distinct
- * from the stage in both schemes, so it mixes in directly. Work (ink, or
+ * Children are tinted toward their section's flag: in light and dark the
+ * field is distinct from the stage, so it mixes in directly. Work (ink, or
  * paper in dark) barely moves. Current or hovered: a step stronger.
+ * In vivid the stage is that flag, so mixing toward bg is the tint (20%
+ * holds 4.5:1 on red).
  */
 .flag-nav__segment {
   --nav-child: color-mix(in srgb, var(--field) 40%, var(--nav-muted));
   --nav-child-on: color-mix(in srgb, var(--field) 40%, var(--fg));
+}
+
+:root.vivid .flag-nav__segment {
+  --nav-child: color-mix(in srgb, var(--fg) 80%, var(--bg));
+  --nav-child-on: color-mix(in srgb, var(--fg) 90%, var(--bg));
 }
 
 .flag-nav__field {
@@ -359,7 +366,7 @@ onMounted(() => {
 }
 
 /* The light that runs along the band on a full load (ignite). Plain accent
-   on light's paper, for the same reason as the marker below. */
+   on paper, for the same reason as the marker below. */
 .flag-nav__field::before {
   content: '';
   position: absolute;
@@ -369,7 +376,7 @@ onMounted(() => {
   pointer-events: none;
 }
 
-:root.dark .flag-nav__field::before {
+:root:is(.dark, .vivid) .flag-nav__field::before {
   background-color: var(--hot);
   box-shadow: var(--glow-near);
   mix-blend-mode: plus-lighter;
@@ -379,7 +386,7 @@ onMounted(() => {
    field (--glow-near, see main.css); a preview stays faint and unlit. Light
    adds onto a darker stage, so not for the marker on light's paper, where it
    would wash out. */
-:root.dark .flag-nav__marker {
+:root:is(.dark, .vivid) .flag-nav__marker {
   background-color: var(--hot);
   box-shadow: var(--glow-near);
   mix-blend-mode: plus-lighter;
@@ -483,9 +490,9 @@ onMounted(() => {
 }
 
 /* The open section is named in its own flag color too, stronger than the
-   closed ones. */
+   closed ones. Not in vivid: its color is the stage. */
 @media (width < 40rem) {
-  .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
+  :root:not(.vivid) .flag-nav__segment[data-open='true'] .flag-nav__link:not([data-child]) {
     color: color-mix(in srgb, var(--field) 85%, var(--fg));
   }
 }

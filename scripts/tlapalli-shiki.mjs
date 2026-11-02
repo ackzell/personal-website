@@ -48,9 +48,10 @@ const key = (theme) => theme.name.replace('tlapalli-', '')
 const gems = themes.filter((theme) => theme.type === 'dark').map(key)
 const byKey = new Map(themes.map((theme) => [key(theme), theme]))
 
+// Dark stages take the dark gems: dark itself, and vivid's graphite work.
 const schemes = [
-  { root: ':root.dark', suffix: '' },
-  { root: ':root:not(.dark)', suffix: '-light' },
+  { root: ":root:is(.dark, .vivid[data-section='work'])", suffix: '' },
+  { root: ":root:not(.dark, .vivid[data-section='work'])", suffix: '-light' },
 ]
 
 function rules(scope, gem) {
@@ -58,10 +59,11 @@ function rules(scope, gem) {
     const theme = byKey.get(gem + suffix)
     const v = `--shiki-${gem}${suffix}`
     const at = [root, scope].filter(Boolean).join(' ')
-    // Only the gem's text color: code sits on the stage, never on the
-    // editor's own background (The Stage Rule, DESIGN.md).
+    // Code sits on the stage (The Stage Rule, DESIGN.md). The editor's own
+    // background is only offered as --code-bg, for vivid's gem panels.
     return `${at} {
   --code-fg: ${theme.colors['editor.foreground']};
+  --code-bg: ${theme.colors['editor.background']};
   --code-selection: ${theme.colors['editor.selectionBackground']};
 }
 ${at} .shiki span {

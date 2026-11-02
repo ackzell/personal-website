@@ -134,7 +134,8 @@ function release(event: PointerEvent) {
   user-select: none;
 }
 
-/* Light scheme: silver. Pale metal only reads as shiny with a dark streak
+/* Light and vivid: silver (on vivid's graphite work too, where black metal
+   would sink). Pale metal only reads as shiny with a dark streak
    beside the bright one, so the band gets one. */
 :root:not(.dark) .sticker {
   --edge: #9a9a9a;
