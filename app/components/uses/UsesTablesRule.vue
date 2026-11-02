@@ -5,7 +5,7 @@ defineProps<{ glyphs: readonly [string, string, string, string] }>()
 </script>
 
 <template>
-  <div class="box__rule" aria-hidden="true">
+  <div class="box__rule" aria-hidden="true" text-muted op-60>
     <span>{{ glyphs[0] }}</span>
     <span class="box__rule-run" />
     <span>{{ glyphs[1] }}</span>

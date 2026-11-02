@@ -105,14 +105,10 @@ onBeforeUnmount(() => observer?.disconnect())
 </script>
 
 <template>
-  <div
-    ref="root" class="uses" :class="{ 'is-armed': armed }" :style="{ ...widths, ...timing }" data-own-entrance
-    @animationstart="heard"
-  >
-    <section
-      v-for="category in categories" :key="category.slug" :aria-labelledby="`uses-${category.slug}`"
-      :class="{ 'is-drawn': drawn.has(category.slug) }" :data-slug="category.slug"
-    >
+  <div ref="root" class="uses" :class="{ 'is-armed': armed }" :style="{ ...widths, ...timing }" data-own-entrance
+    @animationstart="heard">
+    <section v-for="category in categories" :key="category.slug" :aria-labelledby="`uses-${category.slug}`"
+      :class="{ 'is-drawn': drawn.has(category.slug) }" :data-slug="category.slug">
       <!-- The query is typed a character at a time, so it is hidden from assistive tech;
            the category name alone labels the table. -->
       <h2 :id="`uses-${category.slug}`" class="query">
@@ -124,9 +120,7 @@ onBeforeUnmount(() => observer?.disconnect())
               <br>
               <span class="query__char query__indent" :style="{ '--c': index }">{{ indent }}</span>
             </template>
-            <span
-              v-else class="query__char" :class="kind(index)" :style="{ '--c': index }"
-            >{{ char }}</span>
+            <span v-else class="query__char" :class="kind(index)" :style="{ '--c': index }">{{ char }}</span>
           </template>
           <span class="query__caret"> </span>
         </span>
@@ -136,7 +130,7 @@ onBeforeUnmount(() => observer?.disconnect())
       <div class="box" role="table" :aria-labelledby="`uses-${category.slug}`">
         <div class="box__group box__head" role="rowgroup" data-stick>
           <UsesTablesRule :glyphs="rules.top" />
-          <div class="box__row" role="row">
+          <div class="box__row" role="row" text-muted op-60>
             <span class="box__bar box__bar--l" aria-hidden="true" />
             <span class="box__cell box__cell--tool" role="columnheader">{{ $t('uses.tool') }}</span>
             <span class="box__bar box__bar--j1" aria-hidden="true" />
@@ -150,11 +144,11 @@ onBeforeUnmount(() => observer?.disconnect())
         <div class="box__group" role="rowgroup">
           <template v-for="(tool, index) in category.tools" :key="tool.name">
             <UsesTablesRule v-if="index" :glyphs="rules.mid" :style="at(index + 1)" />
-            <div class="box__row" role="row" :style="at(index + 1)">
+            <div class="box__row" role="row" :style="at(index + 1)" text-muted op-60>
               <span class="box__bar box__bar--l" aria-hidden="true" />
               <span class="box__cell box__cell--tool" role="cell">
-                <a v-if="tool.url" :href="tool.url" class="box__link" target="_blank" rel="noopener">{{ tool.name }}<span
-                    class="box__arrow" aria-hidden="true"> ↗</span></a>
+                <a v-if="tool.url" :href="tool.url" class="box__link" target="_blank" rel="noopener">{{ tool.name
+                  }}<span class="box__arrow" aria-hidden="true"> ↗</span></a>
                 <template v-else>{{ tool.name }}</template>
               </span>
               <span class="box__bar box__bar--j1" aria-hidden="true" />
@@ -182,7 +176,7 @@ onBeforeUnmount(() => observer?.disconnect())
 }
 
 /* Two tables side by side once each has room for its note. */
-@media (width >= 64rem) {
+@media (width >=64rem) {
   .uses {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--gap-section);
@@ -252,8 +246,7 @@ onBeforeUnmount(() => observer?.disconnect())
 .box {
   display: grid;
   grid-template-columns:
-    [l] 1ch [tool] calc(var(--tool) * 1ch + 2ch) [j1] 1ch [years] calc(var(--years) * 1ch + 2ch)
-    [j2] 1ch [note] minmax(0, 1fr) [r] 1ch;
+    [l] 1ch [tool] calc(var(--tool) * 1ch + 2ch) [j1] 1ch [years] calc(var(--years) * 1ch + 2ch) [j2] 1ch [note] minmax(0, 1fr) [r] 1ch;
   margin-block-start: var(--space-2);
   /* The font own line height, so the bars of one line meet the next. */
   line-height: normal;
@@ -294,10 +287,21 @@ onBeforeUnmount(() => observer?.disconnect())
   white-space: pre;
 }
 
-.box__bar--l { grid-column: l; }
-.box__bar--j1 { grid-column: j1; }
-.box__bar--j2 { grid-column: j2; }
-.box__bar--r { grid-column: r; }
+.box__bar--l {
+  grid-column: l;
+}
+
+.box__bar--j1 {
+  grid-column: j1;
+}
+
+.box__bar--j2 {
+  grid-column: j2;
+}
+
+.box__bar--r {
+  grid-column: r;
+}
 
 .box__cell {
   padding-inline: 1ch;
@@ -316,7 +320,9 @@ onBeforeUnmount(() => observer?.disconnect())
   font-variant-numeric: tabular-nums;
 }
 
-.box__cell--note { grid-column: note; }
+.box__cell--note {
+  grid-column: note;
+}
 
 .box__head .box__cell {
   color: var(--muted);
@@ -458,30 +464,58 @@ onBeforeUnmount(() => observer?.disconnect())
 }
 
 @keyframes uses-caret {
-  from, to { opacity: 0.85; }
+
+  from,
+  to {
+    opacity: 0.85;
+  }
 }
 
 @keyframes uses-blink {
-  from { opacity: 0.85; }
-  50% { opacity: 0; }
+  from {
+    opacity: 0.85;
+  }
+
+  50% {
+    opacity: 0;
+  }
 }
 
 @keyframes uses-type {
-  from { visibility: hidden; }
+  from {
+    visibility: hidden;
+  }
 }
 
 @keyframes uses-rule {
-  from { clip-path: inset(0 100% 0 0); }
-  to { clip-path: inset(0); }
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
 }
 
 @keyframes uses-bar {
-  from { clip-path: inset(0 0 100% 0); }
-  to { clip-path: inset(0); }
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
 }
 
 @keyframes uses-text {
-  from { opacity: 0; filter: blur(3px); }
-  to { opacity: 1; filter: none; }
+  from {
+    opacity: 0;
+    filter: blur(3px);
+  }
+
+  to {
+    opacity: 1;
+    filter: none;
+  }
 }
 </style>
