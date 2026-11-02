@@ -93,20 +93,22 @@ function scanTo(to: Scheme) {
 function toggle() {
   const from = shown.value
   const to = next.value
-  haptic('scheme')
-  // Nothing scrambles or sweeps: a short fade, heard as any other setting.
+  // Nothing scrambles or sweeps: a short fade, felt and heard as any other setting.
   if (reduceMotion.value === 'reduce') {
     colorMode.preference = to
+    haptic('scheme')
     return sound('toggle')
   }
 
   if ('startViewTransition' in document) {
     scanTo(to)
-    // Heard as the line it is, held at one pitch as it crosses the page.
+    // Felt and heard as the line it is, crossing the page.
+    haptic('sweep')
     soundSweep()
   }
   else {
     colorMode.preference = to
+    haptic('scheme')
     // Heard as a flip clock turning over, on the scramble's own timing,
     // leaning a little toward where the switch sits: one word alone off to
     // one side would sound one-eared in headphones.

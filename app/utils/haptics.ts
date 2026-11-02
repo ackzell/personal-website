@@ -13,6 +13,9 @@ import { sound } from './sounds'
  * - edge: a drag that has nowhere to go (a swipe past the last page).
  * - toggle: a setting switched.
  * - language / scheme: the language or color scheme switched, felt as a toggle.
+ * - sweep: the color scheme scanned up the page (SiteSchemeSwitch): the press,
+ *   then the line passing under the thumb, a grain at each sixth of the page
+ *   it crosses, so they crowd where it runs fastest.
  * - go: a tap that takes you to another page (the flag band).
  * - key: a finger reaching one of the socials, a key on a little keyboard.
  * - stick: a bar catching at the top of the screen as the page scrolls.
@@ -57,6 +60,20 @@ const KINDS = {
   toggle: 'light',
   language: 'light',
   scheme: 'light',
+  /*
+   * The press, then five grains at 1/6 … 5/6 of the page, timed on the line's
+   * 700ms ease in and out (main.css, "Scheme scan"): at 243, 307, 350, 393 and
+   * 457ms. Each delay counts from the end of the one before. Under 16ms so iOS
+   * clicks once each; firmest mid-page, where the line is fastest.
+   */
+  sweep: [
+    { duration: 12, intensity: 0.8 },
+    { delay: 231, duration: 8, intensity: 0.5 },
+    { delay: 56, duration: 8, intensity: 0.7 },
+    { delay: 35, duration: 8, intensity: 0.9 },
+    { delay: 35, duration: 8, intensity: 0.7 },
+    { delay: 56, duration: 8, intensity: 0.5 },
+  ],
   go: 'soft',
   // A tick's crisp single click, at its fullest: a key going down.
   key: [{ duration: 12, intensity: 1 }],
@@ -92,14 +109,14 @@ export function isHapticClick(event: Event) {
 // a project in the log reaching the line, too much to hear on every scroll;
 // a uses table drawing in, heard as it types and prints instead
 // (UsesTables.vue); a social key, heard as its note (SiteFooter.vue); and the language and color scheme, heard as their text
-// turning over instead (plugins/locale-scramble.client.ts,
+// turning over or their line sweeping up instead (plugins/locale-scramble.client.ts,
 // SiteSchemeSwitch.vue).
-const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme'])
+const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme', 'sweep'])
 
 // `size` is what a scrub's tick passed over (0 to 1).
 export function haptic(kind: Haptic, size?: number) {
   if (!import.meta.client) return
   const input = KINDS[kind]
   instance()?.trigger(typeof input === 'function' ? input(size) : input)
-  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'draw' | 'key' | 'language' | 'scheme'>, size)
+  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'draw' | 'key' | 'language' | 'scheme' | 'sweep'>, size)
 }
