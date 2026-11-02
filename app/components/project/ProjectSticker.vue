@@ -166,11 +166,19 @@ function release(event: PointerEvent) {
   block-size: 100%;
   filter: grayscale();
   opacity: var(--detail);
-  transition: filter 300ms var(--ease-out);
+  transition:
+    filter 300ms var(--ease-out),
+    opacity 300ms var(--ease-out);
 }
 
 .sticker[data-active] .sticker__detail {
   filter: none;
+}
+
+/* On vivid's graphite the colour coming back is the point, so it comes back
+   stronger than the silver's resting detail. */
+:root.vivid .sticker[data-active] .sticker__detail {
+  opacity: 0.75;
 }
 
 /* The sheen, cut to the mark: a brushed grain, a diagonal band that slides
