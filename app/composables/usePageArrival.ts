@@ -37,8 +37,19 @@ export function usePageArrival() {
     transition.updateCallbackDone.finally(() => {
       root.dataset.arriving = ''
     })
+    // The new page's snapshot is live, so every frame a block moves, all of
+    // <main> is captured again, the screens of it below the fold too. On a
+    // long, dense page (moliniani's takes, amoxtli's clips) that cost frames,
+    // so for the transition <main> is cut to what's on screen.
+    const main = document.querySelector('main')
     transition.ready.then(
       () => {
+        if (main) {
+          const box = main.getBoundingClientRect()
+          const above = Math.max(0, -box.top)
+          const below = Math.max(0, box.bottom - window.innerHeight)
+          if (above || below) main.style.clipPath = `inset(${above}px -100vw ${below}px)`
+        }
         // Nothing off the side to scroll to while blocks come in from there,
         // and a page that grew wider would cut the view transition short.
         root.dataset.landing = ''
@@ -51,6 +62,7 @@ export function usePageArrival() {
       () => {},
     )
     transition.finished.finally(() => {
+      main?.style.removeProperty('clip-path')
       delete root.dataset.arriving
       delete root.dataset.way
     })
