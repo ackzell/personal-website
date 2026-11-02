@@ -427,6 +427,98 @@ main {
   animation-timing-function: var(--ease-out);
 }
 
+/*
+ * Scheme scan (SiteSchemeSwitch): the new scheme rises up the page from the
+ * switch behind a line, the media palette's scan at the page's size. Only the
+ * stage is captured, so the page, its words and the band's marker all go with
+ * it, and nothing else fades while it runs: the live page below the line
+ * would show colors still on their way.
+ */
+:root[data-scheme-scan] {
+  & *:not(.scheme-scan) {
+    view-transition-name: none !important;
+  }
+  & *,
+  & *::before,
+  & *::after {
+    transition: none !important;
+  }
+  &::view-transition-old(root) {
+    animation: none;
+  }
+  &::view-transition-new(root) {
+    animation: 700ms var(--ease-in-out) both scheme-reveal;
+  }
+  &::view-transition-group(scheme-scan) {
+    animation: 700ms var(--ease-in-out) both scheme-scan;
+  }
+  &::view-transition-new(scheme-scan) {
+    animation: none;
+  }
+}
+
+/* The viewport's size, carrying the line on its top edge: pushed down off the
+   page and drawn back up with the reveal. The line's own color always sits
+   close to one side (paper's ink over vivid's dark fields, dark's paper over
+   light's paper), so it is lit from both: a haze of the old scheme's ink
+   thrown ahead onto the old page, the new ink as the core, and behind it the
+   phosphor, the new section's color still glowing where it just passed. */
+.scheme-scan {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  view-transition-name: scheme-scan;
+  border-block-start: 2px solid var(--fg);
+}
+
+.scheme-scan::before,
+.scheme-scan::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+}
+
+.scheme-scan::before {
+  inset-block-end: 100%;
+  margin-block-end: 2px;
+  block-size: 1.5rem;
+  background: linear-gradient(to top, color-mix(in oklab, var(--scan-old) 45%, transparent), transparent);
+}
+
+.scheme-scan::after {
+  inset-block-start: 0;
+  block-size: min(9rem, 18vh);
+  background: linear-gradient(to bottom,
+      color-mix(in oklab, var(--accent) 45%, transparent),
+      color-mix(in oklab, var(--accent) 12%, transparent) 35%,
+      transparent);
+}
+
+@keyframes scheme-reveal {
+  from {
+    clip-path: inset(100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes scheme-scan {
+  from {
+    translate: 0 100%;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 0;
+  }
+}
+
 /* The page never travels: as a group it would slide from where the old page
    was scrolled to the new page's top, so the new page would come down from
    above. The old one stays where it was read (--page-shift, router.options)

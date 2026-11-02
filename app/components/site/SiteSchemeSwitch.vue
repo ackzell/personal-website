@@ -54,25 +54,71 @@ watch(scheme, (value) => {
   if (!running) shown.value = value
 })
 
+/*
+ * The new scheme is scanned onto the page: a line of light rises from the
+ * switch, at the bottom on every screen, and leaves the new scheme behind it,
+ * the way a clip in the media palette is scanned in (main.css, "Scheme scan").
+ * The class flips inside a view transition, so the old page is a still
+ * snapshot above the line and the new one is live below it.
+ */
+let scan: ViewTransition | undefined
+
+function scanTo(to: Scheme) {
+  const html = document.documentElement
+  scan?.skipTransition()
+  // Before the old snapshot: only the stage is captured, and nothing fades.
+  html.dataset.schemeScan = ''
+  const line = document.createElement('div')
+  line.className = 'scheme-scan'
+  line.setAttribute('aria-hidden', 'true')
+  // The old scheme's ink, for the haze it throws ahead onto the old page.
+  line.style.setProperty('--scan-old', getComputedStyle(html).getPropertyValue('--fg'))
+  const own = document.startViewTransition(async () => {
+    colorMode.preference = to
+    // Two chained watchers in the color-mode plugin put the class on <html>.
+    await nextTick()
+    if (!html.classList.contains(to)) await new Promise(requestAnimationFrame)
+    // Only in the new state, so it has nothing to cross-fade from.
+    document.body.append(line)
+  })
+  scan = own
+  own.finished.finally(() => {
+    line.remove()
+    if (scan !== own) return
+    scan = undefined
+    delete html.dataset.schemeScan
+  })
+}
+
 function toggle() {
   const from = shown.value
   const to = next.value
-  colorMode.preference = to
   haptic('scheme')
-  // Nothing scrambles: heard as any other setting.
-  if (reduceMotion.value === 'reduce') return sound('toggle')
+  // Nothing scrambles or sweeps: a short fade, heard as any other setting.
+  if (reduceMotion.value === 'reduce') {
+    colorMode.preference = to
+    return sound('toggle')
+  }
 
-  // Heard as a flip clock turning over, on the scramble's own timing, leaning
-  // a little toward where the switch sits: one word alone off to one side
-  // would sound one-eared in headphones.
-  const rect = root.value?.getBoundingClientRect()
-  soundClock({
-    at: 0,
-    chars: Math.max(from.length, to.length),
-    step: 1 / 40,
-    settle: 0.3,
-    pan: rect ? ((rect.left + rect.right) / window.innerWidth - 1) * 0.35 : 0,
-  }, LIGHT[to])
+  if ('startViewTransition' in document) {
+    scanTo(to)
+    // Heard as the line it is, held at one pitch as it crosses the page.
+    soundSweep()
+  }
+  else {
+    colorMode.preference = to
+    // Heard as a flip clock turning over, on the scramble's own timing,
+    // leaning a little toward where the switch sits: one word alone off to
+    // one side would sound one-eared in headphones.
+    const rect = root.value?.getBoundingClientRect()
+    soundClock({
+      at: 0,
+      chars: Math.max(from.length, to.length),
+      step: 1 / 40,
+      settle: 0.3,
+      pan: rect ? ((rect.left + rect.right) / window.innerWidth - 1) * 0.35 : 0,
+    }, LIGHT[to])
+  }
 
   running?.cancel()
   const proxy = document.createElement('span')

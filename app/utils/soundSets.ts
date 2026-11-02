@@ -40,6 +40,11 @@ export type SoundSet = Record<SoundKind, Spec | ((size?: number) => Spec | Score
   /** A picture or clip sweeping in behind its line of light, the line travelling `way`. */
   scan: (way: ScanWay) => Score
   /**
+   * The color scheme scanned up the whole page behind its line (main.css,
+   * "Scheme scan"): the scan's voice held at one pitch for SWEEP's crossing.
+   */
+  sweep: () => Score
+  /**
    * A uses table drawing in (UsesTables.vue): `rules` rules, one every
    * `step` seconds, each taking RULE seconds to draw across.
    */
@@ -203,10 +208,11 @@ function board(
  * that envelope, as shares of the crossing.
  */
 const SCAN = { seconds: 0.45 }
+// The scheme's scan, the page's height (700ms, eased in and out).
+const SWEEP = { seconds: 0.7 }
 type Envelope = { a: number, d: number }
 
-function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer): Score {
-  const { seconds } = SCAN
+function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer, seconds = SCAN.seconds): Score {
   const spec = [voice({ a: shape.a * seconds, d: shape.d * seconds })]
   if (way === 'up' || way === 'down') return [{ spec, pan: 0 }]
   const [from, to] = way === 'left' ? [0.7, -0.7] : [-0.7, 0.7]
@@ -282,6 +288,7 @@ const modular: SoundSet = {
   conceal: CONCEAL,
   close: [...ping(0, 330, 0.05, 0.08), tone(0, 220, { wave: 'triangle', f2: 110, glide: 0.1, d: 0.12, peak: 0.1 })],
   scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 })),
+  sweep: () => scan('up', { a: 0.4, d: 0.6 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 }), SWEEP.seconds),
   table: (rules, step) => table(rules, step,
     (seconds) => [tone(0, 220, { wave: 'triangle', a: 0.03, d: seconds, peak: 0.02 })],
     (at, last) => ping(at, last ? 330 : 440, last ? 0.08 : 0.05, 0.05)),
@@ -450,6 +457,11 @@ const panel: SoundSet = {
     const [from, to] = way === 'up' ? [43, 57] : way === 'down' ? [57, 43] : [52.13285282252254, 49.181317777128314]
     return tone(0.005, from, { wave: 'square', f2: to, glide: SCAN.seconds, ...swell, peak: 0.08 })
   }),
+  // The scheme scanned up the whole page: the same low square, held at the
+  // palette's sideways pitch (52 Hz) with no glide, swelling as the line
+  // gathers off the switch and fading as it settles at the top.
+  sweep: () => scan('up', { a: 0.45, d: 0.55 }, (swell) =>
+    tone(0.005, 52, { wave: 'square', ...swell, peak: 0.08 }), SWEEP.seconds),
   // A uses table drawing in: its rules are lines drawing, so two soft
   // sines (200 and 500 Hz) held under it for as long as they take, a touch
   // fuller, and on each rule as it sets off a relay's tick with a short beep
@@ -600,6 +612,7 @@ const film: SoundSet = {
   conceal: CONCEAL,
   close: [...glass(0, 330, 0.2, 0.05, 0.4), air(0, 4000, 800, 0.15, 0.04)],
   scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 220, { ...swell, peak: 0.03, send: 0.3 })),
+  sweep: () => scan('up', { a: 0.4, d: 0.6 }, (swell) => tone(0, 220, { ...swell, peak: 0.03, send: 0.3 }), SWEEP.seconds),
   table: (rules, step) => table(rules, step,
     (seconds) => [air(0, 1200, 2400, seconds, 0.02)],
     (at, last) => glass(at, last ? 440 : 660, last ? 0.12 : 0.06, 0.03, 0.3).slice(0, 2)),

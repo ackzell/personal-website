@@ -311,6 +311,19 @@ export function soundTable(rules: number, step: number) {
   play(SOUND_SETS[soundSet()].table(rules, step), 'table')
 }
 
+/** The color scheme scanned up the page behind its line (SiteSchemeSwitch). */
+export function soundSweep() {
+  if (!heard()) return
+  play(SOUND_SETS[soundSet()].sweep(), 'sweep')
+}
+
+/** The scheme's sweep, from a given set, whatever the switch says (/dev/sounds). */
+export function playSweepFrom(name: SoundSetName) {
+  start()
+  set({ muted: false })
+  play(SOUND_SETS[name].sweep(), `${name}:sweep`)
+}
+
 /**
  * A picture or clip sweeping in behind its line of light (the media palette,
  * the lightbox), the line going `way`, at `loud` of its set's level.
