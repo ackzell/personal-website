@@ -14,6 +14,7 @@ import { sound } from './sounds'
  * - toggle: a setting switched.
  * - language / scheme: the language or color scheme switched, felt as a toggle.
  * - go: a tap that takes you to another page (the flag band).
+ * - key: a finger reaching one of the socials, a key on a little keyboard.
  * - stick: a bar catching at the top of the screen as the page scrolls.
  * - lift: a sticker picked up under the finger.
  * - tilt: the same sticker tilted about under it, a grain every so often as
@@ -57,6 +58,8 @@ const KINDS = {
   language: 'light',
   scheme: 'light',
   go: 'soft',
+  // A tick's crisp single click, at its fullest: a key going down.
+  key: [{ duration: 12, intensity: 1 }],
   stick: 'light',
   lift: 'medium',
   role: [{ duration: 30, intensity: 0.8 }],
@@ -88,15 +91,15 @@ export function isHapticClick(event: Event) {
 // but these: the sticker's tilt, which has no sound yet, a bar sticking and
 // a project in the log reaching the line, too much to hear on every scroll;
 // a uses table drawing in, heard as it types and prints instead
-// (UsesTables.vue); and the language and color scheme, heard as their text
+// (UsesTables.vue); a social key, heard as its note (SiteFooter.vue); and the language and color scheme, heard as their text
 // turning over instead (plugins/locale-scramble.client.ts,
 // SiteSchemeSwitch.vue).
-const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'draw', 'language', 'scheme'])
+const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme'])
 
 // `size` is what a scrub's tick passed over (0 to 1).
 export function haptic(kind: Haptic, size?: number) {
   if (!import.meta.client) return
   const input = KINDS[kind]
   instance()?.trigger(typeof input === 'function' ? input(size) : input)
-  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'draw' | 'language' | 'scheme'>, size)
+  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'draw' | 'key' | 'language' | 'scheme'>, size)
 }
