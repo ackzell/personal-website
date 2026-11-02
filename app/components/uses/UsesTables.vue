@@ -44,7 +44,10 @@ const timing = computed(() => ({
 // Highlighted as an editor would: the names (*, the table, the column) a
 // shade apart from the keywords, and the string literal as a value.
 const names = new Set([...select.matchAll(/\*|uses|category/g)].flatMap((match) => [...match[0]].map((_, i) => match.index + i)))
-const kind = (index: number) => index >= select.length ? 'query__char--value' : names.has(index) ? 'query__char--name' : undefined
+// The category itself, inside its quotes, is the table's title: lit.
+const kind = (index: number, category: UsesCategory) =>
+  index > select.length && index <= select.length + category.name.length ? 'query__char--value query__char--title'
+    : index >= select.length ? 'query__char--value' : names.has(index) ? 'query__char--name' : undefined
 
 // The order a row draws in, down its table; a rule draws with the row under it.
 const at = (step: number) => ({ '--step': step })
@@ -120,7 +123,7 @@ onBeforeUnmount(() => observer?.disconnect())
               <br>
               <span class="query__char query__indent" :style="{ '--c': index }">{{ indent }}</span>
             </template>
-            <span v-else class="query__char" :class="kind(index)" :style="{ '--c': index }">{{ char }}</span>
+            <span v-else class="query__char" :class="kind(index, category)" :style="{ '--c': index }">{{ char }}</span>
           </template>
           <span class="query__caret"> </span>
         </span>
@@ -205,6 +208,15 @@ onBeforeUnmount(() => observer?.disconnect())
 
 .query__char--value {
   color: var(--accent);
+}
+
+/* The category, the title of its table, glows as the lit things do across
+   the site (--hot, --glow; see main.css): neon on dark and vivid, a faint
+   bleed of ink on light's paper. */
+.query__char--title {
+  color: var(--hot);
+  text-shadow: var(--glow);
+  mix-blend-mode: var(--glow-blend);
 }
 
 .query__char--name {
