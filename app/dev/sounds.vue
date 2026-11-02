@@ -133,6 +133,7 @@ function use(set: SoundSetName) {
             <button type="button" @click="word(set)">word</button>
             <button type="button" @click="playBoardFrom(set, BOARD_ROWS)">language</button>
             <button type="button" @click="clock(set)">scheme</button>
+            <button type="button" @click="playSweepFrom(set)">scheme sweep</button>
             <button v-for="way in (['up', 'down', 'left', 'right'] as const)" :key="way" type="button"
               @click="playScanFrom(set, way)">scan {{ way }}</button>
             <button type="button" @click="playTableFrom(set, 4, 0.07)">table</button>
