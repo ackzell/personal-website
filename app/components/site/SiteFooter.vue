@@ -69,13 +69,43 @@ useEventListener(
  * what's under the finger instead of trusting the event's target.
  */
 const touched = ref<number>()
+let release: ReturnType<typeof setTimeout> | undefined
 function follow(event: PointerEvent) {
   if (event.pointerType === 'mouse') return
+  clearTimeout(release)
   const item = document.elementFromPoint(event.clientX, event.clientY)?.closest('li')
   const index = item ? (items.value ?? []).indexOf(item) : -1
   touched.value = index === -1 ? undefined : index
 }
-const letGo = () => (touched.value = undefined)
+/*
+ * A tap is over in a blink, quicker than the icon can grow, so hold the wave
+ * a moment after the finger lifts: the tapped icon is seen standing up, then
+ * settles (or the page leaves under it).
+ */
+function letGo(event: PointerEvent) {
+  clearTimeout(release)
+  release = setTimeout(() => (touched.value = undefined), event.type === 'pointercancel' ? 0 : 220)
+}
+onBeforeUnmount(() => clearTimeout(release))
+
+/*
+ * A social opens somewhere else (another window, tab or app), and the page is
+ * left mid-press: the touch release may never come, and a clicked link keeps
+ * focus, which holds the wave up (:focus-within) on the way back. So as the
+ * page is left, and again as it's shown (also from the back-forward cache),
+ * let the keys go. Focus stays when it's a keyboard's (:focus-visible), as
+ * that's where a keyboard user is.
+ */
+const list = useTemplateRef<HTMLElement>('list')
+function reset() {
+  clearTimeout(release)
+  touched.value = undefined
+  const focused = document.activeElement
+  if (focused instanceof HTMLElement && list.value?.contains(focused) && !focused.matches(':focus-visible')) focused.blur()
+}
+useEventListener(document, 'visibilitychange', reset)
+useEventListener(window, 'blur', reset)
+useEventListener(window, 'pageshow', reset)
 
 /*
  * Each icon is a key with a note of its own; run along them, left to right,
@@ -85,8 +115,11 @@ const letGo = () => (touched.value = undefined)
  */
 const NOTES = [277.18, 440, 277.18, 293.66, 329.63, 415.3]
 const strike = (i: number) => soundNote(NOTES[i % NOTES.length]!)
+// A finger feels each key go down as it hears it.
 watch(touched, (i) => {
-  if (i !== undefined) strike(i)
+  if (i === undefined) return
+  strike(i)
+  haptic('key')
 })
 function enter(event: PointerEvent, i: number) {
   if (event.pointerType === 'mouse') strike(i)
@@ -104,13 +137,15 @@ function enter(event: PointerEvent, i: number) {
          the icons stay 12px apart. The negative margin keeps them aligned.
          Icons sized in rem, off the em text scale, so phones keep the targets.
          In fg, like the switches, not the link accent: in dark, section
-         color is kept for the band, where it marks where you are. -->
-    <ul class="site-footer__links" flex="~ wrap" p="0" m="-1.5" list="none" @pointerdown="follow" @pointermove="follow"
+         color is kept for the band, where it marks where you are.
+         data-press none: the shared key press shrank the link as a finger
+         grew the icon; they press on their own, below. -->
+    <ul ref="list" class="site-footer__links" flex="~ wrap" p="0" m="-1.5" list="none" @pointerdown="follow" @pointermove="follow"
       @pointerup="letGo" @pointercancel="letGo">
       <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined"
         @pointerenter="enter($event, i)">
         <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label"
-          class="text-[1.125rem] text-fg site-footer__land" data-press="key" :style="{ '--i': i }" inline-flex p="1.5">
+          class="text-[1.125rem] text-fg site-footer__land" data-press="none" :style="{ '--i': i }" inline-flex p="1.5">
           <span :class="link.icon" aria-hidden="true" />
         </a>
       </li>
@@ -148,9 +183,10 @@ function enter(event: PointerEvent, i: number) {
  */
 .site-footer__links span {
   --wave: 1;
+  --press: 1;
   --opacity: 1;
   display: block;
-  transform: scale(var(--wave));
+  transform: scale(calc(var(--wave) * var(--press)));
   transform-origin: bottom center;
   opacity: var(--opacity);
 }
@@ -169,7 +205,8 @@ function enter(event: PointerEvent, i: number) {
     --opacity: 0.25;
     transition:
       transform 260ms var(--ease-out),
-      opacity 260ms var(--ease-out);
+      opacity 260ms var(--ease-out),
+      filter 260ms var(--ease-out);
   }
 
   /* While the wave runs, icons outside it fade further. :where() keeps this
@@ -195,6 +232,24 @@ function enter(event: PointerEvent, i: number) {
     --opacity: 0.25;
   }
 
+}
+
+/*
+ * A mouse press: the grown icon gives a little under the click and dims, as
+ * the shared key press does (main.css), pressing down at once and easing
+ * back on release. Not for a finger: data-touched marks a touch, whose
+ * answer is the wave, and a shrink under it fought the grow.
+ */
+.site-footer__links:not(:has([data-touched])) a:active span {
+  --press: 0.88;
+  filter: opacity(0.6);
+  transition-duration: 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-footer__links:not(:has([data-touched])) a:active span {
+    --press: 1;
+  }
 }
 
 /*
@@ -252,7 +307,8 @@ function enter(event: PointerEvent, i: number) {
     --opacity: 0.25;
     transition:
       transform 260ms var(--ease-out),
-      opacity 260ms var(--ease-out);
+      opacity 260ms var(--ease-out),
+      filter 260ms var(--ease-out);
   }
 
   /* :where() keeps this below the wave steps, as with hover. */
@@ -260,14 +316,19 @@ function enter(event: PointerEvent, i: number) {
     --opacity: 0.1;
   }
 
+  /* Bigger than hover's, so it stands clear of the fingertip over it, and
+     quicker to rise, so it answers the touch rather than following it.
+     The 12px between icons still takes it: 1.8 adds 7px a side, its
+     neighbor's 1.3 under 3. */
   li[data-touched] span {
-    --wave: 1.5;
+    --wave: 1.8;
     --opacity: 1;
+    transition-duration: 140ms;
   }
 
   li[data-touched]+li span,
   li:has(+ li[data-touched]) span {
-    --wave: 1.25;
+    --wave: 1.3;
     --opacity: 0.50;
   }
 
