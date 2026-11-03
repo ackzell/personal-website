@@ -62,6 +62,13 @@ const settled = reactive(new Set<string>())
 const root = useTemplateRef<HTMLElement>('root')
 let observer: IntersectionObserver | undefined
 
+// Packed as a bento on wide screens: each table spans as many PACK px rows as
+// it is tall (its bottom padding is the gap), so dense placement stacks the short ones
+// beside a tall one with no holes. Measured, since notes wrap.
+const PACK = 4
+const packed = ref(false)
+let sizer: ResizeObserver | undefined
+
 /*
  * Heard in two parts, each one sound for every table drawing together: the
  * typing, a short run of keys as they start, then the tables drawing, held
@@ -81,6 +88,15 @@ function heard(event: AnimationEvent) {
 }
 
 onMounted(() => {
+  sizer = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const box = entry.target as HTMLElement
+      box.style.setProperty('--span', `${Math.ceil(entry.borderBoxSize[0]!.blockSize / PACK)}`)
+    }
+    packed.value = true
+  })
+  root.value?.querySelectorAll<HTMLElement>(':scope > section').forEach((box) => sizer!.observe(box, { box: 'border-box' }))
+
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
   // The tables on screen when the page arrives draw unfelt; each one scrolled
   // to draws with a short run under the thumb.
@@ -111,11 +127,14 @@ onMounted(() => {
   armed.value = true
 })
 
-onBeforeUnmount(() => observer?.disconnect())
+onBeforeUnmount(() => {
+  observer?.disconnect()
+  sizer?.disconnect()
+})
 </script>
 
 <template>
-  <div ref="root" class="uses" :class="{ 'is-armed': armed }" :style="{ ...widths, ...timing }" data-own-entrance
+  <div ref="root" class="uses" :class="{ 'is-armed': armed, 'is-packed': packed }" :style="{ ...widths, ...timing }" data-own-entrance
     @animationstart="heard">
     <section v-for="category in categories" :key="category.slug" :aria-labelledby="`uses-${category.slug}`"
       :class="{ 'is-drawn': drawn.has(category.slug), 'is-settled': settled.has(category.slug) }" :data-slug="category.slug">
@@ -139,8 +158,9 @@ onBeforeUnmount(() => observer?.disconnect())
            the roles carry the structure for assistive tech. -->
       <div class="box" role="table" :aria-labelledby="`uses-${category.slug}`">
         <div class="box__group box__head" role="rowgroup" data-stick>
+          <SiteMarkLayer clipped />
           <UsesTablesRule :glyphs="rules.top" />
-          <div class="box__row" role="row" text-muted op-60>
+          <div class="box__row" role="row">
             <span class="box__bar box__bar--l" aria-hidden="true" />
             <span class="box__cell box__cell--tool" role="columnheader">{{ $t('uses.tool') }}</span>
             <span class="box__bar box__bar--j1" aria-hidden="true" />
@@ -154,7 +174,7 @@ onBeforeUnmount(() => observer?.disconnect())
         <div class="box__group" role="rowgroup">
           <template v-for="(tool, index) in category.tools" :key="tool.name">
             <UsesTablesRule v-if="index" :glyphs="rules.mid" :style="at(index + 1)" />
-            <div class="box__row" role="row" :style="at(index + 1)" text-muted op-60>
+            <div class="box__row" role="row" :style="at(index + 1)">
               <span class="box__bar box__bar--l" aria-hidden="true" />
               <span class="box__cell box__cell--tool" role="cell">
                 <a v-if="tool.url" :href="tool.url" class="box__link" target="_blank" rel="noopener">{{ tool.name
@@ -180,6 +200,7 @@ onBeforeUnmount(() => observer?.disconnect())
 .uses {
   /* The top of the room under the sticky header, as on Contributions. */
   --stick-top: var(--header-height, 0px);
+  font-size: 0.9em;
   display: grid;
   gap: var(--gap-section);
   align-items: start;
@@ -189,7 +210,22 @@ onBeforeUnmount(() => observer?.disconnect())
 @media (width >=64rem) {
   .uses {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--gap-section);
+    /* Narrower between the pair than between rows, so each table runs wider. */
+    gap: var(--gap-section) var(--gap-block);
+  }
+
+  /* Bento: rows are PACK px (see script) and each table spans its height;
+     dense placement fills the holes. The padding is the gap under each, a
+     little wider than between the pair so the stacks get room to breathe. */
+  .uses.is-packed {
+    grid-auto-rows: 4px;
+    grid-auto-flow: dense;
+    row-gap: 0;
+  }
+
+  .uses.is-packed > section {
+    grid-row: span var(--span);
+    padding-block-end: calc(var(--gap-block) * 1.75);
   }
 }
 
@@ -287,7 +323,8 @@ onBeforeUnmount(() => observer?.disconnect())
 }
 
 /* The heading rows stay under the header while their table scrolls, on the
-   stage color so rows pass under them. */
+   stage color so rows pass under them, carrying the mark as the header does
+   (sticky with a z-index: the stacking context SiteMarkLayer needs). */
 .box__head {
   position: sticky;
   inset-block-start: var(--stick-top);
@@ -310,6 +347,9 @@ onBeforeUnmount(() => observer?.disconnect())
   inset-block-start: 0;
   inset-inline-start: 0;
   white-space: pre;
+  /* Dimmed as the rules are; the words between them keep full contrast. */
+  color: var(--muted);
+  opacity: 0.6;
 }
 
 .box__bar--l {
@@ -383,7 +423,7 @@ onBeforeUnmount(() => observer?.disconnect())
 @media (width < 40rem) {
   .uses {
     --stick-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px));
-    font-size: 0.9em;
+    font-size: 0.85em;
   }
 
   .box {

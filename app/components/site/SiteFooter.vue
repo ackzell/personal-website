@@ -140,8 +140,8 @@ function enter(event: PointerEvent, i: number) {
          color is kept for the band, where it marks where you are.
          data-press none: the shared key press shrank the link as a finger
          grew the icon; they press on their own, below. -->
-    <ul ref="list" class="site-footer__links" flex="~ wrap" p="0" m="-1.5" list="none" @pointerdown="follow" @pointermove="follow"
-      @pointerup="letGo" @pointercancel="letGo">
+    <ul ref="list" class="site-footer__links" flex="~ wrap" p="0" m="-1.5" list="none" @pointerdown="follow"
+      @pointermove="follow" @pointerup="letGo" @pointercancel="letGo">
       <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined"
         @pointerenter="enter($event, i)">
         <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label"
