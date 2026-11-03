@@ -171,6 +171,7 @@ watch(showing, (now, before) => {
 
 <template>
   <div class="palette track-wide" :class="{ 'palette--live': mounted }" :data-power="power">
+    <div class="palette__frame">
     <div v-if="mounted" ref="list" class="palette__list" role="tablist"
       :data-fade-start="!arrivedState.left || undefined" :data-fade-end="!arrivedState.right || undefined"
       aria-orientation="vertical" :aria-label="label" @keydown="onKeydown">
@@ -202,6 +203,7 @@ watch(showing, (now, before) => {
       </div>
       <span v-if="leaving !== null" :key="switches" class="palette__scan" aria-hidden="true" />
     </div>
+    </div>
     <MediaLightbox v-if="mounted" v-model:index="expanded" :items="larger" :from="windowFrame" />
   </div>
 </template>
@@ -213,8 +215,22 @@ watch(showing, (now, before) => {
   gap: var(--gap-block);
 }
 
-/* With JS: the list beside the window, like the palette beside the page. */
+/* With JS: the list beside the window, like the palette beside the page.
+   List and window stick together under the header and section row, held for
+   --hold of scrolling (the room after the frame), then leave together. */
 .palette--live {
+  --hold: 40svh;
+}
+
+.palette--live::after {
+  content: '';
+  display: block;
+  block-size: var(--hold);
+}
+
+.palette--live .palette__frame {
+  position: sticky;
+  top: calc(var(--header-height, 0px) + var(--section-index-height, 0px) + var(--gap-block));
   display: grid;
   grid-template-columns: minmax(8rem, max-content) 1fr;
   gap: var(--gap-block);
@@ -239,9 +255,8 @@ watch(showing, (now, before) => {
 .palette__list {
   display: grid;
   gap: 1px;
-  /* The window's shadow hangs below it; the list sits level with its top. */
-  position: sticky;
-  top: var(--gap-block);
+  /* The fill's frame. */
+  position: relative;
 }
 
 /* The chosen row's fill, filled the way the app fills its palette's current
@@ -484,17 +499,19 @@ watch(showing, (now, before) => {
 
 /* Small screens: the list over the window, as a row to swipe. */
 @media (width < 40rem) {
-  .palette--live {
+  /* No hold: the frame scrolls with the page. */
+  .palette--live::after {
+    content: none;
+  }
+
+  .palette--live .palette__frame {
+    position: static;
     grid-template-columns: 1fr;
     /* Close over the window, so the row reads as its tabs. */
     gap: var(--gap-tight);
   }
 
   .palette__list {
-    /* Still the fill's frame, and it scrolls with the names; no longer
-       stuck, so the sticky offset would only push it under the window. */
-    position: relative;
-    top: auto;
     display: flex;
     overflow-x: auto;
     overscroll-behavior-x: contain;
