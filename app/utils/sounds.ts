@@ -1,5 +1,5 @@
 import { get, getAnalyser, playSpec, set, toBufferSpec, unlock, type Spec } from '@foleyjs/core'
-import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, type SoundSetName, type Travel } from './soundSets'
+import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, type SoundSet, type SoundSetName, type Travel } from './soundSets'
 
 /*
  * What a moment sounds like, in a few kinds. The touch kinds are the same
@@ -171,81 +171,33 @@ async function playTravelling(spec: Spec, from: number, { to, seconds }: Travel)
   source.start(when, 0.03)
 }
 
-function playOne(name: SoundSetName, kind: Sound, size: number | undefined, id: string) {
-  const kept = SOUND_SETS[name][kind]
-  play(typeof kept === 'function' ? kept(size) : kept, id)
-}
+/** What a set plays for a moment, picked out of it: `(set) => set.slide(from, to)`. */
+type Make = (set: SoundSet) => Spec | Score
 
-// Each pitch keeps its own cooldown, so a quick run plays every note.
-function playNote(name: SoundSetName, hz: number) {
-  start()
-  playSpec(SOUND_SETS[name].note(hz), { id: `note:${hz}` })
-}
-
-/** A slide from a given set, whatever the switch says (/dev/sounds). */
-export function playSlideFrom(name: SoundSetName, from: number, to: number) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].slide(from, to), `${name}:slide`)
-}
-
-/** A letter from a given set, whatever the switch says (/dev/sounds). */
-export function playLetterFrom(name: SoundSetName, along: number) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].letter(along), `${name}:letter:${letterTurn++ % 3}`)
-}
-
-/** A board turning over, from a given set, whatever the switch says (/dev/sounds). */
-export function playBoardFrom(name: SoundSetName, rows: FlapRow[]) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].board(rows), `${name}:board`)
-}
-
-/** A flip clock turning over, from a given set, whatever the switch says (/dev/sounds). */
-export function playClockFrom(name: SoundSetName, row: FlapRow, light: number) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].clock(row, light), `${name}:clock`)
-}
-
-/** A scan from a given set, whatever the switch says (/dev/sounds). */
-export function playScanFrom(name: SoundSetName, way: ScanWay) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].scan(way), `${name}:scan`)
-}
-
-/** A table drawing in, from a given set, whatever the switch says (/dev/sounds). */
-export function playTableFrom(name: SoundSetName, rules: number, step: number) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].table(rules, step), `${name}:table`)
-}
-
-/** A note from a given set, whatever the switch says (/dev/sounds). */
-export function playNoteFrom(name: SoundSetName, hz: number) {
-  start()
-  set({ muted: false })
-  playNote(name, hz)
+const ofKind = (kind: Sound, size?: number): Make => (sounds) => {
+  const kept = sounds[kind]
+  return typeof kept === 'function' ? kept(size) : kept
 }
 
 /*
- * Plays one kind from a given set, whatever the switch says (/dev/sounds).
- * It unmutes to do so; the site's next sound() mutes again if it's off.
+ * Plays what `make` picks from a given set, whatever the switch says
+ * (/dev/sounds). It unmutes to do so; the site's next sound() mutes again
+ * if it's off.
  */
-export function playFrom(name: SoundSetName, kind: Sound, size?: number) {
+export function playFromSet(name: SoundSetName, make: Make, id: string) {
   start()
   set({ muted: false })
-  playOne(name, kind, size, `${name}:${kind}`)
+  play(make(SOUND_SETS[name]), `${name}:${id}`)
 }
+
+/** One kind from a given set, whatever the switch says (/dev/sounds). */
+export const playFrom = (name: SoundSetName, kind: Sound, size?: number) => playFromSet(name, ofKind(kind, size), kind)
 
 /*
  * Foley keeps 60ms between two plays of one id, which swallows a burst of
  * the same sound down to a few. Typing is quicker than that and every key
- * should be heard, so keys (and letters, soundLetter) take turns between ids; rows printing are left
- * to thin.
+ * should be heard, so keys (and letters, soundLetter) take turns between
+ * ids; rows printing are left to thin. Each pitch of a note keeps its own.
  */
 const TURNS: Partial<Record<Sound, number>> = { key: 3 }
 let turn = 0
@@ -266,73 +218,46 @@ function heard() {
 }
 
 /*
+ * Plays what `make` picks from the site's set, if it would be heard.
  * Browsers only let audio start after the visitor has pressed or typed
  * something. Until then a sound is left out rather than queued: a role
  * reaching the line on the first scroll isn't worth waking the audio for.
  */
-export function sound(kind: Sound, size?: number) {
-  if (!heard()) return
-  playOne(soundSet(), kind, size, idFor(kind))
+function soundWith(make: Make, id: string) {
+  if (heard()) play(make(SOUND_SETS[soundSet()]), id)
 }
+
+export const sound = (kind: Sound, size?: number) => soundWith(ofKind(kind, size), idFor(kind))
 
 /** A single note at `hz`, in the set's voice: for what plays a tune. */
-export function soundNote(hz: number) {
-  if (!heard()) return
-  playNote(soundSet(), hz)
-}
+export const soundNote = (hz: number) => soundWith((s) => s.note(hz), `note:${hz}`)
 
 /** A letter of a word writing itself (SoundSet's `letter`): where it is in the word. */
-export function soundLetter(along: number) {
-  if (!heard()) return
-  play(SOUND_SETS[soundSet()].letter(along), `letter:${letterTurn++ % 3}`)
-}
+export const soundLetter = (along: number) => soundWith((s) => s.letter(along), `letter:${letterTurn++ % 3}`)
 
 /** The band's marker sliding across the screen, `from` and `to` from -1 (left) to 1 (right). */
-export function soundSlide(from: number, to: number) {
-  if (!heard()) return
-  play(SOUND_SETS[soundSet()].slide(from, to), 'slide')
-}
+export const soundSlide = (from: number, to: number) => soundWith((s) => s.slide(from, to), 'slide')
 
 /** The page's text scrambling into another language, as a departures board turning over. */
-export function soundBoard(rows: FlapRow[]) {
-  if (!heard()) return
-  play(SOUND_SETS[soundSet()].board(rows), 'board')
-}
+export const soundBoard = (rows: FlapRow[]) => soundWith((s) => s.board(rows), 'board')
 
 /** The color scheme's word scrambling into the next, as a flip clock: landing `light` (1), dark (0), system (0.5). */
-export function soundClock(row: FlapRow, light: number) {
-  if (!heard()) return
-  play(SOUND_SETS[soundSet()].clock(row, light), 'clock')
-}
+export const soundClock = (row: FlapRow, light: number) => soundWith((s) => s.clock(row, light), 'clock')
 
 /** A uses table drawing in: `rules` rules, one every `step` seconds. */
-export function soundTable(rules: number, step: number) {
-  if (!heard()) return
-  play(SOUND_SETS[soundSet()].table(rules, step), 'table')
-}
+export const soundTable = (rules: number, step: number) => soundWith((s) => s.table(rules, step), 'table')
 
 /** The color scheme scanned up the page behind its line (SiteSchemeSwitch). */
-export function soundSweep() {
-  if (!heard()) return
-  play(SOUND_SETS[soundSet()].sweep(), 'sweep')
-}
-
-/** The scheme's sweep, from a given set, whatever the switch says (/dev/sounds). */
-export function playSweepFrom(name: SoundSetName) {
-  start()
-  set({ muted: false })
-  play(SOUND_SETS[name].sweep(), `${name}:sweep`)
-}
+export const soundSweep = () => soundWith((s) => s.sweep(), 'sweep')
 
 /**
  * A picture or clip sweeping in behind its line of light (the media palette,
  * the lightbox), the line going `way`, at `loud` of its set's level.
  */
-export function soundScan(way: ScanWay, loud = 1) {
-  if (!heard()) return
-  const score = SOUND_SETS[soundSet()].scan(way)
-  play(loud === 1 ? score : score.map(part => ({
+export const soundScan = (way: ScanWay, loud = 1) => soundWith((s) => {
+  const score = s.scan(way)
+  return loud === 1 ? score : score.map((part) => ({
     ...part,
-    spec: part.spec.map(layer => ({ ...layer, peak: layer.peak * loud })),
-  })), 'scan')
-}
+    spec: part.spec.map((layer) => ({ ...layer, peak: layer.peak * loud })),
+  }))
+}, 'scan')

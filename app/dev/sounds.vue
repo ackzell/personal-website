@@ -69,7 +69,7 @@ const SOCIALS = [277.18, 440, 277.18, 293.66, 329.63, 415.3]
 function socials(set: SoundSetName) {
   stop()
   playing.value = set
-  SOCIALS.forEach((hz, i) => timers.push(setTimeout(() => playNoteFrom(set, hz), i * 160)))
+  SOCIALS.forEach((hz, i) => timers.push(setTimeout(() => playFromSet(set, (s) => s.note(hz), `note:${hz}`), i * 160)))
   timers.push(setTimeout(() => (playing.value = undefined), SOCIALS.length * 160))
 }
 // A word writing itself under the pointer.
@@ -77,7 +77,7 @@ function word(set: SoundSetName) {
   stop()
   playing.value = set
   const letters = 8
-  for (let i = 0; i < letters; i++) timers.push(setTimeout(() => playLetterFrom(set, i / (letters - 1)), i * 35))
+  for (let i = 0; i < letters; i++) timers.push(setTimeout(() => playFromSet(set, (s) => s.letter(i / (letters - 1)), `letter:${i % 3}`), i * 35))
   timers.push(setTimeout(() => (playing.value = undefined), letters * 35))
 }
 // The header and a page's headings switching language: rows down the screen.
@@ -90,8 +90,8 @@ const CLOCK_ROW = { at: 0, chars: 6, step: 1 / 40, settle: 0.3, pan: 0.6 }
 function clock(set: SoundSetName) {
   stop()
   playing.value = set
-  playClockFrom(set, CLOCK_ROW, 1)
-  timers.push(setTimeout(() => playClockFrom(set, { ...CLOCK_ROW, chars: 5 }, 0), 700))
+  playFromSet(set, (s) => s.clock(CLOCK_ROW, 1), 'clock')
+  timers.push(setTimeout(() => playFromSet(set, (s) => s.clock({ ...CLOCK_ROW, chars: 5 }, 0), 'clock'), 700))
   timers.push(setTimeout(() => (playing.value = undefined), 1400))
 }
 const all = (set: SoundSetName) => sequence(set, KINDS.map(({ kind }) => [kind, size.value]), 550)
@@ -131,14 +131,14 @@ function use(set: SoundSetName) {
             <button type="button" @click="scrub(set)">scrub</button>
             <button type="button" @click="socials(set)">socials</button>
             <button type="button" @click="word(set)">word</button>
-            <button type="button" @click="playBoardFrom(set, BOARD_ROWS)">language</button>
+            <button type="button" @click="playFromSet(set, (s) => s.board(BOARD_ROWS), 'board')">language</button>
             <button type="button" @click="clock(set)">scheme</button>
-            <button type="button" @click="playSweepFrom(set)">scheme sweep</button>
+            <button type="button" @click="playFromSet(set, (s) => s.sweep(), 'sweep')">scheme sweep</button>
             <button v-for="way in (['up', 'down', 'left', 'right'] as const)" :key="way" type="button"
-              @click="playScanFrom(set, way)">scan {{ way }}</button>
-            <button type="button" @click="playTableFrom(set, 4, 0.07)">table</button>
-            <button type="button" @click="playSlideFrom(set, -0.7, 0.5)">slide long</button>
-            <button type="button" @click="playSlideFrom(set, 0.1, 0.25)">slide short</button>
+              @click="playFromSet(set, (s) => s.scan(way), 'scan')">scan {{ way }}</button>
+            <button type="button" @click="playFromSet(set, (s) => s.table(4, 0.07), 'table')">table</button>
+            <button type="button" @click="playFromSet(set, (s) => s.slide(-0.7, 0.5), 'slide')">slide long</button>
+            <button type="button" @click="playFromSet(set, (s) => s.slide(0.1, 0.25), 'slide')">slide short</button>
             <button type="button" :disabled="using === set" @click="use(set)">use on the site</button>
           </td>
         </tr>
