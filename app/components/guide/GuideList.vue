@@ -58,7 +58,7 @@ const FADE: Transition = { duration: 0.2, ease: 'easeOut' }
 // A still shows once it's in, or once it won't come (the placeholder stays).
 const arrived = (event: Event) => ((event.target as HTMLElement).dataset.loaded = '')
 
-const still = (id: string) => `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
+const still = (id: string) => youtubeStill(id)
 </script>
 
 <template>
