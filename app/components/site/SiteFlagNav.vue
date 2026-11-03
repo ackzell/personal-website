@@ -205,16 +205,16 @@ onMounted(() => {
   <nav ref="nav" class="flag-nav" flex="~ col" :aria-label="$t('nav.label')" @keydown="onKeydown">
     <ul class="flag-nav__band" flex gap="1" m="0" p="0" list="none">
       <li v-for="segment in segments" :key="segment.key" class="flag-nav__segment data-[open=true]:flex-1" flex="~ none"
-        gap="0.5" min-w="28" :data-section="segment.section" :data-open="segment.open" :data-split="segment.stops.length > 1"
-        :style="{ '--field': `var(--field-${segment.section})` }">
+        gap="0.5" min-w="28" :data-section="segment.section" :data-open="segment.open"
+        :data-split="segment.stops.length > 1" :style="{ '--field': `var(--field-${segment.section})` }">
         <!-- Label hierarchy through brightness and size, not hue: section
              labels (About, Work, Media) are full brightness and a step
              larger; their children (project words, videos, podcast) are
              smaller and dimmed until current or hovered.
              The section's own link sits outside the children's scroller, so
              it stays in view however far they scroll. -->
-        <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current" data-press="none" @click="tap(segment.to)"
-          @pointerdown="lean" @pointermove="lean"
+        <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current" data-press="none"
+          @click="tap(segment.to)" @pointerdown="lean" @pointermove="lean"
           class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
           flex flex-col gap="2" pb="1" min-w="28" decoration="none">
           <span class="flag-nav__field" relative block aria-hidden="true">
@@ -230,8 +230,8 @@ onMounted(() => {
           :style="{ '--children': segment.stops.length - 1 }">
           <li v-for="(stop, i) in segment.stops.slice(1)" :key="stop.key" class="flag-nav__stop" flex="auto" data-child
             :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
-            <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child data-press="none" @click="tap(stop.to)"
-              @pointerdown="lean" @pointermove="lean"
+            <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child data-press="none"
+              @click="tap(stop.to)" @pointerdown="lean" @pointermove="lean"
               class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
@@ -281,13 +281,13 @@ onMounted(() => {
 }
 
 .flag-nav__field {
-  block-size: calc(var(--field-height) / 2);
-  margin-block-start: calc(var(--field-height) / 2);
+  block-size: calc(var(--field-height) / 3);
+  margin-block-start: calc(var(--field-height) / 3);
   background: var(--line);
 }
 
 [data-open='true'] .flag-nav__field {
-  block-size: var(--field-height);
+  block-size: calc(var(--field-height) / 3);
   margin-block-start: 0;
   background: var(--line);
 }
