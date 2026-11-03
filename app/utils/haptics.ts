@@ -111,12 +111,14 @@ export function isHapticClick(event: Event) {
 // (UsesTables.vue); a social key, heard as its note (SiteFooter.vue); and the language and color scheme, heard as their text
 // turning over or their line sweeping up instead (plugins/locale-scramble.client.ts,
 // SiteSchemeSwitch.vue).
-const SILENT = new Set<Haptic>(['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme', 'sweep'])
+const SILENT = ['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme', 'sweep'] as const satisfies readonly Haptic[]
+// The rest must each be a Sound too, or sound(kind) below won't type-check.
+const isHeard = (kind: Haptic): kind is Exclude<Haptic, (typeof SILENT)[number]> => !(SILENT as readonly Haptic[]).includes(kind)
 
 // `size` is what a scrub's tick passed over (0 to 1).
 export function haptic(kind: Haptic, size?: number) {
   if (!import.meta.client) return
   const input = KINDS[kind]
   instance()?.trigger(typeof input === 'function' ? input(size) : input)
-  if (!SILENT.has(kind)) sound(kind as Exclude<Haptic, 'tilt' | 'stick' | 'commit' | 'draw' | 'key' | 'language' | 'scheme' | 'sweep'>, size)
+  if (isHeard(kind)) sound(kind, size)
 }
