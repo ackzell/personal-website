@@ -703,7 +703,7 @@ const { linked, waiting, order, fit } = useGuideReveal(root, reducedMotion)
 }
 
 /* A playlist wraps into lines of fixed cells (a frame, or a bar where lengths
-   are known) so the block's area is how much there is. Bars stand in rows of
+   are known) so the area of the block is how much there is. Bars stand in rows of
    a fixed height, tallest the longest. */
 .guide__strip--wrap {
   --cell: 1.125rem;
