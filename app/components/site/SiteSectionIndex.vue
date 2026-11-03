@@ -181,11 +181,18 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 .section-index__list {
   display: flex;
   align-items: start;
-  block-size: 100%;
   gap: var(--gap-block);
   overflow-x: auto;
   overscroll-behavior-x: contain;
   scrollbar-width: none;
+  /* Room inside the scroll box for the links' tap padding (space-2) and the
+     focus ring past it (space-1), which it would clip; the negative margin
+     keeps the row where it was. */
+  --ring-room: calc(var(--space-2) + var(--space-1));
+  box-sizing: border-box;
+  block-size: calc(100% + 2 * var(--ring-room));
+  margin: calc(-1 * var(--ring-room)) calc(-1 * var(--space-1));
+  padding: var(--ring-room) var(--space-1);
 }
 
 .section-index__list> :first-child {
@@ -275,6 +282,8 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
     gap: var(--gap-tight);
     block-size: auto;
     overflow: visible;
+    margin: 0;
+    padding: 0;
   }
 
   .section-index--auto .section-index__list>* {

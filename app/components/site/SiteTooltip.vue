@@ -222,10 +222,6 @@ onBeforeUnmount(() => {
   text-decoration: none;
 }
 
-.site-tooltip__name:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 /* The inverse of the stage, so it reads as lifted off the page without a
    border. Fades in a beat after the pointer arrives, out at once. */
