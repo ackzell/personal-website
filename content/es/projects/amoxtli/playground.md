@@ -3,7 +3,11 @@ title: "playground"
 description: "El entorno en el navegador para las lecciones y los retos, creado sobre un fork de almostnode."
 ---
 
-Antes de crear los componentes interactivos para la plataforma, lo único que tenía era este Playground, que originalmente estaba basado en [web containers](https://webcontainers.io/) , pero después encontré [almostnode](https://almostnode.dev/) y decidí migrar hacia él.
+## La Historia
+
+Antes de que te cuente acerca de los últimos cambios, te contaré acerca de lo que tenía al principio. Era un proyecto basado en [TutorialKit](https://tutorialkit.dev/) y funcionaba más o menos, pero decidí moverme a una solución que fuera verdaderamente basada en el ecosistema de Vue para la plataforma.
+
+Incluso después de moverme a Nuxt Content y debido al hecho que hice un fork de [learn.nuxt.com](https://learn.nuxt.com/en), la primera porción _interactiva_ del libro era este playground, que originalmente estaba basado en [web containers](https://webcontainers.io/), pero después encontré [almostnode](https://almostnode.dev/) y decidí migrar hacia él.
 
 ::media-clip{src="/media/amoxtli/playground.mp4" webm="/media/amoxtli/playground.webm" poster="/media/amoxtli/playground.webp" label="Código editado en el Playground y guardado como snapshot; el snapshot comparado lado a lado con el código actual y, al salir con cambios sin guardar, un aviso para guardarlos." width="1440" height="900" wide}
 ::

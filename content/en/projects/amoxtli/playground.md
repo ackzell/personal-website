@@ -4,7 +4,10 @@ description: "The in-browser environment for lessons and challenges, built on a 
 ---
 
 ## The Story
-Before creating the interactive components for the platform, I only had this playground, which initially was based on [web containers](https://webcontainers.io/) but then I came across [almostnode](https://almostnode.dev/) and decided to migrate to it.
+
+Before I tell you about the latest changes, I'll let you in on something I built before: it was based on [TutorialKit](https://tutorialkit.dev/) and it mostly worked, but I decided to move on to a truly Vue-ecosystem-based solution for the whole platform.
+
+Even after I moved to Nuxt Content, and given the fact I forked [learn.nuxt.com](https://learn.nuxt.com/en), the first _interactive_ portion of the book was the playground, which initially was based on [web containers](https://webcontainers.io/) but then I came across [almostnode](https://almostnode.dev/) and decided to migrate to it.
 
 ::media-clip{src="/media/amoxtli/playground.mp4" webm="/media/amoxtli/playground.webm" poster="/media/amoxtli/playground.webp" label="Code edited in the Playground and saved as a snapshot, the snapshot compared side by side with the current code, then a prompt to save before leaving with unsaved changes." width="1440" height="900" wide}
 ::
