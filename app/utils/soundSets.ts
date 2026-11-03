@@ -78,7 +78,7 @@ const tone = (at: number, f: number, shape: Shape = {}): Layer =>
 const noise = (at: number, shape: Filtered = {}): Layer =>
   ({ kind: 'noise', at, filter: 'bandpass', f: 2000, f2: null, glide: 0.1, q: 1, a: 0.002, d: 0.03, peak: 0.06, send: 0, ...shape })
 
-// The lightbox opening and closing (Lightbox.vue), the same in every set:
+// The lightbox opening and closing (MediaLightbox.vue), the same in every set:
 // the user's cue, a soft lowpass breath whose filter settles as the picture
 // lands. Opening breathes bright (2.6 kHz settling to 1.5); closing, the
 // same breath darker (1.2 kHz down to 600 Hz), a touch quicker to go. Kept
@@ -200,7 +200,7 @@ function board(
 }
 
 /*
- * The line of light sweeping a picture or clip in (Palette.vue, Lightbox.vue:
+ * The line of light sweeping a picture or clip in (MediaPalette.vue, MediaLightbox.vue:
  * 450ms, eased out), heard for as long as it takes to cross. Going up or
  * down it's heard in the middle; crossing sideways it travels with the
  * line, from the side it sets off to the side it lands (a part's `travel`,

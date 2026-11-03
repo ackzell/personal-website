@@ -49,8 +49,8 @@ const id = computed(() => {
   const url = new URL(props.src)
   return url.searchParams.get('v') ?? url.pathname.split('/').pop()!
 })
-const watchUrl = computed(() => `https://www.youtube.com/watch?v=${id.value}`)
-const thumbnail = computed(() => props.poster ?? `https://i.ytimg.com/vi/${id.value}/maxresdefault.jpg`)
+const watchUrl = computed(() => youtubeWatch(id.value))
+const thumbnail = computed(() => props.poster ?? youtubeStill(id.value, 'maxresdefault'))
 
 // idle: only the thumbnail, no player yet. loading: the player is on its way
 // (or resuming) under the thumbnail. playing: the thumbnail is off it.
@@ -186,14 +186,6 @@ function step(event: KeyboardEvent) {
   seek(to, true)
 }
 
-/** 1:05, or 1:02:05 past the hour. */
-function clock(seconds: number) {
-  const s = Math.floor(seconds)
-  const [h, m] = [Math.floor(s / 3600), Math.floor((s % 3600) / 60)]
-  const ss = String(s % 60).padStart(2, '0')
-  return h ? `${h}:${String(m).padStart(2, '0')}:${ss}` : `${m}:${ss}`
-}
-
 watch(() => props.inactive, (inactive) => {
   if (!inactive || (state.value !== 'playing' && state.value !== 'loading')) return
   state.value = 'paused'
@@ -229,7 +221,7 @@ function toggle() {
 </script>
 
 <template>
-  <figure class="media media--video" :class="{ 'track-wide': wide }" :data-state="state">
+  <MediaShell :wide="wide" class="media--video" :data-state="state">
     <!-- Filled, a touch is the frame's own: a sheet under it doesn't pull, the page doesn't swipe. -->
     <div ref="screen" class="media__frame video__frame" :class="{ 'is-filled': filled, 'is-large': large }"
       @touchstart.stop>
@@ -250,10 +242,10 @@ function toggle() {
       <div v-if="duration" ref="track" class="video__seek" :class="{ 'is-scrubbing': scrubbing }" role="slider"
         tabindex="0" :aria-label="`${t('projects.media.seek')}: ${title}`" aria-valuemin="0"
         :aria-valuemax="Math.round(duration)" :aria-valuenow="Math.round(played)"
-        :aria-valuetext="`${clock(played)} / ${clock(duration)}`"
+        :aria-valuetext="`${formatClock(played)} / ${formatClock(duration)}`"
         :style="{ '--played': played / duration, '--loaded': loaded }" @pointerdown="grab" @pointermove="drag"
         @pointerup="letGo" @pointercancel="letGo" @keydown="step">
-        <span class="video__time" aria-hidden="true">{{ clock(played) }}</span>
+        <span class="video__time" aria-hidden="true">{{ formatClock(played) }}</span>
       </div>
       <button v-if="mounted" type="button" data-press="key" class="media__toggle media__expand video__expand"
         :aria-label="large ? t('projects.media.shrink') : t('projects.media.fullscreen')" :aria-pressed="large"
@@ -261,12 +253,12 @@ function toggle() {
         <span :class="large ? 'i-iconoir-collapse' : 'i-iconoir-expand'" aria-hidden="true" />
       </button>
     </div>
-    <figcaption class="media__caption">
+    <template #caption>
       <slot mdc-unwrap="p" />
-      <a :href="watchUrl" class="media__out" :class="{ 'video__out--alone': !slots.default }">{{ t('projects.media.watch')
-      }}<span class="i-iconoir-arrow-up-right" aria-hidden="true" /></a>
-    </figcaption>
-  </figure>
+      <MediaOutLink :href="watchUrl" ms="group first:0" :class="{ 'video__out--alone': !slots.default }">{{
+        t('projects.media.watch') }}</MediaOutLink>
+    </template>
+  </MediaShell>
 </template>
 
 <style scoped>

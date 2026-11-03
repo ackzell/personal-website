@@ -680,10 +680,6 @@ function onClose() {
   opacity: 1;
 }
 
-.lightbox__thumb:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 /* The line under the one showing: the light the step's line is made of. */
 .lightbox__line {
@@ -767,7 +763,6 @@ function onClose() {
 }
 
 .lightbox__button:focus-visible {
-  outline: 2px solid var(--accent);
   outline-offset: -2px;
 }
 

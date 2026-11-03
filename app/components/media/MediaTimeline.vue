@@ -22,7 +22,7 @@ const props = defineProps<{
   podcast: GuideSeries[]
 }>()
 
-const { t, n, locale } = useI18n()
+const { t, n } = useI18n()
 // Months until hydrated, so the server's columns match; then quarters on phones.
 const mounted = useMounted()
 const phone = useMediaQuery('(width < 40rem)')
@@ -148,15 +148,15 @@ function doorOf(slug: 'videos' | 'podcast') {
   return { path: `/${slug}`, query: { month }, hash: first > 0 ? `#row-${series[first]!.id}` : undefined }
 }
 
-const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric', timeZone: 'UTC' }))
+const formatMonth = useMonthFormat()
 const nameOf = (column: { year: number, month: number }) => {
-  const from = monthFormat.value.format(Date.UTC(column.year, column.month))
-  return step.value === 1 ? from : `${from} – ${monthFormat.value.format(Date.UTC(column.year, column.month + step.value - 1))}`
+  const from = formatMonth(Date.UTC(column.year, column.month))
+  return step.value === 1 ? from : `${from} – ${formatMonth(Date.UTC(column.year, column.month + step.value - 1))}`
 }
 const readout = computed(() => {
   if (reading.value === null) {
     const { first, last } = range.value
-    return { when: `${monthFormat.value.format(Date.UTC(Math.floor(first / 12), first % 12))} → ${monthFormat.value.format(Date.UTC(Math.floor(last / 12), last % 12))}`, videos: null, episodes: null }
+    return { when: `${formatMonth(Date.UTC(Math.floor(first / 12), first % 12))} → ${formatMonth(Date.UTC(Math.floor(last / 12), last % 12))}`, videos: null, episodes: null }
   }
   const column = columns.value[reading.value]!
   const of = (key: string, releases: GuideRelease[]) => `${t(key, releases.length)}${timed.value && releases.length ? ` (${hours(releases)} h)` : ''}`
@@ -297,7 +297,6 @@ const readout = computed(() => {
 }
 
 .timeline__link:focus-visible {
-  outline: 2px solid var(--accent);
   outline-offset: 4px;
 }
 
