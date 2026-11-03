@@ -50,6 +50,13 @@
       },
       "default": []
     },
+    "related": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
     "devlogPlaylist": {
       "type": "string"
     }

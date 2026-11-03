@@ -46,4 +46,6 @@ export interface ProjectPart extends ProjectFacts {
   title: string
   description: string
   order: number
+  /** Project slugs, listed at the end of the part's page. */
+  related: string[]
 }

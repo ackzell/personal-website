@@ -17,6 +17,12 @@ if (!project.value || !part.value || !page.value) {
   throw createError({ statusCode: 404, statusMessage: 'Project not found', fatal: true })
 }
 
+const related = computed(() =>
+  (part.value?.related ?? [])
+    .map((relatedSlug) => projects.value?.find((p) => p.slug === relatedSlug))
+    .filter((p) => p !== undefined),
+)
+
 const siblings = computed(() => parts.value?.filter((p) => p.slug !== partSlug.value) ?? [])
 
 // The same row as the project page, with its family last.
@@ -25,6 +31,7 @@ const sections = computed(() => [
   { id: 'details', label: t('projects.index.details') },
   { id: 'story', label: t('projects.index.story') },
   ...(siblings.value.length ? [{ id: 'also', label: t('projects.alsoIn', { word: project.value?.word }) }] : []),
+  ...(related.value.length ? [{ id: 'related', label: t('projects.related') }] : []),
 ])
 
 useSeoMeta({
@@ -67,6 +74,11 @@ useSeoMeta({
     <section v-if="siblings.length" id="also" aria-labelledby="siblings-heading" mt="section">
       <h2 id="siblings-heading" mb="group" class="running-head">{{ t('projects.alsoIn', { word: project.word }) }}</h2>
       <ProjectParts :parts="siblings" />
+    </section>
+
+    <section v-if="related.length" id="related" aria-labelledby="related-heading" mt="section">
+      <h2 id="related-heading" mb="group" class="running-head">{{ t('projects.related') }}</h2>
+      <ProjectIndex :projects="related" />
     </section>
   </ProjectPage>
 </template>
