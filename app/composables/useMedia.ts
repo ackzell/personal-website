@@ -59,7 +59,9 @@ export function usePodcastSeasons() {
 
       const seasoned = episodes.filter((episode) => episode.season)
       const seasonOf = (episode: Episode) => episode.season
-        ?? seasoned.filter((other) => other.published <= episode.published).reduce((_, other) => other.season!, seasoned.at(-1)?.season ?? 1)
+        // Newest first, so the first one out by then is the latest season to have aired.
+        ?? seasoned.find((other) => other.published <= episode.published)?.season
+        ?? seasoned.at(-1)?.season ?? 1
 
       const bySeason = new Map<number, Episode[]>()
       for (const episode of episodes) {
