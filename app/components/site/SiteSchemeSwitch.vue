@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { animate, scrambleText } from 'animejs'
+import type { ComponentPublicInstance } from 'vue'
 
 /*
  * The footer's twin of the header's lang="en": the switch as the CSS it sets,
@@ -16,8 +17,9 @@ const reduceMotion = usePreferredReducedMotion()
 const { t } = useI18n()
 
 // The phone rail stands on it (main.css), so it needs the height.
-const root = useTemplateRef<HTMLElement>('root')
-usePublishedHeight(root, '--scheme-height')
+const root = useTemplateRef<ComponentPublicInstance>('root')
+const el = computed(() => (root.value?.$el ?? null) as HTMLElement | null)
+usePublishedHeight(el, '--scheme-height')
 
 // The stored preference, not the resolved scheme, so "system" can show. Until
 // it is known (prerendered pages, until mount) the text stays hidden. Gated on
@@ -112,7 +114,7 @@ function toggle() {
     // Heard as a flip clock turning over, on the scramble's own timing,
     // leaning a little toward where the switch sits: one word alone off to
     // one side would sound one-eared in headphones.
-    const rect = root.value?.getBoundingClientRect()
+    const rect = el.value?.getBoundingClientRect()
     soundClock({
       at: 0,
       chars: Math.max(from.length, to.length),
@@ -139,70 +141,19 @@ function toggle() {
 </script>
 
 <template>
-  <!-- The quotes and property name are decoration; the button reads as what
-       it does and where it stands. -->
-  <div ref="root" class="scheme-switch" data-keeps-panel>
+  <!-- The button reads as what it does and where it stands. -->
+  <SiteAttrSwitch ref="root" name="color-scheme" class="scheme-switch" data-keeps-panel>
     <!-- Only shown where it leaves the footer bar (phones), so the mark
          carries across its own background too. -->
     <SiteMarkLayer clipped class="scheme-switch__mark" />
-    <span class="scheme-switch__name" aria-hidden="true">color-scheme="</span>
-    <button type="button" class="scheme-switch__value" :title="labels[next]" data-no-scramble @click="toggle">
+    <button type="button" :title="labels[next]" data-no-scramble @click="toggle">
       <span class="sr-only">{{ $t('site.scheme') }}: {{ labels[scheme] }}</span>
-      <span class="scheme-switch__text" :style="{ visibility: known ? undefined : 'hidden' }" aria-hidden="true">{{
-        shown }}</span>
+      <span :style="{ visibility: known ? undefined : 'hidden' }" aria-hidden="true">{{ shown }}</span>
     </button>
-    <span class="scheme-switch__name" aria-hidden="true">"</span>
-  </div>
+  </SiteAttrSwitch>
 </template>
 
 <style scoped>
-.scheme-switch {
-  display: flex;
-  align-items: baseline;
-  font-family: var(--font-code);
-  font-weight: var(--code-weight);
-  font-variation-settings: 'CASL' 0;
-  font-size: 0.75rem;
-  color: var(--muted);
-}
-
-/* Held back like the stops beside a page, until reached for. The text only:
-   on phones the switch stands on its own patch of stage, which stays solid. */
-.scheme-switch__name,
-.scheme-switch__value {
-  opacity: 0.65;
-  transition: opacity 200ms var(--ease-out);
-}
-
-.scheme-switch:is(:active, :has(:focus-visible)) :is(.scheme-switch__name, .scheme-switch__value) {
-  opacity: 1;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .scheme-switch:hover :is(.scheme-switch__name, .scheme-switch__value) {
-    opacity: 1;
-  }
-}
-
-.scheme-switch__value {
-  padding: var(--space-1) 0.15em;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-variation-settings: inherit;
-  color: var(--fg);
-  cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.3em;
-  transition: text-decoration-color 150ms ease;
-}
-
-/* Same as the locale switch: hover or focus underlines the value. */
-.scheme-switch__value:is(:hover, :focus-visible) {
-  text-decoration-color: currentColor;
-}
-
 .scheme-switch__mark {
   display: none;
 }
