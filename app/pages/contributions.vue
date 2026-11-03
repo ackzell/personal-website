@@ -14,6 +14,7 @@ useSeoMeta({ title: () => t('contributions.title') })
     <h1 track="wide" class="running-head">{{ $t('contributions.title') }}
       <span v-if="total" class="tabular-nums">({{ total }})</span>
     </h1>
+    <p track="wide" max-w="[var(--content-width)]" text="sm">{{ $t('contributions.intro') }}</p>
     <ContributionGraph data-own-entrance v-if="projects" :projects="projects" mt="block" />
   </div>
 </template>

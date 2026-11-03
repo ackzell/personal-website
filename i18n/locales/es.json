@@ -128,6 +128,7 @@
   },
   "contributions": {
     "title": "Contribuciones",
+    "intro": "Realmente creo en el software de código abierto y estas son algunas de las cosas con las que he contribuido a distintas comunidades. La mayoría son pequeños fixes aquí y allá (activa el filtro de erratas). Pero, según yo, cuando hablamos de OSS todo cuenta.",
     "errata": "Errata",
     "prompt": "¿Mostrar {count} erratas (typos, docs, etc.)?",
     "yes": "sí",
@@ -135,7 +136,7 @@
   },
   "uses": {
     "title": "Uses",
-    "intro": "",
+    "intro": "Inspirado por el sitio {usesTech} de Wes Bos. Aquí hay algunas de las herramientas, hardware y dispositivos que han sido o que son parte de mi día a día.",
     "tool": "Herramienta",
     "years": "Años",
     "note": "Nota",
