@@ -4,15 +4,17 @@ start: 2024-01
 end: 2026-06
 role:
   en: Senior Software Engineer
-  es: Ingeniero de Software Sénior
+  es: Ingeniero de Software Senior
 summary:
   en:
-    - Currently participating in frontend development activities including bug fixes, feature development, and AI-leveraged testing initiatives that added thousands of tests.
-    - Spearheading Angular-to-Next.js migration (third successful migration project across companies), supporting Design System initiative.
+    - My first job living in Europe.
+    - Participated in frontend development activities including bug fixes, feature development, and AI-leveraged testing initiatives that added thousands of tests.
+    - Spearheaded Angular-to-Next.js migration (third successful migration project across companies), supporting their Design System initiative.
     - Developed chatbot UI consuming AWS Bedrock service.
   es:
-    - Participo en el desarrollo frontend con corrección de errores, nuevas funcionalidades e iniciativas de pruebas apoyadas en IA que sumaron miles de tests.
-    - Lidero la migración de Angular a Next.js (el tercer proyecto de migración exitoso entre empresas) y apoyo la iniciativa de Design System.
+    - Mi primer empleo viviendo en Europa.
+    - Participé en el desarrollo frontend con corrección de errores, nuevas funcionalidades e iniciativas de pruebas apoyadas en IA que sumaron miles de tests.
+    - Migré gran parte de una app desde Angular a Next.js (el tercer proyecto de migración exitoso entre empresas) poniendo en práctica el recién creado Design System.
     - Desarrollé la interfaz de un chatbot que consume el servicio AWS Bedrock.
 stack:
   [

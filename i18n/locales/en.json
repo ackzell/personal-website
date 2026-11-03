@@ -19,14 +19,14 @@
   "home": {
     "bio": "About me",
     "title": "Axel Martínez",
-    "intro": "Senior Frontend Engineer with 11+ years building scalable web applications and leading technical innovation. JS and TypeScript specialist with proven experience in large-scale application architecture, successful technology migrations across multiple organizations, and cross-functional team participation, particularly in remote-first environments. Passionate about emerging technologies, software development tooling, and knowledge sharing through content creation and mentoring.",
+    "intro": "Hello there! I'm a Mexican software engineer mostly dedicated to the frontend throughout my career. I've built on the web for more than 12 years (wow, time flies!) and I'm really excited to share with you through this website my professional experience as well as things I create  to scratch my own itches. Please feel free to poke around and reach out as well. Thank you!",
     "featured": "Currently working on",
     "allProjects": "All projects",
     "timeline": "Experience"
   },
   "projects": {
     "title": "Projects",
-    "intro": "Tools I've built, mostly for myself first. Each one is named after a word in Nahuatl.",
+    "intro": "Here you will find side projects, tools and experiments that I've built to mostly for myself because I like having my own environment and being in control of certain things helps me to feel more productive or maybe I have an experiment I want to build upon. Most of them are my attempts to learn new things: techniques, tools, technologies, and things like that. There's a pattern with the names you will see. They mostly have Nahuatl names, an ancient language spoken in Mexico since before the colonial times.",
     "pronunciation": "Pronunciation",
     "meaning": "Meaning",
     "related": "Related projects",
