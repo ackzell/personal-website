@@ -37,7 +37,7 @@ export default defineCachedEventHandler(async (): Promise<Contribution[]> => {
       number: item.number,
       title: item.title,
       url: item.html_url,
-      merged: merged.slice(0, 10),
+      merged: localDay(merged),
     }]
   })
 }, { name: 'contributions', maxAge: 60 * 60 })

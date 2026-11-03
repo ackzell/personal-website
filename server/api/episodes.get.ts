@@ -74,7 +74,7 @@ export default defineCachedEventHandler(async (): Promise<Episode[]> => {
       title: text(item, 'title') ?? '',
       url: site + page(id),
       audio,
-      published: new Date(text(item, 'pubDate') ?? '').toISOString().slice(0, 10),
+      published: localDay(text(item, 'pubDate') ?? ''),
       duration: seconds(text(item, 'itunes:duration') ?? '0'),
       season: optionalNumber(text(item, 'itunes:season')),
       episode: optionalNumber(text(item, 'itunes:episode')),
