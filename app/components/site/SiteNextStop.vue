@@ -71,8 +71,8 @@ const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
         <span class="stop__route">
           <span v-if="way.rel === 'prev'" class="stop__arrow i-iconoir-arrow-left" aria-hidden="true" />
           <span class="stop__path">
-            <SiteScrambleText :text="way.folders" :still="!bar" class="stop__folders" aria-hidden="true" />
-            <SiteScrambleText :text="way.label" :still="!bar" class="stop__name" :lang="way.lang" />
+            <SiteScrambleText :text="way.folders" :still="!bar" class="stop__folders" typeset="code" aria-hidden="true" />
+            <SiteScrambleText :text="way.label" :still="!bar" class="stop__name" typeset="code" :lang="way.lang" />
           </span>
           <span v-if="way.rel === 'next'" class="stop__arrow i-iconoir-arrow-right" aria-hidden="true" />
         </span>
@@ -169,9 +169,6 @@ const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
 /* As the header's lang="…" and the footer's color-scheme="…", dimmed as
    the band dims its children (--muted drops under 4.5:1 on the red stage). */
 .stop__folders {
-  font-family: var(--font-code);
-  font-weight: var(--code-weight);
-  font-variation-settings: 'CASL' 0;
   font-size: 0.75rem;
   line-height: 1.4;
   color: color-mix(in srgb, var(--fg) 80%, var(--bg));
@@ -179,9 +176,7 @@ const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
 
 /* The name in the folders' own type and size, set apart only by weight. */
 .stop__name {
-  font-family: var(--font-code);
   font-weight: 600;
-  font-variation-settings: 'CASL' 0;
   font-size: 0.75rem;
   line-height: 1.4;
 }
@@ -222,7 +217,6 @@ const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
 }
 
 .stop:focus-visible {
-  outline: 2px solid var(--accent);
   outline-offset: var(--space-2);
 }
 

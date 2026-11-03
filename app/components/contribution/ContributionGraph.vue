@@ -29,7 +29,7 @@ import { animate as spring, useMotionValue, useMotionValueEvent, type Transition
  */
 const props = defineProps<{ projects: ContributedProject[] }>()
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const reducedMotion = usePreferredReducedMotion()
 
 const showErrata = ref(false)
@@ -327,8 +327,7 @@ watch([lit, headOn], () => {
 }, { flush: 'post' })
 useResizeObserver(frame, () => headPlaced && placeHead(true))
 
-const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric', timeZone: 'UTC' }))
-const formatDate = (date: string) => monthFormat.value.format(new Date(`${date}T00:00:00Z`))
+const formatMonth = useMonthFormat()
 
 const owner = (repo: string) => repo.split('/')[0]
 const name = (repo: string) => repo.split('/')[1]
@@ -339,7 +338,7 @@ const name = (repo: string) => repo.split('/')[1]
     @animationstart="typing" @animationend="entered">
     <!-- The switch as a command of the log itself and the question it asks: the
          answer picks the flag on the git log below it. -->
-    <div class="errata-switch" data-stick>
+    <div class="errata-switch" typeset="code" data-stick>
       <SiteMarkLayer clipped />
       <p class="errata-switch__command" m="0" aria-hidden="true">$ <span v-for="(key, c) in command" :key="c"
           class="key" :style="{ '--c': c }">{{ key }}</span> <span ref="flagText" class="errata-switch__flag"><span
@@ -349,7 +348,7 @@ const name = (repo: string) => repo.split('/')[1]
         <span aria-hidden="true">? {{ t('contributions.prompt', { count: errataCount }) }} [</span>
         <template v-for="(answer, a) in answers" :key="answer.label">
           <span v-if="a > 0" aria-hidden="true">/</span>
-          <button type="button" class="errata-switch__answer" :aria-pressed="showErrata === answer.value"
+          <button type="button" class="errata-switch__answer" btn-bare :aria-pressed="showErrata === answer.value"
             data-no-scramble @click="answer.value !== showErrata && toggleErrata()">{{ showErrata === answer.value
               ? capitalize(answer.label) : answer.label }}</button>
         </template>
@@ -389,7 +388,7 @@ const name = (repo: string) => repo.split('/')[1]
             <a decoration-0 :href="row.merge.url" target="_blank" rel="noopener">{{ row.merge.title }}</a>
             <p v-if="row.merge.note" m="0">{{ row.merge.note }}</p>
             <p m="0" typeset="code" text="sm muted" class="tabular-nums">
-              #{{ row.merge.number }} · <time :datetime="row.merge.merged">{{ formatDate(row.merge.merged) }}</time>
+              #{{ row.merge.number }} · <time :datetime="row.merge.merged">{{ formatMonth(row.merge.merged) }}</time>
             </p>
           </div>
         </li>
@@ -807,9 +806,6 @@ const name = (repo: string) => repo.split('/')[1]
   justify-self: stretch;
   display: grid;
   gap: var(--space-1);
-  font-family: var(--font-code);
-  font-weight: var(--code-weight);
-  font-variation-settings: 'CASL' 0;
   font-size: 0.875em;
   color: var(--muted);
 }
@@ -821,20 +817,17 @@ const name = (repo: string) => repo.split('/')[1]
 
 .errata-switch__answer {
   padding: var(--space-1) 0.15em;
-  border: 0;
-  background: none;
-  font: inherit;
-  font-variation-settings: inherit;
-  color: inherit;
-  cursor: pointer;
   text-decoration: underline;
   text-decoration-color: transparent;
   text-underline-offset: 0.3em;
-  transition: text-decoration-color 150ms ease, color 150ms ease;
+  transition: text-decoration-color 150ms ease, color 150ms ease, font-weight 150ms ease;
 }
 
+/* The picked answer in ink and heavier: color alone reads too quietly as on.
+   Recursive is monospace, so the weight change moves nothing. */
 .errata-switch__answer[aria-pressed='true'] {
   color: var(--fg);
+  font-weight: 600;
   cursor: default;
 }
 

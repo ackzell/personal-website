@@ -21,6 +21,8 @@ const spaceProps: Record<string, string[]> = {
   'my': ['margin-block'],
   'mt': ['margin-top'],
   'mb': ['margin-bottom'],
+  'ms': ['margin-inline-start'],
+  'me': ['margin-inline-end'],
   'p': ['padding'],
   'px': ['padding-inline'],
   'py': ['padding-block'],
@@ -104,6 +106,9 @@ export const presetAckzell = definePreset(() => ({
     // Project words (lexicon headwords, project headings). Set via class on
     // links: `text` as an attribute breaks <a> (see uno.config.ts).
     ['text-headword', { 'font-size': 'var(--headword-size)', 'line-height': '1' }],
+    // A button that reads as a word or an icon: no box, the text around it.
+    // Each component still sets its own padding, color and underline.
+    ['btn-bare', { 'padding': '0', 'border': '0', 'background': 'none', 'font': 'inherit', 'color': 'inherit', 'cursor': 'pointer' }],
   ],
   shortcuts: {
     // A quiet label over content that speaks for itself, like a dictionary's

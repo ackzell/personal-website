@@ -429,6 +429,12 @@ onMounted(() => {
   display: none;
 }
 
+/* Focus ring inside the stop: outside, the stops scroll box clips it and
+   the next field paints over its edge. */
+.flag-nav__link:focus-visible {
+  outline-offset: -2px;
+}
+
 .flag-nav__stops[data-fade-start] {
   --fade-start: var(--fade);
 }
