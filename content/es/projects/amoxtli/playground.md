@@ -1,15 +1,20 @@
 ---
 title: "playground"
-description: "El entorno en el navegador donde corren las lecciones, sobre un fork de almostnode."
+description: "El entorno en el navegador para las lecciones y los retos, creado sobre un fork de almostnode."
 ---
 
-<!-- TODO(owner): lo que obtiene quien aprende. Un editor, una terminal, un servidor de desarrollo y recarga en caliente, sin instalar nada. -->
+Antes de crear los componentes interactivos para la plataforma, lo único que tenía era este Playground, que originalmente estaba basado en [web containers](https://webcontainers.io/) , pero después encontré [almostnode](https://almostnode.dev/) y decidí migrar hacia él.
 
 ::media-clip{src="/media/amoxtli/playground.mp4" webm="/media/amoxtli/playground.webm" poster="/media/amoxtli/playground.webp" label="Código editado en el Playground y guardado como snapshot; el snapshot comparado lado a lado con el código actual y, al salir con cambios sin guardar, un aviso para guardarlos." width="1440" height="900" wide}
 ::
 
-<!-- TODO(owner): por qué un fork de almostnode. Ser dueño del runtime en lugar de preguntarle a StackBlitz por el uso comercial, y un reto que de otra forma se sentía fuera de alcance. -->
+## Algunos detalles técnicos (pero no todos)
+Tuve que hacer un fork de almost node y modificarlo para hacer que funcionara, pero un día finalmente lo hizo. La idea principal es tener un ambiente muy similar al que tendrías en tu propia computadora corriendo Node con Vite y sirviendo tu ambiente de desarrollo.
 
-<!-- TODO(owner): lo que hay debajo, con honestidad. Buena parte del fork se parchó con IA; lo que respaldas es el resultado: Vite 7 real sirviendo SFCs de Vue con HMR en vivo, una shell interactiva, una consola sin el ruido de la página anfitriona y una API compatible con WebContainers. Publicado hasta la 0.5.5. -->
+La verdad, utilicé inteligencia artificial realmente para todo esto de la migración. Pero al ver los resultados y después de muchos auditorías que le hice al código, creo que está trabajando lo mejor que pude haberlo hecho funcionar así que lo dejé en la plataforma.
 
-<!-- TODO(owner, opcional): cómo la maneja una lección. Código inicial, soluciones y suites de retos, por birpc entre la página y la vista previa. -->
+Algo no menos importante es que también quería probar utilizar IA y ver hasta dónde podría llegar en algo que de otra forma no me sentiría cómodo haciendo por mi cuenta y probablemente hubiera tardado mucho tiempo, así que es una de las razones por las que hice la migración también.
+
+Lo que hace el fork, sobre todo es servir Vue SFCs en un Vite 7 real y soporta hot module replacement o HMR, un shell interactivo, y la salida de la consola sin tener el ruido de la página huésped (la app de Nuxt, pues). También tiene una API compatible con la de web containers para evitar reescribir la parte que se conecta dentro de la aplicación de Nuxt.
+
+El playground comparte un par de características de [yehyecoa](/projects/yehyecoa) que son el control de versiones y arrastrar y colocar para reorganizar el layout.
