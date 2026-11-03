@@ -11,7 +11,7 @@ async function youtubeFeed(query: { playlist_id: string }): Promise<Video[]> {
       id,
       title: text(entry, 'title') ?? '',
       url: `https://www.youtube.com/watch?v=${id}`,
-      published: (text(entry, 'published') ?? '').slice(0, 10),
+      published: localDay(text(entry, 'published') ?? ''),
     }
   })
 }
@@ -68,7 +68,7 @@ export async function youtubePlaylist(playlistId: string): Promise<Video[]> {
         id,
         title: snippet.title,
         url: `https://www.youtube.com/watch?v=${id}`,
-        published: videoPublishedAt.slice(0, 10),
+        published: localDay(videoPublishedAt),
         duration: isoSeconds(video.contentDetails.duration),
         views: video.statistics.viewCount === undefined ? undefined : Number(video.statistics.viewCount),
       }]
