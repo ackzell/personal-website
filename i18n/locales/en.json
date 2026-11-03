@@ -128,6 +128,7 @@
   },
   "contributions": {
     "title": "Contributions",
+    "intro": "I do believe in open source software and these are a few things that I've contributed back to different communities. Most of them are little fixes here and there (toggle the errata filter). But everything counts when we talk about OSS IMHO.",
     "errata": "Errata",
     "prompt": "Show {count} errata (typos, docs, etc.)?",
     "yes": "yes",
@@ -135,7 +136,7 @@
   },
   "uses": {
     "title": "Uses",
-    "intro": "",
+    "intro": "Inspired by Wes Bos's {usesTech}, here are some of the tools, hardware, and gear that has been or currently is of my day to day.",
     "tool": "Tool",
     "years": "Years",
     "note": "Note",

@@ -57,6 +57,8 @@ const at = (step: number) => ({ '--step': step })
 // observer runs, so without script (or with reduced motion) they just stand.
 const armed = ref(false)
 const drawn = reactive(new Set<string>())
+// Drawn and done (the caret's blink aside): only then may the title glow blend.
+const settled = reactive(new Set<string>())
 const root = useTemplateRef<HTMLElement>('root')
 let observer: IntersectionObserver | undefined
 
@@ -89,6 +91,11 @@ onMounted(() => {
       if (!entry.isIntersecting) continue
       const slug = (entry.target as HTMLElement).dataset.slug!
       drawn.add(slug)
+      const box = entry.target as HTMLElement
+      nextTick(() => Promise.all(box.getAnimations({ subtree: true })
+        .filter((animation) => !(animation instanceof CSSAnimation && animation.animationName.startsWith('uses-blink')))
+        .map((animation) => animation.finished))
+        .then(() => settled.add(slug), () => {}))
       observer!.unobserve(entry.target)
       drew = true
       const rows = props.categories.find((category) => category.slug === slug)?.tools.length ?? 0
@@ -111,7 +118,7 @@ onBeforeUnmount(() => observer?.disconnect())
   <div ref="root" class="uses" :class="{ 'is-armed': armed }" :style="{ ...widths, ...timing }" data-own-entrance
     @animationstart="heard">
     <section v-for="category in categories" :key="category.slug" :aria-labelledby="`uses-${category.slug}`"
-      :class="{ 'is-drawn': drawn.has(category.slug) }" :data-slug="category.slug">
+      :class="{ 'is-drawn': drawn.has(category.slug), 'is-settled': settled.has(category.slug) }" :data-slug="category.slug">
       <!-- The query is typed a character at a time, so it is hidden from assistive tech;
            the category name alone labels the table. -->
       <h2 :id="`uses-${category.slug}`" class="query">
@@ -217,6 +224,12 @@ onBeforeUnmount(() => observer?.disconnect())
   color: var(--hot);
   text-shadow: var(--glow);
   mix-blend-mode: var(--glow-blend);
+}
+
+/* Not while its table draws: plus-lighter on characters typed one by one
+   strobed in Chrome (dark, vivid) as the arriving page faded and slid in. */
+.is-armed section:not(.is-settled) .query__char--title {
+  mix-blend-mode: normal;
 }
 
 .query__char--name {
