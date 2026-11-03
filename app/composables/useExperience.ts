@@ -11,11 +11,6 @@ export function useExperience() {
   )
 }
 
-const monthIndex = (month: string) => {
-  const [year, m] = month.split('-').map(Number)
-  return year! * 12 + m!
-}
-
 async function fetchExperience(locale: 'en' | 'es'): Promise<Role[]> {
   const items = await queryCollection('experience').all()
 

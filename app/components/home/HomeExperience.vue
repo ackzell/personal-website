@@ -30,16 +30,6 @@ import { animate, useMotionValue, useMotionValueEvent, type AnimationPlaybackCon
  */
 const props = defineProps<{ title: string, roles: Role[], recognition: Recognition[] }>()
 
-const monthIndex = (month: string) => {
-  const [year, m] = month.split('-').map(Number)
-  return year! * 12 + m!
-}
-
-const monthAt = (index: number) => {
-  const year = Math.floor((index - 1) / 12)
-  return `${year}-${String(index - year * 12).padStart(2, '0')}`
-}
-
 // Each role's awards and certifications, oldest first, with where each one
 // falls down the role's field (0 at its end, the field's top, to 1 at its start).
 const earned = computed(() => {

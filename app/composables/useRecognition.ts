@@ -11,11 +11,6 @@ export function useRecognition() {
   )
 }
 
-const monthIndex = (month: string) => {
-  const [year, m] = month.split('-').map(Number)
-  return year! * 12 + m!
-}
-
 async function fetchRecognition(locale: 'en' | 'es'): Promise<Recognition[]> {
   const items = await queryCollection('recognition').all()
 
