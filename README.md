@@ -6,6 +6,7 @@ Personal site and portfolio. Nuxt 4 + Nuxt Content + @nuxtjs/i18n, prerendered a
 vp install
 vp run dev        # nuxt dev
 vp run generate   # static build → .output/public
+vp run test       # feed parser tests
 ```
 
 ## Structure
@@ -14,13 +15,21 @@ vp run generate   # static build → .output/public
 app/
   config/nav.ts         main nav + social links (single source of truth)
   composables/          the only way pages get data
-  components/site/      header, nav, locale switch, footer
+  components/site/      header, flag nav, locale/scheme/sound switches, footer
   components/word/      WordHeading: Nahuatl word, pronunciation, meaning
-  components/project/   ProjectCard, ProjectStatus
-  pages/                /, /projects, /projects/[slug], /videos, /podcast, /about
+  components/project/   project index, ledger, lexicon, parts, status
+  components/<area>/    home, contribution, guide, media, uses
+  pages/                /, /contributions, /uses, /projects, /projects/[slug],
+                        /projects/[slug]/[part], /media, /videos, /podcast
+  utils/                sounds, haptics, transitions, months
 content/
-  projects/<slug>.yml        language-agnostic project metadata
-  <locale>/projects/<slug>.md  translated copy + case study
+  projects/<slug>.yml          language-agnostic project metadata
+  projects/<slug>/<part>.yml   a project's parts (tlapalli's themes, site)
+  <locale>/projects/<slug>.md  translated copy + case study (parts alike)
+  experience/, recognition/    roles, awards and certifications
+  contributions.yml, media.yml, uses.yml   curation for the fetched lists
+server/api/             GitHub merges, podcast RSS, YouTube playlists; run at build
+tests/                  `vp run test` (node --test)
 i18n/locales/           UI strings (en, es)
 content.config.ts       collection schemas (zod), validated at build
 ```

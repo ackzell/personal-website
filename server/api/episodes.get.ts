@@ -1,13 +1,13 @@
 /**
  * My typeof Radio's episodes, newest first, from the podcast's RSS (hosted on
- * Buzzsprout). Generated with the site, like /api/videos.
+ * Buzzsprout). Generated with the site, like /api/playlists.
  *
  * The feed doesn't link to mytypeof.dev; each episode's page there is named
  * after its mp3, minus Buzzsprout's numeric prefix, but not exactly: the site
  * drops the dots and underscores the mp3 turns into dashes, and has numbered
  * one episode differently. So the real names come from the site's sitemap.
  */
-const feed = 'https://feeds.buzzsprout.com/1190693.rss'
+const feed = 'https://rss.buzzsprout.com/1190693.rss'
 const site = 'https://mytypeof.dev/episode/'
 const sitemap = 'https://mytypeof.dev/sitemap.xml'
 
