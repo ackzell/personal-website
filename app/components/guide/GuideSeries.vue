@@ -18,44 +18,14 @@
  * The first press or key puts the guide back as it was.
  * The items themselves live on YouTube and mytypeof.dev.
  */
-import { animate, useMotionValue, useMotionValueEvent, useSpring, useTransform, useVelocity, type Transition } from 'motion-v'
 import type { ListItem } from './GuideList.vue'
 
 const props = defineProps<{ series: GuideSeries[] }>()
 
-const { t, n, locale } = useI18n()
+const { t, n } = useI18n()
 
-const dateFormat = computed(() => new Intl.DateTimeFormat(locale.value, { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' }))
-const formatDate = (date: string) => dateFormat.value.format(new Date(`${date}T00:00:00Z`))
-
-// 19:50, or 1:02:10 past the hour.
-const pad = (value: number) => String(value).padStart(2, '0')
-function formatLength(seconds: number) {
-  const h = Math.floor(seconds / 3600)
-  const m = Math.floor((seconds % 3600) / 60)
-  return h ? `${h}:${pad(m)}:${pad(seconds % 60)}` : `${m}:${pad(seconds % 60)}`
-}
-
-// A figure is a number and its unit, split out of the message that says both
-// ("{count} views"), so each language keeps its own plural and word order.
-type Figure = { value: string, unit?: string, soft?: boolean }
-const MARK = '\u0001'
-function figure(key: string, value: string, plural: number): Figure {
-  const unit = t(key, { count: MARK }, plural).replace(MARK, '').trim()
-  return { value, unit }
-}
-
-// A release's figures, in a fixed order: its place in the playlist, when, how
-// long, how many watched or downloaded.
-function figures(release: GuideRelease, number?: number): Figure[] {
-  return [
-    ...(number ? [{ value: `#${number}` }] : []),
-    { value: formatDate(release.published), soft: true },
-    ...(release.duration ? [{ value: formatLength(release.duration) }] : []),
-    ...(release.views ? [figure('media.guide.views', n(release.views), release.views)] : []),
-    ...(release.downloads ? [figure('media.guide.downloads', n(release.downloads), release.downloads)] : []),
-  ]
-}
+const { formatDate, figure, figures } = useGuideFigures()
+const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 
 // A strip is as long as its series has releases, against the longest on the
 // page, so a playlist with a dozen videos never reads as a sliver the way it
@@ -78,7 +48,7 @@ const route = useRoute()
 const month = route.query.month
 const lit = ref(typeof month === 'string' && /^\d{4}-\d{2}$/.test(month) ? month : null)
 const isLit = (release: GuideRelease) => !!lit.value && release.published.startsWith(lit.value)
-const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'long', year: 'numeric', timeZone: 'UTC' }))
+const formatLongMonth = useMonthFormat('long')
 
 const podcast = computed(() => props.series.some((row) => row.kind === 'podcast'))
 const hasBars = computed(() => props.series.some((row) => row.releases.some((release) => release.duration)))
@@ -89,7 +59,7 @@ const hasViews = computed(() => props.series.some((row) => row.kind === 'playlis
 function idleOf(row: GuideSeries, releases: GuideRelease[], from: string, to: string) {
   const count = lit.value ? releases.filter(isLit).length : 0
   if (!count) return `${formatDate(from)} → ${formatDate(to)}`
-  const name = monthFormat.value.format(new Date(`${lit.value}-01T00:00:00Z`))
+  const name = formatLongMonth(lit.value!)
   return `${name} · ${t(row.kind === 'podcast' ? 'media.guide.episodes' : 'media.guide.videos', count)}`
 }
 
@@ -104,7 +74,7 @@ const rows = computed(() => props.series.map((row) => {
   const hours = releases.reduce((total, release) => total + (release.duration ?? 0), 0) / 3600
 
   // 15 videos is the public feed's ceiling, not a count: "15+ videos".
-  const totals: Figure[] = [
+  const totals: GuideFigure[] = [
     figure(row.kind === 'podcast' ? 'media.guide.episodes' : 'media.guide.videos', row.capped ? `${releases.length}+` : String(releases.length), releases.length),
     { value: from.slice(0, 4) === to.slice(0, 4) ? from.slice(0, 4) : `${from.slice(0, 4)}–${to.slice(0, 4)}` },
     ...(hours ? [{ value: n(hours, { maximumFractionDigits: 1 }), unit: 'h' }] : []),
@@ -121,7 +91,7 @@ const rows = computed(() => props.series.map((row) => {
         row.kind === 'playlist' ? `${index + 1}` : '',
         formatDate(release.published),
         release.title,
-        release.duration ? formatLength(release.duration) : '',
+        release.duration ? formatClock(release.duration) : '',
         release.downloads ? t('media.guide.downloads', { count: n(release.downloads) }) : '',
         release.views ? t('media.guide.views', { count: n(release.views) }) : '',
       ].filter(Boolean).join(' · '),
@@ -148,8 +118,8 @@ const rows = computed(() => props.series.map((row) => {
 
 // Which cell is being read out in each row: the line under the strip, which
 // also serves the keyboard.
-type Cell = { release: GuideRelease, figures: Figure[] }
-const reading = ref<Record<string, { title: string, figures: Figure[], id: string }>>({})
+type Cell = { release: GuideRelease, figures: GuideFigure[] }
+const reading = ref<Record<string, { title: string, figures: GuideFigure[], id: string }>>({})
 function read(row: string, cell: Cell) {
   reading.value[row] = { title: cell.release.title, figures: cell.figures, id: cell.release.id }
 }
@@ -176,73 +146,16 @@ function cellAt(event: PointerEvent, cells: Cell[]) {
 }
 
 /*
- * The card that shows what's being read: one for the whole guide, so moving
- * to the next cell swaps its picture rather than its box. A mouse carries it
+ * The card that shows what's being read (useGuideCard). A mouse carries it
  * just above the pointer, still only, since the line under the strip says
  * the rest. A finger hides that line, so above the strip the card says it
  * all, and it steps from cell to cell under the finger.
- *
- * It rides springs: it trails the pointer a hair and swings as it goes, its
- * top leaning back against the way it's moving (hung from the pointer, at
- * its foot), and rights itself as it comes to rest. It stops without
- * overshooting, and the lean has a spring of its own, so it eases upright
- * rather than snapping back when the card stops.
  */
 type Row = GuideSeries
 const card = useTemplateRef<HTMLElement>('card')
 const preview = ref<{ row: Row, cell: Cell, touch: boolean } | null>(null)
-const at = { x: useMotionValue(0), y: useMotionValue(0) }
-// Moving right at this speed (px/s) leans it the most, back to the left.
-const lean = useTransform(useVelocity(at.x), [-3200, 0, 3200], [5, 0, -5], { clamp: true })
-const swing = useSpring(lean, { bounce: 0, visualDuration: 0.2 })
-const FOLLOW: Transition = { type: 'spring', bounce: 0, visualDuration: 0.22 }
-const STEP: Transition = { type: 'spring', bounce: 0, visualDuration: 0.28 }
-// Off screen, it appears where it belongs rather than gliding in.
-const placed = ref(false)
-const EDGE = 12
+const { placed, aim, still, wanted, want } = useGuideCard(card, reducedMotion)
 
-// Written straight to the card each frame, outside Vue.
-function paint() {
-  const element = card.value
-  if (!element) return
-  element.style.translate = `${at.x.get()}px ${at.y.get()}px`
-  element.style.rotate = reducedMotion.value ? '' : `${swing.get()}deg`
-}
-useMotionValueEvent(at.x, 'change', paint)
-useMotionValueEvent(at.y, 'change', paint)
-useMotionValueEvent(swing, 'change', paint)
-
-async function aim(x: number, above: number, below: number) {
-  await nextTick()
-  const element = card.value
-  if (!element) return
-  const header = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-height')) || 0
-  const { offsetWidth: width, offsetHeight: height } = element
-  const to = {
-    x: Math.min(Math.max(EDGE, x - width / 2), window.innerWidth - width - EDGE),
-    y: above - height - EDGE >= header + EDGE ? above - height - EDGE : below + EDGE,
-  }
-  if (!placed.value || reducedMotion.value) {
-    at.x.jump(to.x)
-    at.y.jump(to.y)
-    paint()
-  } else {
-    const spring = preview.value?.touch ? STEP : FOLLOW
-    animate(at.x, to.x, spring)
-    animate(at.y, to.y, spring)
-  }
-  requestAnimationFrame(() => {
-    placed.value = true
-  })
-}
-
-/*
- * The still on the card. The one on show stays until the next has loaded
- * and decoded, so a swap is never an empty box; a sweep passes cells by, and
- * only the one it rests on for a beat is fetched.
- */
-const stillOf = (id: string, size = 'mqdefault') => `https://i.ytimg.com/vi/${id}/${size}.jpg`
-const watchUrl = (id: string) => `https://www.youtube.com/watch?v=${id}`
 // The host's own player, held to one episode by the name of its page there,
 // so a play here counts as a download.
 const playerUrl = (episode: string) => `https://mytypeof.dev/embed/player?image-display=true&title-display=false&type=podcast&podcast-slug=my-typeof-radio&episode-slug=${episode}`
@@ -250,27 +163,6 @@ const playerUrl = (episode: string) => `https://mytypeof.dev/embed/player?image-
 useHead(() => ({
   link: props.series.some((row) => row.kind === 'playlist') ? [{ rel: 'preconnect', href: 'https://i.ytimg.com' }] : [],
 }))
-const ready = new Set<string>()
-const still = ref<string>()
-const wanted = ref<string>()
-let fetchTimer: ReturnType<typeof setTimeout> | undefined
-function want(id: string) {
-  const src = stillOf(id)
-  wanted.value = src
-  clearTimeout(fetchTimer)
-  if (ready.has(src)) {
-    still.value = src
-    return
-  }
-  fetchTimer = setTimeout(() => {
-    const image = new Image()
-    image.src = src
-    image.decode().catch(() => {}).then(() => {
-      ready.add(src)
-      if (wanted.value === src) still.value = src
-    })
-  }, 60)
-}
 
 function show(row: Row, cell: Cell, touch: boolean) {
   read(row.id, cell)
@@ -295,7 +187,7 @@ function hover(event: PointerEvent, row: Row, cells: Cell[]) {
   // A slight tick for each release the mouse comes to (a finger's scrub has its own).
   if (cell.release.id !== reading.value[row.id]?.id) sound('point')
   show(row, cell, false)
-  if (preview.value) aim(event.clientX, event.clientY - 8, event.clientY + 20)
+  if (preview.value) aim(event.clientX, event.clientY - 8, event.clientY + 20, false)
 }
 
 /*
@@ -311,7 +203,7 @@ function stepTo(strip: HTMLElement, row: Row, cell: Cell) {
   show(row, cell, true)
   const { top, bottom } = strip.getBoundingClientRect()
   const box = strip.querySelector(`[data-release="${CSS.escape(cell.release.id)}"]`)!.getBoundingClientRect()
-  aim(box.left + box.width / 2, top, bottom)
+  aim(box.left + box.width / 2, top, bottom, true)
 }
 
 function press(event: PointerEvent, row: Row, cells: Cell[]) {
@@ -323,7 +215,7 @@ function press(event: PointerEvent, row: Row, cells: Cell[]) {
   // The cell fills in at once, under the finger.
   read(row.id, cell)
   // The sheet's still is on its way while the finger is still down.
-  if (row.kind === 'playlist') new Image().src = stillOf(cell.release.id, 'hqdefault')
+  if (row.kind === 'playlist') new Image().src = youtubeStill(cell.release.id, 'hqdefault')
   // A beat before the card, in case this is the start of a scroll.
   const strip = event.currentTarget as HTMLElement
   const timer = setTimeout(() => stepTo(strip, row, cell), 90)
@@ -360,7 +252,7 @@ function abandon(row: string) {
 }
 
 // What a tap on a touch screen lifts into a sheet.
-interface Lifted { video?: string, episode?: string, title: string, from: string, figures: Figure[], url: string }
+interface Lifted { video?: string, episode?: string, title: string, from: string, figures: GuideFigure[], url: string }
 const sheet = shallowRef<Lifted | null>(null)
 function lay(row: Row, cell: Cell) {
   hide()
@@ -422,7 +314,6 @@ function stopUnlight() {
 onBeforeUnmount(stopUnlight)
 
 const open = ref(new Set<string>())
-const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 // Phones, where the name and the strip stack (see the styles).
 const narrow = useMediaQuery('(width < 52rem)')
 // The row whose list is up in a sheet, on a phone.
@@ -451,55 +342,15 @@ async function toggle(row: Row, items: ListItem[], big: boolean, event: MouseEve
   section?.scrollIntoView({ block: 'start', behavior: reducedMotion.value ? 'auto' : 'smooth' })
 }
 
-// Closing folds the list up into its row and, if the row's name has gone
-// off the top, scrolls back to it alongside: you come back to where you
-// opened it. Only paint moves while it folds (the list clips away, what's
-// below slides up); the page is laid out once, at the end, when the list is
-// hidden and everything is already where that puts it. Where that is gets
-// measured first, with the list taken out for a moment: the footer may only
-// come part way (a short page holds it to the bottom of the screen), and the
-// scroll is brought within the shorter page as it folds, so the browser
-// never has to pull it in afterwards.
+// Closing folds the list up into its row (foldAway), back to where it opened.
 const collapsing = new Set<HTMLElement>()
 async function collapse(section: HTMLElement) {
   const panel = section.querySelector<HTMLElement>('.guide__panel')
   if (!panel || reducedMotion.value || collapsing.has(panel)) return
   collapsing.add(panel)
-  // Everything after the row on the page: the rows below, then whatever
-  // follows the guide (the footer), skipping what's fixed to the screen.
-  const below: HTMLElement[] = []
-  for (let at: HTMLElement | null = section; at && at !== document.body; at = at.parentElement) {
-    for (let next = at.nextElementSibling; next; next = next.nextElementSibling) {
-      if (next instanceof HTMLElement && getComputedStyle(next).position !== 'fixed') below.push(next)
-    }
-  }
-  const html = document.documentElement
-  const before = below.map((element) => element.getBoundingClientRect().top)
-  panel.style.display = 'none'
-  const after = below.map((element) => element.getBoundingClientRect().top)
-  const last = html.scrollHeight - html.clientHeight
-  panel.style.removeProperty('display')
-
-  const from = window.scrollY
-  const top = section.getBoundingClientRect().top
-  const pad = Number.parseFloat(getComputedStyle(html).scrollPaddingTop) || 0
-  const back = top < pad ? from + top - pad - (Number.parseFloat(getComputedStyle(section).scrollMarginBlockStart) || 0) : from
-  const to = Math.max(0, Math.min(back, last))
-
-  const fold = { duration: 0.32, ease: [0.32, 0.72, 0, 1] } as const
-  await Promise.all([
-    animate(panel, { clipPath: ['inset(0 0 0 0)', 'inset(0 0 100% 0)'], opacity: [1, 0] }, fold),
-    ...below.map((element, i) => animate(element, { y: [0, after[i]! - before[i]!] }, fold)),
-    to !== from && animate(from, to, { ...fold, onUpdate: (y) => window.scrollTo({ top: y, behavior: 'instant' }) }),
-  ])
-  open.value = new Set()
-  await nextTick()
-  // Same frame as the list leaving the layout, so nothing moves.
-  for (const element of [panel, ...below]) {
-    element.style.removeProperty('transform')
-    element.style.removeProperty('clip-path')
-    element.style.removeProperty('opacity')
-  }
+  await foldAway(section, panel, () => {
+    open.value = new Set()
+  })
   collapsing.delete(panel)
 }
 
@@ -521,71 +372,9 @@ function watchPanel(element: unknown) {
 }
 onBeforeUnmount(() => watcher?.disconnect())
 
-// Entrance: each strip draws itself in, a row after the one above. Rows on
-// screen from the start draw as the page arrives (their animation is in the
-// server's markup, so nothing flashes on load). Rows below draw as they're
-// scrolled up the screen, tied to the scroll (CSS scroll-driven animations),
-// so scrolling back undraws them. Where that isn't supported they wait out
-// of sight and draw once they're well in, in the order they came up.
+// Entrance: each strip draws itself in (useGuideReveal).
 const root = useTemplateRef<HTMLElement>('root')
-// Without scroll-driven animations: how far up from the bottom of the screen
-// a row's top has to come before it draws.
-const REVEAL_AT = 0.3
-const linked = ref(new Set<string>())
-const waiting = ref(new Set<string>())
-const order = ref<Record<string, number>>({})
-// A drawn-by-scroll row finishes this far (screens) after its top comes up.
-// One too near the page's end to be scrolled that far has its whole
-// sequence squeezed (--fit) to finish just before the bottom; measured again
-// as the page changes height (a list opened, a turned phone).
-const REVEAL_SPAN = 0.68
-const fit = ref<Record<string, number>>({})
-function measureFit() {
-  const screen = window.innerHeight
-  // A row's timeline starts once its top clears the page's scroll padding
-  // (room left for the footer), not the very bottom of the screen.
-  const end = document.documentElement.scrollHeight - (Number.parseFloat(getComputedStyle(document.documentElement).scrollPaddingBottom) || 0)
-  const next: Record<string, number> = {}
-  for (const element of root.value?.querySelectorAll<HTMLElement>('.guide__row[data-row]') ?? []) {
-    if (!linked.value.has(element.dataset.row!)) continue
-    const room = (end - element.getBoundingClientRect().top - window.scrollY) / screen - 0.06
-    if (room < REVEAL_SPAN) next[element.dataset.row!] = Math.max(0.3, room / REVEAL_SPAN)
-  }
-  fit.value = next
-}
-const page = shallowRef<HTMLElement>()
-useResizeObserver(page, measureFit)
-let arrivals: IntersectionObserver | undefined
-onMounted(() => {
-  if (reducedMotion.value) return
-  const scrollDriven = CSS.supports('animation-timeline: view()')
-  // Measured from the page's top: a new page arrives scrolled there.
-  const line = window.innerHeight * (scrollDriven ? 1 : 1 - REVEAL_AT)
-  const below = [...root.value?.querySelectorAll<HTMLElement>('.guide__row[data-row]') ?? []]
-    .filter((element) => element.getBoundingClientRect().top + window.scrollY > line)
-  if (!below.length) return
-  const ids = new Set(below.map((element) => element.dataset.row!))
-  if (scrollDriven) {
-    linked.value = ids
-    page.value = document.documentElement
-    return
-  }
-  waiting.value = ids
-  arrivals = new IntersectionObserver((entries) => {
-    const next = new Set(waiting.value)
-    let batch = 0
-    for (const { target, isIntersecting } of entries) {
-      if (!isIntersecting) continue
-      const id = (target as HTMLElement).dataset.row!
-      order.value[id] = batch++
-      next.delete(id)
-      arrivals!.unobserve(target)
-    }
-    waiting.value = next
-  }, { rootMargin: `0px 0px -${REVEAL_AT * 100}% 0px` })
-  below.forEach((element) => arrivals!.observe(element))
-})
-onBeforeUnmount(() => arrivals?.disconnect())
+const { linked, waiting, order, fit } = useGuideReveal(root, reducedMotion)
 </script>
 
 <template>
@@ -687,8 +476,8 @@ onBeforeUnmount(() => arrivals?.disconnect())
       </template>
       <template #default="{ item }">
         <MediaVideo v-if="item.video" :key="item.video" class="guide__sheet-video"
-          :src="watchUrl(item.video)" :title="item.title"
-          :poster="stillOf(item.video, 'hqdefault')" />
+          :src="youtubeWatch(item.video)" :title="item.title"
+          :poster="youtubeStill(item.video, 'hqdefault')" />
         <iframe v-else-if="item.episode" :key="item.episode" class="guide__sheet-player"
           :src="playerUrl(item.episode)" :title="item.title" allow="autoplay; encrypted-media" loading="lazy" />
         <p v-if="!item.video" m="0">
@@ -976,10 +765,6 @@ onBeforeUnmount(() => arrivals?.disconnect())
   -webkit-touch-callout: none;
 }
 
-.guide__cell:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 /*
  * Entrance: a row's name develops and lifts, landing on the work section's
