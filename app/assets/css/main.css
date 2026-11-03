@@ -772,11 +772,37 @@ main {
   :root.dark.has-tile-wipe:active-view-transition-type(section-forward, section-back):not(:active-view-transition-type(to-work))::view-transition-old(root) {
     animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-dim;
   }
+
+  /* Light's stages are all paper at one lightness, a few percent apart in
+     hue: the slabs open from paper onto paper and vanish. The old sheet
+     shades a step as they come in, so each lands as fresh paper on it. */
+  :root.light.has-tile-wipe:active-view-transition-type(section-forward, section-back)::view-transition-old(root) {
+    animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-shade;
+  }
+
+  /* Vivid's fields sit near one lightness too (green, red, graphite all
+     around L 0.4), so their slabs differ mostly in hue, as dark's do. The
+     old field dims halfway to dark's, staying daylight. */
+  :root.vivid.has-tile-wipe:active-view-transition-type(section-forward, section-back)::view-transition-old(root) {
+    animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-dusk;
+  }
+}
+
+@keyframes vt-dusk {
+  to {
+    filter: brightness(0.72);
+  }
 }
 
 @keyframes vt-dim {
   to {
     filter: brightness(0.4);
+  }
+}
+
+@keyframes vt-shade {
+  to {
+    filter: brightness(0.9);
   }
 }
 
