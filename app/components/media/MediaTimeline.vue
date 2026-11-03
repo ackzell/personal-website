@@ -10,7 +10,10 @@
  *
  * Each half is a door: its name (Videos, Podcast) links to its guide and
  * covers the half, and the word travels into the section's heading as a
- * project's does (utils/viewTransition.ts). Pointing anywhere along the
+ * project's does (utils/viewTransition.ts). Under a mouse, a column with
+ * releases on that half is a door to its month there instead (?month=), and
+ * the guide opens with that month lit up. A finger can't pick a month that
+ * finely, so a tap on the bars goes to the guide as the name does. Pointing anywhere along the
  * timeline reads that column out under it and steps the rest back; a finger
  * scrubs the same way. A table by year carries the same for screen readers.
  */
@@ -132,6 +135,19 @@ function release() {
   reading.value = null
 }
 
+// Where the bars lead: to the month being read, where a mouse reads it and
+// that half has something in it, else to the guide as the name does. The
+// row it's first in is scrolled to, unless that's the guide's first row.
+const fine = useMediaQuery('(hover: hover) and (pointer: fine)')
+function doorOf(slug: 'videos' | 'podcast') {
+  const column = fine.value && step.value === 1 && reading.value !== null ? columns.value[reading.value] : undefined
+  if (!column?.[sideOf(slug)].length) return `/${slug}`
+  const month = `${column.year}-${String(column.month + 1).padStart(2, '0')}`
+  const series = slug === 'videos' ? props.videos : props.podcast
+  const first = series.findIndex((row) => row.releases.some((release) => release.published.startsWith(month)))
+  return { path: `/${slug}`, query: { month }, hash: first > 0 ? `#row-${series[first]!.id}` : undefined }
+}
+
 const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'short', year: 'numeric', timeZone: 'UTC' }))
 const nameOf = (column: { year: number, month: number }) => {
   const from = monthFormat.value.format(Date.UTC(column.year, column.month))
@@ -173,9 +189,10 @@ const readout = computed(() => {
         <p class="timeline__stats" m="0" text="sm muted">{{ half.stats }}</p>
       </div>
 
-      <!-- The bars are a door to the same page, over the half's link, so a
-           finger on them is told apart from one on the label. -->
-      <NuxtLinkLocale :to="`/${half.slug}`" class="timeline__bars" decoration="none" tabindex="-1" aria-hidden="true">
+      <!-- The bars are a door to the same page (or, under a mouse, to the
+           month read), over the half's link, so a finger on them is told
+           apart from one on the label. -->
+      <NuxtLinkLocale :to="doorOf(half.slug)" class="timeline__bars" decoration="none" tabindex="-1" aria-hidden="true">
         <div
           v-for="column in columns"
           :key="column.index"

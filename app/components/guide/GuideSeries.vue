@@ -12,6 +12,10 @@
  * lifts the release into a sheet (GuideSheet), docked at the side on a wide
  * screen, rather than leaving the site; a click meant for a new tab still
  * goes to it.
+ * Come from a month on the media hub's timeline (?month=2023-04), that
+ * month's releases are lit across every strip and the rest step back, each
+ * row's line saying how many it holds; one release alone opens in the sheet.
+ * The first press or key puts the guide back as it was.
  * The items themselves live on YouTube and mytypeof.dev.
  */
 import { animate, useMotionValue, useMotionValueEvent, useSpring, useTransform, useVelocity, type Transition } from 'motion-v'
@@ -69,9 +73,25 @@ const shadeOf = (release: GuideRelease) => {
 // An episode stands as tall as it runs.
 const heightOf = (release: GuideRelease) => release.duration ? `${Math.max(18, (release.duration / longest.value) * 100)}%` : undefined
 
+// The month to light, from the hub's timeline, as 2023-04.
+const route = useRoute()
+const month = route.query.month
+const lit = ref(typeof month === 'string' && /^\d{4}-\d{2}$/.test(month) ? month : null)
+const isLit = (release: GuideRelease) => !!lit.value && release.published.startsWith(lit.value)
+const monthFormat = computed(() => new Intl.DateTimeFormat(locale.value, { month: 'long', year: 'numeric', timeZone: 'UTC' }))
+
 const podcast = computed(() => props.series.some((row) => row.kind === 'podcast'))
 const hasBars = computed(() => props.series.some((row) => row.releases.some((release) => release.duration)))
 const hasViews = computed(() => props.series.some((row) => row.kind === 'playlist' && row.releases.some((release) => release.views !== undefined)))
+
+// The line under a strip at rest: its span, or, while a month is lit, how
+// much of the row is in it.
+function idleOf(row: GuideSeries, releases: GuideRelease[], from: string, to: string) {
+  const count = lit.value ? releases.filter(isLit).length : 0
+  if (!count) return `${formatDate(from)} → ${formatDate(to)}`
+  const name = monthFormat.value.format(new Date(`${lit.value}-01T00:00:00Z`))
+  return `${name} · ${t(row.kind === 'podcast' ? 'media.guide.episodes' : 'media.guide.videos', count)}`
+}
 
 const rows = computed(() => props.series.map((row) => {
   // A season is read oldest first; a playlist is in the order it was made in.
@@ -121,7 +141,7 @@ const rows = computed(() => props.series.map((row) => {
     // Past this many, the strip is an overview and the list is the way in.
     big: row.kind === 'playlist' && releases.length > 12,
     totals,
-    idle: `${formatDate(from)} → ${formatDate(to)}`,
+    idle: idleOf(row, releases, from, to),
     all: releases.map((release, index) => ({ release, number: index + 1, figures: figures(release, row.kind === 'playlist' ? index + 1 : undefined) })),
   }
 }))
@@ -381,6 +401,26 @@ function pick(event: MouseEvent, row: Row, item: ListItem) {
   lay(row, item)
 }
 
+// A month lit from the hub: one release alone is lifted straight into the
+// sheet. Whatever is pressed or typed next, the guide is back to itself.
+onMounted(() => {
+  if (!lit.value) return
+  const found = rows.value.flatMap(({ row, cells }) => cells.filter((cell) => isLit(cell.release)).map((cell) => ({ row, cell })))
+  // A video in two playlists is still one release.
+  if (new Set(found.map(({ cell }) => cell.release.id)).size === 1) lay(found[0]!.row, found[0]!.cell)
+  window.addEventListener('pointerdown', unlight, true)
+  window.addEventListener('keydown', unlight, true)
+})
+function unlight() {
+  lit.value = null
+  stopUnlight()
+}
+function stopUnlight() {
+  window.removeEventListener('pointerdown', unlight, true)
+  window.removeEventListener('keydown', unlight, true)
+}
+onBeforeUnmount(stopUnlight)
+
 const open = ref(new Set<string>())
 const reducedMotion = useMediaQuery('(prefers-reduced-motion: reduce)')
 // Phones, where the name and the strip stack (see the styles).
@@ -514,7 +554,7 @@ onBeforeUnmount(() => arrivals?.disconnect())
       </p>
     </aside>
     <div role="list" :aria-label="t('media.guide.label')">
-      <section v-for="({ row, cells, width, totals, idle, bars, big, all }, index) in rows" :key="row.id"
+      <section v-for="({ row, cells, width, totals, idle, bars, big, all }, index) in rows" :id="`row-${row.id}`" :key="row.id"
         class="guide__row" :class="{ 'guide__row--waiting': waiting.has(row.id), 'guide__row--linked': linked.has(row.id) }"
         :style="{ '--row': order[row.id] ?? index, '--enter-base': row.id in order ? '0ms' : undefined, '--fit': fit[row.id] }"
         :data-row="row.id" role="listitem">
@@ -537,10 +577,10 @@ onBeforeUnmount(() => arrivals?.disconnect())
             @pointermove="hover($event, row, cells); scrub($event, row, cells)" @pointerup="lift"
             @pointercancel="abandon(row.id)" @pointerleave="$event.pointerType === 'mouse' && hide(row.id)"
             @contextmenu="lastPointer !== 'mouse' && $event.preventDefault()"
-            :class="{ 'guide__strip--bars': bars, 'guide__strip--wrap': row.kind === 'playlist' }"
+            :class="{ 'guide__strip--bars': bars, 'guide__strip--wrap': row.kind === 'playlist', 'guide__strip--lit': lit }"
             :style="{ '--cells': cells.length, 'inline-size': width }" :aria-hidden="big || undefined">
             <a v-for="(cell, i) in cells" :key="cell.release.id" class="guide__cell" data-press="sink"
-              :class="{ 'guide__cell--on': reading[row.id]?.id === cell.release.id }" :href="cell.release.url"
+              :class="{ 'guide__cell--on': reading[row.id]?.id === cell.release.id, 'guide__cell--lit': isLit(cell.release) }" :href="cell.release.url"
               :aria-label="cell.label" :tabindex="big ? -1 : undefined"
               :style="{ height: cell.height, '--min': cell.minutes, '--shade': cell.shade, '--i': i }"
               :data-release="cell.release.id" @focus="read(row.id, cell); sound('point')" @blur="delete reading[row.id]"
@@ -852,6 +892,15 @@ onBeforeUnmount(() => arrivals?.disconnect())
 
 .guide__strip .guide__cell {
   background: color-mix(in oklab, var(--fg) calc(var(--shade, 78) * 1%), transparent);
+}
+
+/* A month lit from the hub: its releases fill in and the rest step back. */
+.guide__strip--lit .guide__cell {
+  background: color-mix(in oklab, var(--fg) 16%, transparent);
+}
+
+.guide__strip--lit .guide__cell--lit {
+  background: var(--fg);
 }
 
 /* The cell being read fills in, under a mouse, a finger or the keyboard. */
