@@ -8,6 +8,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "typecheck": "nuxt typecheck",
+    "test": "node --test 'tests/*.test.ts'",
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
