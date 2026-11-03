@@ -402,7 +402,7 @@ function blur(slug: string) {
                 <template v-else>{{ role.company }}</template>
               </div>
             </h3>
-            <p v-for="(line, i) in role.summary" :key="i" class="experience__piece" op-80 :style="{ '--j': i + 2 }"
+            <p v-for="(line, i) in role.summary" :key="i" class="experience__summary experience__piece" op-80 :style="{ '--j': i + 2 }"
               m="0">{{
                 line }}</p>
             <ul v-if="role.stack.length" class="experience__stack experience__piece"
@@ -586,6 +586,13 @@ function blur(slug: string) {
   content: '';
   position: absolute;
   inset: 0;
+}
+
+/* Sitting back by opacity lifts the summary over the cover (opacity paints
+   it as a layer of its own, after the link), so a press on it would miss
+   the role: it lets presses through to the cover instead. */
+.experience__summary {
+  pointer-events: none;
 }
 
 .experience__company {
