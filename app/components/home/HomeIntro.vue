@@ -226,6 +226,10 @@ function relayout() {
    back upright; once it's still, it glows a moment. Hidden by CSS
    until it starts, so the whole mark never flashes first. */
 const live = ref(false)
+// Drawn once per page load: coming back to home within the site finds it
+// already there, so seeing it again takes a reload. App state, so it lasts
+// across client navigations and starts over with the document.
+const drawnThisLoad = useState('home-mark-drawn', () => false)
 let effects: VoidFunction[] = []
 let entrance: AnimationPlaybackControls[] = []
 // Which drawing is current, so a stopped one's follow-ups never run into the next.
@@ -356,7 +360,12 @@ watch(() => [props.title, props.text, localeSwitching.value], relayout)
 
 onMounted(async () => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  drawIn()
+  // Left alone, the pens show the mark whole.
+  if (drawnThisLoad.value) live.value = true
+  else {
+    drawnThisLoad.value = true
+    drawIn()
+  }
   await document.fonts.ready
   if (!body.value) return
   flowing.value = true
