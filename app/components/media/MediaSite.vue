@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ComponentPublicInstance } from 'vue'
 /**
  * A project's own website, live inside the case study, placed from markdown:
  *
@@ -37,7 +38,7 @@ const state = ref<'idle' | 'loading' | 'live'>('idle')
 
 const NARROW = '(width < 40rem)'
 
-const figure = useTemplateRef<HTMLElement>('figure')
+const figure = useTemplateRef<ComponentPublicInstance>('figure')
 const reducedMotion = usePreferredReducedMotion()
 
 // Bring the whole frame into view as it goes live: two quiet sites side by
@@ -45,24 +46,24 @@ const reducedMotion = usePreferredReducedMotion()
 // scroll-padding keeps it clear of the sticky header.
 function tryLive() {
   state.value = 'loading'
-  figure.value?.scrollIntoView({ behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth', block: 'start' })
+  const el: HTMLElement | undefined = figure.value?.$el
+  el?.scrollIntoView({ behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth', block: 'start' })
 }
 </script>
 
 <template>
-  <figure ref="figure" class="media media--site" :class="{ 'track-wide': wide }" :data-state="state">
+  <MediaShell ref="figure" :wide="wide" class="media--site" :data-state="state">
     <!-- The mat: a field around the bar and the frame, so the embedded site
          reads as one object set on the stage, not as more of this page. -->
     <div class="site__mat">
       <div class="site__bar">
         <span class="site__host">{{ host }}</span>
         <span class="site__actions">
-          <button v-if="mounted && state !== 'live'" type="button" class="site__try" :disabled="state === 'loading'"
+          <button v-if="mounted && state !== 'live'" type="button" class="site__try" btn-bare :disabled="state === 'loading'"
             @click="tryLive">
             {{ t('projects.media.tryLive') }}
           </button>
-          <a :href="src" class="media__out">{{ t('projects.media.openSite') }}<span class="i-iconoir-arrow-up-right"
-              aria-hidden="true" /></a>
+          <MediaOutLink :href="src">{{ t('projects.media.openSite') }}</MediaOutLink>
         </span>
       </div>
 
@@ -84,10 +85,10 @@ function tryLive() {
       </div>
     </div>
 
-    <figcaption v-if="slots.default" class="media__caption">
+    <template v-if="slots.default" #caption>
       <slot mdc-unwrap="p" />
-    </figcaption>
-  </figure>
+    </template>
+  </MediaShell>
 </template>
 
 <style scoped>
@@ -139,12 +140,7 @@ function tryLive() {
 
 /* The one action on the stage: set in the accent, as a word, not a pill. */
 .site__try {
-  padding: 0;
-  border: 0;
-  background: none;
-  font: inherit;
   color: var(--accent);
-  cursor: pointer;
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
   text-underline-offset: 0.25em;

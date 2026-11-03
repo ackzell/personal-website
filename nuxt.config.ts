@@ -10,7 +10,7 @@ export default defineNuxtConfig({
 
   modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts', '@unocss/nuxt', '@vueuse/nuxt/module', '@nuxtjs/color-mode'],
 
-  css: ['~/assets/css/main.css', '~/assets/css/tlapalli.css'],
+  css: ['~/assets/css/main.css', '~/assets/css/media.css', '~/assets/css/tlapalli.css'],
 
   hooks: {
     // Schemas for the YAML in content/, so VS Code checks it while editing

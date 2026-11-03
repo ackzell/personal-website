@@ -268,7 +268,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 </script>
 
 <template>
-  <figure class="media take track-wide" :class="{ 'take--recoloring': recoloring }" :data-gem="gem">
+  <MediaShell wide class="take" :class="{ 'take--recoloring': recoloring }" :data-gem="gem">
     <div class="take__body">
       <div class="take__code">
         <div class="take__bar">
@@ -352,10 +352,10 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
       </div>
     </div>
     <p class="sr-only" aria-live="polite">{{ announcement }}</p>
-    <figcaption v-if="caption().length" class="media__caption take__caption">
+    <template v-if="caption().length" #caption>
       <component :is="node" v-for="(node, i) in caption()" :key="i" />
-    </figcaption>
-  </figure>
+    </template>
+  </MediaShell>
 </template>
 
 <style scoped>
@@ -626,10 +626,6 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   cursor: pointer;
 }
 
-.take__play:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 .take__track {
   position: relative;
@@ -676,10 +672,6 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   background: var(--accent);
 }
 
-.take__scrub:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
 
 /* Where each cue starts, above the bar. */
 .take__tick {

@@ -29,16 +29,15 @@ const power = usePowerOn(frame)
 </script>
 
 <template>
-  <figure class="media" :class="{ 'track-wide': wide, 'media--window': window }"
-    :data-power="props.window ? power : undefined">
+  <MediaShell :wide="wide" :class="{ 'media--window': window }" :data-power="props.window ? power : undefined">
     <div ref="frame" class="media__frame" :class="{ 'power-screen': window }">
       <img :src="src" :alt="alt" :width="width" :height="height" loading="lazy" decoding="async"
         :data-scheme="srcLight ? 'dark' : undefined">
       <img v-if="srcLight" :src="srcLight" :alt="alt" :width="width" :height="height" loading="lazy" decoding="async"
         data-scheme="light">
     </div>
-    <figcaption v-if="slots.default" class="media__caption">
+    <template v-if="slots.default" #caption>
       <slot mdc-unwrap="p" />
-    </figcaption>
-  </figure>
+    </template>
+  </MediaShell>
 </template>

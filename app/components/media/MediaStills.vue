@@ -163,7 +163,6 @@ function show(event: MouseEvent, i: number) {
 }
 
 .stills__link:focus-visible {
-  outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
 

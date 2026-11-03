@@ -69,7 +69,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
 </script>
 
 <template>
-  <figure class="media media--clip" :class="{ 'track-wide': props.wide }">
+  <MediaShell :wide="props.wide" class="media--clip">
     <div class="media__frame">
       <video ref="video" :poster="poster" :width="width" :height="height" :aria-label="label" :controls="!mounted"
         muted loop playsinline preload="metadata" :class="{ 'media__expandable': expandable && mounted }"
@@ -85,10 +85,9 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
         <span class="i-iconoir-expand" aria-hidden="true" />
       </button>
     </div>
-    <figcaption v-if="slots.default || youtube" class="media__caption">
+    <template v-if="slots.default || youtube" #caption>
       <slot mdc-unwrap="p" />
-      <a v-if="youtube" :href="youtube" class="media__out">{{ t('projects.media.youtube') }}<span
-          class="i-iconoir-arrow-up-right" aria-hidden="true" /></a>
-    </figcaption>
-  </figure>
+      <MediaOutLink v-if="youtube" :href="youtube" ms="group first:0">{{ t('projects.media.youtube') }}</MediaOutLink>
+    </template>
+  </MediaShell>
 </template>
