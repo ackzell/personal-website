@@ -82,6 +82,8 @@ function go(event: MouseEvent, id: string) {
   const el = document.getElementById(id)
   if (!el) return
   event.preventDefault()
+  // The panel's hover tick, for picking a name.
+  sound('point')
   current.value = id
   travelling.value = true
   // Already in place: no scroll comes to release it.

@@ -68,8 +68,9 @@ function pick(index: number) {
   leaving.value = active.value
   active.value = index
   switches.value++
-  // Its line sweeps down to a name further down the list, up to one above.
-  soundScan(forward.value ? 'down' : 'up', 0.35)
+  // Its line sweeps down to a name further down the list, up to one above;
+  // heard crossing sideways as the lightbox's does, the next one leftward.
+  soundScan(forward.value ? 'left' : 'right')
   clearTimeout(settle)
   settle = setTimeout(() => (leaving.value = null), SWITCH_MS)
 }

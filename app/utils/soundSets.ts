@@ -212,8 +212,8 @@ const SCAN = { seconds: 0.45 }
 const SWEEP = { seconds: 0.7 }
 type Envelope = { a: number, d: number }
 
-function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer, seconds = SCAN.seconds): Score {
-  const spec = [voice({ a: shape.a * seconds, d: shape.d * seconds })]
+function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer | Layer[], seconds = SCAN.seconds): Score {
+  const spec = [voice({ a: shape.a * seconds, d: shape.d * seconds })].flat()
   if (way === 'up' || way === 'down') return [{ spec, pan: 0 }]
   const [from, to] = way === 'left' ? [0.7, -0.7] : [-0.7, 0.7]
   return [{ spec, pan: from, travel: { to, seconds } }]
@@ -267,6 +267,23 @@ const pluck = (at: number, f: number, d: number, peak = 0.12) =>
 
 const MODULAR_SCALE = [220, 262, 294, 330, 392, 440, 523, 587, 660]
 
+// Modular's, which the panel plays too. A picture or clip sweeping in
+// behind its line of light: a low triangle hum through the crossing,
+// arriving quickly and fading with the line, with two quiet sine octaves
+// over it, which are what a phone's speaker plays of it (about 19 dB on a
+// laptop, 15 on a phone).
+const scanHum = (way: ScanWay) => scan(way, { a: 0.1, d: 0.8 }, (swell) => [
+  tone(0, 110, { ...swell, wave: 'triangle', peak: 0.07 }),
+  tone(0, 220, { ...swell, peak: 0.012 }),
+  tone(0, 440, { ...swell, peak: 0.008 }),
+])
+// The landing mark's strokes as resonant brushes rising as they're drawn:
+// each half of the ring (the bottom one INK_STAGGER after the top) over the
+// half's 1.2s, and the A's angle over its 0.7s; at the site-motion level
+// (about 18 dB), three times modular's first peaks.
+const INK: Spec = [noise(0, { f: 300, f2: 900, glide: 1.1, q: 6, a: 0.5, d: 0.6, peak: 0.09 })]
+const ANGLE_BRUSH: Spec = [noise(0, { f: 400, f2: 1000, glide: 0.35, q: 6, a: 0.35, d: 0.35, peak: 0.06 })]
+
 const modular: SoundSet = {
   note: (hz) => [...ping(0, hz, 0.18, 0.1, 0.15), pluck(0, hz, 0.2, 0.08)],
   slide: (from, to) => slide(from, to,
@@ -287,7 +304,7 @@ const modular: SoundSet = {
   reveal: REVEAL,
   conceal: CONCEAL,
   close: [...ping(0, 330, 0.05, 0.08), tone(0, 220, { wave: 'triangle', f2: 110, glide: 0.1, d: 0.12, peak: 0.1 })],
-  scan: (way) => scan(way, { a: 0.1, d: 0.8 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 })),
+  scan: scanHum,
   sweep: () => scan('up', { a: 0.4, d: 0.6 }, (swell) => tone(0, 110, { ...swell, wave: 'triangle', peak: 0.04 }), SWEEP.seconds),
   table: (rules, step) => table(rules, step,
     (seconds) => [tone(0, 220, { wave: 'triangle', a: 0.03, d: seconds, peak: 0.02 })],
@@ -308,8 +325,8 @@ const modular: SoundSet = {
     : noise(at, { f: pick([880, 1100, 1320]), q: 8, d: 0.008, peak: 0.014 * loud }), CLOCK),
   on: [...ping(0, 330, 0.05), ...ping(0.06, 440, 0.08, 0.1, 0.2)],
   off: [...ping(0, 440, 0.05), ...ping(0.06, 330, 0.08)],
-  ink: [noise(0, { f: 300, f2: 900, glide: 1.1, q: 6, a: 0.5, d: 0.6, peak: 0.03 })],
-  angle: [noise(0, { f: 400, f2: 1000, glide: 0.35, q: 6, a: 0.35, d: 0.35, peak: 0.02 })],
+  ink: INK,
+  angle: ANGLE_BRUSH,
   cross: ping(0, 880, 0.02, 0.04),
   glow: [tone(0, 110, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.04 })],
   part: ping(0, 660, 0.3, 0.015),
@@ -340,57 +357,7 @@ const HUM = 120
 const LIGHT_HUM = 100
 const GLOW_HUM = 110
 
-/* A pen stroke of the landing mark heard as a small hum on `f`: a sine with
-   a triangle a hair sharp, swelling to the stroke's middle, where the pen is
-   quickest, and fading through its end, a little past it. */
-const hum = (f: number, seconds: number): Spec => [
-  tone(0, f, { a: seconds / 2, d: seconds / 2 + 0.15, peak: 0.018 }),
-  tone(0, f * 1.004, { a: seconds / 2, d: seconds / 2 + 0.15, wave: 'triangle', peak: 0.005 }),
-]
-
 /** The landing mark's ring: each half inking in, and how long the bottom one waits after the top (HomeIntro.vue). */
-/* A pen stroke of the landing mark heard as a felt tip on paper around `f`:
-   a soft, low brush that never brightens (a rising, filtered hiss reads as
-   chalk on a board), swelling to the stroke's middle, where the pen is
-   quickest, and fading through its end. */
-const marker = (f: number, seconds: number): Spec => [
-  noise(0, { filter: 'lowpass', f, q: 0.7, a: seconds / 2, d: seconds / 2 + 0.1, peak: 0.02 }),
-]
-
-/* A pen stroke of the landing mark heard as a pencil on paper: graphite's
-   soft dry hiss around `f` (high, but steady: it never brightens, which read
-   as chalk), a little of the pressure under it, and the paper's tooth, a
-   fine grain of tiny catches, thickest where the pencil is quickest. Under
-   the same swell as the others. The grain is seeded, so a stroke is drawn
-   the same each time and rendered once. */
-const pencil = (f: number, seconds: number, seed: number): Spec => {
-  const swell = { a: seconds / 2, d: seconds / 2 + 0.08 }
-  const random = seeded(seed)
-  const grains = Math.round(seconds * 50)
-  const tooth = Array.from({ length: grains }, (_, i) => {
-    const at = (i + random()) / grains * seconds
-    const speed = Math.sin(Math.PI * at / seconds)
-    return noise(at, { f: f * (0.7 + random() * 0.8), q: 3, d: 0.003, peak: 0.014 * speed * (0.5 + random() * 0.5) })
-  })
-  return [
-    noise(0, { f, q: 0.9, ...swell, peak: 0.014 }),
-    noise(0, { filter: 'lowpass', f: 500, q: 0.7, ...swell, peak: 0.01 }),
-    ...tooth,
-  ]
-}
-
-const seeded = (seed: number) => () => {
-  seed = (seed + 0x6D2B79F5) | 0
-  let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
-  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-  return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-}
-
-/* Which the mark's strokes are heard as, while they're tried. */
-const PEN: 'hum' | 'marker' | 'pencil' = 'pencil'
-const stroke = (hz: number, f: number, seconds: number, seed: number) =>
-  PEN === 'hum' ? hum(hz, seconds) : PEN === 'marker' ? marker(f, seconds) : pencil(f * 7, seconds, seed)
-
 export const INK_SECONDS = 1.2
 export const INK_STAGGER = 0.35
 /** The A's angle, up one leg and down the other, in one stroke (HomeIntro.vue). */
@@ -406,7 +373,8 @@ const PART = 0.6
  * a sawtooth edge did too, but a phone plays only its buzz). Three
  * steps, 5 dB apart, measured A-weighted through a laptop speaker's rolloff:
  * - what the visitor did (on/off, toggle, a swipe's detent/undo/edge, lift,
- *   the lightbox, the scheme and palette scans): about 23 dB;
+ *   the lightbox): about 23 dB; the scheme's sweep about 21, and the
+ *   palette and lightbox scans, which come quickly, about 19;
  * - the site moving in answer (slide, role, glow, the mark's strokes, rain,
  *   table, clock, the side panel, swap, a scrub's tick at its biggest, the
  *   socials' notes, enter): about 18;
@@ -474,19 +442,11 @@ const panel: SoundSet = {
   reveal: REVEAL,
   conceal: CONCEAL,
   close: breath(1000, 500, 0.18, 0.08, 0.064),
-  // A picture or clip sweeping in behind its line of light: a low square
-  // gliding, from the Cue Designer (52 to 49 Hz, a 0.3s swell and 0.16s
-  // fade), its glide and envelope stretched to the line's crossing. Up or
-  // down the glide widens to a fourth around it, so it's heard to go the
-  // line's way: up as the line rises, down as it falls. Sideways it keeps
-  // the designer's own small fall. Well under the designer's peak (0.4): a
-  // low square is heard by its overtones, so a touch over the sines.
-  scan: (way) => scan(way, { a: 0.3 / 0.46, d: 0.16 / 0.46 }, (swell) => {
-    const [from, to] = way === 'up' ? [43, 57] : way === 'down' ? [57, 43] : [52.13285282252254, 49.181317777128314]
-    return tone(0.005, from, { wave: 'square', f2: to, glide: SCAN.seconds, ...swell, peak: 0.04 })
-  }),
-  // The scheme scanned up the whole page: the same low square, held at the
-  // palette's sideways pitch (52 Hz) with no glide, swelling as the line
+  // A picture or clip sweeping in behind its line of light: modular's
+  // low triangle hum (scanHum).
+  scan: scanHum,
+  // The scheme scanned up the whole page: a low square, held at 52 Hz with
+  // no glide, swelling as the line
   // gathers off the switch and fading as it settles at the top.
   sweep: () => scan('up', { a: 0.45, d: 0.55 }, (swell) =>
     tone(0.005, 52, { wave: 'square', ...swell, peak: 0.028 }), SWEEP.seconds),
@@ -563,21 +523,11 @@ const panel: SoundSet = {
     : noise(at, { f: 1100 + Math.random() * 700, q: 4, d: 0.004 + Math.random() * 0.002, peak: 0.017 * loud }), CLOCK),
   on: [beep(0, 1000, 0.05, 0.016), beep(0.08, 2000, 0.06, 0.016)],
   off: [beep(0, 2000, 0.05, 0.018), beep(0.08, 1000, 0.06, 0.018)],
-  // The mark drawing itself in on the landing page (HomeIntro.vue). Each
-  // of its ring's two halves inked (1.2s, eased in and out; the bottom one
-  // INK_STAGGER after the top, sized 1): a pen stroke (stroke, above),
-  // swelling as the pen speeds up mid-way and fading as it slows into the
-  // gap, and heard travelling a little the way the half is drawn: the top
-  // left to right, the bottom right to left. The two a little apart, as
-  // hums on two notes of the glow's A, as markers one a touch duller.
-  ink: (half = 0) => {
-    const [hz, f, from] = half < 0.5 ? [GLOW_HUM * 2, 480, -0.25] : [GLOW_HUM * 4 / 3, 380, 0.25]
-    return [{ spec: stroke(hz, f, INK_SECONDS, half < 0.5 ? 1 : 2), pan: from, travel: { to: -from, seconds: INK_SECONDS } }]
-  },
-  // The A's angle drawn in one stroke (0.7s, eased in and out): the pen
-  // again, swelling to the apex and fading down the other leg, moving a
-  // little left to right with it; as a hum, a fifth above the glow's.
-  angle: [{ spec: stroke(GLOW_HUM * 1.5, 430, ANGLE, 3), pan: -0.2, travel: { to: 0.2, seconds: ANGLE } }],
+  // The mark drawing itself in on the landing page (HomeIntro.vue): its
+  // ring's two halves and the A's angle as modular's rising brushes (INK,
+  // ANGLE_BRUSH).
+  ink: INK,
+  angle: ANGLE_BRUSH,
   // The stroke across passing over the A's right leg: a nib's small dry
   // tick, with a touch of body under it.
   cross: [
