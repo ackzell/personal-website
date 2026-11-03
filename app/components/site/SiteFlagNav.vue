@@ -388,8 +388,16 @@ onMounted(() => {
    would wash out. */
 :root:is(.dark, .vivid) .flag-nav__marker {
   background-color: var(--hot);
-  box-shadow: var(--glow-near);
+  /* The thinner bar carries less light of its own: one wider halo, kept
+     within the scroller's --space-3 of headroom so it isn't clipped. */
+  box-shadow: var(--glow-near), 0 0 16px color-mix(in oklab, var(--accent) 35%, transparent);
   mix-blend-mode: plus-lighter;
+}
+
+/* Dark's near-black stage swallows more of the halo than vivid's fields do. */
+:root.dark .flag-nav__marker {
+  box-shadow: var(--glow-near), 0 0 6px color-mix(in oklab, var(--accent) 60%, transparent),
+    0 0 16px color-mix(in oklab, var(--accent) 55%, transparent);
 }
 
 /*
