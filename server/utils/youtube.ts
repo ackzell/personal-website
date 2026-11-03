@@ -45,7 +45,7 @@ export async function youtubePlaylist(playlistId: string): Promise<Video[]> {
     const entries: PlaylistItems['items'] = []
     let pageToken: string | undefined
     do {
-      const page: PlaylistItems = await $fetch(`${api}/playlistItems`, {
+      const page: PlaylistItems = await $fetch<PlaylistItems>(`${api}/playlistItems`, {
         query: { part: 'snippet,contentDetails', playlistId, maxResults: 50, pageToken, key },
       })
       entries.push(...page.items)

@@ -13,7 +13,7 @@ const projectCopy = z.object({
 })
 
 // Copy that differs per locale, kept beside the data it describes.
-const localized = <T extends z.ZodTypeAny>(schema: T) => z.object({ en: schema, es: schema })
+const localized = <T extends Parameters<typeof z.array>[0]>(schema: T) => z.object({ en: schema, es: schema })
 
 // Where a project (or one of its parts) lives, beyond its repos.
 const links = z
