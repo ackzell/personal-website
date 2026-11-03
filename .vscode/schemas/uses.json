@@ -63,8 +63,7 @@
                 }
               },
               "required": [
-                "name",
-                "since"
+                "name"
               ],
               "additionalProperties": false
             }
