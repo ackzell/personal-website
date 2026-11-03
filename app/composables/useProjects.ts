@@ -125,6 +125,7 @@ async function fetchParts(locale: 'en' | 'es', parent?: string): Promise<Project
         repos: item.repos ?? [],
         links: item.links ?? {},
         stack: item.stack ?? [],
+        related: item.related ?? [],
         devlogPlaylist: item.devlogPlaylist,
       }
     })

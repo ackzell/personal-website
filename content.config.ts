@@ -176,6 +176,7 @@ export default defineContentConfig({
         repos: z.array(z.string()).default([]),
         links,
         stack: z.array(z.string()).default([]),
+        related: z.array(z.string()).default([]),
         devlogPlaylist: z.string().optional(),
       }),
     }),
