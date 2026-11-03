@@ -1096,7 +1096,7 @@ main:focus {
 :root:has(.section-index) {
   /* Its line (the names' text-[0.60rem] leading-[1.4]), and room under it:
      above, the header's own padding is the gap, as between the band's rows. */
-  --section-index-height: calc(0.6rem * 1.4 + var(--gap-tight));
+  --section-index-height: calc(0.6rem * 1.4 + var(--gap-group));
 }
 @media (width >= 60rem) {
   :root:has(.section-index--auto) {
