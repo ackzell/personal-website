@@ -7,6 +7,8 @@ const rules = {
   top: ['┌', '┬', '┬', '┐'],
   mid: ['├', '┼', '┼', '┤'],
   bottom: ['└', '┴', '┴', '┘'],
+  // Between rows the bars just run on: the faint run meets them with no joint.
+  row: ['│', '│', '│', '│'],
 } as const
 
 // From the first year to the last, or to now while I still use it.
@@ -173,8 +175,8 @@ onBeforeUnmount(() => {
         </div>
         <div class="box__group" role="rowgroup">
           <template v-for="(tool, index) in category.tools" :key="tool.name">
-            <UsesTablesRule v-if="index" :glyphs="rules.mid" :style="at(index + 1)" />
-            <div class="box__row" role="row" :style="at(index + 1)">
+            <UsesTablesRule v-if="index" class="box__rule--row" :glyphs="rules.row" :style="at(index + 1)" />
+            <div class="box__row" :class="{ 'is-retired': tool.until }" role="row" :style="at(index + 1)">
               <span class="box__bar box__bar--l" aria-hidden="true" />
               <span class="box__cell box__cell--tool" role="cell">
                 <a v-if="tool.url" :href="tool.url" class="box__link" target="_blank" rel="noopener">{{ tool.name
@@ -374,6 +376,19 @@ onBeforeUnmount(() => {
   overflow-wrap: anywhere;
 }
 
+/* A little air above and below each row, so rows without notes don't
+   crowd. On the cells, not the row: a subgrid's padding sits outside its
+   items, so the bars would break. */
+.box__group:not(.box__head) .box__cell {
+  padding-block: 0.3em;
+}
+
+/* The rules between rows only whisper; the bars they cross stay as strong
+   as elsewhere, so they run unbroken. */
+.box :deep(.box__rule--row .box__rule-run) {
+  opacity: 0.3;
+}
+
 .box__cell--tool {
   grid-column: tool;
   color: var(--fg);
@@ -391,6 +406,21 @@ onBeforeUnmount(() => {
 
 .box__head .box__cell {
   color: var(--muted);
+}
+
+/* No longer in use: a step back, so what I use now leads. Each cell keeps its
+   own color, faded toward the stage, so it reads as dimmed, not recolored.
+   (Not opacity: the draw-in animation holds that at 1.) */
+.is-retired .box__cell--tool {
+  color: color-mix(in oklab, var(--fg) 60%, var(--bg));
+}
+
+.is-retired .box__cell--years {
+  color: color-mix(in oklab, var(--accent) 60%, var(--bg));
+}
+
+.is-retired .box__cell--note {
+  color: color-mix(in oklab, var(--muted) 75%, var(--bg));
 }
 
 .box__link {
@@ -432,6 +462,15 @@ onBeforeUnmount(() => {
 
   .box__row {
     grid-template-rows: auto auto;
+  }
+
+  /* The air goes above the tool and below its note, not between them. */
+  .box__group:not(.box__head) :is(.box__cell--tool, .box__cell--years) {
+    padding-block-end: 0;
+  }
+
+  .box__group:not(.box__head) .box__cell--note {
+    padding-block-start: 0;
   }
 
   .box__bar {
