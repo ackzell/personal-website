@@ -259,6 +259,7 @@ onBeforeUnmount(() => {
    the site (--hot, --glow; see main.css): neon on dark and vivid, a faint
    bleed of ink on light's paper. */
 .query__char--title {
+  font-weight: 500;
   color: var(--hot);
   text-shadow: var(--glow);
   mix-blend-mode: var(--glow-blend);
