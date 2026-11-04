@@ -1,6 +1,7 @@
 import type { RouterConfig } from '@nuxt/schema'
 import { START_LOCATION, type RouteLocationNormalized } from 'vue-router'
 import { trackPageScroll } from '~/utils/pageScroll'
+import { isLocaleSwitch } from '~/utils/localeSwitch'
 
 /*
  * Nuxt's default scroll behavior (wait for the page transition, restore saved
@@ -63,6 +64,8 @@ function trackViewTransitions() {
 export default <RouterConfig>{
   scrollBehavior(to, from, savedPosition) {
     trackViewTransitions()
+    // A language switch turns the page over in place (locale-scramble): stay put.
+    if (isLocaleSwitch(to, from)) return false
     if (samePath(to, from)) {
       if (from.hash && !to.hash) return savedPosition ?? { left: 0, top: 0 }
       if (to.hash) return { el: to.hash, top: hashTop(to.hash), behavior: 'auto' }

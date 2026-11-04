@@ -1,6 +1,6 @@
 import { animate, scrambleText } from 'animejs'
 import type { FlapRow } from '~/utils/soundSets'
-import { localeSwitching } from '~/utils/localeSwitch'
+import { isLocaleSwitch, localeSwitching } from '~/utils/localeSwitch'
 
 /*
  * On a language switch the page turns over in place, in two beats:
@@ -269,11 +269,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     if (rows.length) soundBoard(rows)
   }
 
-  // A switch is the same page under another locale's name (about___es).
-  const localeOf = (name: unknown) => String(name ?? '').split('___')[1]
-  const baseOf = (name: unknown) => String(name ?? '').split('___')[0]
   useRouter().beforeEach(async (to, from) => {
-    if (!from.name || localeOf(to.name) === localeOf(from.name) || baseOf(to.name) !== baseOf(from.name)) return
+    if (!isLocaleSwitch(to, from)) return
     to.meta.viewTransition = false
     if (reduceMotion()) return
     // Beat 1. The locale has already changed and the page may have
