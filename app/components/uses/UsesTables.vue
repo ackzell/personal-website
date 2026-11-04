@@ -408,19 +408,17 @@ onBeforeUnmount(() => {
   color: var(--muted);
 }
 
-/* No longer in use: a step back, so what I use now leads. Each cell keeps its
-   own color, faded toward the stage, so it reads as dimmed, not recolored.
-   (Not opacity: the draw-in animation holds that at 1.) */
+/* No longer in use: the name steps back, so what I use now leads. Only the
+   name: years and notes are already quiet, and fading them too fails AA
+   contrast on light's paper. (Not opacity: the draw-in holds that at 1.) */
 .is-retired .box__cell--tool {
   color: color-mix(in oklab, var(--fg) 60%, var(--bg));
 }
 
-.is-retired .box__cell--years {
-  color: color-mix(in oklab, var(--accent) 60%, var(--bg));
-}
-
-.is-retired .box__cell--note {
-  color: color-mix(in oklab, var(--muted) 75%, var(--bg));
+/* ...and what I use now steps forward. Recursive is mono, so a heavier
+   weight keeps its width: the columns don't shift. */
+.box__row:not(.is-retired) .box__cell--tool {
+  font-weight: 500;
 }
 
 .box__link {
