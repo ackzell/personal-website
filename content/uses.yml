@@ -6,7 +6,9 @@
 #
 categories:
   - slug: editor
-    name: { en: Editor, es: Editor }
+    name:
+      en: Editor
+      es: Editor
     tools:
       - name: VSCode
         since: 2015
@@ -37,7 +39,9 @@ categories:
           es: Para mis primeros proyectos.
 
   - slug: terminal
-    name: { en: Terminal, es: Terminal }
+    name:
+      en: Terminal
+      es: Terminal
     tools:
       - name: bash
         since: 2015
@@ -78,7 +82,9 @@ categories:
         url: https://apps.microsoft.com/detail/9n0dx20hk701?hl=en-US&gl=ES
 
   - slug: hardware
-    name: { en: Hardware, es: Hardware }
+    name:
+      en: Hardware
+      es: Hardware
     tools:
       - name: Macbook Pro 16 M1 (2021)
         since: 2024
@@ -123,7 +129,7 @@ categories:
         since: 2020
       - name: Podmic USB
         since: 2024
-      - name: Antlion Audio USB
+      - name: Antlion Modmic USB 2
         since: 2026
       - name: MSI Pro Mp165 E6
         since: 2026
@@ -143,13 +149,16 @@ categories:
           es: en 2026 no tengo dónde montarlo :(
 
   # - slug: tools
-  #   name: { en: Tools, es: Herramientas }
+  #   name:
+  # en: Tools, es: Herramientas
   #   tools:
   #     - name: TODO tool
   #       since: 2019
 
   - slug: frameworks-and-libs
-    name: { en: Frameworks & libs, es: Frameworks y libs }
+    name:
+      en: Frameworks & libs
+      es: Frameworks y libs
     tools:
       - name: jQuery & jQueryUI
         url: https://jqueryui.com/
@@ -212,7 +221,9 @@ categories:
           es: "La opinión que nadie me pidió: siempre debió tener un nombre diferente"
 
   - slug: software
-    name: { en: Software, es: Software }
+    name:
+      en: Software
+      es: Software
     tools:
       - name: Windows
         since: 2001
@@ -260,14 +271,94 @@ categories:
           en: just like PowerToys, but for Mac
           es: algo como PowerToys, pero pa Mac
       - name: Tinycast
+        since: 2026
         url: https://tinycast.dev/
         note:
           en: muscle memory triggers it constantly
           es: lanzado constantemente por pura memoria muscular
+      - name: Cloudflare
+        since: 2020
 
   - slug: config
-    name: { en: Fonts & themes, es: Tipografías y temas }
+    name:
+      en: Fonts & themes
+      es: Tipografías y temas
     tools:
       - name: Tlapalli
+        url: https://tlapalli.ackzell.dev
         since: 2025
+        note:
+          en: created by yours trully
+          es: creado por un servidor
+      - name: Night Owl
+        url: https://marketplace.visualstudio.com/items?itemName=sdras.night-owl
+        since: 2019
+        note:
+          en: I'm a fan of sdras
+          es: Soy fan de sdras
+      - name: Material Theme
+        since: 2015
+        until: 2024
+        note:
+          en: Some drama involved and I dropped it.
+          es: Algo dramático pasó y ya mejor dejé de usarlo.
+      - name: Panda Theme
+        url: https://marketplace.visualstudio.com/items?itemName=tinkertrain.theme-panda
+        since: 2024
+      - name: Ayu
+        url: https://ayutheme.com/
+        since: 2021
       - name: Source Code Pro
+        since: 2014
+        note:
+          en: I don't know when I started using it, but I love it
+          es: No sé cuándo empecé a usarla, pero me encanta.
+      - name: JetBrains Mono
+        url: https://www.jetbrains.com/lp/mono/
+        since: 2021
+      - name: Anonymous Pro
+        url: https://fonts.google.com/specimen/Anonymous+Pro
+        since: 2020
+      - name: Ubuntu Mono
+        url: https://design.ubuntu.com/font
+        since: 2011
+        note:
+          en: this was part of a major rebranding years ago
+          es: parte de un rebranding muy grande hace algunos años
+      - name: Space Mono
+        url: https://fonts.google.com/specimen/Space+Mono?preview.script=Latn
+        since: 2018
+      - name: Victor Mono
+        url: https://rubjo.github.io/victor-mono/
+        since: 2023
+        note:
+          en: lots of variants, lovely cursive
+          es: muchas variantes, la cursiva me encanta
+
+  - slug: ai
+    name:
+      en: AI
+      es: IA
+    tools:
+      - name: OpenCode
+        since: 2026
+        note:
+          en: Big Pickle and DeepSeek yield good results for me
+          es: Big Pickle y DeepSeek me dan buenos resultados
+      - name: Claude
+        since: 2026
+      - name: herdr (TUI)
+        url: https://herdr.dev/
+        since: 2026
+      - name: impeccable skill
+        url: https://impeccable.style/
+        since: 2026
+      - name: grill-me / handoff skills
+        since: 2026
+        url: https://www.aihero.dev
+      - name: speckit
+        url: https://speckit.org/
+        since: 2026
+      - name: Fluidvoice
+        url: https://fluidvoice.com/
+        since: 2026

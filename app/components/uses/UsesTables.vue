@@ -113,7 +113,7 @@ onMounted(() => {
       nextTick(() => Promise.all(box.getAnimations({ subtree: true })
         .filter((animation) => !(animation instanceof CSSAnimation && animation.animationName.startsWith('uses-blink')))
         .map((animation) => animation.finished))
-        .then(() => settled.add(slug), () => {}))
+        .then(() => settled.add(slug), () => { }))
       observer!.unobserve(entry.target)
       drew = true
       const rows = props.categories.find((category) => category.slug === slug)?.tools.length ?? 0
@@ -136,10 +136,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="uses" :class="{ 'is-armed': armed, 'is-packed': packed }" :style="{ ...widths, ...timing }" data-own-entrance
-    @animationstart="heard">
+  <div ref="root" class="uses" :class="{ 'is-armed': armed, 'is-packed': packed }" :style="{ ...widths, ...timing }"
+    data-own-entrance @animationstart="heard">
     <section v-for="category in categories" :key="category.slug" :aria-labelledby="`uses-${category.slug}`"
-      :class="{ 'is-drawn': drawn.has(category.slug), 'is-settled': settled.has(category.slug) }" :data-slug="category.slug">
+      :class="{ 'is-drawn': drawn.has(category.slug), 'is-settled': settled.has(category.slug) }"
+      :data-slug="category.slug">
       <!-- The query is typed a character at a time, so it is hidden from assistive tech;
            the category name alone labels the table. -->
       <h2 :id="`uses-${category.slug}`" class="query">
@@ -180,7 +181,7 @@ onBeforeUnmount(() => {
               <span class="box__bar box__bar--l" aria-hidden="true" />
               <span class="box__cell box__cell--tool" role="cell">
                 <a v-if="tool.url" :href="tool.url" class="box__link" target="_blank" rel="noopener">{{ tool.name
-                  }}<span class="box__arrow" aria-hidden="true"> ↗</span></a>
+                }}<span class="box__arrow" aria-hidden="true"> ↗</span></a>
                 <template v-else>{{ tool.name }}</template>
               </span>
               <span class="box__bar box__bar--j1" aria-hidden="true" />
@@ -225,7 +226,7 @@ onBeforeUnmount(() => {
     row-gap: 0;
   }
 
-  .uses.is-packed > section {
+  .uses.is-packed>section {
     grid-row: span var(--span);
     padding-block-end: calc(var(--gap-block) * 1.75);
   }
