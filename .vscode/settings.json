@@ -1,18 +1,14 @@
 {
-  "editor.fontFamily": "'Source Code Pro'",
-  "editor.fontWeight": "400",
-  "tailwindCSS.includeLanguages": {
-    "vue": "html"
-  },
+  "editor.fontFamily": "Anonymous",
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
+  "editor.allowVariableFonts": false,
   "workbench.iconTheme": "gruvbox-material-icon-theme",
-  "workbench.experimental.modernUIEditorTabStyle": "connected",
+  "workbench.experimental.modernUIEditorTabStyle": "pill",
   "workbench.experimental.modernUIUppercaseViewHeaders": false,
   "window.autoDetectColorScheme": true,
   "workbench.preferredLightColorTheme": "Tlapalli l-00: Obsidian Light",
   "workbench.preferredDarkColorTheme": "Tlapalli 00: Obsidian",
-  "editor.experimentalGpuAcceleration": "on",
   "i18n-ally.localesPaths": [
     "i18n",
     "i18n/locales"
