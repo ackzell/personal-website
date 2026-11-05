@@ -258,6 +258,15 @@ categories:
         note:
           en: learned about it in high school, still my go to
           es: aprendí a usarlo en la prepa, lo instalo siempre que puedo
+      - name: Audacity
+        url: https://www.audacityteam.org/
+        since: 2019
+      - name: Camtasia
+        url: https://www.techsmith.com/camtasia/
+        since: 2020
+      - name: Meld
+        url: https://meldstudio.co/
+        since: 2026
       - name: Windows PowerToys
         url: https://learn.microsoft.com/es-es/windows/powertoys/
         since: 2015
