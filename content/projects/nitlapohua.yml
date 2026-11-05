@@ -1,4 +1,15 @@
 status: active
 order: 6
-stack: [nuxt, vue, typescript, partykit, unocss, motion-v, animejs]
+stack:
+  [
+    nuxt,
+    vue,
+    typescript,
+    partykit,
+    unocss,
+    motion-v,
+    animejs,
+    foley,
+    web-haptics,
+  ]
 related: []
