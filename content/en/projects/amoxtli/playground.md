@@ -3,8 +3,6 @@ title: "playground"
 description: "The in-browser environment for lessons and challenges, built on a fork of almostnode."
 ---
 
-## The Story
-
 Before I tell you about the latest changes, I'll let you in on something I built before: it was based on [TutorialKit](https://tutorialkit.dev/) and it mostly worked, but I decided to move on to a truly Vue-ecosystem-based solution for the whole platform.
 
 Even after I moved to Nuxt Content, and given the fact I forked [learn.nuxt.com](https://learn.nuxt.com/en), the first _interactive_ portion of the book was the playground, which initially was based on [web containers](https://webcontainers.io/) but then I came across [almostnode](https://almostnode.dev/) and decided to migrate to it.

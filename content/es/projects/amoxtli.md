@@ -6,7 +6,6 @@ pronunciation: "a-MÓSH-tli"
 ---
 
 
-## La historia
 El sucesor espiritual de [Notes On Vue](https://notes-on-vue.ackzell.dev).
 
 Este es un proyecto que he tenido muchas ganas de hacer por mucho tiempo. Después de obtener cierta experiencia con Vue, quise crear un curso y eso significaba crear el material y las herramientas de apoyo para el mismo, así que primero iteré en ese proyecto antes mencionado: Notes on Vue que ya tenía video, texto y snippets de código, pero lo que realmente quería crear era una plataforma donde la interactividad fuera la manera principal de navegarla y también pues que permitiera a diferentes estilos de aprendizaje aprovecharla. 
