@@ -2,6 +2,7 @@
 title: "Yehyecoa"
 description: "Un playground de Vue enfocado, para ensayar código en grupo."
 meaning: "intentar; experimentar; ensayar"
+pronunciation: "ye-ye-CÓ-a"
 ---
 
 Mi propia versión del Vue Playground, hecha para correr dentro de las lecciones de Amoxtli. Deja fuera el selector de versiones y el código compilado, para que quien aprende vea solo su componente y lo que muestra. Está aquí mismo: cambia el código y la vista previa lo sigue.

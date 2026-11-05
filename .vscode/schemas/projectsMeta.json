@@ -3,9 +3,6 @@
   "title": "projectsMeta",
   "type": "object",
   "properties": {
-    "pronunciation": {
-      "type": "string"
-    },
     "status": {
       "type": "string",
       "enum": [
@@ -83,7 +80,6 @@
     }
   },
   "required": [
-    "pronunciation",
     "status",
     "order"
   ],

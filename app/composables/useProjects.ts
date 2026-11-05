@@ -58,7 +58,7 @@ const slugOf = (stem: string) => stem.split('/').pop()!
 async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
   const [meta, copy] = await Promise.all([
     queryCollection('projectsMeta').all(),
-    queryCollection(`projects_${locale}`).select('stem', 'title', 'description', 'meaning').all(),
+    queryCollection(`projects_${locale}`).select('stem', 'title', 'description', 'meaning', 'pronunciation').all(),
   ])
 
   const copyBySlug = new Map(copy.map((page) => [slugOf(page.stem), page]))
@@ -75,7 +75,7 @@ async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
       return {
         slug,
         word: slug,
-        pronunciation: item.pronunciation,
+        pronunciation: page.pronunciation,
         meaning: page.meaning,
         title: page.title,
         description: page.description,

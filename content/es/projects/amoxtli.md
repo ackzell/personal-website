@@ -2,6 +2,7 @@
 title: "Amoxtli Vue"
 description: "Una plataforma interactiva y multimedia para aprender Vue: texto, video y componentes interactivos."
 meaning: "libro"
+pronunciation: "a-MÓSH-tli"
 ---
 
 

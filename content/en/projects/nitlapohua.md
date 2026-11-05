@@ -2,6 +2,7 @@
 title: "Nitlapohua"
 description: "A couch-multiplayer mental math battle for the family."
 meaning: "I count"
+pronunciation: "nee-tla-POH-wah"
 ---
 
 <!-- TODO(owner): this copy is a placeholder drafted by Claude from the repo's README, not yours. Rewrite it in your own words, in both languages. Add repos/links in content/projects/nitlapohua.yml once the repo or deploy is public. -->

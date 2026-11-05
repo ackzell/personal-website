@@ -2,6 +2,7 @@
 title: "Yehyecoa"
 description: "A focused Vue playground for rehearsing code together."
 meaning: "to try; to experiment; to rehearse"
+pronunciation: "yeh-yeh-CO-ah"
 ---
 
 My own spin on the Vue Playground, built to run inside the lessons of Amoxtli. It leaves out the version picker and the compiled output, so a learner sees only their component and what it renders. It's right here: change the code and the preview follows.
