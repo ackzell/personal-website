@@ -55,5 +55,5 @@ Los quizzes son dinámicos, lo que significa que cambian en el orden de las preg
 
 Aquí hay un preview de lo que ya llevo escrito hasta ahora. Es un trabajo que sigue *en progreso* realmente, pero estoy haciendo lo posible por completarlo y poder ofrecerlo al público. Actualmente solo está disponible a través de una invitación personal. Puedo enviarte una si te interesa. Sólo hazme saber. 😉
 
-::media-clip{src="/media/amoxtli/contents.mp4" webm="/media/amoxtli/contents.webm" poster="/media/amoxtli/contents.webp" label="El árbol de contenidos del libro, abierto desde el encabezado de la lección; se expanden Interactividad, Reactividad y Estilos, y la lista baja hasta el reto de Estilos." width="1440" height="900"}
+::media-chapters
 ::

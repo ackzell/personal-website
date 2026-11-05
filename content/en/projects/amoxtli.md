@@ -58,5 +58,5 @@ The quizzes are dynamic, meaning that they change the sorting of the questions *
 
 Here's a preview of what I've written and completed thus far. It is a heavy WIP but that I am working toward completing to offer it to the public. Currently only accessible through a personal invite. I can hand you one if you are interested, just let me know 😉
 
-::media-clip{src="/media/amoxtli/contents.mp4" webm="/media/amoxtli/contents.webm" poster="/media/amoxtli/contents.webp" label="The book's content tree opened from the lesson header; Interactivity, Reactivity and Styling expand, and the list scrolls down to the Styling challenge." width="1440" height="900"}
+::media-chapters
 ::
