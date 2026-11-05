@@ -64,6 +64,8 @@
       "fullscreen": "Full screen",
       "shrink": "Exit full screen",
       "seek": "Position in the video",
+      "lessons": "{count} lesson | {count} lessons",
+      "challenge": "Challenge",
       "lightbox": {
         "close": "Close",
         "previous": "Previous",
