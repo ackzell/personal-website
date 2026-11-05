@@ -35,7 +35,7 @@ items:
     label: Hovering a typed event handler shows the types and docs for Event and HTMLInputElement, as an editor would.
   - id: annotations
     name: annotations
-    label: A note pinned to a line of code, then collapsed lines expanded to show the rest of the component.
+    label: Two notes pinned to the code light up on hover, the v-if, v-else-if, v-else and latest-version matches brighten in turn, and the collapsed lines expand and fold back.
   - id: themes
     name: themes
     label: The lesson switched between light and dark, then the changelog opened from the version number.
