@@ -26,6 +26,7 @@ const marks: Record<string, string> = {
   'pinia': 'i-simple-icons-pinia',
   'unocss': 'i-simple-icons-unocss',
   'zed': 'i-simple-icons-zedindustries',
+  'motion-canvas': 'i-brand-motion-canvas',
 }
 const stackIcon = (slug: string) => marks[slug] ?? 'i-iconoir-package'
 
