@@ -2,7 +2,7 @@
 const { t } = useI18n()
 const { data: podcast } = await usePodcastSeasons()
 
-useSeoMeta({ title: () => t('podcast.title') })
+usePageSeo(() => ({ title: t('podcast.title'), description: t('podcast.intro') }))
 </script>
 
 <template>

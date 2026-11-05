@@ -3,7 +3,7 @@ const { t } = useI18n()
 const { data: videos } = await useVideoSeries()
 const { data: podcast } = await usePodcastSeasons()
 
-useSeoMeta({ title: () => t('media.title') })
+usePageSeo(() => ({ title: t('media.title'), description: t('media.description') }))
 </script>
 
 <template>

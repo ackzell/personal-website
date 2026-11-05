@@ -2,7 +2,7 @@
 const { t } = useI18n()
 const { data: categories } = await useUses()
 
-useSeoMeta({ title: () => t('uses.title') })
+usePageSeo(() => ({ title: t('uses.title'), description: t('uses.description') }))
 </script>
 
 <template>

@@ -6,8 +6,17 @@ const head = useLocaleHead({ seo: true })
 
 useHead(() => ({
   htmlAttrs: { lang: head.value.htmlAttrs.lang },
-  link: head.value.link,
-  meta: head.value.meta,
+  link: [
+    ...head.value.link,
+    { rel: 'apple-touch-icon', href: '/icons/apple-touch-icon.png' },
+    { rel: 'manifest', href: '/site.webmanifest' },
+  ],
+  meta: [
+    ...head.value.meta,
+    { property: 'og:site_name', content: t('site.name') },
+    { property: 'og:type', content: 'website' },
+    { name: 'twitter:card', content: 'summary_large_image' },
+  ],
   titleTemplate: (title) => (title ? `${title} · ${t('site.name')}` : t('site.name')),
 }))
 </script>

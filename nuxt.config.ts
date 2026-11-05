@@ -14,7 +14,7 @@ export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
   devtools: { enabled: true },
 
-  modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts', '@unocss/nuxt', '@vueuse/nuxt/module', '@nuxtjs/color-mode'],
+  modules: ['@nuxt/content', '@nuxtjs/i18n', '@nuxt/fonts', '@unocss/nuxt', '@vueuse/nuxt/module', '@nuxtjs/color-mode', 'nuxt-og-image', '@nuxtjs/sitemap'],
 
   css: ['~/assets/css/main.css', '~/assets/css/media.css', '~/assets/css/tlapalli.css'],
 
@@ -69,6 +69,8 @@ export default defineNuxtConfig({
       {
         name: 'Recursive',
         provider: 'google',
+        // Also for the social cards, which only see global fonts.
+        global: true,
         // Covers code (320) through headings (520) and a bold step.
         weights: ['300 700'],
         // Pin MONO so Google serves a smaller instance; keep CASL variable.
@@ -76,7 +78,7 @@ export default defineNuxtConfig({
         // forms); they roughly double the file (latin ~105 → ~221 KB).
         variableAxis: { MONO: ['1'], CASL: [['0', '1']], CRSV: [['0', '1']], slnt: [['-15', '0']] },
       },
-      { name: 'Source Code Pro', provider: 'google', weights: [400, 700] },
+      { name: 'Source Code Pro', provider: 'google', weights: [400, 700], global: true },
     ],
   },
 
@@ -130,6 +132,9 @@ export default defineNuxtConfig({
       { code: 'es', language: 'es-419', name: 'Español', file: 'es.json' },
     ],
   },
+
+  // Every page is prerendered, so cards are built once and no renderer ships.
+  ogImage: { zeroRuntime: true },
 
   nitro: {
     prerender: {

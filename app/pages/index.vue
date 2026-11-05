@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { socialLinks } from '~/config/nav'
+
 const { t } = useI18n()
 const [{ data: projects }, { data: roles }, { data: recognition }] = await Promise.all([
   useProjects(),
@@ -16,7 +18,21 @@ const sections = computed(() => [
   ...(featured.value ? [{ id: 'currently', label: t('home.featured') }] : []),
 ])
 
-useSeoMeta({ title: '', description: () => t('home.intro') })
+usePageSeo(() => ({ title: t('home.title'), description: t('home.description') }))
+
+const site = useSiteConfig()
+useHead({
+  script: [{
+    type: 'application/ld+json',
+    textContent: () => JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': [
+        { '@type': 'WebSite', name: t('site.name'), url: site.url },
+        { '@type': 'Person', name: t('home.title'), url: site.url, sameAs: socialLinks.map((link) => link.href) },
+      ],
+    }),
+  }],
+})
 </script>
 
 <template>

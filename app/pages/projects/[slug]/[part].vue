@@ -44,10 +44,11 @@ const sections = computed(() => [
   ...(related.value.length ? [{ id: 'related', label: t('projects.related') }] : []),
 ])
 
-useSeoMeta({
-  title: () => `${part.value?.title} · ${project.value?.title}`,
-  description: () => part.value?.description,
-})
+usePageSeo(() => ({
+  title: `${part.value?.title} · ${project.value?.title}`,
+  description: part.value?.description,
+  entry: { heading: part.value?.title, parent: project.value?.title },
+}))
 </script>
 
 <template>

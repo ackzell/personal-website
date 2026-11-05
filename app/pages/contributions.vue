@@ -5,7 +5,7 @@ const { data: projects } = await useContributions()
 // Every merged pull request, errata included.
 const total = computed(() => projects.value?.reduce((n, project) => n + project.merges.length, 0) ?? 0)
 
-useSeoMeta({ title: () => t('contributions.title') })
+usePageSeo(() => ({ title: t('contributions.title'), description: t('contributions.description') }))
 </script>
 
 <template>

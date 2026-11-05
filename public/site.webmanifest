@@ -1,0 +1,10 @@
+{
+  "name": "ackzell.dev",
+  "short_name": "ackzell",
+  "start_url": "/",
+  "display": "standalone",
+  "icons": [
+    { "src": "/icons/ax-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/ax-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
