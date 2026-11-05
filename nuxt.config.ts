@@ -1,8 +1,14 @@
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import tlapalliJson from './shiki/tlapalli.json'
 
 // JSON widens `type` to string; Shiki wants to know it's a dark or light theme.
 const tlapalli = tlapalliJson.map((theme) => ({ ...theme, type: theme.type as 'dark' | 'light' }))
+
+// Prerendered so a feed that fails fails the build and the last good deploy
+// stays up. The pages alone would swallow the error and publish a blank section.
+const playlists = [...readFileSync('content/media.yml', 'utf8').matchAll(/playlist: (\S+)/g)]
+  .map(([, id]) => `/api/playlists/${id}`)
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-10-01',
@@ -135,7 +141,7 @@ export default defineNuxtConfig({
   nitro: {
     prerender: {
       crawlLinks: true,
-      routes: ['/'],
+      routes: ['/', '/api/contributions', '/api/episodes', '/api/amoxtli-chapters', ...playlists],
     },
   },
 })

@@ -9,6 +9,8 @@ vp run generate   # static build → .output/public
 vp run test       # feed parser tests
 ```
 
+Contributions, episodes, playlists and Amoxtli's chapters are read at build time. `.github/workflows/rebuild.yml` calls a Cloudflare Pages deploy hook daily (repo secret `SITE_DEPLOY_HOOK`) to keep them current. A source that fails also fails the build, so the last good deploy stays up.
+
 ## Structure
 
 ```
