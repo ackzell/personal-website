@@ -23,6 +23,16 @@ const related = computed(() =>
     .filter((p) => p !== undefined),
 )
 
+// A part installs as its project does, unless it says otherwise.
+const facts = computed(() => part.value && {
+  ...part.value,
+  links: {
+    marketplace: project.value?.links.marketplace,
+    openvsx: project.value?.links.openvsx,
+    ...part.value.links,
+  },
+})
+
 const siblings = computed(() => parts.value?.filter((p) => p.slug !== partSlug.value) ?? [])
 
 // The same row as the project page, with its family last.
@@ -67,7 +77,7 @@ useSeoMeta({
 
     <p class="gloss" mt="tight">{{ part.description }}</p>
 
-    <ProjectLedger id="details" :project="part" mt="block" />
+    <ProjectLedger v-if="facts" id="details" :project="facts" mt="block" />
 
     <ContentRenderer v-if="page" id="story" :value="page" class="prose story" />
 
