@@ -2,6 +2,7 @@
 title: "Moliniani"
 description: "Crea videos de Motion Canvas con componentes de Vue."
 meaning: "movimiento"
+pronunciation: "mo-li-NIÁ-ni"
 ---
 
 <!-- TODO(owner): every paragraph, caption and video label on this page (and the "Code theme", "Scrub through the clip" and "Running …" strings in i18n/locales/*.json) is a placeholder drafted by Claude, not yours. Rewrite them in your own words, in both languages, before launch. The code blocks are the real scenes and can stay. -->

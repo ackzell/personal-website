@@ -2,6 +2,7 @@
 title: "Nitlapohua"
 description: "Una batalla de cálculo mental para jugar en familia, desde el sillón."
 meaning: "yo cuento"
+pronunciation: "ni-tla-PÓ-ua"
 ---
 
 <!-- TODO(owner): this copy is a placeholder drafted by Claude from the repo's README, not yours. Rewrite it in your own words, in both languages. Add repos/links in content/projects/nitlapohua.yml once the repo or deploy is public. -->

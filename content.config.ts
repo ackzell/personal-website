@@ -10,6 +10,8 @@ import { defineCollection, defineContentConfig, z } from '@nuxt/content'
 const projectCopy = z.object({
   // Translation of the Nahuatl word.
   meaning: z.string(),
+  // The word respelled for this language's readers.
+  pronunciation: z.string(),
 })
 
 // Copy that differs per locale, kept beside the data it describes.
@@ -146,7 +148,6 @@ export default defineContentConfig({
       type: 'data',
       source: 'projects/*.yml',
       schema: z.object({
-        pronunciation: z.string(),
         status: z.enum(['shipped', 'active', 'experiment']),
         featured: z.boolean().default(false),
         order: z.number(),
