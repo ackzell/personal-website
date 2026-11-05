@@ -5,8 +5,6 @@ meaning: "book"
 pronunciation: "ah-MOSH-tlee"
 ---
 
-## The story
-
 The spiritual successor to [Notes On Vue](https://notes-on-vue.ackzell.dev).
 This is a project that has been in the back of my mind for the longest time. After gaining some experience in Vue I wanted to create a course on it, and that meant creating the materials and helper tools to support it. 
 
