@@ -31,7 +31,7 @@ items:
     label: Al pasar el cursor sobre un manejador de eventos tipado aparecen los tipos y la documentación de Event y HTMLInputElement, como en un editor.
   - id: annotations
     name: anotaciones
-    label: Una nota fijada a una línea de código; luego se expanden las líneas colapsadas para mostrar el resto del componente.
+    label: Dos notas fijadas al código se iluminan al pasar el cursor, las coincidencias de v-if, v-else-if, v-else y latest-version se avivan una a una, y las líneas colapsadas se expanden y se vuelven a plegar.
   - id: themes
     name: temas
     label: La lección cambiada entre claro y oscuro; luego se abre el changelog desde el número de versión.
