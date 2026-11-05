@@ -21,6 +21,8 @@ export default defineNuxtConfig({
         import('./content.config'),
       ])
       writeContentSchemas(config)
+      // Dev only: warns when a page exists in one locale but not the other.
+      if (process.env.NODE_ENV !== 'production') (await import('./scripts/content-pairs.mjs')).watchContentPairs()
     },
     // Dev only: every sound in every set, side by side (app/dev/sounds.vue).
     'pages:extend'(pages) {
