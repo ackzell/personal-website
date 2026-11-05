@@ -1,8 +1,6 @@
-order: 2
+order: 1
 repos:
   - ackzell/tlapalli-vscode-theme
   - ackzell/tlapalli-zed-theme
-  - ackzell/tlapalli-video
-# TODO: links.marketplace, links.openvsx
-stack: [vscode, zed, motion-canvas]
-# TODO: devlogPlaylist, once the livestreams are up.
+stack: [vscode, zed]
+devlogPlaylist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP

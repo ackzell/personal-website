@@ -1,7 +1,6 @@
-order: 1
+order: 2
 repos:
   - ackzell/tlapalli-website
-  - ackzell/tlapalli-screenshots
 links:
   site: https://tlapalli.ackzell.dev
 stack: [typescript, vue, nuxt, unocss]

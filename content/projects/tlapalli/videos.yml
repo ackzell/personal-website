@@ -1,0 +1,4 @@
+order: 4
+repos:
+  - ackzell/tlapalli-vscode-video
+stack: [motion-canvas, typescript]
