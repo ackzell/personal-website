@@ -5,4 +5,9 @@ meaning: "color"
 pronunciation: "tla-PAH-lee"
 ---
 
-Eight hues, each in dark and light. Tokens are told apart by lightness and italics instead of many colors.
+::media-video{src="https://youtu.be/DhDsVio-k6Q" title="On creating a VS Code theme" poster="/media/tlapalli/essay-theme.jpg"}
+::
+
+You know the feeling when you say, "I think I can create my own visual theme?" Well, that's what happened here.
+
+It all started just with the one theme and exploded into several repos. I've had so much fun with this!
