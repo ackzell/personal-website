@@ -5,7 +5,8 @@
  * Hovering or focusing a row leans its name letter by letter, as the index's
  * words do (ProjectIndex.vue). The rows hang off a drawn tree, so they read
  * as branches of the project rather than projects of their own; each name
- * travels to its part's heading.
+ * travels to its part's heading. Past two parts they fold into columns of two,
+ * so the page below stays in view.
  */
 defineProps<{
   parts: ProjectPart[]
@@ -15,7 +16,7 @@ defineProps<{
 </script>
 
 <template>
-  <ul class="parts" :class="{ 'parts--rooted': rooted }" m="0" p="0" list="none">
+  <ul class="parts" :class="{ 'parts--rooted': rooted }" :style="{ '--cols': Math.ceil(parts.length / 2) }" m="0" p="0" list="none">
     <li v-for="(part, i) in parts" :key="part.slug" class="parts__item" :style="{ '--row': i }">
       <NuxtLinkLocale :to="`/projects/${part.parent}/${part.slug}`" class="parts__name" data-press="cover" typeset="heading">
         <!-- One span per letter so the lean ripples through the name.
@@ -85,6 +86,24 @@ defineProps<{
    section's mt-tight) to meet the trunk coming down from the word. */
 .parts--rooted > .parts__item:first-child::before {
   --reach: var(--gap-tight);
+}
+
+/* Two rows at most, read down then across. A phone keeps one column: two
+   narrow ones wrap the descriptions until they're no shorter. */
+@media (width >= 40rem) {
+  .parts {
+    max-inline-size: calc(var(--content-width) * var(--cols));
+    display: grid;
+    grid-template-rows: repeat(2, auto);
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    column-gap: var(--space-4);
+  }
+
+  .parts__item:nth-child(even)::before {
+    inset-block-end: auto;
+    block-size: var(--stub);
+  }
 }
 
 /* Entrance: each row's trunk grows down in turn, after the trunk beside the
