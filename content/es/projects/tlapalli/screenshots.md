@@ -1,5 +1,5 @@
 ---
-title: "screenshots"
+title: "capturas"
 description: "Utilidades para actualizar las imágenes del README y del sitio."
 ---
 

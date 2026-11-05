@@ -1,5 +1,5 @@
 ---
-title: "Sitio web"
+title: "sitio web"
 description: "El sitio donde se muestran las variantes."
 ---
 

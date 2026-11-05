@@ -1,5 +1,5 @@
 ---
-title: "Temas"
+title: "temas"
 description: "El tema para VS Code y su versión para Zed."
 ---
 
