@@ -44,7 +44,7 @@
     },
     "ledger": {
       "site": "Sitio",
-      "install": "Instalar",
+      "install": "Instalar extensión",
       "source": "Código",
       "stack": "Stack",
       "devlog": "Devlog",

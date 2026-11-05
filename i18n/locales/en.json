@@ -44,7 +44,7 @@
     },
     "ledger": {
       "site": "Site",
-      "install": "Install",
+      "install": "Install extension",
       "source": "Source",
       "stack": "Stack",
       "devlog": "Devlog",

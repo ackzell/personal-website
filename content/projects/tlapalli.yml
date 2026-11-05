@@ -5,3 +5,7 @@ stack: []
 related: [tlachialoni]
 logo: /logos/tlapalli.svg
 devlogPlaylist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP
+# Install links show on every part's page too.
+links:
+  openvsx: https://open-vsx.org/extension/ackzell/tlapalli
+  marketplace: https://marketplace.visualstudio.com/items?itemName=ackzell.tlapalli
