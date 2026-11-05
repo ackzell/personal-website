@@ -163,8 +163,11 @@ async function playTravelling(spec: Spec, from: number, { to, seconds }: Travel)
   const pan = context.createStereoPanner()
   pan.pan.value = from
   const when = context.currentTime + 0.01
-  const way = Float32Array.from({ length: 32 }, (_, i) => from + (to - from) * (1 - (1 - i / 31) ** 3))
+  const way = Float32Array.from({ length: 32 }, (_, i) => from + (to - from) * (1 - (1 - i / 31) ** 2))
   pan.pan.setValueCurveAtTime(way, when, seconds)
+  // It's over when its travel is: a held voice fades out arriving.
+  gain.gain.setValueAtTime(volume, when + seconds * 0.6)
+  gain.gain.linearRampToValueAtTime(0, when + seconds)
   source.connect(gain).connect(pan).connect(out)
   source.onended = () => source.disconnect()
   // A render starts its sound 0.03s in.

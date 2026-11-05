@@ -215,7 +215,7 @@ type Envelope = { a: number, d: number }
 function scan(way: ScanWay, shape: Envelope, voice: (swell: Envelope) => Layer | Layer[], seconds = SCAN.seconds): Score {
   const spec = [voice({ a: shape.a * seconds, d: shape.d * seconds })].flat()
   if (way === 'up' || way === 'down') return [{ spec, pan: 0 }]
-  const [from, to] = way === 'left' ? [0.7, -0.7] : [-0.7, 0.7]
+  const [from, to] = way === 'left' ? [1, -1] : [-1, 1]
   return [{ spec, pan: from, travel: { to, seconds } }]
 }
 
@@ -268,15 +268,22 @@ const pluck = (at: number, f: number, d: number, peak = 0.12) =>
 const MODULAR_SCALE = [220, 262, 294, 330, 392, 440, 523, 587, 660]
 
 // Modular's, which the panel plays too. A picture or clip sweeping in
-// behind its line of light: a low triangle hum through the crossing,
-// arriving quickly and fading with the line, with two quiet sine octaves
-// over it, which are what a phone's speaker plays of it (about 19 dB on a
-// laptop, 15 on a phone).
-const scanHum = (way: ScanWay) => scan(way, { a: 0.1, d: 0.8 }, (swell) => [
-  tone(0, 110, { ...swell, wave: 'triangle', peak: 0.07 }),
-  tone(0, 220, { ...swell, peak: 0.012 }),
-  tone(0, 440, { ...swell, peak: 0.008 }),
-])
+// behind its line of light: a low triangle hum, with two quiet sine octaves
+// over it, which are what a phone's speaker plays of it. Foley's decay is
+// exponential and would leave it gone by the middle of the crossing, heard
+// in the center, so it barely decays (d is many crossings long) and holds
+// until the travel's own fade (utils/sounds.ts) takes it on the far side.
+const scanHum = (way: ScanWay) => {
+  // Stereo has no up or down: a line going up or down is heard in the middle,
+  // its pitch moving the same way, a minor third across.
+  const [from, to] = way === 'up' ? [0.92, 1.09] : way === 'down' ? [1.09, 0.92] : [1, 1]
+  const hum = (f: number, shape: Shape) => tone(0, f * from, { ...shape, f2: f * to, glide: SCAN.seconds })
+  return scan(way, { a: 0.1, d: 6 }, (swell) => [
+    hum(110, { ...swell, wave: 'triangle', peak: 0.045 }),
+    hum(220, { ...swell, peak: 0.008 }),
+    hum(440, { ...swell, peak: 0.005 }),
+  ]).map((part) => ({ ...part, travel: part.travel ?? { to: 0, seconds: SCAN.seconds } }))
+}
 // The landing mark's strokes as resonant brushes rising as they're drawn:
 // each half of the ring (the bottom one INK_STAGGER after the top) over the
 // half's 1.2s, and the A's angle over its 0.7s; at the site-motion level
