@@ -15,24 +15,24 @@
     "@chenglou/pretext": "1.0.0",
     "@floating-ui/dom": "1.8.0",
     "@foleyjs/core": "2.9.0",
-    "@nuxt/content": "^3.16.1",
-    "@nuxtjs/color-mode": "4.0.1",
+    "@nuxt/content": "^3.16.2",
+    "@nuxtjs/color-mode": "4.1.0",
     "@nuxtjs/i18n": "^10.6.0",
     "@vueuse/nuxt": "15.0.0",
     "animejs": "^4.5.0",
-    "motion-v": "^2.9.0",
-    "nuxt": "^4.6.0",
-    "vue": "^3.5.43",
+    "motion-v": "^2.11.0",
+    "nuxt": "^4.6.4",
+    "vue": "^3.5.44",
     "vue-router": "^5.4.0",
     "web-haptics": "0.0.6"
   },
   "devDependencies": {
     "@iconify-json/iconoir": "^1.2.12",
-    "@iconify-json/simple-icons": "^1.2.99",
+    "@iconify-json/simple-icons": "^1.2.101",
     "@nuxt/fonts": "^0.14.0",
-    "@unocss/nuxt": "^66.10.5",
+    "@unocss/nuxt": "^66.12.0",
     "typescript": "^5.9.3",
-    "unocss": "^66.10.5",
-    "vue-tsc": "^3.3.12"
+    "unocss": "^66.12.0",
+    "vue-tsc": "^3.3.14"
   }
 }
