@@ -42,7 +42,7 @@ const segments = computed(() =>
     const open = section.value === item.section
     /**
      * "page" on the item's own page, "true" anywhere else in its section
-     * (e.g. a project detail page, or /videos under Media).
+     * (e.g. a project detail page, or /content/videos under Media).
      */
     const current: Current = isPage(item.to) ? 'page' : open ? 'true' : undefined
     const stops: Stop[] = [{ key: item.key, to: item.to, label: t(`nav.${item.key}`), current }]
@@ -60,7 +60,7 @@ const segments = computed(() =>
     }
 
     // The marker marks the page itself when it's on the band, then the child
-    // it sits under (a project's part), otherwise the section (e.g. /videos).
+    // it sits under (a project's part), otherwise the section (e.g. /content/videos).
     const marked = stops.find((stop) => stop.current === 'page')
       ?? stops.find((stop) => stop.child && stop.current)
       ?? (current && stops.length === 1 ? stops[0] : undefined)

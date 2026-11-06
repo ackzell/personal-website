@@ -11,9 +11,9 @@ const sectionByRoute: Record<string, Section> = {
   projects: 'work',
   'projects-slug': 'work',
   'projects-slug-part': 'work',
-  media: 'media',
-  videos: 'media',
-  podcast: 'media',
+  content: 'media',
+  'content-videos': 'media',
+  'content-podcast': 'media',
 }
 
 /** Section for a route base name (locale suffix already stripped). */

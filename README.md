@@ -22,7 +22,7 @@ app/
   components/project/   project index, ledger, lexicon, parts, status
   components/<area>/    home, contribution, guide, media, uses
   pages/                /, /contributions, /uses, /projects, /projects/[slug],
-                        /projects/[slug]/[part], /media, /videos, /podcast
+                        /projects/[slug]/[part], /content, /content/videos, /content/podcast
   utils/                sounds, haptics, transitions, months
 content/
   projects/<slug>.yml          language-agnostic project metadata

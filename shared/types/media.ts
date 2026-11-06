@@ -53,7 +53,7 @@ export interface GuideRelease {
   views?: number
 }
 
-/** A row of the guide on /media: a playlist or the podcast, with its releases. */
+/** A row of the guide on /content: a playlist or the podcast, with its releases. */
 export interface GuideSeries {
   id: string
   kind: 'playlist' | 'podcast'

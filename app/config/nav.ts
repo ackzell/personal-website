@@ -13,12 +13,12 @@ export const mainNav = [
   { key: 'work', to: '/projects', section: 'work' },
   {
     key: 'media',
-    to: '/media',
+    to: '/content',
     section: 'media',
     // Labels come from `<key>.title`, the pages' own headings.
     children: [
-      { key: 'videos', to: '/videos' },
-      { key: 'podcast', to: '/podcast' },
+      { key: 'videos', to: '/content/videos' },
+      { key: 'podcast', to: '/content/podcast' },
     ],
   },
 ] as const

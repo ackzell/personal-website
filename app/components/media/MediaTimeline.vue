@@ -141,11 +141,11 @@ function release() {
 const fine = useMediaQuery('(hover: hover) and (pointer: fine)')
 function doorOf(slug: 'videos' | 'podcast') {
   const column = fine.value && step.value === 1 && reading.value !== null ? columns.value[reading.value] : undefined
-  if (!column?.[sideOf(slug)].length) return `/${slug}`
+  if (!column?.[sideOf(slug)].length) return `/content/${slug}`
   const month = `${column.year}-${String(column.month + 1).padStart(2, '0')}`
   const series = slug === 'videos' ? props.videos : props.podcast
   const first = series.findIndex((row) => row.releases.some((release) => release.published.startsWith(month)))
-  return { path: `/${slug}`, query: { month }, hash: first > 0 ? `#row-${series[first]!.id}` : undefined }
+  return { path: `/content/${slug}`, query: { month }, hash: first > 0 ? `#row-${series[first]!.id}` : undefined }
 }
 
 const formatMonth = useMonthFormat()
@@ -173,7 +173,7 @@ const readout = computed(() => {
     <section v-for="half in halves" :key="half.slug" class="timeline__half" :class="`timeline__half--${half.slug}`" :aria-labelledby="`half-${half.slug}`">
       <div class="timeline__label">
         <h2 :id="`half-${half.slug}`" class="timeline__word text-headword" m="0" typeset="heading">
-          <NuxtLinkLocale :to="`/${half.slug}`" class="timeline__link" data-press="cover" decoration="none">
+          <NuxtLinkLocale :to="`/content/${half.slug}`" class="timeline__link" data-press="cover" decoration="none">
             <span :style="mediaTransition(half.slug)">
               <!-- One span per letter so the hover can ripple through the word.
                    Assistive tech gets the whole word from the hidden copy. -->
