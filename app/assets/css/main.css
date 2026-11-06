@@ -156,6 +156,82 @@
   --field-media: var(--deeper-glow-red);
 }
 
+/* The 404 solitaire's suits (ErrorSolitaire): paper faces with the flag as the
+   ink on light; on vivid the flag as faces, but for the suit that is the stage's
+   own color (below). --card-*-glow is the suit's color once its pile is won: the
+   flag on light's paper, dark's lit colors on vivid's fields. */
+:root {
+  /* A step under the stage, which is the same paper: the faces would melt into it. */
+  --card-paper: color-mix(in oklab, var(--softflag-paper), var(--softflag-ink) 4%);
+  --card-2xx: var(--card-paper);
+  --card-2xx-ink: var(--softflag-green);
+  --card-2xx-glow: var(--softflag-green);
+  --card-3xx: var(--card-paper);
+  --card-3xx-ink: var(--softflag-ink);
+  --card-3xx-glow: var(--softflag-ink);
+  --card-4xx: var(--card-paper);
+  --card-4xx-ink: var(--softflag-red);
+  --card-4xx-glow: var(--softflag-red);
+  --card-back: color-mix(in srgb, var(--fg) 34%, var(--bg));
+  --card-back-ink: var(--fg);
+  --card-edge: transparent;
+}
+
+:root.vivid {
+  /* Green, red and black faces sit as dark as the fields, and a hue alone goes
+     missing for red-green color blindness: the edge separates them by brightness. */
+  --card-edge: var(--fg);
+  --card-2xx: var(--softflag-green);
+  --card-2xx-ink: var(--softflag-paper);
+  --card-2xx-glow: var(--deeper-glow-green);
+  --card-3xx: var(--softflag-ink);
+  --card-3xx-ink: var(--softflag-paper);
+  --card-3xx-glow: var(--deeper-paper);
+  --card-4xx: var(--softflag-red);
+  --card-4xx-ink: var(--softflag-paper);
+  --card-4xx-glow: var(--deeper-glow-red);
+  /* Light's gray: mixed from the field, it would only be a paler field. */
+  --card-back: color-mix(in srgb, var(--softflag-ink) 34%, var(--softflag-paper));
+  --card-back-ink: var(--softflag-ink);
+}
+
+/* The suit that matches the stage would sink into it, so it takes the stage's
+   text color for its face, and lights in that color too. */
+:root.vivid[data-section='about'] {
+  --card-2xx: var(--fg);
+  --card-2xx-ink: var(--softflag-green);
+  --card-2xx-glow: var(--fg);
+}
+
+:root.vivid[data-section='work'] {
+  --card-3xx: var(--fg);
+  --card-3xx-ink: var(--softflag-ink);
+  --card-3xx-glow: var(--fg);
+}
+
+:root.vivid[data-section='media'] {
+  --card-4xx: var(--fg);
+  --card-4xx-ink: var(--softflag-red);
+  --card-4xx-glow: var(--fg);
+}
+
+:root.dark {
+  --card-2xx: var(--deeper-glow-green);
+  --card-2xx-ink: var(--deeper-night);
+  --card-2xx-glow: var(--card-2xx);
+  --card-3xx: var(--deeper-paper);
+  --card-3xx-ink: var(--deeper-night);
+  --card-3xx-glow: var(--card-3xx);
+  --card-4xx: color-mix(in oklab, var(--deeper-glow-red), white 15%);
+  --card-4xx-ink: var(--deeper-night);
+  --card-4xx-glow: var(--card-4xx);
+}
+
+/* An empty slot's label: as quiet as it can go and still make AA on the slot. */
+:root { --slot-ink: color-mix(in srgb, var(--fg) 62%, var(--bg)); }
+:root.vivid { --slot-ink: color-mix(in srgb, var(--fg) 83%, var(--bg)); }
+:root.dark { --slot-ink: color-mix(in srgb, var(--fg) 57%, var(--bg)); }
+
 /* Semantic tokens. */
 :root {
   /* Mixed for the hue, then set back to the paper's own lightness (0.962 is
@@ -199,8 +275,12 @@
  * Light adds nothing onto paper, so there lit is ink: the accent itself,
  * --hotter a step deeper, with a faint bleed instead of a bloom. Vivid's
  * fields are all dark enough to glow on, as dark does.
+ *
+ * .glows-own resolves all of this again from the element's own --accent,
+ * for something lit in a color other than the page's section.
  */
-:root {
+:root,
+.glows-own {
   --hot: var(--accent);
   --hotter: color-mix(in oklab, var(--accent), black 25%);
   --glow-blend: normal;
@@ -209,7 +289,8 @@
   --glow: var(--glow-near);
 }
 
-:root:is(.dark, .vivid) {
+:root:is(.dark, .vivid),
+:root:is(.dark, .vivid) .glows-own {
   --hot: color-mix(in oklab, var(--accent), white 45%);
   --hotter: color-mix(in oklab, var(--accent), white 75%);
   --glow-blend: plus-lighter;

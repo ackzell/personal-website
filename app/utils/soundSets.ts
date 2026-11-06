@@ -16,6 +16,7 @@ export type SoundKind =
   | 'role' | 'draw' | 'type' | 'key' | 'enter' | 'print' | 'forward' | 'back'
   | 'open' | 'reveal' | 'conceal' | 'close' | 'swap' | 'peek' | 'point' | 'on' | 'off'
   | 'ink' | 'angle' | 'cross' | 'glow' | 'part'
+  | 'pick' | 'lay' | 'turn' | 'nudge'
 
 /*
  * Each kind, plus the set's voice for a single note at any pitch, for what
@@ -77,6 +78,32 @@ const tone = (at: number, f: number, shape: Shape = {}): Layer =>
   ({ kind: 'tone', at, f, wave: 'sine', f2: null, glide: 0.06, a: 0.002, d: 0.05, peak: 0.08, send: 0, ...shape })
 const noise = (at: number, shape: Filtered = {}): Layer =>
   ({ kind: 'noise', at, filter: 'bandpass', f: 2000, f2: null, glide: 0.1, q: 1, a: 0.002, d: 0.03, peak: 0.06, send: 0, ...shape })
+
+/*
+ * The 404's solitaire (ErrorSolitaire.vue), the same in every set: card stock
+ * on a table, so all noise and no pitch, and kept at a hover's level or under.
+ * pick: a card coming up. lay: coming down. turn: flicked over, or taken back.
+ * nudge: a dull tap where it won't go.
+ */
+const CARDS = {
+  pick: [noise(0, { f: 2600, q: 1.2, a: 0.001, d: 0.012, peak: 0.05 })],
+  lay: [
+    noise(0, { filter: 'lowpass', f: 1400, a: 0.001, d: 0.018, peak: 0.09 }),
+    noise(0, { f: 3200, q: 2, a: 0.001, d: 0.004, peak: 0.03 }),
+  ],
+  turn: [
+    noise(0, { f: 3000, q: 1.5, a: 0.001, d: 0.006, peak: 0.05 }),
+    noise(0.035, { f: 1800, q: 1.5, a: 0.001, d: 0.01, peak: 0.05 }),
+  ],
+  nudge: [noise(0, { filter: 'lowpass', f: 500, a: 0.001, d: 0.02, peak: 0.1 })],
+} satisfies Partial<Record<SoundKind, Spec>>
+
+/*
+ * A dragged card over velvet (soundRub in utils/sounds.ts): a held hush the nap
+ * keeps dark, in Hz from `low` up to a top that opens from `dull` to `bright`
+ * the faster it goes, and `peak` the level at its fastest.
+ */
+export const RUB = { low: 250, dull: 800, bright: 1500, peak: 0.02 }
 
 // The lightbox opening and closing (MediaLightbox.vue), the same in every set:
 // the user's cue, a soft lowpass breath whose filter settles as the picture
@@ -292,6 +319,7 @@ const INK: Spec = [noise(0, { f: 300, f2: 900, glide: 1.1, q: 6, a: 0.5, d: 0.6,
 const ANGLE_BRUSH: Spec = [noise(0, { f: 400, f2: 1000, glide: 0.35, q: 6, a: 0.35, d: 0.35, peak: 0.06 })]
 
 const modular: SoundSet = {
+  ...CARDS,
   note: (hz) => [...ping(0, hz, 0.18, 0.1, 0.15), pluck(0, hz, 0.2, 0.08)],
   slide: (from, to) => slide(from, to,
     (at, length, speed) => [noise(at, { f: 300 + 500 * speed, q: 6, a: length * 0.7, d: length * 1.3, peak: 0.06 * speed })],
@@ -389,6 +417,7 @@ const PART = 0.6
  *   part, go under the slide): about 13. Letters stay under that, felt.
  */
 const panel: SoundSet = {
+  ...CARDS,
   // A note of the socials' tune (the footer) as a small kalimba tine,
   // barely touched: a soft thumb, a round sine that rings only a moment
   // (so a slide across the icons is a run of tuned taps, not a song played
@@ -579,6 +608,7 @@ const air = (at: number, from: number, to: number, d: number, peak = 0.05) =>
 const FILM_SCALE = [330, 392, 440, 523, 587, 660]
 
 const film: SoundSet = {
+  ...CARDS,
   note: (hz) => glass(0, hz, 0.35, 0.05, 0.4),
   slide: (from, to) => slide(from, to,
     (at, length, speed) => [air(at, 1200 + 2400 * speed, 1400 + 2400 * speed, length * 1.3, 0.04 * speed)],

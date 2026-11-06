@@ -9,10 +9,13 @@ useSeoMeta({ title: () => String(error.statusCode), robots: 'noindex' })
 <template>
   <NuxtLayout>
     <div class="page">
-      <h1 track="wide" class="text-headword">{{ error.statusCode }}</h1>
-      <p track="wide">
-        <NuxtLinkLocale to="/">{{ $t('site.name') }}</NuxtLinkLocale>
-      </p>
+      <ErrorSolitaire v-if="error.statusCode === 404" />
+      <template v-else>
+        <h1 track="wide" class="text-headword">{{ error.statusCode }}</h1>
+        <p track="wide">
+          <NuxtLinkLocale to="/">{{ $t('site.name') }}</NuxtLinkLocale>
+        </p>
+      </template>
     </div>
   </NuxtLayout>
 </template>

@@ -1,5 +1,5 @@
 import { get, getAnalyser, playSpec, set, toBufferSpec, unlock, type Spec } from '@foleyjs/core'
-import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, type SoundSet, type SoundSetName, type Travel } from './soundSets'
+import { RUB, SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, type SoundSet, type SoundSetName, type Travel } from './soundSets'
 
 /*
  * What a moment sounds like, in a few kinds. The touch kinds are the same
@@ -37,6 +37,9 @@ import { SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, typ
  *   across passing over the A, and the glow once it's still.
  * - part: the landing intro's text parting around the mark as it scrolls
  *   up into it (closing again is quiet).
+ * - pick / lay / turn / nudge: the 404's solitaire cards (soundSets.ts, CARDS).
+ *   Dragged, a card is heard brushing the table instead, from where it is on
+ *   the screen (soundRub).
  * And the language switch, heard as the page's text turning over like a
  * departures board as it scrambles (soundBoard), and the color scheme's
  * word as a flip clock on a desk (soundClock); and a picture or clip
@@ -231,6 +234,74 @@ function soundWith(make: Make, id: string) {
 }
 
 export const sound = (kind: Sound, size?: number) => soundWith(ofKind(kind, size), idFor(kind))
+
+/*
+ * A card dragged over the table: one held sound, not plays of a spec, since
+ * foley has no sustain and repeats read as ticking. Looped noise with an
+ * uneven grain, heard only while moving: `move` takes the distance and time
+ * since the last call, and a pause in them lets it die away.
+ */
+const FAST = 1.5 // px per ms: a quick drag's speed, heard at full
+const STILL = 90 // ms without a move before it fades
+let rubNoise: AudioBuffer | undefined
+
+function makeRubNoise(context: BaseAudioContext) {
+  const buffer = context.createBuffer(1, context.sampleRate * 3, context.sampleRate)
+  const data = buffer.getChannelData(0)
+  const hold = Math.round(context.sampleRate * 0.04)
+  let grain = 0.5
+  let toward = 0.5
+  for (let i = 0; i < data.length; i++) {
+    if (i % hold === 0) toward = Math.random()
+    grain += (toward - grain) * 0.001
+    data[i] = (Math.random() * 2 - 1) * (0.8 + grain * 0.4)
+  }
+  return buffer
+}
+
+export function soundRub(pan: number) {
+  if (!heard()) return
+  start()
+  unlock()
+  const out = getAnalyser()
+  const { muted, volume } = get()
+  if (!out || muted) return
+  const context = out.context
+  const source = context.createBufferSource()
+  source.buffer = rubNoise ??= makeRubNoise(context)
+  source.loop = true
+  const low = context.createBiquadFilter()
+  low.type = 'highpass'
+  low.frequency.value = RUB.low
+  const top = context.createBiquadFilter()
+  top.type = 'lowpass'
+  top.frequency.value = RUB.dull
+  const gain = context.createGain()
+  gain.gain.value = 0
+  const panner = context.createStereoPanner()
+  panner.pan.value = pan
+  source.connect(low).connect(top).connect(gain).connect(panner).connect(out)
+  source.onended = () => source.disconnect()
+  source.start(0, Math.random() * source.buffer.duration)
+  const toLevel = (level: number, seconds: number) => gain.gain.setTargetAtTime(level * RUB.peak * volume, context.currentTime, seconds)
+  let still: ReturnType<typeof setTimeout> | undefined
+  return {
+    move(distance: number, ms: number, pan: number) {
+      if (ms <= 0) return
+      const speed = Math.min(distance / ms / FAST, 1)
+      toLevel(Math.sqrt(speed), 0.08)
+      top.frequency.setTargetAtTime(RUB.dull + (RUB.bright - RUB.dull) * speed, context.currentTime, 0.12)
+      panner.pan.setTargetAtTime(pan, context.currentTime, 0.05)
+      clearTimeout(still)
+      still = setTimeout(() => toLevel(0, 0.1), STILL)
+    },
+    stop() {
+      clearTimeout(still)
+      toLevel(0, 0.05)
+      source.stop(context.currentTime + 0.3)
+    },
+  }
+}
 
 /** A single note at `hz`, in the set's voice: for what plays a tune. */
 export const soundNote = (hz: number) => soundWith((s) => s.note(hz), `note:${hz}`)

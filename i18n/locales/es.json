@@ -1,4 +1,11 @@
 {
+  "solitaire": {
+    "board": "Solitaire",
+    "draw": "Draw a card",
+    "undo": "Deshacer",
+    "reset": "Empezar de nuevo",
+    "message": "Sorry, that page doesn't exist, but now that you're here, care to play some solitaire?"
+  },
   "site": {
     "name": "ackzell.dev",
     "skipToContent": "Saltar al contenido",

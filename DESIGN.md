@@ -212,6 +212,15 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Layout:** On the wide track; from 64rem the tables sit two side by side.
 - **Mobile:** Two columns, Tool and Years; the note drops under its tool inside the same frame, and its header is read, not shown.
 
+### 404 Solitaire
+- **Character:** The 404 page is a game of solitaire. The deck is HTTP status codes: 2xx, 3xx and 4xx are the suits, the last digit the rank, with the reason phrase on the card as the protocol words it. The suit digit is heavier (700 against 400), so the suits read without their colors. It's dealt from the bad URL, only from deals a casual player wins nine times in ten or more (tests/solitaire.test.ts). Only real 404s get it; other errors keep the plain page.
+- **Cards and slots:** Every card, either face up, carries the site's mark cropped the way the stage crops it, at 7% of its ink. Empty slots stay plain: a 3% fill and a label at the lowest contrast that still makes AA (--slot-ink).
+- **The missing card:** 404 isn't dealt. It's the page's heading, and it goes on the 4xx pile between 403 and 405. Once 403 is down the heading comes on per The Lit Rule and keeps lifting to be taken; under reduced motion it only comes on.
+- **Cards:** The one place cards exist, since here they're the material, not a container. Square and flat, no shadows: the stage shows through a 2px gap around each (`--card-*`, main.css). On light they're paper faces with the flag as the ink. On vivid the flag's fields are the faces, except the suit that matches the stage (2xx on green, 3xx on graphite, 4xx on red), which takes the stage's text color as its face so it doesn't sink in; every face-up card there also carries a 1.5px edge in that color, because the flag's faces are as dark as the stages and a hue difference alone goes missing for red-green color blindness. On dark, the lit colors with night ink.
+- **Input:** Press sends a card to its pile, or else the next column it fits; drag places it. On the table Tab is one stop and the arrows walk the cards. Undo goes all the way back; start over deals the same game again, won or not.
+- **Held:** A dragged card comes up off the table, tipped so the half it's held by is the nearer one, and settles flat as it lands. Under reduced motion it stays flat.
+- **Won:** The three full piles light, each in its own suit's color (on vivid, the suit that matches the stage lights in the stage's text color), and each becomes the way into its section. The cards then leave the piles one by one and bounce off the bottom of the screen, stamping a trail that fades once the last is gone; doors stay live underneath. Reduced motion skips the bounce.
+
 ### Links
 - **Style:** Accent colored, underlined by default; navigation links drop the underline and rely on the band.
 - **Focus:** 2px accent outline, 2px offset.

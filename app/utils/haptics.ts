@@ -22,6 +22,9 @@ import { sound } from './sounds'
  * - lift: a sticker picked up under the finger.
  * - tilt: the same sticker tilted about under it, a grain every so often as
  *   the finger travels, firmer the further it leans from flat (size, 0 to 1).
+ * - pick / lay / turn / nudge: a solitaire card picked up, put down, flicked
+ *   over or taken back, and refused. Felt as lift, detent, tick and edge are,
+ *   but heard as card stock (utils/soundSets.ts, CARDS).
  *
  * Scrolling through a list, each list has a beat of its own, so a thumb can
  * tell where it is without looking:
@@ -79,6 +82,10 @@ const KINDS = {
   key: [{ duration: 12, intensity: 1 }],
   stick: 'light',
   lift: 'medium',
+  pick: 'medium',
+  lay: 'light',
+  turn: tick,
+  nudge: 'rigid',
   role: [{ duration: 30, intensity: 0.8 }],
   commit: [{ duration: 12, intensity: 0.7 }, { delay: 70, duration: 12, intensity: 0.7 }],
   draw: [{ duration: 12, intensity: 0.6 }, { delay: 90, duration: 12, intensity: 0.6 }, { delay: 90, duration: 12, intensity: 0.6 }],
