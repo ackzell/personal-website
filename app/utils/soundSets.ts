@@ -302,13 +302,13 @@ const MODULAR_SCALE = [220, 262, 294, 330, 392, 440, 523, 587, 660]
 // until the travel's own fade (utils/sounds.ts) takes it on the far side.
 const scanHum = (way: ScanWay) => {
   // Stereo has no up or down: a line going up or down is heard in the middle,
-  // its pitch moving the same way, a minor third across.
-  const [from, to] = way === 'up' ? [0.92, 1.09] : way === 'down' ? [1.09, 0.92] : [1, 1]
-  const hum = (f: number, shape: Shape) => tone(0, f * from, { ...shape, f2: f * to, glide: SCAN.seconds })
-  return scan(way, { a: 0.1, d: 6 }, (swell) => [
-    hum(110, { ...swell, wave: 'triangle', peak: 0.045 }),
-    hum(220, { ...swell, peak: 0.008 }),
-    hum(440, { ...swell, peak: 0.005 }),
+  // at one pitch (a glide read as cartoonish), its level moving instead:
+  // swelling as it rises, falling away as it drops.
+  const shape = way === 'up' ? { a: 0.6, d: 6 } : way === 'down' ? { a: 0.05, d: 3 } : { a: 0.1, d: 6 }
+  return scan(way, shape, (swell) => [
+    tone(0, 110, { ...swell, wave: 'triangle', peak: 0.045 }),
+    tone(0, 220, { ...swell, peak: 0.008 }),
+    tone(0, 440, { ...swell, peak: 0.005 }),
   ]).map((part) => ({ ...part, travel: part.travel ?? { to: 0, seconds: SCAN.seconds } }))
 }
 // The landing mark's strokes as resonant brushes rising as they're drawn:
