@@ -334,7 +334,7 @@ function blur(slug: string) {
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
         text="sm muted">
         <span class="tabular-nums">{{ lastYear }}</span>
-        <div ref="band" class="experience__band" :data-state="state" flex="~ col 1" @pointerdown="scrubStart"
+        <div ref="band" class="experience__band" :data-state="state" :data-scrubbing="scrubbed ? '' : undefined" flex="~ col 1" @pointerdown="scrubStart"
           @pointermove="scrubMove" @pointerup="scrubEnd" @pointercancel="scrubEnd" @click.capture="scrubClick">
           <!-- Pointer shortcuts to the links on the roles themselves, so kept out of the tab
                order and the accessibility tree. -->
@@ -470,6 +470,11 @@ function blur(slug: string) {
   touch-action: none;
   user-select: none;
   -webkit-touch-callout: none;
+}
+
+.experience__band[data-scrubbing],
+.experience__band[data-scrubbing] :deep(*) {
+  cursor: grabbing;
 }
 
 .experience__field {

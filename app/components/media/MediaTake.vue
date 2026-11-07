@@ -644,6 +644,10 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   appearance: none;
 }
 
+.take__scrub:active {
+  cursor: grabbing;
+}
+
 .take__scrub::-webkit-slider-runnable-track {
   block-size: 0.25rem;
   background: linear-gradient(var(--accent), var(--accent)) 0 / var(--progress) 100% no-repeat, var(--line);

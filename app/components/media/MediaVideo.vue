@@ -405,6 +405,10 @@ function toggle() {
   opacity: 1;
 }
 
+.video__seek.is-scrubbing {
+  cursor: grabbing;
+}
+
 .video__seek:focus-visible {
   outline-offset: 0;
 }
