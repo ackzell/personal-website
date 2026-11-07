@@ -152,6 +152,8 @@ export default defineContentConfig({
         featured: z.boolean().default(false),
         order: z.number(),
         repos: z.array(z.string()).default([]),
+        // Where each repo keeps its history of changes.
+        changelogs: z.array(z.string().url()).default([]),
         links,
         stack: z.array(z.string()).default([]),
         related: z.array(z.string()).default([]),
@@ -175,6 +177,8 @@ export default defineContentConfig({
       schema: z.object({
         order: z.number(),
         repos: z.array(z.string()).default([]),
+        // Where each repo keeps its history of changes.
+        changelogs: z.array(z.string().url()).default([]),
         links,
         stack: z.array(z.string()).default([]),
         related: z.array(z.string()).default([]),

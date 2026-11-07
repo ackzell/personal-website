@@ -2,5 +2,8 @@ order: 1
 repos:
   - ackzell/tlapalli-vscode-theme
   - ackzell/tlapalli-zed-theme
+changelogs:
+  - https://github.com/ackzell/tlapalli-vscode-theme/blob/HEAD/CHANGELOG.md
+  - https://github.com/ackzell/tlapalli-zed-theme/blob/HEAD/CHANGELOG.md
 stack: [vscode, zed]
 devlogPlaylist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP

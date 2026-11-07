@@ -38,8 +38,14 @@ const repoItem = (repo: string): Item => {
   return { label: name ?? repo, muted: name ? `${owner}/` : undefined, href: `https://github.com/${repo}` }
 }
 
+// Named after its repo, which its GitHub URL starts with.
+const changelogItem = (url: string): Item => ({
+  ...repoItem(new URL(url).pathname.split('/').slice(1, 3).join('/')),
+  href: url,
+})
+
 const rows = computed<Row[]>(() => {
-  const { links, repos, stack, devlogPlaylist } = props.project
+  const { links, repos, changelogs, stack, devlogPlaylist } = props.project
   const all: Row[] = [
     { key: 'site', label: t('projects.ledger.site'), items: links.site ? [{ label: host(links.site), href: links.site }] : [] },
     {
@@ -52,6 +58,7 @@ const rows = computed<Row[]>(() => {
     },
     { key: 'release', label: t('projects.ledger.release'), items: links.release ? [{ label: host(links.release), href: links.release }] : [] },
     { key: 'source', label: t('projects.ledger.source'), items: repos.map(repoItem) },
+    { key: 'changelog', label: t('projects.ledger.changelog'), items: changelogs.map(changelogItem) },
     { key: 'video', label: t('projects.ledger.video'), items: links.video ? [{ label: host(links.video), href: links.video }] : [] },
     {
       key: 'devlog',

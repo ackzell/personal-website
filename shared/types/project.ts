@@ -13,6 +13,7 @@ export interface ProjectLinks {
 /** What the ledger shows: where a project or part lives and what it's made of. */
 export interface ProjectFacts {
   repos: string[]
+  changelogs: string[]
   links: ProjectLinks
   stack: string[]
   /** YouTube playlist with livestreams / progress updates. */

@@ -2,6 +2,9 @@ status: active
 order: 4
 repos:
   - ackzell/yehyecoa-vue
+changelogs:
+  - https://github.com/ackzell/yehyecoa-vue/releases
+  - https://github.com/ackzell/yehyecoa-vue/blob/develop/CHANGELOG.md
 stack: [vue, typescript, monaco, partykit, pinia, dexie, unocss]
 related: [amoxtli]
 devlogPlaylist: PLB7_0uWtxEak

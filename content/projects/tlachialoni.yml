@@ -2,6 +2,8 @@ status: shipped
 order: 3
 repos:
   - ackzell/tlachialoni
+changelogs:
+  - https://github.com/ackzell/tlachialoni/blob/HEAD/CHANGELOG.md
 links:
   video: https://youtu.be/3mEV4Aqni_s
 stack: [electron, vue, typescript, vite, opencode, speckit]

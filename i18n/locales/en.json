@@ -55,6 +55,7 @@
       "site": "Site",
       "install": "Install extension",
       "source": "Source",
+      "changelog": "Changelog",
       "stack": "Stack",
       "devlog": "Devlog",
       "release": "Release",

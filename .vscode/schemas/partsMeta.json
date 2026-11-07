@@ -13,6 +13,14 @@
       },
       "default": []
     },
+    "changelogs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "default": []
+    },
     "links": {
       "type": "object",
       "properties": {
