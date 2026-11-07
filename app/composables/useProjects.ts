@@ -55,7 +55,7 @@ export function useProjectPartPage(slug: MaybeRefOrGetter<string>, part: MaybeRe
 
 const slugOf = (stem: string) => stem.split('/').pop()!
 
-async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
+export async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
   const [meta, copy] = await Promise.all([
     queryCollection('projectsMeta').all(),
     queryCollection(`projects_${locale}`).select('stem', 'title', 'description', 'meaning', 'pronunciation').all(),

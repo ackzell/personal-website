@@ -4,14 +4,16 @@ export function useUses() {
 
   return useAsyncData(
     () => `uses-${locale.value}`,
-    async (): Promise<UsesCategory[]> => {
-      const file = await queryCollection('uses').first()
-
-      return (file?.categories ?? []).map((category) => ({
-        slug: category.slug,
-        name: category.name[locale.value],
-        tools: category.tools.map(({ note, ...tool }) => ({ ...tool, note: note?.[locale.value] || undefined })),
-      }))
-    },
+    () => fetchUses(locale.value),
   )
+}
+
+export async function fetchUses(locale: 'en' | 'es'): Promise<UsesCategory[]> {
+  const file = await queryCollection('uses').first()
+
+  return (file?.categories ?? []).map((category) => ({
+    slug: category.slug,
+    name: category.name[locale],
+    tools: category.tools.map(({ note, ...tool }) => ({ ...tool, note: note?.[locale] || undefined })),
+  }))
 }

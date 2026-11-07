@@ -97,6 +97,10 @@ export default defineNuxtConfig({
     // Optional; adds every video, with lengths and views, to the playlists
     // (server/utils/youtube.ts). Server-only, like the one above.
     youtubeApiKey: process.env.YT_API_KEY ?? '',
+    public: {
+      // The commit being deployed, for the console (plugins/console.client.ts).
+      commit: process.env.CF_PAGES_COMMIT_SHA ?? '',
+    },
   },
 
   content: {
