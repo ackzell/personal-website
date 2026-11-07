@@ -7,7 +7,7 @@ pronunciation: "nee-tla-POH-wah"
 
 <!-- TODO(owner): this copy is a placeholder drafted by Claude from the repo's README, not yours. Rewrite it in your own words, in both languages. Add repos/links in content/projects/nitlapohua.yml once the repo or deploy is public. -->
 
-::media-clip{src="/media/nitlapohua/video.mp4" label="Nitlapōhua intro" }
+::media-clip{src="/media/nitlapohua/video.mp4" webm="/media/nitlapohua/video.webm" label="Nitlapōhua intro"}
 ::
 
 
@@ -19,6 +19,30 @@ There are two ways to play:
 - **Individual mode:** they practice basic arithmetic on their own, at their own pace.
 
 The idea is that it automatically calibrates to their level. As they get better at the current level, it starts asking them harder and harder questions, so it keeps growing with them.
+
+::media-stills{dir="/media/nitlapohua/stills" width="1170" height="2532" label="Nitlapohua's screens"}
+---
+items:
+  - src: question-john
+    alt: John's phone at level 2, a single-digit addition over the chalkboard number pad.
+  - src: question-paul
+    alt: Paul's phone at level 8, a one-digit multiplication.
+  - src: question-george
+    alt: George's phone at level 14, a two-digit multiplication.
+  - src: lobby
+    alt: The lobby, with the QR code, the four-letter room code and the three players ready.
+  - src: calibration
+    alt: Ringo's first calibration, answering until he misses two.
+  - src: stamp
+    alt: A correct answer stamped ¡BUENO!, with the points it earned underneath.
+  - src: streak
+    alt: A fifth straight correct answer, showing the ×3 streak chip and the multiplied points.
+  - src: interlude
+    alt: Between bursts, with the standings, a recap of the last burst and the button for the next one.
+  - src: results
+    alt: Final standings, with each player's score and how their level moved.
+---
+::
 
 
 ## On building it
