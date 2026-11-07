@@ -15,6 +15,8 @@ const resting = useState('site-mark-resting', () => false)
 onMounted(() => {
   resting.value = true
 })
+
+useMarkRipple()
 </script>
 
 <template>

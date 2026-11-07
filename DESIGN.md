@@ -104,7 +104,7 @@ A three-field flag palette in three schemes, picked on the footer switch (`color
 
 ### Secondary
 - **Soft Paper** (#f6f2ea): The light stage (tinted 3% toward green or red on About and Media, held at its own lightness), and the text on vivid's green and red.
-- **Graphite** (#454140) and **Silver** (#dbd6d5): Vivid's work stage and its text: the flag's white halfway to night, as dark as the green and red. Warm toward red, since a yellowish gray this dark reads olive. A dark stage for code and marks.
+- **Graphite** (#404040) and **Silver** (#cecdcd): Vivid's work stage and its text: the flag's white halfway to night, as dark as the green and red. A dark stage for code and marks.
 
 ### Neutral
 - **Ink** (#141312): Text on the paper stage.
@@ -178,6 +178,12 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 ### Header and Footer
 - **Header:** Sticky, stage-colored. Brand name in code type, locale switch at the end, the band on its own row spanning the wide track. On mobile only the band sticks.
 - **Footer:** Icon-only social links, 30px targets edge to edge with 12px between icons; the label lives in aria-label and title. On mobile it is a fixed icon rail.
+
+### Backdrop Mark
+- **Character:** The ax mark behind every stage, scaled far past the screen with its ring bleeding off the inline-end edge. It lives in the layout, so it stays put across pages and only its shade follows the section. The header, footer and other bars that paint the stage color carry clipped copies, so it reads as one shape under all of them. It fades in once mounted; without JS there is no mark.
+- **Shade:** A faint step off the stage, at 14% opacity. Light mixes 12% of the accent into the stage, vivid 10% of white, dark 40% of black. Dark's work mixes the stage with 20% of its accent instead, a light mark on the night stage.
+- **Ripple:** A tap or click on the mark's own shape sends a ring of tiles through it, and through nothing else on the page. It uses the section transition's 32px bricks; each tile lags the front a little, so the ring never reads as a clean circle, and it weakens as it travels. Tiles take the accent at up to 9% in light, 16% in vivid and dark, so light and dark tint them per section while vivid's and work's stay neutral.
+- **Press:** Presses on the mark's gaps, on links and other controls, drags, scrolls and clicks that end a text selection send nothing. Nothing runs until the first press or after the ring has passed, a section change clears it, and under reduced motion it never fires; the mark stays still.
 
 ### Lexicon
 - **Character:** A dictionary running head with entries in columns. Each entry is one target: the headword link covers it.

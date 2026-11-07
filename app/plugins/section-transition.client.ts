@@ -1,4 +1,5 @@
 import { sectionOf, sectionOrder, type Section } from '~/composables/useSection'
+import { TILE_SIZE } from '~/utils/markRipple'
 import { changeOrigin } from '~/utils/pageArrival'
 import { sound, soundSlide } from '~/utils/sounds'
 
@@ -15,7 +16,6 @@ import { sound, soundSlide } from '~/utils/sounds'
  * `has-tile-wipe` class turns it on once the worklet is ready; anywhere else,
  * or under forced colors, the straight clip-path wipe stays.
  */
-const TILE_SIZE = 32
 /**
  * Shares of the linear progress, read by the worklet: SPREAD is how scattered
  * the starts are, FLIP a tile's run, LAND the part of it spent flying in.

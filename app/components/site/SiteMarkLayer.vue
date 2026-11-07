@@ -19,12 +19,21 @@
 defineProps<{ clipped?: boolean }>()
 
 const resting = useState('site-mark-resting', () => false)
+
+const canvas = useTemplateRef('canvas')
+onMounted(() => {
+  if (canvas.value) markRippleCanvases.add(canvas.value)
+})
+onBeforeUnmount(() => {
+  if (canvas.value) markRippleCanvases.delete(canvas.value)
+})
 </script>
 
 <template>
   <span :class="{ 'site-mark-clip': clipped }" aria-hidden="true">
     <span class="site-mark">
       <SiteMarkGlyph class="site-mark__svg" :data-resting="resting" />
+      <span class="site-mark__ripple" hidden><canvas ref="canvas" /></span>
     </span>
   </span>
 </template>
@@ -53,7 +62,7 @@ const resting = useState('site-mark-resting', () => false)
   pointer-events: none;
   /* A shade of the stage itself, not the foreground: on light, paper tinted
      toward the section's flag; on dark, darker than the stage. */
-  color: color-mix(in oklab, var(--bg) 93%, var(--accent));
+  color: color-mix(in oklab, var(--bg) 88%, var(--accent));
   transition: color 600ms var(--ease-out);
 }
 
@@ -71,19 +80,49 @@ const resting = useState('site-mark-resting', () => false)
   color: color-mix(in oklab, var(--dark-accent) 20%, var(--bg));
 }
 
-.site-mark__svg {
+.site-mark__svg,
+.site-mark__ripple {
   --mark-size: min(154lvh, 220vw);
-  --mark-rest: 0.14;
   position: absolute;
   inset-inline-start: calc(100% - var(--mark-size) * 0.533);
   inset-block-start: calc(46% - var(--mark-size) / 2);
   inline-size: var(--mark-size);
   block-size: var(--mark-size);
+}
+
+.site-mark__svg {
+  --mark-rest: 0.14;
   opacity: 0;
   transition: opacity 900ms var(--ease-out);
 }
 
 .site-mark__svg[data-resting='true'] {
   opacity: var(--mark-rest);
+}
+
+/* useMarkRipple: the ring of tiles a press sends through the mark. Hidden until
+   then, so the mask costs nothing at rest. Its image is the glyph, set on first press. */
+.site-mark__ripple {
+  contain: strict;
+  mask-position: center;
+  mask-size: 100% 100%;
+  mask-repeat: no-repeat;
+}
+
+.site-mark__ripple canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  image-rendering: pixelated;
+  color: var(--accent);
+  --mark-ripple-strength: 0.09;
+}
+
+:root.vivid .site-mark__ripple canvas {
+  --mark-ripple-strength: 0.16;
+}
+
+:root.dark .site-mark__ripple canvas {
+  --mark-ripple-strength: 0.16;
 }
 </style>
