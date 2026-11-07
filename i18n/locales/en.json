@@ -8,7 +8,8 @@
   },
   "console": {
     "message": "I knew I'd see you here lol! Thanks for checking out this website. Cheers!.",
-    "hint": "While you're here, try typing:"
+    "hint": "While you're here, try typing:",
+    "v1": "This is v2. Did you ever visit v1?"
   },
   "site": {
     "name": "ackzell.dev",

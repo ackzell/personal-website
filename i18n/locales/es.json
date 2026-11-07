@@ -8,7 +8,8 @@
   },
   "console": {
     "message": "Ya sabía que vendrías a la consola jajaj! Gracias por visitar este website. Saludos!",
-    "hint": "Ya que estás aquí, prueba a escribir:"
+    "hint": "Ya que estás aquí, prueba a escribir:",
+    "v1": "Esta es la v2. ¿Conociste la v1?"
   },
   "site": {
     "name": "ackzell.dev",
