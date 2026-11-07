@@ -1,14 +1,13 @@
-# Default starter for Gridsome
+# ackzell.dev, v1
 
-This is the project you get when you run `gridsome create new-project`.
+This is v1 of my personal site, built in 2020 with [Gridsome](https://gridsome.org) and Tailwind CSS.
 
-### 1. Install Gridsome CLI tool if you don't have
+- **See it running:** [v1.ackzell.dev](https://v1.ackzell.dev)
+- **Current site:** [ackzell.dev](https://ackzell.dev), with its source on this repo's [default branch](https://github.com/ackzell/personal-website)
 
-`npm install --global @gridsome/cli`
+To run it locally, use Node 12 (see `.node-version`):
 
-### 2. Create a Gridsome project
-
-1. `gridsome create my-gridsome-site` to install default starter
-2. `cd my-gridsome-site` to open the folder
-3. `gridsome develop` to start a local dev server at `http://localhost:8080`
-4. Happy coding 🎉🙌
+```sh
+npm install
+npm run develop
+```
