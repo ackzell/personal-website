@@ -54,7 +54,8 @@ const links = useTemplateRef<HTMLAnchorElement[]>('links')
 const spot = (i: number) => links.value?.[i]
 
 const full = (name: string) => `${props.dir}/${name}.webp`
-const srcset = (name: string) => `${props.dir}/${name}-720.webp 720w, ${full(name)} 1440w`
+// The full file is as wide as the capture says; the sheet always gets a 720.
+const srcset = (name: string) => `${props.dir}/${name}-720.webp 720w, ${full(name)} ${props.width}w`
 const SIZES = '(width < 40rem) 50vw, 33vw'
 
 // The lightbox shows the capture for the scheme the page is in.
