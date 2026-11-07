@@ -1,8 +1,8 @@
 const SOURCE = 'https://github.com/ackzell/personal-website'
 
 /*
- * For whoever opens the devtools: the flag in this scheme's colors, then what
- * this page really cost to load, then `ackzell` to poke at. The commands fetch
+ * For whoever opens the devtools: the flag in this scheme's colors, what this
+ * page really cost to load, then `ackzell` to poke at. The commands fetch
  * on demand, so a visitor who never types one doesn't download the content.
  */
 export default defineNuxtPlugin((nuxtApp) => {
@@ -11,15 +11,28 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   const greet = () => {
     const root = getComputedStyle(document.documentElement)
-    const stage = getComputedStyle(document.body)
-    const box = 'padding: 2px 0;'
-    const stripe = (field: string) => `${box} background: ${root.getPropertyValue(field)};`
+    const color = (name: string) => root.getPropertyValue(name)
+    const { classList } = document.documentElement
+    const dark = classList.contains('dark')
+    const vivid = classList.contains('vivid')
+
+    // The whole message is the flag: a third of its characters per stripe.
+    const message = [...(i18n.t('console.message') || 'ackzell.dev')]
+    const third = Math.ceil(message.length / 3)
+    const stripes = [0, 1, 2].map((i) => `%c${message.slice(i * third, (i + 1) * third).join('')}`).join('')
+
+    // Dark's stripes are lit, and vivid's middle one silver: both want ink.
+    const stripe = (name: string) => [color(`--field-${name}`), color(dark || (vivid && name === 'work') ? '--softflag-ink' : '--softflag-paper')]
+    const [about, onAbout] = stripe('about')
+    const [work, onWork] = stripe('work')
+    const [media, onMedia] = stripe('media')
+    // The outer stripes fade over padding of their own, so no text sits on the console's background.
+    const fade = '4em'
     console.log(
-      `%c  %c  %c  %c ${i18n.t('console.message') || 'ackzell.dev'} `,
-      stripe('--field-about'),
-      stripe('--field-work'),
-      stripe('--field-media'),
-      `${box} background: ${stage.backgroundColor}; color: ${stage.color};`,
+      stripes,
+      `padding: 2px 0 2px ${fade}; color: ${onAbout}; background: linear-gradient(to right, transparent, ${about} ${fade});`,
+      `padding: 2px 0; color: ${onWork}; background: ${work};`,
+      `padding: 2px ${fade} 2px 0; color: ${onMedia}; background: linear-gradient(to left, transparent, ${media} ${fade});`,
     )
 
     const [page] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[]
@@ -35,7 +48,10 @@ export default defineNuxtPlugin((nuxtApp) => {
       commit: commit.slice(0, 7) || 'dev',
     })
 
-    console.log(`ackzell.projects\nackzell.uses\n${commit ? `${SOURCE}/tree/${commit}` : SOURCE}`)
+    const command = 'font-family: monospace; font-weight: bold;'
+    console.log(`${i18n.t('console.hint')} %cackzell.projects%c, %cackzell.uses`, command, '', command)
+
+    console.log(commit ? `${SOURCE}/tree/${commit}` : SOURCE)
   }
 
   Object.assign(window, {
