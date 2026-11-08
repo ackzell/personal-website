@@ -51,6 +51,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     const command = 'font-family: monospace; font-weight: bold;'
     console.log(`${i18n.t('console.hint')} %cackzell.projects%c, %cackzell.uses`, command, '', command)
 
+    console.log(i18n.t('console.stack'))
     console.log(commit ? `${SOURCE}/tree/${commit}` : SOURCE)
 
     console.log(`${i18n.t('console.v1')} https://v1.ackzell.dev`)
