@@ -13,6 +13,7 @@ import { sound } from './sounds'
  * - edge: a drag that has nowhere to go (a swipe past the last page).
  * - toggle: a setting switched.
  * - language / scheme: the language or color scheme switched, felt as a toggle.
+ * - fold: a fold opened or closed (Amoxtli's chapters), felt as a toggle.
  * - sweep: the color scheme scanned up the page (SiteSchemeSwitch): the press,
  *   then the line passing under the thumb, a grain at each sixth of the page
  *   it crosses, so they crowd where it runs fastest.
@@ -22,6 +23,9 @@ import { sound } from './sounds'
  * - lift: a sticker picked up under the finger.
  * - tilt: the same sticker tilted about under it, a grain every so often as
  *   the finger travels, firmer the further it leans from flat (size, 0 to 1).
+ * - ripple: a press sending a ring of tiles through the backdrop mark, one
+ *   tick at its smallest. Given how far across the screen (0 to 1), for its
+ *   sound's pan.
  * - pick / lay / turn / nudge: a solitaire card picked up, put down, flicked
  *   over or taken back, and refused. Felt as lift, detent, tick and edge are,
  *   but heard as card stock (utils/soundSets.ts, CARDS).
@@ -63,6 +67,7 @@ const KINDS = {
   toggle: 'light',
   language: 'light',
   scheme: 'light',
+  fold: 'light',
   /*
    * The press, then five grains at 1/6 … 5/6 of the page, timed on the line's
    * 700ms ease in and out (main.css, "Scheme scan"): at 243, 307, 350, 393 and
@@ -81,6 +86,7 @@ const KINDS = {
   // A tick's crisp single click, at its fullest: a key going down.
   key: [{ duration: 12, intensity: 1 }],
   stick: 'light',
+  ripple: [{ duration: 6, intensity: 1 }],
   lift: 'medium',
   pick: 'medium',
   lay: 'light',
@@ -117,8 +123,8 @@ export function isHapticClick(event: Event) {
 // a uses table drawing in, heard as it types and prints instead
 // (UsesTables.vue); a social key, heard as its note (SiteFooter.vue); and the language and color scheme, heard as their text
 // turning over or their line sweeping up instead (plugins/locale-scramble.client.ts,
-// SiteSchemeSwitch.vue).
-const SILENT = ['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme', 'sweep'] as const satisfies readonly Haptic[]
+// SiteSchemeSwitch.vue); and a chapter folding, too slight to hear (MediaChapters.vue).
+const SILENT = ['tilt', 'stick', 'commit', 'draw', 'key', 'language', 'scheme', 'sweep', 'fold'] as const satisfies readonly Haptic[]
 // The rest must each be a Sound too, or sound(kind) below won't type-check.
 const isHeard = (kind: Haptic): kind is Exclude<Haptic, (typeof SILENT)[number]> => !(SILENT as readonly Haptic[]).includes(kind)
 

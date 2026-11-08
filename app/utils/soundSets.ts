@@ -15,7 +15,7 @@ export type SoundKind =
   | 'tick' | 'detent' | 'undo' | 'edge' | 'toggle' | 'go' | 'lift'
   | 'role' | 'draw' | 'type' | 'key' | 'enter' | 'print' | 'forward' | 'back'
   | 'open' | 'reveal' | 'conceal' | 'close' | 'swap' | 'peek' | 'point' | 'on' | 'off'
-  | 'ink' | 'angle' | 'cross' | 'glow' | 'part'
+  | 'cross' | 'glow' | 'part' | 'ripple'
   | 'pick' | 'lay' | 'turn' | 'nudge'
 
 /*
@@ -114,6 +114,63 @@ const breath = (f: number, f2: number, a: number, d: number, peak: number): Spec
   [noise(0, { filter: 'lowpass', f, f2, glide: 0.12, q: 1.4, a, d, peak })]
 const REVEAL = breath(2600, 1500, 0.1, 0.32, 0.03)
 const CONCEAL = breath(1200, 600, 0.08, 0.28, 0.06)
+
+/*
+ * A press sending a ring of light through the backdrop mark (useMarkRipple),
+ * the same in every set: a trickle of small water drops as the ring front
+ * reaches tile after tile, thinning as it fades. Pitches scattered and
+ * gaps uneven, with no glide on a drop and no falling line across them:
+ * a pitch inflection or a steady falling run reads as laughter. It sets off
+ * from where it was pressed, `across` the screen from 0 to 1, and leaves for
+ * the far side, where most of the ring has to go; pressed mid-screen, it
+ * stays there.
+ */
+const DROP_AT = [0, 0.022, 0.061, 0.078, 0.13, 0.16, 0.215, 0.26, 0.33, 0.37, 0.45, 0.52, 0.6, 0.71]
+const DROP_HZ = [2090, 1760, 2350, 1975, 1570, 2210, 1865, 2490, 1660, 2090, 1760, 2350, 1975, 2210]
+const drops = (from: number, to: number): Spec => DROP_AT.slice(from, to).map((at, i) =>
+  tone(at, DROP_HZ[from + i]!, { a: 0.001, d: 0.045, peak: 0.0055 * 0.88 ** (from + i) }))
+const ripple = (across = 0.5): Score => {
+  const from = (across * 2 - 1) * 0.9
+  return [drops(0, 7), drops(7, 14)].map((spec) => ({ spec, pan: from, travel: { to: -from, seconds: 0.9 } }))
+}
+
+/*
+ * The landing mark's small tiles settling in place ahead of the pens
+ * (utils/markTiles), the same in every set: a light patter, mostly dry
+ * ticks with now and then a small glint at one of the ripple's drop
+ * pitches, kin to the backdrop mark's trickle and kept under the pens'
+ * strokes. `landings` are a few dozen tiles picked from the drawing, each
+ * when it settles and where it sits across the mark (-1 to 1); they are
+ * heard in groups placed by where they sit.
+ */
+export type Landing = { at: number, pan: number }
+const TILE_GROUP = 4
+export const tilesLanding = (landings: Landing[]): Score => {
+  const byPlace = [...landings].sort((a, b) => a.pan - b.pan)
+  return Array.from({ length: Math.ceil(byPlace.length / TILE_GROUP) }, (_, g) => {
+    const group = byPlace.slice(g * TILE_GROUP, (g + 1) * TILE_GROUP)
+    return {
+      spec: group.map(({ at }) => Math.random() < 0.2
+        ? tone(at, pick(DROP_HZ), { a: 0.001, d: 0.03, peak: 0.0025 })
+        : noise(at, { f: 2400 + Math.random() * 1600, q: 3, a: 0.001, d: 0.003 + Math.random() * 0.004, peak: 0.012 + Math.random() * 0.008 })),
+      pan: group.reduce((sum, { pan }) => sum + pan, 0) / group.length * 0.5,
+    }
+  })
+}
+
+/*
+ * The flag band's submenu labels coming in as the mouse nears them
+ * (useSubmenuReveal), the same in every set: a dry tick, the panel's
+ * `point`, for each label as it shows, heard where it sits, softer the
+ * farther out from the one nearest the mouse, so the run spreads outward
+ * from where it came in. `labels` are when each shows, where (-1 to 1),
+ * and how many steps out it is.
+ */
+export type Label = Landing & { step: number }
+export const labelsShowing = (labels: Label[]): Score => labels.map(({ at, pan, step }) => ({
+  spec: [noise(at, { f: 1800, q: 5, d: 0.002, peak: 0.07 * 0.8 ** step })],
+  pan,
+}))
 
 const share = (size = 0.5) => Math.min(Math.max(size, 0), 1)
 const pick = <T>(from: T[]) => from[Math.floor(Math.random() * from.length)]!
@@ -311,15 +368,9 @@ const scanHum = (way: ScanWay) => {
     tone(0, 440, { ...swell, peak: 0.005 }),
   ]).map((part) => ({ ...part, travel: part.travel ?? { to: 0, seconds: SCAN.seconds } }))
 }
-// The landing mark's strokes as resonant brushes rising as they're drawn:
-// each half of the ring (the bottom one INK_STAGGER after the top) over the
-// half's 1.2s, and the A's angle over its 0.7s; at the site-motion level
-// (about 18 dB), three times modular's first peaks.
-const INK: Spec = [noise(0, { f: 300, f2: 900, glide: 1.1, q: 6, a: 0.5, d: 0.6, peak: 0.09 })]
-const ANGLE_BRUSH: Spec = [noise(0, { f: 400, f2: 1000, glide: 0.35, q: 6, a: 0.35, d: 0.35, peak: 0.06 })]
-
 const modular: SoundSet = {
   ...CARDS,
+  ripple,
   note: (hz) => [...ping(0, hz, 0.18, 0.1, 0.15), pluck(0, hz, 0.2, 0.08)],
   slide: (from, to) => slide(from, to,
     (at, length, speed) => [noise(at, { f: 300 + 500 * speed, q: 6, a: length * 0.7, d: length * 1.3, peak: 0.06 * speed })],
@@ -360,8 +411,6 @@ const modular: SoundSet = {
     : noise(at, { f: pick([880, 1100, 1320]), q: 8, d: 0.008, peak: 0.014 * loud }), CLOCK),
   on: [...ping(0, 330, 0.05), ...ping(0.06, 440, 0.08, 0.1, 0.2)],
   off: [...ping(0, 440, 0.05), ...ping(0.06, 330, 0.08)],
-  ink: INK,
-  angle: ANGLE_BRUSH,
   cross: ping(0, 880, 0.02, 0.04),
   glow: [tone(0, 110, { a: 0.375, d: 1.125, wave: 'triangle', peak: 0.04 })],
   part: ping(0, 660, 0.3, 0.015),
@@ -392,11 +441,6 @@ const HUM = 120
 const LIGHT_HUM = 100
 const GLOW_HUM = 110
 
-/** The landing mark's ring: each half inking in, and how long the bottom one waits after the top (HomeIntro.vue). */
-export const INK_SECONDS = 1.2
-export const INK_STAGGER = 0.35
-/** The A's angle, up one leg and down the other, in one stroke (HomeIntro.vue). */
-export const ANGLE = 0.7
 
 /** The intro's lines easing over as the text parts (HomeIntro.vue's --centered). */
 const PART = 0.6
@@ -408,9 +452,9 @@ const PART = 0.6
  * a sawtooth edge did too, but a phone plays only its buzz). Three
  * steps, 5 dB apart, measured A-weighted through a laptop speaker's rolloff:
  * - what the visitor did (on/off, toggle, a swipe's detent/undo/edge, lift,
- *   the lightbox): about 23 dB; the scheme's sweep about 21, and the
- *   palette and lightbox scans, which come quickly, about 19;
- * - the site moving in answer (slide, role, glow, the mark's strokes, rain,
+ *   the lightbox): about 23 dB; the scheme's sweep about 19, as are the
+ *   palette and lightbox scans, which come quickly;
+ * - the site moving in answer (slide, role, glow, the mark's flick, rain,
  *   table, clock, the side panel, swap, a scrub's tick at its biggest, the
  *   socials' notes, enter): about 18;
  * - hovers and quick trickles (peek, point, keys, type, print, board, cross,
@@ -418,6 +462,7 @@ const PART = 0.6
  */
 const panel: SoundSet = {
   ...CARDS,
+  ripple,
   // A note of the socials' tune (the footer) as a small kalimba tine,
   // barely touched: a soft thumb, a round sine that rings only a moment
   // (so a slide across the icons is a run of tuned taps, not a song played
@@ -485,7 +530,7 @@ const panel: SoundSet = {
   // no glide, swelling as the line
   // gathers off the switch and fading as it settles at the top.
   sweep: () => scan('up', { a: 0.45, d: 0.55 }, (swell) =>
-    tone(0.005, 52, { wave: 'square', ...swell, peak: 0.028 }), SWEEP.seconds),
+    tone(0.005, 52, { wave: 'square', ...swell, peak: 0.022 }), SWEEP.seconds),
   // A uses table drawing in: its rules are lines drawing, so two soft
   // sines (200 and 500 Hz) held under it for as long as they take, a touch
   // fuller, and on each rule as it sets off a relay's tick with a short beep
@@ -559,13 +604,8 @@ const panel: SoundSet = {
     : noise(at, { f: 1100 + Math.random() * 700, q: 4, d: 0.004 + Math.random() * 0.002, peak: 0.017 * loud }), CLOCK),
   on: [beep(0, 1000, 0.05, 0.016), beep(0.08, 2000, 0.06, 0.016)],
   off: [beep(0, 2000, 0.05, 0.018), beep(0.08, 1000, 0.06, 0.018)],
-  // The mark drawing itself in on the landing page (HomeIntro.vue): its
-  // ring's two halves and the A's angle as modular's rising brushes (INK,
-  // ANGLE_BRUSH).
-  ink: INK,
-  angle: ANGLE_BRUSH,
-  // The stroke across passing over the A's right leg: a nib's small dry
-  // tick, with a touch of body under it.
+  // The landing mark's stroke across passing over the A's right leg: a
+  // nib's small dry tick, with a touch of body under it.
   cross: [
     noise(0, { f: 2600, q: 4, d: 0.003, peak: 0.095 }),
     noise(0.002, { filter: 'lowpass', f: 700, d: 0.008, peak: 0.057 }),
@@ -609,6 +649,7 @@ const FILM_SCALE = [330, 392, 440, 523, 587, 660]
 
 const film: SoundSet = {
   ...CARDS,
+  ripple,
   note: (hz) => glass(0, hz, 0.35, 0.05, 0.4),
   slide: (from, to) => slide(from, to,
     (at, length, speed) => [air(at, 1200 + 2400 * speed, 1400 + 2400 * speed, length * 1.3, 0.04 * speed)],
@@ -649,8 +690,6 @@ const film: SoundSet = {
     : noise(at, { f: 1800 + Math.random() * 1200, q: 2, d: 0.004, peak: 0.014 * loud, send: 0.2 }), CLOCK),
   on: [...glass(0, 440, 0.1, 0.05, 0.4), ...glass(0.08, 660, 0.2, 0.05, 0.4)],
   off: [...glass(0, 660, 0.1, 0.05, 0.4), ...glass(0.08, 330, 0.2, 0.05, 0.4)],
-  ink: [air(0, 1200, 3000, 1.1, 0.03)],
-  angle: [air(0, 1500, 3500, 0.7, 0.02)],
   cross: glass(0, 1320, 0.03, 0.015, 0.2),
   glow: [tone(0, 220, { a: 0.375, d: 1.125, peak: 0.03, send: 0.4 })],
   part: glass(0, 1320, 0.3, 0.01, 0.4),

@@ -1,5 +1,5 @@
 import { get, getAnalyser, playSpec, set, toBufferSpec, unlock, type Spec } from '@foleyjs/core'
-import { RUB, SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind, type SoundSet, type SoundSetName, type Travel } from './soundSets'
+import { labelsShowing, RUB, SOUND_SETS, tilesLanding, type FlapRow, type Label, type Landing, type ScanWay, type Score, type SoundKind, type SoundSet, type SoundSetName, type Travel } from './soundSets'
 
 /*
  * What a moment sounds like, in a few kinds. The touch kinds are the same
@@ -32,11 +32,14 @@ import { RUB, SOUND_SETS, type FlapRow, type ScanWay, type Score, type SoundKind
  * - peek: a tooltip coming out.
  * - point: the pointer (or keyboard focus) lighting another item in a graph.
  * - on / off: sound itself switched (the switch is heard, not muted).
- * - ink / angle / cross / glow: the mark drawing itself in on the landing
- *   page: its ring's two halves inked, the A's angle drawn, the stroke
- *   across passing over the A, and the glow once it's still.
+ * - cross / glow: the landing mark drawing itself in: its stroke across
+ *   passing over the A, and the glow once it's still (its tiles settling
+ *   are soundTiles).
  * - part: the landing intro's text parting around the mark as it scrolls
  *   up into it (closing again is quiet).
+ * - ripple: a press sending a ring of light through the backdrop mark, given
+ *   how far across the screen it was (0 to 1): a trickle of drops, leaving for the
+ *   far side.
  * - pick / lay / turn / nudge: the 404's solitaire cards (soundSets.ts, CARDS).
  *   Dragged, a card is heard brushing the table instead, from where it is on
  *   the screen (soundRub).
@@ -319,9 +322,45 @@ export const soundBoard = (rows: FlapRow[]) => soundWith((s) => s.board(rows), '
 export const soundClock = (row: FlapRow, light: number) => soundWith((s) => s.clock(row, light), 'clock')
 
 /** A uses table drawing in: `rules` rules, one every `step` seconds. */
-export const soundTable = (rules: number, step: number) => soundWith((s) => s.table(rules, step), 'table')
+/*
+ * A table's sound is too many layers for one play, and foley nudges each
+ * play's pitch on its own, so its beeps would come out of tune with each
+ * other and the bed the longer the table. Rendered unnudged and started
+ * together instead.
+ */
+export function soundTable(rules: number, step: number) {
+  if (heard()) playTogether(SOUND_SETS[soundSet()].table(rules, step))
+}
+
+async function playTogether(score: Score) {
+  const buffers = await Promise.all(score.map((part) => toBufferSpec(part.spec)))
+  const out = getAnalyser()
+  const { muted, volume } = get()
+  if (!out || muted) return
+  const context = out.context
+  const when = context.currentTime + 0.01
+  score.forEach((part, i) => {
+    if (!buffers[i]) return
+    const source = context.createBufferSource()
+    source.buffer = buffers[i]
+    const gain = context.createGain()
+    gain.gain.value = volume
+    const pan = context.createStereoPanner()
+    pan.pan.value = part.pan
+    source.connect(gain).connect(pan).connect(out)
+    source.onended = () => source.disconnect()
+    // A render starts its sound 0.03s in.
+    source.start(when, 0.03)
+  })
+}
 
 /** The color scheme scanned up the page behind its line (SiteSchemeSwitch). */
+/** The landing mark's tiles settling in as its pens draw it (soundSets.ts, tilesLanding). */
+export const soundTiles = (landings: Landing[]) => soundWith(() => tilesLanding(landings), 'tiles')
+
+/** The flag band's submenu labels showing, nearest the mouse first (soundSets.ts, labelsShowing). */
+export const soundLabels = (labels: Label[]) => soundWith(() => labelsShowing(labels), 'labels')
+
 export const soundSweep = () => soundWith((s) => s.sweep(), 'sweep')
 
 /**

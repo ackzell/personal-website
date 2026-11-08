@@ -14,11 +14,6 @@ const { locale, t } = useI18n()
 const { data: book } = useFetch('/api/amoxtli-chapters')
 const chapters = computed(() => book.value?.[locale.value] ?? [])
 
-function toggled(event: MouseEvent) {
-  const opening = !(event.currentTarget as HTMLElement).parentElement?.hasAttribute('open')
-  sound(opening ? 'reveal' : 'conceal')
-  haptic('toggle')
-}
 </script>
 
 <template>
@@ -26,7 +21,7 @@ function toggled(event: MouseEvent) {
     <ul class="chapters" m="0" p="0" list="none">
       <li v-for="(chapter, i) in chapters" :key="chapter.title">
         <details class="chapter" :open="i === 0">
-          <summary class="chapter__head" data-press="key" @click="toggled">
+          <summary class="chapter__head" data-press="none" @click="haptic('fold')">
             <span class="chapter__fold i-iconoir-nav-arrow-right" aria-hidden="true" />
             <span class="chapter__title" typeset="heading">{{ chapter.title }}</span>
             <span class="chapter__count">
@@ -83,6 +78,14 @@ function toggled(event: MouseEvent) {
 .chapter__title {
   font-size: var(--subentry-size);
   line-height: 1.2;
+  transition: filter 0.25s var(--ease-out);
+}
+
+/* The press answers on the words alone, as words do (main.css "Press"), not
+   the whole row: dimmed at once, easing back on release. */
+.chapter__head:active .chapter__title {
+  filter: opacity(0.55);
+  transition-duration: 0s;
 }
 
 .chapter__count {

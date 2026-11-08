@@ -84,7 +84,8 @@ let pending = 0
 function heard(event: AnimationEvent) {
   if (event.pseudoElement || !pending || !event.animationName.startsWith('uses-rule')) return
   const rule = event.target as HTMLElement
-  if (!rule.parentElement?.classList.contains('box__head') || rule.previousElementSibling) return
+  // The head's first rule, whatever layers sit before it.
+  if (!rule.parentElement?.classList.contains('box__head') || rule !== rule.parentElement.querySelector(':scope > .box__rule')) return
   soundTable(pending, STEP / 1000)
   pending = 0
 }

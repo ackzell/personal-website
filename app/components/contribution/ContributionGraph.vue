@@ -266,6 +266,8 @@ onBeforeUnmount(() => stopArriving?.())
  * for it, and moves to the next on a spring that keeps its speed if the light
  * moves on mid-way. It waits for its row to print (on arrival and on each
  * run) or scroll in, and comes on in place rather than travelling there.
+ * It holds a copy of the mark, so the page arrival leaves it out, whose inline
+ * opacity would show the tag before its row has printed.
  */
 const HEAD: Transition = { type: 'spring', bounce: 0.15, visualDuration: 0.45 }
 
@@ -394,8 +396,8 @@ const name = (repo: string) => repo.split('/')[1]
         </li>
       </ol>
     </Transition>
-      <span class="log__head" :class="{ 'is-on': headOn }" typeset="code" text="sm muted" aria-hidden="true">(<span
-          class="log__head-ref">HEAD</span>)</span>
+      <span class="log__head" :class="{ 'is-on': headOn }" typeset="code" text="sm muted" aria-hidden="true"><SiteMarkLayer clipped /><span
+          class="log__head-text">(<span class="log__head-ref">HEAD</span>)</span></span>
     </div>
   </div>
 </template>
@@ -438,7 +440,9 @@ const name = (repo: string) => repo.split('/')[1]
 
 /* The log prints in the frame; HEAD rides over it, from the top corner to
    its slot (--head-x, --head-y, from the springs). It keeps the stage color
-   under it as it crosses the rows, and scrolls under the sticky switch. */
+   and the mark under it as it crosses the rows, and scrolls under the sticky
+   switch. Offsets rather than a translate, and the blur on the text alone:
+   either would misplace its copy of the mark (SiteMarkLayer). */
 .log-frame {
   position: relative;
 }
@@ -458,25 +462,33 @@ const name = (repo: string) => repo.split('/')[1]
 .log__head {
   position: absolute;
   z-index: 1;
-  inset-block-start: 0;
-  inset-inline-start: 0;
-  translate: var(--head-x, 0) var(--head-y, 0);
+  inset-block-start: var(--head-y, 0);
+  inset-inline-start: var(--head-x, 0);
   font-size: var(--head-size);
   background: var(--bg);
   pointer-events: none;
   opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.log__head-text {
   filter: blur(4px);
-  transition:
-    opacity 200ms var(--ease-out),
-    filter 200ms var(--ease-out);
+  transition: filter 200ms var(--ease-out);
 }
 
 /* It comes on as its row arrives, out of the same soft blur, a beat after. */
-.log__head.is-on {
-  opacity: 1;
-  filter: none;
+.log__head.is-on,
+.log__head.is-on .log__head-text {
   transition-duration: 500ms;
   transition-delay: 150ms;
+}
+
+.log__head.is-on {
+  opacity: 1;
+}
+
+.log__head.is-on .log__head-text {
+  filter: none;
 }
 
 /* As git colors it. */
@@ -787,7 +799,7 @@ const name = (repo: string) => repo.split('/')[1]
     transition-delay: calc(var(--batch, 0) * 40ms);
   }
 
-  .log__head {
+  .log__head-text {
     filter: none;
   }
 }

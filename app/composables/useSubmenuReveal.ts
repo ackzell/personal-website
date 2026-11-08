@@ -1,5 +1,8 @@
 /** Pointer distance (px) around the submenu that counts as "in range". */
 const REVEAL_RANGE = 48
+/** Each label's wait per step out from the ripple's origin, and its fade in (SiteFlagNav's reveal styles); heard half way in. */
+const RIPPLE_STEP = 0.06
+const LABEL_IN = 0.2
 
 interface SubmenuRevealOptions {
   /** The open section's submenu list, if there is one. */
@@ -59,9 +62,24 @@ export function useSubmenuReveal({ submenu, isSectionPage, currentIndex }: Subme
         if (!near) return
       }
       if (near === reveal.value) return
-      if (near) rippleOrigin.value = nearest()
+      if (near) {
+        rippleOrigin.value = nearest()
+        heardFrom(list, rippleOrigin.value)
+      }
       reveal.value = near
     })
+  }
+
+  /* Each label heard as it shows, where it is on screen, out from `origin`.
+     Only for the mouse coming near: opening a section already has the page
+     change's sounds. */
+  function heardFrom(list: HTMLElement, origin: number) {
+    const labels = [...list.children].map((item, i) => {
+      const { left, width } = item.getBoundingClientRect()
+      const step = Math.abs(i - origin)
+      return { step, at: step * RIPPLE_STEP + LABEL_IN / 2, pan: ((left + width / 2) / innerWidth * 2 - 1) * 0.7 }
+    })
+    soundLabels(labels)
   }
 
   const onPointerLeave = () => (reveal.value = false)

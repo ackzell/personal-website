@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { layout, layoutNextLine, prepareWithSegments } from '@chenglou/pretext'
 import type { LayoutCursor, PreparedTextWithSegments } from '@chenglou/pretext'
-import { animate, frame, mapValue, motionValue, svgEffect, type AnimationPlaybackControls } from 'motion-v'
-import { ANGLE, INK_SECONDS, INK_STAGGER } from '~/utils/soundSets'
 import { localeSwitching } from '~/utils/localeSwitch'
 
 /*
@@ -219,140 +217,9 @@ function relayout() {
   measure()
 }
 
-/* Entrance: the top arc is inked left to right and the bottom right to
-   left; as they glide into the gaps the A is drawn, its angle in one stroke
-   up and over, then the stroke across flicked out to its tip, and the flick
-   carries the A with it: it rocks toward the tip on its feet and springs
-   back upright; once it's still, it glows a moment. Hidden by CSS
-   until it starts, so the whole mark never flashes first. */
-const live = ref(false)
-// Drawn once per page load: coming back to home within the site finds it
-// already there, so seeing it again takes a reload. App state, so it lasts
-// across client navigations and starts over with the document.
-const drawnThisLoad = useState('home-mark-drawn', () => false)
-let effects: VoidFunction[] = []
-let entrance: AnimationPlaybackControls[] = []
-// Which drawing is current, so a stopped one's follow-ups never run into the next.
-let run = 0
-
-/* A tight halo and a wide one, sized to the mark so a small one on a phone
-   glows as much as a large one; `strength` 0 is none. */
-function halo(glyph: SVGSVGElement, strength: number) {
-  const size = glyph.clientWidth
-  const [r, g, b] = getComputedStyle(glyph).color.match(/[\d.]+/g)!.map(Number)
-  const ring = (blur: number, alpha: number) => `drop-shadow(0 0 ${(size * blur).toFixed(1)}px rgba(${r}, ${g}, ${b}, ${alpha * strength}))`
-  return `${ring(0.012, 0.7)} ${ring(0.045, 0.45)}`
-}
-
-function glow(glyph: SVGSVGElement) {
-  const strength = motionValue(0)
-  strength.on('change', now => glyph.style.filter = halo(glyph, now))
-  return animate(strength, [0, 1, 0], {
-    duration: 1.5,
-    times: [0, 0.25, 1],
-    ease: [[0.22, 1, 0.36, 1], [0.45, 0, 0.55, 1]],
-  })
-}
-
-// Each arc of the ring inks in INK seconds, the bottom one STAGGER after the
-// top: shared with the ink sound, which follows each (utils/soundSets).
-const INK = INK_SECONDS
-const STAGGER = INK_STAGGER
-const INKING: [number, number, number, number] = [0.45, 0, 0.15, 1]
-
-// How far along the stroke across it passes over the A's right leg.
-const CROSSING = 0.53
-
-function drawIn() {
-  const glyph = mark.value?.querySelector('svg')
-  if (!glyph) return
-  const current = ++run
-  // The top arc, then the bottom one a beat after it, so the two are seen,
-  // and heard, as two strokes rather than one.
-  const top = motionValue(0)
-  const bottom = motionValue(0)
-  // One stroke over both legs: the left one draws through the first half.
-  const angle = motionValue(0)
-  const cross = motionValue(0)
-  const rock = motionValue(0)
-  effects = [
-    ...[top, bottom].map((half, i) => svgEffect(glyph.querySelectorAll('.glyph-pen-ring')[i]!, { pathLength: half })),
-    svgEffect(glyph.querySelector('.glyph-pen-left')!, { pathLength: mapValue(angle, [0, 0.5], [0, 1]) }),
-    svgEffect(glyph.querySelector('.glyph-pen-right')!, { pathLength: mapValue(angle, [0.5, 1], [0, 1]) }),
-    svgEffect(glyph.querySelector('.glyph-pen-cross')!, { pathLength: cross }),
-    svgEffect(glyph.querySelector('.glyph-a')!, { rotate: rock }),
-  ]
-  frame.render(() => live.value = true)
-  // Heard on the drawing's own frames: each of the ring's halves and the
-  // A's angle as they set off, and a tick as the stroke across passes over the A's right leg (a little
-  // past half way along it).
-  const inked = [top, bottom].map((half, i) => {
-    const off = half.on('change', () => {
-      off()
-      sound('ink', i)
-    })
-    return off
-  })
-  const angled = angle.on('change', () => {
-    angled()
-    sound('angle')
-  })
-  const crossed = cross.on('change', (now) => {
-    if (now < CROSSING) return
-    crossed()
-    sound('cross')
-  })
-  effects.push(...inked, angled, crossed)
-  entrance = [
-    // A gentle start and a long glide into the gaps.
-    animate(top, 1, { delay: 0.15, duration: INK, ease: INKING }),
-    animate(bottom, 1, { delay: 0.15 + STAGGER, duration: INK, ease: INKING }),
-    animate(angle, 1, { delay: 0.95 + STAGGER, duration: ANGLE, ease: [0.65, 0, 0.35, 1] }),
-    animate(cross, 1, { delay: 1.6 + STAGGER, duration: 0.3, ease: [0.22, 1, 0.36, 1] }),
-  ]
-  // Tipped quickly as the flick reaches the tip, then let go on a spring that
-  // rocks it past upright once and settles; it picks up whatever speed the
-  // tip still has. (A spring from 0 to 0 with a kick alone doesn't run.)
-  const tip = animate(rock, 1, { delay: 1.75 + STAGGER, duration: 0.14, ease: [0.22, 1, 0.36, 1] })
-  entrance.push(tip)
-  tip.then(() => {
-    if (current !== run) return
-    const settle = animate(rock, 0, { type: 'spring', bounce: 0.2, visualDuration: 0.5, velocity: rock.getVelocity() })
-    entrance.push(settle)
-    // Once it's still, it glows: a halo in its own color blooms and fades,
-    // and the mark is left flat, with no filter on it.
-    settle.then(() => {
-      if (current !== run) return
-      sound('glow')
-      const glowing = glow(glyph)
-      entrance.push(glowing)
-      glowing.then(() => glyph.style.removeProperty('filter'))
-    })
-  })
-}
-
-function stopEntrance() {
-  for (const stop of effects) stop()
-  for (const animation of entrance) animation.stop()
-  effects = []
-  entrance = []
-  run++
-}
-
-/* Sound switched on: if the mark is on screen, it draws itself in again from
-   nothing, so the press is answered by the mark's own sound. */
-function replay() {
-  const glyph = mark.value?.querySelector('svg')
-  if (!glyph || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  const { top, bottom } = glyph.getBoundingClientRect()
-  if (bottom <= 0 || top >= window.innerHeight) return
-  stopEntrance()
-  glyph.style.removeProperty('filter')
-  drawIn()
-}
+const { live } = useMarkEntrance(mark)
 
 useEventListener(window, 'scroll', schedule, { passive: true })
-onMounted(() => onBeforeUnmount(onSoundOn(replay)))
 useResizeObserver(root, relayout)
 // A language switch fades the painted lines out still in the old language
 // (plugins/locale-scramble.client.ts): relayout holds off until it's over.
@@ -360,12 +227,6 @@ watch(() => [props.title, props.text, localeSwitching.value], relayout)
 
 onMounted(async () => {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-  // Left alone, the pens show the mark whole.
-  if (drawnThisLoad.value) live.value = true
-  else {
-    drawnThisLoad.value = true
-    drawIn()
-  }
   await document.fonts.ready
   if (!body.value) return
   flowing.value = true
@@ -373,10 +234,7 @@ onMounted(async () => {
   relayout()
 })
 
-onBeforeUnmount(() => {
-  cancelAnimationFrame(pending)
-  stopEntrance()
-})
+onBeforeUnmount(() => cancelAnimationFrame(pending))
 </script>
 
 <template>
@@ -404,6 +262,8 @@ onBeforeUnmount(() => {
   inline-size: clamp(5rem, 25vw, 14rem);
   block-size: clamp(5rem, 25vw, 14rem);
   margin-inline: auto;
+  /* Holds the tiles' canvas (utils/markTiles) before it turns sticky. */
+  position: relative;
   /* Read by the script as the room kept between the ring and the text. */
   column-gap: clamp(var(--gap-tight), 2vw, var(--gap-group));
 }

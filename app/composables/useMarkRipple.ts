@@ -155,7 +155,9 @@ export function useMarkRipple() {
       if (e.timeStamp - tap.at > TAP_MS || Math.hypot(e.clientX - tap.x, e.clientY - tap.y) > TAP_SLOP) return
       if (!getSelection()?.isCollapsed) return
       const glyph = document.querySelector<SVGSVGElement>('.site-mark__svg')
-      if (glyph && onGlyph(glyph, e.clientX, e.clientY)) ripple.start(e.clientX, e.clientY, glyph)
+      if (!glyph || !onGlyph(glyph, e.clientX, e.clientY)) return
+      ripple.start(e.clientX, e.clientY, glyph)
+      haptic('ripple', e.clientX / innerWidth)
     }, { passive: true, signal })
   })
 

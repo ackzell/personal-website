@@ -35,7 +35,7 @@ const id = useId()
             <path d="M 135.5 -10 H 270 V 250 H 125.5 Z" />
           </clipPath>
           <clipPath :id="`${id}-legs`">
-            <path clip-rule="evenodd"
+            <path class="glyph-legs-bounds" clip-rule="evenodd"
               d="M -10 -10 H 270 V 250 H -10 Z M 110.96 149.23 L 139.17 125.62 L 143.8 146.48 L 95.2 199.6 Z M 156.1 110 L 230 50 L 240 140 L 162 130 Z" />
           </clipPath>
           <!-- Along the middle of each stroke, past its ends: up the left leg,

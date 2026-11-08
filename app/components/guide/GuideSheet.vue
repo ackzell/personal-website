@@ -119,7 +119,7 @@ async function drop() {
     await run
     // Another pick brought it back while the line drew in.
     if (run !== sliding) return
-    sound('close')
+    sound('conceal')
     const out = sliding = animate(el, { right: -el.offsetWidth }, motion(SLIDE_OUT))
     await out
     if (out !== sliding) return
@@ -153,7 +153,7 @@ watch(item, async (now) => {
     swap(now)
     // Caught on its way out, it comes back with the new pick.
     if (leaving) {
-      sound('open')
+      sound('reveal')
       rise()
     } else {
       sound('swap')
@@ -161,7 +161,7 @@ watch(item, async (now) => {
     return
   }
   showing.value = { item: now }
-  sound('open')
+  sound(docked.value ? 'reveal' : 'open')
   if (el.open) {
     // Caught on its way down, the sheet comes back up from there.
     panel.value?.scrollTo(0, 0)
