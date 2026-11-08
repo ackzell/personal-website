@@ -287,6 +287,41 @@ function enter(event: PointerEvent, i: number) {
   }
 }
 
+/*
+ * On a first visit (main.css, "First visit") they land as they do crossing
+ * the breakpoint (the FLIP above): carried in from the edge, raised, then
+ * lowered into the slot, one after another as the footer comes up.
+ */
+:root[data-intro='build'] .site-footer__land {
+  --land-from: 0, 2.5rem;
+  animation: site-footer-intro 620ms calc(2400ms + var(--i) * 60ms) backwards;
+}
+
+/* Built: the everyday landing would otherwise start over once "build" is gone. */
+:root[data-intro='done'] .site-footer__land {
+  animation: none;
+}
+
+@media (width < 40rem) {
+  :root[data-intro='build'] .site-footer__land {
+    --land-from: var(--rail-width), 0;
+  }
+}
+
+@keyframes site-footer-intro {
+  from {
+    opacity: 0;
+    transform: translate(var(--land-from));
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  60% {
+    opacity: 1;
+    transform: translateY(-6px) scale(1.06);
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  }
+}
+
 /* A drag along the icons is theirs, not the page's: on the rail it runs the
    same way as scrolling, and the page scrolls from anywhere else. */
 .site-footer__links {

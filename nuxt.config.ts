@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import tlapalliJson from './shiki/tlapalli.json'
+import { INTRO_SEEN } from './app/utils/intro'
 
 // JSON widens `type` to string; Shiki wants to know it's a dark or light theme.
 const tlapalli = tlapalliJson.map((theme) => ({ ...theme, type: theme.type as 'dark' | 'light' }))
@@ -56,6 +57,12 @@ export default defineNuxtConfig({
       ],
       // A screen that would switch on from JS (usePowerOn) is simply lit.
       noscript: [{ innerHTML: '<style>.power-screen{clip-path:none!important;animation:none!important}</style>' }],
+      // A first visit ever, marked before the first paint so the header and
+      // footer never show and then hide (plugins/intro.client.ts).
+      script: [{
+        innerHTML: `try{localStorage.getItem('${INTRO_SEEN}')||matchMedia('(prefers-reduced-motion: reduce)').matches||document.documentElement.setAttribute('data-intro','')}catch(e){}`,
+        tagPosition: 'head',
+      }],
     },
   },
 

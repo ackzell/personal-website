@@ -1208,6 +1208,90 @@ main:focus {
   }
 }
 
+/*
+ * First visit: the page comes in alone, then the header and footer build
+ * around it, so the eye goes to each in turn (plugins/intro.client.ts). The
+ * brand drops in, the band draws in field by field (its light runs along
+ * behind, SiteFlagNav), the footer fades up and each setting lights up as it
+ * arrives, then settles to its resting dim. The landing page waits out most
+ * of the mark's drawing. If the script never builds it, it all shows anyway.
+ */
+:root[data-intro] {
+  --intro-at: 1100ms;
+}
+:root[data-intro]:has(.home-intro) {
+  --intro-at: 2600ms;
+}
+:root[data-intro=''] :is(.site-header > a, .flag-nav, .attr-switch, .site-footer) {
+  animation: intro-wait 6s;
+}
+:root[data-intro='build'] .site-header > a {
+  animation: 500ms var(--ease-out) backwards intro-drop;
+}
+/* Field by field, about · work · media: each bar draws in from its left, as
+   the hover preview fills, and its label comes up once it's under way. */
+:root[data-intro='build'] .flag-nav__field {
+  transform-origin: left;
+  animation: 700ms var(--ease-in-out) calc(300ms + var(--intro-field, 0) * 200ms) backwards intro-draw;
+}
+:root[data-intro='build'] .flag-nav__link > :not(.flag-nav__field) {
+  animation: 400ms var(--ease-out) calc(600ms + var(--intro-field, 0) * 200ms) backwards intro-fade;
+}
+.flag-nav__segment:nth-child(2) {
+  --intro-field: 1;
+}
+.flag-nav__segment:nth-child(3) {
+  --intro-field: 2;
+}
+:root[data-intro='build'] .site-footer {
+  animation: 600ms var(--ease-out) 2300ms backwards intro-fade;
+}
+:root[data-intro='build'] .attr-switch > * {
+  animation: 900ms ease-in-out var(--intro-step) backwards intro-lit;
+}
+.site-header .attr-switch:first-child {
+  --intro-step: 1400ms;
+}
+.site-header .attr-switch:last-child {
+  --intro-step: 1700ms;
+}
+.site-footer .attr-switch {
+  --intro-step: 2550ms;
+}
+@keyframes intro-wait {
+  from,
+  to {
+    opacity: 0;
+  }
+}
+@keyframes intro-drop {
+  from {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--space-2));
+  }
+}
+@keyframes intro-draw {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+/* No end frame: it settles back to the switch's own resting dim. */
+@keyframes intro-lit {
+  from {
+    opacity: 0;
+  }
+  35%,
+  65% {
+    opacity: 1;
+    text-decoration-color: currentColor;
+  }
+}
+
 /* Defaults use :where() so any utility overrides them without a fight. */
 :where(.page) > * {
   grid-column: content;

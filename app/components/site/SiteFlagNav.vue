@@ -181,11 +181,13 @@ function ignite() {
   const fields = [...nav.value.querySelectorAll<HTMLElement>('.flag-nav__field')].filter((field) => field.checkVisibility())
   // Under a second end to end, however many fields there are.
   const step = Math.min(110, 900 / fields.length)
+  // On a first visit, behind the band's own drawing in (main.css, "First visit").
+  const wait = introLeft() && introLeft() + 1250
   fields.forEach((field, n) => {
     field.animate({ opacity: [0, 1, 0], offset: [0, 0.25, 1] }, {
       pseudoElement: '::before',
       duration: 450,
-      delay: n * step,
+      delay: wait + n * step,
       easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
     })
   })

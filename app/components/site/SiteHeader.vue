@@ -23,13 +23,13 @@ useResizeObserver(header, () => {
 // The brand introduces its owner: it arrives as the name and decodes into the
 // domain, once per load (the header outlives page changes), and decodes back
 // to the name while a mouse rests on it or it has focus. Touch never hovers,
-// so a tap only goes home.
+// so a tap only goes home. On a first visit it counts from its own arrival.
 const intro = ref(true)
 const over = ref(false)
 const hover = (event: PointerEvent, on: boolean) => {
   if (event.pointerType === 'mouse') over.value = on
 }
-onMounted(() => setTimeout(() => (intro.value = false), 1600))
+onMounted(() => setTimeout(() => (intro.value = false), introLeft() + 1600))
 
 // Heard as the bottom stops are: a departures board turning over, one row on
 // the scramble's timing (SiteScrambleText), panned to where the brand sits.

@@ -49,7 +49,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
 
     const command = 'font-family: monospace; font-weight: bold;'
-    console.log(`${i18n.t('console.hint')} %cackzell.projects%c, %cackzell.uses`, command, '', command)
+    console.log(`${i18n.t('console.hint')} %cackzell.projects%c, %cackzell.uses%c, %cackzell.intro`, command, '', command, '', command)
 
     console.log(i18n.t('console.stack'))
     console.log(commit ? `${SOURCE}/tree/${commit}` : SOURCE)
@@ -72,6 +72,16 @@ export default defineNuxtPlugin((nuxtApp) => {
             console.groupEnd()
           }
         })
+      },
+      // Forgets the first visit (plugins/intro.client.ts) and loads again, so it plays as it first did.
+      get intro() {
+        try {
+          localStorage.removeItem(INTRO_SEEN)
+        } catch {
+          // Storage blocked: there was never an intro to forget.
+        }
+        location.reload()
+        return undefined
       },
     },
   })
