@@ -24,7 +24,6 @@ const links = z
     video: z.string().url(),
     marketplace: z.string().url(),
     openvsx: z.string().url(),
-    release: z.string().url(),
     previewAccess: z.string(),
   })
   .partial()
@@ -154,6 +153,8 @@ export default defineContentConfig({
         repos: z.array(z.string()).default([]),
         // Where each repo keeps its history of changes.
         changelogs: z.array(z.string().url()).default([]),
+        // A repo whose latest release the ledger shows, for a parent whose repos live with its parts.
+        release: z.string().optional(),
         links,
         stack: z.array(z.string()).default([]),
         related: z.array(z.string()).default([]),

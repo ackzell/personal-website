@@ -33,6 +33,9 @@
       },
       "default": []
     },
+    "release": {
+      "type": "string"
+    },
     "links": {
       "type": "object",
       "properties": {
@@ -49,10 +52,6 @@
           "format": "uri"
         },
         "openvsx": {
-          "type": "string",
-          "format": "uri"
-        },
-        "release": {
           "type": "string",
           "format": "uri"
         },

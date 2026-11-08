@@ -84,6 +84,7 @@ export async function fetchProjects(locale: 'en' | 'es'): Promise<Project[]> {
         order: item.order,
         repos: item.repos ?? [],
         changelogs: item.changelogs ?? [],
+        release: item.release,
         links: item.links ?? {},
         stack: item.stack ?? [],
         related: item.related ?? [],

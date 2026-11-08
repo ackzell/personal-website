@@ -40,10 +40,6 @@
           "type": "string",
           "format": "uri"
         },
-        "release": {
-          "type": "string",
-          "format": "uri"
-        },
         "previewAccess": {
           "type": "string"
         }

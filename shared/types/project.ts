@@ -5,15 +5,23 @@ export interface ProjectLinks {
   video?: string
   marketplace?: string
   openvsx?: string
-  release?: string
   /** How to ask for access to an invite-only preview. Never the preview URL itself. */
   previewAccess?: string
+}
+
+/** A repo's latest GitHub release; `published` is `YYYY-MM-DD`. */
+export interface Release {
+  tag: string
+  url: string
+  published: string
 }
 
 /** What the ledger shows: where a project or part lives and what it's made of. */
 export interface ProjectFacts {
   repos: string[]
   changelogs: string[]
+  /** A repo whose latest release shows in place of the repos' own, for a parent whose repos live with its parts. */
+  release?: string
   links: ProjectLinks
   stack: string[]
   /** YouTube playlist with livestreams / progress updates. */

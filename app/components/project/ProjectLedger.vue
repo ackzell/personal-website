@@ -9,7 +9,7 @@ const props = defineProps<{ project: ProjectFacts }>()
 
 const { t } = useI18n()
 
-type Item = { label: string, href?: string, muted?: string, icon?: string }
+type Item = { label: string, href?: string, muted?: string, note?: string, icon?: string }
 type Row = { key: string, label: string, items: Item[] }
 
 /* A brand mark for a stack entry, by the slug the project's metadata uses.
@@ -45,6 +45,22 @@ const changelogItem = (url: string): Item => {
   return { label: parts.at(-1) ?? url, muted: `${parts[2]}/`, href: url }
 }
 
+// Each repo's latest release, fetched rather than written down so it can't go stale.
+const monthOf = useMonthFormat()
+const releaseRepos = computed(() => props.project.release ? [props.project.release] : props.project.repos)
+const { data: releases } = useAsyncData(
+  () => `releases-${releaseRepos.value.join()}`,
+  () => Promise.all(releaseRepos.value.map((repo) => $fetch<Release | null>(`/api/releases/${repo}`))),
+)
+
+// The repo name goes before the version only when there's more than one to tell apart.
+const releaseItems = computed<Item[]>(() => releaseRepos.value.flatMap((repo, i) => {
+  const release = releases.value?.[i]
+  if (!release) return []
+  const muted = releaseRepos.value.length > 1 ? `${repo.split('/')[1]} ` : undefined
+  return [{ label: release.tag, muted, note: monthOf(release.published), href: release.url }]
+}))
+
 const rows = computed<Row[]>(() => {
   const { links, repos, changelogs, stack, devlogPlaylist } = props.project
   const all: Row[] = [
@@ -57,7 +73,7 @@ const rows = computed<Row[]>(() => {
         ...(links.openvsx ? [{ label: 'Open VSX', href: links.openvsx }] : []),
       ],
     },
-    { key: 'release', label: t('projects.ledger.release'), items: links.release ? [{ label: host(links.release), href: links.release }] : [] },
+    { key: 'release', label: t('projects.ledger.release'), items: releaseItems.value },
     { key: 'source', label: t('projects.ledger.source'), items: repos.map(repoItem) },
     { key: 'changelog', label: t('projects.ledger.changelog'), items: changelogs.map(changelogItem) },
     { key: 'video', label: t('projects.ledger.video'), items: links.video ? [{ label: host(links.video), href: links.video }] : [] },
@@ -86,7 +102,7 @@ const rows = computed<Row[]>(() => {
         <ul class="ledger__items" m="0" p="0" list="none">
           <li v-for="(item, i) in row.items" :key="item.label" :style="{ '--i': i }">
             <a v-if="item.href" :href="item.href" class="ledger__link">
-              <span v-if="item.muted" class="ledger__muted">{{ item.muted }}</span>{{ item.label }}<span
+              <span v-if="item.muted" class="ledger__muted">{{ item.muted }}</span>{{ item.label }}<span v-if="item.note" class="ledger__muted"> · {{ item.note }}</span><span
                 class="ledger__out i-iconoir-arrow-up-right" aria-hidden="true" />
             </a>
             <span v-else>
