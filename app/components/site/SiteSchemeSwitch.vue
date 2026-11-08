@@ -28,6 +28,8 @@ usePublishedHeight(el, '--scheme-height')
 const mounted = useMounted()
 const known = computed(() => mounted.value && !colorMode.unknown)
 const scheme = computed<Scheme>(() => {
+  // Everything it feeds (text, title, label) must match the server's at hydration.
+  if (!known.value) return 'light'
   const preference = colorMode.preference as Scheme
   if (order.includes(preference)) return preference
   // No pick yet ("system"): the scheme the system resolved to.

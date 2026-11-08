@@ -58,9 +58,11 @@ const full = (name: string) => `${props.dir}/${name}.webp`
 const srcset = (name: string) => `${props.dir}/${name}-720.webp 720w, ${full(name)} ${props.width}w`
 const SIZES = '(width < 40rem) 50vw, 33vw'
 
-// The lightbox shows the capture for the scheme the page is in.
+// The lightbox shows the capture for the scheme the page is in. Only once
+// mounted: the server can't know the stored scheme, so hydration matches it.
+const mounted = useMounted()
 const shown = computed(() => props.items.map((item) => {
-  const name = item.light && colorMode.value !== 'dark' ? item.light : item.src
+  const name = item.light && (!mounted.value || colorMode.value !== 'dark') ? item.light : item.src
   return {
     src: full(name),
     thumb: `${props.dir}/${name}-720.webp`,
