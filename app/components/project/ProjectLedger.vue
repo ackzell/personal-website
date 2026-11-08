@@ -38,11 +38,12 @@ const repoItem = (repo: string): Item => {
   return { label: name ?? repo, muted: name ? `${owner}/` : undefined, href: `https://github.com/${repo}` }
 }
 
-// Named after its repo, which its GitHub URL starts with.
-const changelogItem = (url: string): Item => ({
-  ...repoItem(new URL(url).pathname.split('/').slice(1, 3).join('/')),
-  href: url,
-})
+// Named after its file, with its repo (from the GitHub URL) quiet before it,
+// so it doesn't read as a repeat of the source link.
+const changelogItem = (url: string): Item => {
+  const parts = new URL(url).pathname.split('/')
+  return { label: parts.at(-1) ?? url, muted: `${parts[2]}/`, href: url }
+}
 
 const rows = computed<Row[]>(() => {
   const { links, repos, changelogs, stack, devlogPlaylist } = props.project
