@@ -33,7 +33,7 @@
     "bio": "Sobre mí",
     "title": "Axel Martínez",
     "description": "Artesano mexicano de software. Aprendiz eterno de tecnologías web. Estudiante insaciable. Padre de familia. Beatle fan.",
-    "intro": "¡Hola! Soy un ingeniero de software mexicano dedicado sobre todo al frontend a lo largo de mi carrera. He construido para la web por más de {years} años (ándale! el tiempo vuela) y estoy muy contento de compartir contigo a través de este website mi experiencia profesional, así como las cosas que voy creando fuera de mi empleo. Por favor, siéntete libre de explorar el sitio y también de contactarme. Buen día!",
+    "intro": "¡Hola! Soy un ingeniero de software mexicano dedicado sobre todo al frontend a lo largo de mi carrera. He construido para la web por más de {years} años (ándale! el tiempo vuela) y estoy muy contento de compartir contigo a través de este website mi experiencia profesional, así como las cosas que voy creando fuera de mi empleo. Por favor, siéntete libre de explorar el sitio y también de contactarme. ¡Buen día!",
     "featured": "Mi proyecto más activo",
     "allProjects": "Todos los proyectos",
     "timeline": "Trayectoria"
@@ -41,7 +41,7 @@
   "projects": {
     "title": "Proyectos",
     "description": "Proyectos personales, herramientas y experimentos en los que trabajo",
-    "intro": "Proyectos, herramientas y experimentos que he construido sobre todo para mí mismo, porque me gusta tener cierto control de mi ambiente y tenerlo me permite sentirme un poco más productivo o tal vez estoy experimentando con algo y quiero construir sobre ello. La mayoría son mis intentos por aprender cosas nuevas, técnicas, herramientas, tecnologías y cosas así. Hay un patrón que verás con los nombres y es que todos tienen nombres en náhuatl. Este es un idioma antiguo que se hablaba en México desde antes de la época colonial.",
+    "intro": "Proyectos, herramientas y experimentos que he construido sobre todo para mí mismo. La mayoría son mis intentos por aprender cosas nuevas: técnicas, herramientas, tecnologías y cosas así. Hay un patrón que verás con los nombres y es que de un tiempo para acá todos tienen nombres en náhuatl. Este es un idioma antiguo que se habla en México desde antes de la época colonial.",
     "pronunciation": "Pronunciación",
     "meaning": "Significado",
     "related": "Proyectos relacionados",
