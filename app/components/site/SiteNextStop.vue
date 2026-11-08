@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Explicit: the auto-import intermittently went missing after HMR (ReferenceError).
+import { pressLean } from '~/utils/pressLean'
 /**
  * The stops on either side along the flag band: where a swipe or ← / →
  * would go, for whoever reads to the end (and the sign, on touch, that
