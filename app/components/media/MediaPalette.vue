@@ -367,6 +367,17 @@ watch(showing, (now, before) => {
     animation: 450ms var(--ease-out) both palette-recede;
   }
 
+  /* The caption sits on the page, not the screen, so it stays out of the
+     wipe: the old line clears ahead of it, the new one settles in as it
+     lands, and the two never overlap. */
+  .is-leaving :deep(.media__caption) {
+    animation: 100ms var(--ease-out) both reverse palette-fade;
+  }
+
+  .is-entering :deep(.media__caption) {
+    animation: 200ms var(--ease-out) 300ms both palette-caption;
+  }
+
   /* Once the window has switched on, the rows fill in down the list, the way
      the app's palette fills with results. */
   [data-power='off'] .palette__item {
@@ -473,6 +484,13 @@ watch(showing, (now, before) => {
   to {
     translate: 0 0;
     opacity: 0;
+  }
+}
+
+@keyframes palette-caption {
+  from {
+    opacity: 0;
+    translate: 0 3px;
   }
 }
 
