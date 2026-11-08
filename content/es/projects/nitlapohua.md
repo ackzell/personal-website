@@ -42,5 +42,5 @@ Este es uno de los primeros proyectos donde comencé a utilizar skills, más esp
 
 Después de eso fui pidiendo cambios específicos y cosas que quería hacer, y aquí hay un poco más de la explicación de cómo fue este proceso:
 
-::media-video{src="https://youtu.be/Jryar4K7ltQ" label="Nitlapōhua: A multiplayer maths game I made for my kids" poster="/media/nitlapohua/essay.jpg"}
+::media-video{src="https://youtu.be/Jryar4K7ltQ" title="Nitlapōhua: A multiplayer maths game I made for my kids" poster="/media/nitlapohua/essay.jpg"}
 ::

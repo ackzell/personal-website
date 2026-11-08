@@ -48,5 +48,5 @@ items:
 ## On building it
 This is one of the first projects I started using skills for. More specifically the skills grill-me and handoff. And all I did was set the technology I wanted to use and bounce some ideas with the LLM model. After that I asked for specific changes and things that I wanted to do and you can actually watch a video regarding all of this here:
 
-::media-video{src="https://youtu.be/Jryar4K7ltQ" label="Nitlapōhua: A multiplayer maths game I made for my kids" poster="/media/nitlapohua/essay.jpg"}
+::media-video{src="https://youtu.be/Jryar4K7ltQ" title="Nitlapōhua: A multiplayer maths game I made for my kids" poster="/media/nitlapohua/essay.jpg"}
 ::
