@@ -338,34 +338,28 @@ onMounted(() => {
   }
 }
 
+/* Pressing fills it too (touch never hovers, so the fill would be missing)
+   and firms it up at once. */
 .flag-nav__link:active .flag-nav__field::after {
+  transform: scaleX(1);
   opacity: 0.6;
+  transition:
+    transform 120ms var(--ease-out),
+    opacity 0ms;
 }
 
-/* Pressed, the label answers in its letters as the marker firms up: the
-   site's word lean (casual, cursive, slanted, as in the project index),
-   quick going in and slow letting go. Flat, no depth: the band is paper. */
+/* Pressed, the letters soften toward handwriting (casual only: upright, same
+   size), quick going in and slow letting go. */
 .flag-nav__text {
-  --slnt: 0;
   --casl: 0;
-  --crsv: 0;
-  display: inline-block;
   font-family: Recursive;
-  font-variation-settings: 'CASL' var(--casl), 'CRSV' var(--crsv), 'slnt' var(--slnt);
-  transition:
-    --slnt 450ms var(--ease-out),
-    --casl 450ms var(--ease-out),
-    --crsv 0ms 200ms,
-    transform 0.25s var(--ease-out);
+  font-variation-settings: 'CASL' var(--casl);
+  transition: --casl 450ms var(--ease-out);
 }
 
 .flag-nav__link:active .flag-nav__text {
-  --slnt: -15;
   --casl: 1;
-  --crsv: 1;
-  transform: scale(0.97);
-  transition-duration: 120ms, 120ms, 0ms, 80ms;
-  transition-delay: 0ms;
+  transition-duration: 90ms;
 }
 
 .flag-nav__link[aria-current='page'] .flag-nav__field::after,
@@ -572,11 +566,6 @@ onMounted(() => {
 
   .flag-nav__link:active .flag-nav__field::after {
     opacity: 0.6;
-  }
-
-  .flag-nav__link:active .flag-nav__text {
-    --slnt: 0;
-    transform: none;
   }
 }
 </style>

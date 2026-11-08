@@ -171,7 +171,7 @@ Square and unadorned. Fields are straight horizontal bars (0.25rem tall when ope
 - **Character:** A row of colored fields, in flag order, with a label under each. Closed sections show their flag color; the open section is the stage itself with a faint track for the marker to ride on.
 - **Marker:** One accent bar marks the current page. It slides between pages on navigation, in the direction of travel, arriving in its new section's accent. It's lit per The Lit Rule, with `--glow-near` since the open section's stops scroll sideways and would clip wider halos.
 - **Intro:** On a full load (not in-app navigation) the light runs along the band once, field by field, left to right, under a second end to end, and leaves the marker lit. Reduced motion skips it.
-- **Hover / Focus:** A faint marker (35% accent) fills the field from the left, as the real one would arrive. Pressing firms it up to 60%. Not shown on the current page.
+- **Hover / Focus:** A faint marker (35% accent) fills the field from the left, as the real one would arrive. Pressing fills it (touch included) and firms it up to 60%, and the label softens to casual letters, upright and the same size. Not shown on the current page.
 - **Submenu labels:** At rest an open section shows children as fields plus the current label. As the pointer nears, labels ripple in from the stop nearest it, 60ms per step; picking a child hides the rest until the pointer leaves and returns. Touch keeps them shown.
 - **Mobile:** Collapsed fields with a Menu toggle covering the whole band; open, segments stack and project words wrap, with 2.75rem targets.
 
