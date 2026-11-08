@@ -55,7 +55,7 @@ items:
 ---
 ::
 
-## The... what's it's name again?
+## The... what's its name again?
 This is a Tlachialoni (or Tlachieloni), it was a staff that used to be depicted being used by High Priests or deities who would **see through** a circle made of some kind of mirror (obsidian or metal):
 
 ::media-stills{dir="/media/tlachialoni/examples" width="1440" height="900" label="What is a tlachialoni"}
@@ -106,13 +106,13 @@ items:
     caption: "Or docked to the side, which doubles as a quick look at a narrower layout."
   - src: history-overlay-back
     alt: "A back arrow at the left edge of the page, shown while swiping on the touchpad to go back."
-    caption: "Swipe on the touchpad and an arrow shows which way you're going."
+    caption: "Swipe two fingers on the touchpad and an arrow shows which way you're going in your browsing history (left - back, right - forward)."
   - src: failure
     alt: "The error card for an unreachable target: \"Can't reach this target\", http://localhost:3000, connection refused, with Retry, Edit URL and Go Back buttons."
     caption: "When the dev server isn't running yet, you get a quiet error with a retry instead of a blank window."
   - src: titlebar-mode
     alt: "The title bar pinned above the page, showing the address and window controls, with the window size in the corner."
-    caption: "The title bar can stay put, with the window size in the corner."
+    caption: "The title bar can stay put (the window size in the corner shows up on every resize)."
   - src: strip-dark
     light: strip-light
     alt: "The thin title strip across the top of the window, holding the address and window controls."

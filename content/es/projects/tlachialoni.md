@@ -54,7 +54,8 @@ items:
 ---
 ::
 
-Esto es un Tlachialoni (o Tlachieloni):
+## Tla qué?... 
+Esto es un Tlachialoni (o Tlachieloni), un bastón que se representaba en manos de sumos sacerdotes o deidades que **veían a través** de un círculo hecho de algún tipo de espejo (obsidiana o metal):
 
 ::media-stills{dir="/media/tlachialoni/examples" width="1440" height="900" label="Qué es un tlachialoni"}
 ---
@@ -74,7 +75,8 @@ items:
 ---
 ::
 
-Me gusta mucho la experiencia minimalista que tiene el navegador Arc. Pero simplemente no logré que me funcionara como navegador para desarrollar el front end de mis apps. Así que después de ir cambiando entre algunos otros navegadores, incluyendo el buen Google Chrome de siempre y el navegador Orion, decidí intentarlo y crear mi propia versión de lo que podría ser un navegador minimalista enfocado en desarrollo.
+## Justifique.
+Me gusta mucho la experiencia minimalista que tiene el navegador [Arc](https://arc.net/). Pero simplemente no logré que me funcionara como navegador para desarrollar el front end de mis apps. Así que después de ir cambiando entre algunos otros navegadores, incluyendo el buen Google Chrome de siempre y el navegador [Orion](https://orionbrowser.com/), decidí intentarlo y crear mi propia versión de lo que podría ser un navegador minimalista enfocado en desarrollo.
 
 Creo que también se ve muy bien en un video donde estoy mostrando la app en la que trabajo: lo que rodea a la página no distrae, así que puedo enfocar la atención en el contenido de la app.
 
@@ -102,13 +104,13 @@ items:
     caption: "O a un lado, que de paso sirve para ver rápido un diseño más angosto."
   - src: history-overlay-back
     alt: "Una flecha hacia atrás en el borde izquierdo de la página, que aparece al deslizar en el touchpad para regresar."
-    caption: "Desliza en el touchpad y una flecha te muestra hacia dónde vas."
+    caption: "Desliza dos dedos en el touchpad y una flecha te muestra hacia dónde vas en tu historial de navegación (izquierda - atrás, derecha - adelante)."
   - src: failure
     alt: "La tarjeta de error para un destino al que no se puede llegar: \"Can't reach this target\", http://localhost:3000, conexión rechazada, con los botones Retry, Edit URL y Go Back."
     caption: "Cuando el servidor de desarrollo todavía no está corriendo, ves un error discreto con opción de reintentar en lugar de una ventana en blanco."
   - src: titlebar-mode
     alt: "La barra de título fija arriba de la página, con la dirección y los controles de la ventana, y el tamaño de la ventana en la esquina."
-    caption: "La barra de título puede quedarse fija, con el tamaño de la ventana en la esquina."
+    caption: "La barra de título puede quedarse fija (el tamaño de la ventana en la esquina aparece con cada resize)"
   - src: strip-dark
     light: strip-light
     alt: "La franja delgada de título a lo ancho de la parte de arriba de la ventana, con la dirección y los controles de la ventana."
