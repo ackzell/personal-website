@@ -33,7 +33,7 @@
     "bio": "Sobre mí",
     "title": "Axel Martínez",
     "description": "Artesano mexicano de software. Aprendiz eterno de tecnologías web. Estudiante insaciable. Padre de familia. Beatle fan.",
-    "intro": "¡Hola! Soy un ingeniero de software mexicano dedicado sobre todo al frontend a lo largo de mi carrera. He construido para la web por más de 12 años y estoy muy contento de compartir contigo a través de este website mi experiencia profesional, así como las cosas que voy creando para satisfacer mis propias necesidades. Por favor, siéntete libre de explorar y también de contactarme. ¡Gracias!",
+    "intro": "¡Hola! Soy un ingeniero de software mexicano dedicado sobre todo al frontend a lo largo de mi carrera. He construido para la web por más de {years} años (ándale! el tiempo vuela) y estoy muy contento de compartir contigo a través de este website mi experiencia profesional, así como las cosas que voy creando fuera de mi empleo. Por favor, siéntete libre de explorar el sitio y también de contactarme. Buen día!",
     "featured": "Mi proyecto más activo",
     "allProjects": "Todos los proyectos",
     "timeline": "Trayectoria"

@@ -41,7 +41,7 @@ useHead({
 
     <!-- The name already heads this one, set its own way, so its label is for assistive tech only. -->
     <section id="about" :aria-label="$t('home.bio')">
-      <HomeIntro :title="$t('home.title')" :text="$t('home.intro')" />
+      <HomeIntro :title="$t('home.title')" :text="$t('home.intro', { years: new Date().getFullYear() - 2012 })" />
     </section>
 
     <section id="experience" aria-labelledby="timeline-heading">
