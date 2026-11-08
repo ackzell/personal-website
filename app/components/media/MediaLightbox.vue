@@ -26,6 +26,10 @@
  * On wider screens the bar holds a strip of them all, small, to jump to any
  * one; a line of light under the strip travels to the one showing. Zoomed
  * in, the bar reads out how far.
+ *
+ * When any of them has a caption, a line above the bar says what to look at
+ * in the one showing; the room for it is kept for all, so they don't resize
+ * from one to the next. The alt stays the description for screen readers.
  */
 export interface LightboxItem {
   /** The still, or the clip's mp4. */
@@ -38,6 +42,8 @@ export interface LightboxItem {
   webm?: string
   /** A small one for the strip; the poster or the still otherwise. */
   thumb?: string
+  /** What to look at in it, shown above the bar. */
+  caption?: string
 }
 
 const props = defineProps<{
@@ -86,6 +92,7 @@ const forward = ref(true)
 const switches = ref(0)
 
 const current = computed(() => (showing.value === null ? undefined : props.items[showing.value]))
+const captioned = computed(() => props.items.some((item) => item.caption))
 const isClip = computed(() => current.value?.poster !== undefined)
 const zoomed = computed(() => scale.value > MIN)
 const ratio = computed(() => (current.value ? Number(current.value.width) / Number(current.value.height) : 1))
@@ -436,7 +443,7 @@ function onClose() {
 
 <template>
   <dialog ref="dialog" class="lightbox"
-    :class="{ 'is-idle': idle, 'is-closing': closing, 'is-dragging': holding && dragged > 0 }"
+    :class="{ 'is-idle': idle, 'is-closing': closing, 'is-dragging': holding && dragged > 0, 'has-captions': captioned }"
     :style="{ '--dragged': dragged }" :aria-label="current?.alt" @close="onClose" @cancel.prevent="index = null"
     @keydown="onKeydown" @pointermove="wake" @pointerdown="wake">
     <div ref="view" class="lightbox__view" :class="{ 'is-zoomed': zoomed, 'is-holding': holding }"
@@ -459,6 +466,12 @@ function onClose() {
       <span v-if="stepping && current" :key="switches" class="lightbox__scan" :style="{ '--ratio': ratio }"
         aria-hidden="true" />
     </div>
+
+    <p v-if="captioned" class="lightbox__caption" aria-live="polite">
+      <Transition name="lightbox-caption" mode="out-in">
+        <span :key="showing ?? -1">{{ current?.caption }}</span>
+      </Transition>
+    </p>
 
     <div class="lightbox__bar">
       <span class="lightbox__count" aria-live="polite">
@@ -514,6 +527,8 @@ function onClose() {
    in under the one flying out of the page, and lifts as it flies back. */
 .lightbox {
   --lightbox-bar: 3.5rem;
+  --lightbox-caption: 0rem;
+  --lightbox-foot: calc(var(--lightbox-bar) + var(--lightbox-caption));
   --lightbox-gutter: var(--space-12);
   position: fixed;
   inset: 0;
@@ -530,26 +545,65 @@ function onClose() {
   transition: background-color 300ms var(--ease-out);
 }
 
-.lightbox__bar {
+.lightbox__bar,
+.lightbox__caption {
   transition: opacity 300ms var(--ease-out);
+}
+
+.lightbox.has-captions {
+  --lightbox-caption: 3.25rem;
+}
+
+/* Up to two lines, centred over the bar, in the room kept for it. */
+.lightbox__caption {
+  position: absolute;
+  inset: auto 0 var(--lightbox-bar);
+  block-size: var(--lightbox-caption);
+  display: grid;
+  place-items: end center;
+  margin: 0;
+  padding-inline: var(--lightbox-gutter);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* The old line clears ahead of the step; the new one settles in as the
+   wipe finishes. */
+.lightbox-caption-leave-active {
+  transition: opacity 100ms var(--ease-out);
+}
+
+.lightbox-caption-enter-active {
+  transition: opacity 200ms var(--ease-out), translate 200ms var(--ease-out);
+}
+
+.lightbox-caption-leave-to,
+.lightbox-caption-enter-from {
+  opacity: 0;
+}
+
+.lightbox-caption-enter-from {
+  translate: 0 3px;
 }
 
 .lightbox.is-closing {
   background-color: transparent;
 }
 
-.is-closing :is(.lightbox__bar, .lightbox__step) {
+.is-closing :is(.lightbox__bar, .lightbox__caption, .lightbox__step) {
   opacity: 0;
 }
 
 /* Dragged away, the bar and buttons lift with the dark, and follow the
    pointer without easing. */
-.lightbox:not(.is-closing) :is(.lightbox__bar, .lightbox__step) {
+.lightbox:not(.is-closing) :is(.lightbox__bar, .lightbox__caption, .lightbox__step) {
   opacity: calc(1 - var(--dragged, 0));
 }
 
 .lightbox.is-dragging,
-.is-dragging :is(.lightbox__bar, .lightbox__step) {
+.is-dragging :is(.lightbox__bar, .lightbox__caption, .lightbox__step) {
   transition: none;
 }
 
@@ -558,7 +612,7 @@ function onClose() {
     background-color: transparent;
   }
 
-  .lightbox[open] :is(.lightbox__bar, .lightbox__step) {
+  .lightbox[open] :is(.lightbox__bar, .lightbox__caption, .lightbox__step) {
     opacity: 0;
   }
 }
@@ -574,7 +628,7 @@ function onClose() {
 
 .lightbox__view {
   position: absolute;
-  inset: 0 0 var(--lightbox-bar);
+  inset: 0 0 var(--lightbox-foot);
   display: grid;
   place-items: center;
   overflow: hidden;
@@ -612,7 +666,7 @@ function onClose() {
 .lightbox__media,
 .lightbox__scan {
   inline-size: min(calc(100vw - 2 * var(--lightbox-gutter)),
-      calc((100dvh - var(--lightbox-bar) - var(--space-6)) * var(--ratio)));
+      calc((100dvh - var(--lightbox-foot) - var(--space-6)) * var(--ratio)));
 }
 
 .lightbox__media {
@@ -768,7 +822,7 @@ function onClose() {
 
 .lightbox__step {
   position: absolute;
-  inset-block-start: calc(50% - var(--lightbox-bar) / 2);
+  inset-block-start: calc(50% - var(--lightbox-foot) / 2);
   translate: 0 -50%;
   font-size: 1.75rem;
   transition: background-color 150ms var(--ease-out), opacity 300ms var(--ease-out);
@@ -895,6 +949,15 @@ function onClose() {
     --lightbox-gutter: var(--space-2);
   }
 
+  .lightbox.has-captions {
+    --lightbox-caption: 4.5rem;
+  }
+
+  .lightbox__caption {
+    padding-inline: var(--space-4);
+    font-size: 0.875rem;
+  }
+
   .lightbox__step {
     font-size: 1.25rem;
     background: rgb(0 0 0 / 0.45);
@@ -907,6 +970,7 @@ function onClose() {
 
   .lightbox,
   .lightbox__bar,
+  .lightbox__caption,
   .lightbox__media,
   .lightbox__step,
   .lightbox__line.is-placed {
@@ -923,6 +987,11 @@ function onClose() {
 
   .lightbox__scan {
     display: none;
+  }
+
+  .lightbox-caption-enter-active,
+  .lightbox-caption-leave-active {
+    transition: none;
   }
 }
 </style>

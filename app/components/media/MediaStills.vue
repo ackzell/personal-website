@@ -8,6 +8,7 @@
  *   items:
  *     - src: page-loaded
  *       alt: What the screenshot shows.
+ *       caption: What to look at in it, in the lightbox. Optional.
  *     - src: strip-dark
  *       light: strip-light
  *       alt: …
@@ -15,7 +16,7 @@
  *   ::
  *
  * Each item is `<dir>/<src>.webp` at full size, with a `<src>-720.webp` beside
- * it for the sheet. `light` swaps in a capture for the light scheme, like
+ * it for the sheet. An item's own `width`/`height` override the sheet's. `light` swaps in a capture for the light scheme, like
  * MediaFigure's `srcLight`. A still opens in a lightbox (MediaLightbox), to
  * zoom into and step through; without JS it links to its full-size file. It
  * opens out of the still and goes back into it.
@@ -34,6 +35,11 @@ interface Still {
   src: string
   light?: string
   alt: string
+  /** What to look at in it, shown in the lightbox. */
+  caption?: string
+  /** For a still whose size differs from the sheet's. */
+  width?: number | string
+  height?: number | string
 }
 
 const props = defineProps<{
@@ -55,7 +61,7 @@ const spot = (i: number) => links.value?.[i]
 
 const full = (name: string) => `${props.dir}/${name}.webp`
 // The full file is as wide as the capture says; the sheet always gets a 720.
-const srcset = (name: string) => `${props.dir}/${name}-720.webp 720w, ${full(name)} ${props.width}w`
+const srcset = (item: Still, name: string) => `${props.dir}/${name}-720.webp 720w, ${full(name)} ${item.width ?? props.width}w`
 const SIZES = '(width < 40rem) 50vw, 33vw'
 
 // The lightbox shows the capture for the scheme the page is in. Only once
@@ -67,8 +73,9 @@ const shown = computed(() => props.items.map((item) => {
     src: full(name),
     thumb: `${props.dir}/${name}-720.webp`,
     alt: item.alt,
-    width: props.width,
-    height: props.height,
+    caption: item.caption,
+    width: item.width ?? props.width,
+    height: item.height ?? props.height,
   }
 }))
 
@@ -99,10 +106,10 @@ function show(event: MouseEvent, i: number) {
     <li v-for="(item, i) in items" :key="item.src" :style="{ '--i': i }">
       <a ref="links" :href="full(item.src)" class="stills__link" data-press="none" @click="show($event, i)" @pointermove="lean"
         @pointerdown="lean" @pointerleave="settle" @pointercancel="settle">
-        <img :src="full(item.src)" :srcset="srcset(item.src)" :sizes="SIZES" :alt="item.alt" :width="width"
-          :height="height" loading="lazy" decoding="async" :data-scheme="item.light ? 'dark' : undefined">
-        <img v-if="item.light" :src="full(item.light)" :srcset="srcset(item.light)" :sizes="SIZES" :alt="item.alt"
-          :width="width" :height="height" loading="lazy" decoding="async" data-scheme="light">
+        <img :src="full(item.src)" :srcset="srcset(item, item.src)" :sizes="SIZES" :alt="item.alt" :width="item.width ?? width"
+          :height="item.height ?? height" loading="lazy" decoding="async" :data-scheme="item.light ? 'dark' : undefined">
+        <img v-if="item.light" :src="full(item.light)" :srcset="srcset(item, item.light)" :sizes="SIZES" :alt="item.alt"
+          :width="item.width ?? width" :height="item.height ?? height" loading="lazy" decoding="async" data-scheme="light">
       </a>
     </li>
   </ul>
