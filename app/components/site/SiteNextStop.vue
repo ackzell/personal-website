@@ -58,8 +58,6 @@ watch(ways, (now, before) => {
 
 // Taken, it's felt and heard as a tap on the flag band is.
 const go = () => haptic('go')
-// The route leans in where it's pressed (utils/pressLean).
-const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
 </script>
 
 <template>
@@ -67,7 +65,7 @@ const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
     <div class="next-stop__row">
       <NuxtLinkLocale v-for="way in ways" :key="way.rel" :to="way.to" :rel="way.rel" :data-way="way.rel"
         :data-crossing="way.section !== section || undefined" :style="{ '--field': `var(--field-${way.section})` }"
-        class="stop" data-press="none" @click="go" @pointerdown="lean" @pointermove="lean">
+        class="stop" data-press="none" @click="go">
         <span class="stop__route">
           <span v-if="way.rel === 'prev'" class="stop__arrow i-iconoir-arrow-left" aria-hidden="true" />
           <span class="stop__path">
@@ -144,12 +142,10 @@ const lean = (event: PointerEvent) => pressLean(event, '.stop__route')
   opacity: 1;
 }
 
-/* Pressed, the route comes up and gives under the finger, as the flag
-   band's labels do (SiteFlagNav): it leans in where it's pressed, the near
-   end going in and the far end coming up (--press-x, set by lean()), and
-   settles flat as it lifts. Only the words: the field under them stays. */
+/* Pressed, the route comes up and gives a little under the finger. Only
+   the words: the field under them stays. */
 .stop:active .stop__route {
-  transform: perspective(12em) rotateY(calc(var(--press-x, 0) * 10deg)) scale(0.97);
+  transform: scale(0.97);
   transition-duration: 200ms, 80ms;
 }
 

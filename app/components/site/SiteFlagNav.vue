@@ -165,9 +165,6 @@ function tap(to: string) {
   if (!isPage(to)) haptic('go')
 }
 
-// The words lean in where they're pressed (utils/pressLean).
-const lean = (event: PointerEvent) => pressLean(event, '.flag-nav__text')
-
 // The band resizes with the window, so whether the stops overflow can change
 // without a scroll.
 useResizeObserver(nav, measure)
@@ -214,7 +211,7 @@ onMounted(() => {
              The section's own link sits outside the children's scroller, so
              it stays in view however far they scroll. -->
         <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current" data-press="none"
-          @click="tap(segment.to)" @pointerdown="lean" @pointermove="lean"
+          @click="tap(segment.to)"
           class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
           flex flex-col gap="2" pb="1" min-w="28" decoration="none">
           <span class="flag-nav__field" relative block aria-hidden="true">
@@ -231,7 +228,7 @@ onMounted(() => {
           <li v-for="(stop, i) in segment.stops.slice(1)" :key="stop.key" class="flag-nav__stop" flex="auto" data-child
             :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
             <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child data-press="none"
-              @click="tap(stop.to)" @pointerdown="lean" @pointermove="lean"
+              @click="tap(stop.to)"
               class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
@@ -341,23 +338,28 @@ onMounted(() => {
   }
 }
 
+/* Pressing fills it too (touch never hovers, so the fill would be missing)
+   and firms it up at once. */
 .flag-nav__link:active .flag-nav__field::after {
+  transform: scaleX(1);
   opacity: 0.6;
+  transition:
+    transform 120ms var(--ease-out),
+    opacity 0ms;
 }
 
-/* Pressed, the label gives under the finger as the marker firms up: the
-   words lean in where they're pressed, the near end going in and the far
-   end coming up, like a key pressed off center (--press-x, set by lean()),
-   and settle flat as it lifts. The site's press (main.css) without the dim,
-   the marker being the answer; only the words, so the band stays whole. */
+/* Pressed, the letters soften toward handwriting (casual only: upright, same
+   size), quick going in and slow letting go. */
 .flag-nav__text {
-  display: inline-block;
-  transition: transform 0.25s var(--ease-out);
+  --casl: 0;
+  font-family: Recursive;
+  font-variation-settings: 'CASL' var(--casl);
+  transition: --casl 450ms var(--ease-out);
 }
 
 .flag-nav__link:active .flag-nav__text {
-  transform: perspective(8em) rotateY(calc(var(--press-x, 0) * 14deg)) scale(0.97);
-  transition-duration: 80ms;
+  --casl: 1;
+  transition-duration: 90ms;
 }
 
 .flag-nav__link[aria-current='page'] .flag-nav__field::after,
@@ -564,10 +566,6 @@ onMounted(() => {
 
   .flag-nav__link:active .flag-nav__field::after {
     opacity: 0.6;
-  }
-
-  .flag-nav__link:active .flag-nav__text {
-    transform: none;
   }
 }
 </style>
