@@ -212,14 +212,14 @@ onMounted(() => {
              it stays in view however far they scroll. -->
         <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current" data-press="none"
           @click="tap(segment.to)"
-          class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease]"
+          class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap"
           flex flex-col gap="2" pb="1" min-w="28" decoration="none">
           <span class="flag-nav__field" relative block aria-hidden="true">
             <!-- One per page; the name lets the page transition slide it (main.css). -->
             <span v-if="segment.marked === segment.key" class="flag-nav__marker [view-transition-name:flag-marker]"
               absolute inset="0" bg="accent" />
           </span>
-          <span pe="3"><span class="flag-nav__text">{{ segment.stops[0]!.label }}</span></span>
+          <span pe="3">{{ segment.stops[0]!.label }}</span>
         </NuxtLinkLocale>
         <ul v-if="segment.stops.length > 1" class="flag-nav__stops" flex gap="0.5" m="0" p="0" list="none"
           :aria-label="segment.stops[0]!.label" :data-reveal="reveal || undefined"
@@ -229,13 +229,13 @@ onMounted(() => {
             :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
             <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child data-press="none"
               @click="tap(stop.to)"
-              class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap transition-[color] duration-150 ease-[ease] hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
+              class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
                 <span v-if="segment.marked === stop.key" class="flag-nav__marker [view-transition-name:flag-marker]"
                   absolute inset="0" bg="accent" />
               </span>
-              <span class="flag-nav__label" pe="3"><span class="flag-nav__text">{{ stop.label }}</span></span>
+              <span class="flag-nav__label" pe="3">{{ stop.label }}</span>
             </NuxtLinkLocale>
           </li>
         </ul>
@@ -348,18 +348,17 @@ onMounted(() => {
     opacity 0ms;
 }
 
-/* Pressed, the letters soften toward handwriting (casual only: upright, same
-   size), quick going in and slow letting go. */
-.flag-nav__text {
-  --casl: 0;
-  font-family: Recursive;
-  font-variation-settings: 'CASL' var(--casl);
-  transition: --casl 450ms var(--ease-out);
+/* Pressed, the stop gives a little under the finger, stripe and words as
+   one, and eases back as it lifts. */
+.flag-nav__link {
+  transition:
+    color 150ms ease,
+    scale 0.25s var(--ease-out);
 }
 
-.flag-nav__link:active .flag-nav__text {
-  --casl: 1;
-  transition-duration: 90ms;
+.flag-nav__link:active {
+  scale: 0.97;
+  transition-duration: 150ms, 80ms;
 }
 
 .flag-nav__link[aria-current='page'] .flag-nav__field::after,
@@ -540,6 +539,10 @@ onMounted(() => {
 }
 
 @media (prefers-reduced-motion: reduce) {
+
+  .flag-nav__link:active {
+    scale: none;
+  }
 
   /* Labels still reveal, as a plain fade: no drop, no stagger. */
   .flag-nav__label {
