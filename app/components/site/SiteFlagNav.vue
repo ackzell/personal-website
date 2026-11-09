@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { RouteLocationNormalized } from 'vue-router'
+import { sectionOf } from '~/composables/useSection'
 import { mainNav } from '~/config/nav'
 
 /**
@@ -17,6 +19,7 @@ const { t } = useI18n()
 const route = useRoute()
 const localePath = useLocalePath()
 const section = useSection()
+const routeBaseName = useRouteBaseName()
 // Same key as the work pages' own query, so they share one payload.
 const { data: projects } = useProjects()
 
@@ -160,6 +163,47 @@ useEventListener(stopsList, 'scroll', () => {
   passed = now
 }, { passive: true })
 
+/*
+ * A page on its way: the stop it's going to keeps its preview and a firmer
+ * fill runs along it, slowly, like a progress bar ("Loading" in the styles).
+ * The next page's payload and code load before the page transition freezes
+ * the screen, so this is seen; as the transition starts it firms all the way.
+ */
+const loading = ref<{ key?: string, done: boolean } | null>(null)
+
+function stopFor(to: RouteLocationNormalized) {
+  const path = stripSlash(to.path)
+  const at = (stop: Stop) => stripSlash(localePath(stop.to))
+  const stops = segments.value.flatMap((segment) => segment.stops)
+  return (stops.find((stop) => at(stop) === path)
+    ?? stops.find((stop) => stop.child && path.startsWith(`${at(stop)}/`))
+    ?? segments.value.find((segment) => segment.section === sectionOf(routeBaseName(to)))?.stops[0])?.key
+}
+
+if (import.meta.client) {
+  const router = useRouter()
+  const nuxtApp = useNuxtApp()
+  const offs = [
+    router.beforeEach((to, from) => {
+      loading.value = to.path === from.path ? null : { key: stopFor(to), done: false }
+    }),
+    router.afterEach((_to, _from, failure) => {
+      if (failure) loading.value = null
+    }),
+    router.onError(() => (loading.value = null)),
+    nuxtApp.hook('page:view-transition:start', () => {
+      if (loading.value) loading.value.done = true
+    }),
+    nuxtApp.hook('page:finish', () => {
+      loading.value = null
+    }),
+  ]
+  onBeforeUnmount(() => offs.forEach((off) => off()))
+}
+
+const loadingAt = (key: string) =>
+  loading.value?.key === key ? (loading.value.done ? 'done' : '') : undefined
+
 // A tap that goes somewhere is felt; the page already shown goes nowhere.
 function tap(to: string) {
   if (!isPage(to)) haptic('go')
@@ -213,7 +257,7 @@ onMounted(() => {
              The section's own link sits outside the children's scroller, so
              it stays in view however far they scroll. -->
         <NuxtLinkLocale :to="segment.to" :aria-current="segment.stops[0]!.current" data-press="none"
-          @click="tap(segment.to)"
+          :data-loading="loadingAt(segment.key)" @click="tap(segment.to)"
           class="flag-nav__link text-[1rem] text-fg leading-[1.4] whitespace-nowrap"
           flex flex-col gap="2" pb="1" min-w="28" decoration="none">
           <span class="flag-nav__field" relative block aria-hidden="true">
@@ -230,7 +274,7 @@ onMounted(() => {
           <li v-for="(stop, i) in segment.stops.slice(1)" :key="stop.key" class="flag-nav__stop" flex="auto" data-child
             :style="{ '--ripple': Math.abs(i - rippleOrigin) }">
             <NuxtLinkLocale :to="stop.to" :aria-current="stop.current" :lang="stop.lang" data-child data-press="none"
-              @click="tap(stop.to)"
+              :data-loading="loadingAt(stop.key)" @click="tap(stop.to)"
               class="flag-nav__link text-[0.75rem] text-[var(--nav-child)] leading-[1.4] whitespace-nowrap hover:text-[var(--nav-child-on)] current:text-[var(--nav-child-on)] current:font-bold"
               flex flex-col gap="2" pb="1" decoration="none">
               <span class="flag-nav__field" relative block aria-hidden="true">
@@ -366,6 +410,40 @@ onMounted(() => {
 .flag-nav__link[aria-current='page'] .flag-nav__field::after,
 .flag-nav__link[data-child][aria-current] .flag-nav__field::after {
   display: none;
+}
+
+/*
+ * Loading: the preview stays put and a firmer fill (a press's 0.6) runs
+ * along it, easing toward 90% over a few seconds and never getting there on
+ * its own. As the page arrives it firms all the way. Kept under reduced
+ * motion: it's slow, and it's the only sign the page is coming.
+ * The extra .flag-nav outranks the hidden preview on a current child.
+ */
+@property --load {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: 0%;
+}
+
+.flag-nav .flag-nav__link[data-loading] .flag-nav__field::after {
+  display: block;
+  opacity: 1;
+  transform: scaleX(1);
+  background: linear-gradient(to right,
+      color-mix(in oklab, var(--accent) 60%, transparent) var(--load),
+      color-mix(in oklab, var(--accent) 35%, transparent) var(--load));
+  animation: flag-nav-load 6s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
+}
+
+.flag-nav .flag-nav__link[data-loading='done'] .flag-nav__field::after {
+  animation: none;
+  --load: 100%;
+}
+
+@keyframes flag-nav-load {
+  to {
+    --load: 90%;
+  }
 }
 
 /* The light that runs along the band on a full load (ignite). Plain accent
