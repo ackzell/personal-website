@@ -29,8 +29,14 @@ function fitCurrently() {
   const root = document.documentElement
   const below = root.scrollHeight - (el.getBoundingClientRect().bottom + window.scrollY)
   const above = Number.parseFloat(getComputedStyle(root).scrollPaddingTop) || 0
-  el.style.setProperty('--currently-room', `${Math.max(0, below + above)}px`)
+  const room = Math.max(0, Math.round(below + above))
+  // Setting it resizes the page, which measures again; sub-pixel rounding
+  // (phones) would flip it a pixel each pass, so small changes are ignored.
+  if (Math.abs(room - lastRoom) <= 1) return
+  lastRoom = room
+  el.style.setProperty('--currently-room', `${room}px`)
 }
+let lastRoom = -2
 if (import.meta.client) useResizeObserver(document.body, fitCurrently)
 
 usePageSeo(() => ({ title: t('home.title'), description: t('home.description') }))
