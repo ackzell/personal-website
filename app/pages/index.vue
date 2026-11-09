@@ -19,6 +19,20 @@ const sections = computed(() => [
   ...(featured.value ? [{ id: 'currently', label: t('home.featured') }] : []),
 ])
 
+// The page ends where the featured project sits at the top: its room is a
+// screen less the scroll padding above and everything below it (next stop,
+// footer), measured as those change.
+const currently = useTemplateRef<HTMLElement>('currently')
+function fitCurrently() {
+  const el = currently.value
+  if (!el) return
+  const root = document.documentElement
+  const below = root.scrollHeight - (el.getBoundingClientRect().bottom + window.scrollY)
+  const above = Number.parseFloat(getComputedStyle(root).scrollPaddingTop) || 0
+  el.style.setProperty('--currently-room', `${Math.max(0, below + above)}px`)
+}
+if (import.meta.client) useResizeObserver(document.body, fitCurrently)
+
 usePageSeo(() => ({ title: t('home.title'), description: t('home.description') }))
 
 const site = useSiteConfig()
@@ -50,7 +64,7 @@ useHead({
         :recognition="recognition ?? []" />
     </section>
 
-    <section v-if="featured" id="currently" aria-labelledby="featured-heading">
+    <section v-if="featured" id="currently" ref="currently" aria-labelledby="featured-heading">
       <h2 id="featured-heading" track="wide" class="running-head">{{ $t('home.featured') }}</h2>
       <ProjectLexicon :projects="[featured]" />
     </section>
@@ -58,8 +72,8 @@ useHead({
 </template>
 
 <style scoped>
-/* The last section is at least a screen tall, so its anchor lands it at the
-   top with empty room below rather than stopping short at the page's end. */
+/* The last section, with what follows it, fills a screen exactly, so its anchor
+   lands it at the top and the page can't scroll past into empty room. */
 /* Proximity, not mandatory: scrolling settles on it only when it comes near,
    so the long timeline above still scrolls freely. */
 :global(:root:has(#currently)) {
@@ -69,6 +83,6 @@ useHead({
   scroll-snap-align: start;
   /* Three times a section's gap: the timeline ends in open room before what's next. */
   margin-top: calc(var(--gap-section) * 3);
-  min-block-size: calc(100svh - var(--header-height, 0px) - var(--section-index-height, 0px));
+  min-block-size: calc(100svh - var(--currently-room, var(--header-height, 0px) + var(--section-index-height, 0px)));
 }
 </style>
