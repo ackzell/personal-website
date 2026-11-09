@@ -296,11 +296,12 @@ function landed(event: AnimationEvent, i: number) {
 /*
  * On a first visit (main.css, "First visit") they land as they do crossing
  * the breakpoint (the FLIP above): carried in from the edge, raised, then
- * lowered into the slot, one after another as the footer comes up.
+ * lowered into the slot, one after another as the footer comes up, far
+ * enough apart that their notes (landed) carry the tune.
  */
 :root[data-intro='build'] .site-footer__land {
   --land-from: 0, 2.5rem;
-  animation: site-footer-intro 620ms calc(2400ms + var(--i) * 60ms) backwards;
+  animation: site-footer-intro 620ms calc(2400ms + var(--i) * 200ms) backwards;
 }
 
 /* Built: the everyday landing would otherwise start over once "build" is gone. */
