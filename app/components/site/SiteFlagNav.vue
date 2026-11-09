@@ -413,36 +413,69 @@ onMounted(() => {
 }
 
 /*
- * Loading: the preview stays put and a firmer fill (a press's 0.6) runs
- * along it, easing toward 90% over a few seconds and never getting there on
- * its own. As the page arrives it firms all the way. Kept under reduced
- * motion: it's slow, and it's the only sign the page is coming.
+ * Loading: the stop you're going to keeps its preview, and after a beat (so
+ * a quick page never shows it) the band's light (ignite's ::before, below)
+ * runs along its field, back and forth, until the page is in. Hover and
+ * press never move or light, so this can't read as either. As the page
+ * arrives the field comes on whole, steady, and the marker slides into it.
  * The extra .flag-nav outranks the hidden preview on a current child.
  */
-@property --load {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
-}
-
 .flag-nav .flag-nav__link[data-loading] .flag-nav__field::after {
   display: block;
-  opacity: 1;
+  opacity: 0.35;
   transform: scaleX(1);
-  background: linear-gradient(to right,
-      color-mix(in oklab, var(--accent) 60%, transparent) var(--load),
-      color-mix(in oklab, var(--accent) 35%, transparent) var(--load));
-  animation: flag-nav-load 6s cubic-bezier(0.1, 0.6, 0.3, 1) forwards;
 }
 
-.flag-nav .flag-nav__link[data-loading='done'] .flag-nav__field::after {
-  animation: none;
-  --load: 100%;
+.flag-nav .flag-nav__link[data-loading] .flag-nav__field::before {
+  box-shadow: var(--glow-near);
 }
 
-@keyframes flag-nav-load {
+.flag-nav .flag-nav__link[data-loading=''] .flag-nav__field::before {
+  inset-inline-end: auto;
+  inline-size: 30%;
+  animation: flag-nav-run 1.1s 150ms cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+}
+
+.flag-nav .flag-nav__link[data-loading='done'] .flag-nav__field::before {
+  opacity: 1;
+}
+
+/* Section links sit outside the stops' clipping scroller: the full glow. */
+.flag-nav .flag-nav__segment>.flag-nav__link[data-loading] .flag-nav__field::before {
+  box-shadow: var(--glow);
+}
+
+/* From the field's start to its end (70% of it is 233% of the light), three
+   times the field's thickness so a thin bar still carries it. */
+@keyframes flag-nav-run {
+  from {
+    opacity: 1;
+    transform: translateX(0) scaleY(3);
+  }
+
   to {
-    --load: 90%;
+    opacity: 1;
+    transform: translateX(233.33%) scaleY(3);
+  }
+}
+
+/* Reduced motion: the light stays in place and breathes on the whole field. */
+@keyframes flag-nav-breathe {
+  from {
+    opacity: 0.2;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flag-nav .flag-nav__link[data-loading=''] .flag-nav__field::before {
+    inset-inline-end: 0;
+    inline-size: auto;
+    animation-name: flag-nav-breathe;
+    animation-duration: 900ms;
   }
 }
 
