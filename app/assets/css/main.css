@@ -1342,3 +1342,27 @@ main:focus {
 :where(.prose) > .media + * {
   margin-top: var(--gap-block);
 }
+
+/*
+ * Image placeholders: until an image is in (plugins/image-placeholders), its
+ * reserved box holds a faint tint of the ink that breathes slowly, so a page
+ * that arrives before its images shows where they are coming. Taken away on
+ * load so transparent images don't keep it. SVGs (the project logos and
+ * stickers) never get it: they're tiny, and a box behind a die-cut shape
+ * reads as a border.
+ */
+img:not([data-loaded], [src$='.svg']) {
+  background-color: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  img:not([data-loaded], [src$='.svg']) {
+    animation: image-waiting 1.6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes image-waiting {
+  to {
+    background-color: color-mix(in srgb, var(--fg) 16%, transparent);
+  }
+}
