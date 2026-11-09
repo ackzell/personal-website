@@ -1,4 +1,5 @@
 import type { Layer, NoiseLayer, Spec, ToneLayer } from '@foleyjs/core'
+import { cssTime } from '~/utils/cssTime'
 
 /*
  * The site's sounds, in three sets to choose between by ear (utils/sounds.ts
@@ -178,14 +179,14 @@ const pick = <T>(from: T[]) => from[Math.floor(Math.random() * from.length)]!
 /*
  * Rain for the tiled wipe on a section change: a drop for each of a few
  * dozen tiles as it lands, drawn fresh every time. The timing is the
- * wipe's own (public/worklets/tile-wipe.js, with plugins/section-transition
+ * wipe's own (utils/tileCover.ts, with plugins/section-transition
  * and main.css's --tile-transition): tiles at share u of the way out start
  * once the front gets there, scattered more the farther out it is, and land
  * part way through their flip. There are more tiles farther out, as a
  * ring's are. The drops travel across the stereo field the way the page
  * goes, `way` 1 forward (left to right), -1 back.
  */
-const TILE = { seconds: 0.95, spread: 0.45, flip: 0.32, land: 0.7 }
+const TILE = { spread: 0.45, flip: 0.32, land: 0.7 }
 /*
  * The band's marker sliding to the new page, with the page transition
  * (--page-transition, eased in and out: the flag-marker group in main.css).
@@ -226,7 +227,8 @@ const DROPS = 32
 const PARTS = 4
 
 function rain(way: 1 | -1, drop: (at: number, i: number) => Layer): Score {
-  const { seconds, spread, flip, land } = TILE
+  const { spread, flip, land } = TILE
+  const seconds = (import.meta.client ? cssTime('--tile-transition') || 950 : 950) / 1000
   const times = Array.from({ length: DROPS }, () => {
     const u = Math.sqrt(Math.random())
     const start = (u * (1 - spread) + Math.random() * spread * Math.min(u * 4, 1)) * (1 - flip * 1.3)

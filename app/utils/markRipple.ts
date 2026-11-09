@@ -1,4 +1,4 @@
-/** One tile of the section transition (the --tile-size of worklets/tile-wipe.js) and the mark's ripple. Odd rows sit half a tile over. */
+/** One tile of the section transition (utils/tileCover.ts) and the mark's ripple. Odd rows sit half a tile over. */
 export const TILE_SIZE = 32
 
 const SPEED = 1 // px per ms

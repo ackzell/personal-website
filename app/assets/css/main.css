@@ -798,20 +798,32 @@ main {
   --unwipe-to: inset(0 0 0 100%);
 }
 
-/* Tiled reveal (Chromium, once plugins/section-transition has the worklet
-   ready): the new page arrives as square slabs spreading out from the
-   clicked link. The worklet masks cut the slabs as windows onto the new page,
-   from one linear progress; the easing lives per slab. Under forced colors it
-   stays the plain wipe. */
+/* Tiled reveal (Chromium, once plugins/section-transition has WebGL and the
+   worklet ready): the new page arrives as square slabs spreading out from the
+   clicked link. The new page lies whole under a canvas (utils/tileCover) that
+   paints the old stage with the slabs cut out of it, on the GPU. The old
+   page, header and footer are named apart as the old state is captured
+   (data-tile-leaving) and ride above the cover, their words cleared from the
+   press just ahead of the slabs by the worklet, from one linear progress.
+   Under forced colors it stays the plain wipe. */
 :root {
   --tile-transition: 950ms;
 }
 
-/* Traveling words and the marker stay above the pages. */
+/* On a phone the front has a fraction of the ground to cover, so at the
+   desktop's run it races through: it takes longer to keep reading as a sweep
+   across the page. */
+@media (max-width: 640px) {
+  :root {
+    --tile-transition: 1300ms;
+  }
+}
+
+/* Traveling words and the marker stay above the pages and the cover. */
 ::view-transition-group(*.word),
 ::view-transition-group(*.plate),
 ::view-transition-group(flag-marker) {
-  z-index: 2;
+  z-index: 3;
 }
 
 @property --wipe-progress {
@@ -820,55 +832,95 @@ main {
   initial-value: 0;
 }
 
+.tile-cover {
+  display: none;
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  block-size: 100lvh;
+  pointer-events: none;
+}
+
+:root[data-tile-cover] .tile-cover {
+  display: block;
+  view-transition-name: tile-cover;
+}
+
+/* The old state only. No stage of their own: the cover is their stage. */
+:root[data-tile-leaving] {
+  & main {
+    view-transition-name: tile-old-page;
+  }
+  & .site-header {
+    view-transition-name: tile-old-header;
+  }
+  & .site-footer {
+    view-transition-name: tile-old-footer;
+  }
+  & :is(.site-header, .site-footer) {
+    background-color: transparent !important;
+  }
+}
+
 @media (forced-colors: none) {
   :root.has-tile-wipe:active-view-transition-type(section-forward, section-back) {
     &::view-transition-new(root),
-    &::view-transition-new(page) {
+    &::view-transition-new(page),
+    &::view-transition-group(tile-cover),
+    &::view-transition-new(tile-cover) {
+      animation: none;
+    }
+    &::view-transition-group(tile-cover) {
+      z-index: 1;
+    }
+    &::view-transition-group(tile-old-page),
+    &::view-transition-group(tile-old-header),
+    &::view-transition-group(tile-old-footer) {
+      animation: none;
+      z-index: 2;
+    }
+    &::view-transition-old(tile-old-page),
+    &::view-transition-old(tile-old-header),
+    &::view-transition-old(tile-old-footer) {
       animation: var(--tile-transition) linear both vt-tiles;
       mask-image: paint(tile-wipe);
     }
-    &::view-transition-new(page) {
-      --tile-ox: var(--tile-new-x);
-      --tile-oy: var(--tile-new-y);
+    &::view-transition-old(tile-old-page) {
+      translate: 0 var(--page-shift, 0px);
+      --tile-ox: var(--tile-page-x);
+      --tile-oy: var(--tile-page-y);
     }
-    /* The old words clear from the press outward just ahead of the slabs
-       (the worklet, inverted); the old stage stays until the slabs cover it,
-       so the two pages' words never mix within a slab's edge. */
-    &::view-transition-old(page) {
-      animation: var(--tile-transition) linear both vt-tiles;
-      mask-image: paint(tile-wipe);
-      --tile-invert: 1;
-      --tile-ox: var(--tile-old-x);
-      --tile-oy: var(--tile-old-y);
+    &::view-transition-old(tile-old-header) {
+      --tile-ox: var(--tile-header-x);
+      --tile-oy: var(--tile-header-y);
+    }
+    &::view-transition-old(tile-old-footer) {
+      --tile-ox: var(--tile-footer-x);
+      --tile-oy: var(--tile-footer-y);
+    }
+    /* The old chrome dims with the stage under it (the cover's dim, per
+       scheme in the plugin), so the outgoing section sinks as the slabs land. */
+    &::view-transition-old(tile-old-header),
+    &::view-transition-old(tile-old-footer) {
+      animation:
+        var(--tile-transition) linear both vt-tiles,
+        calc(var(--tile-transition) * 0.4) var(--ease-out) both var(--tile-dim, none);
+    }
+    &.dark:not(:active-view-transition-type(to-work)) {
+      --tile-dim: vt-dim;
+    }
+    &.light {
+      --tile-dim: vt-shade;
+    }
+    &.vivid {
+      --tile-dim: vt-dusk;
     }
     /* Unless a swipe sent it: it carries on, as within a section. */
-    &[data-swipe]::view-transition-old(page) {
+    &[data-swipe]::view-transition-old(tile-old-page) {
       animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
       mask-image: none;
     }
-  }
-
-  /* The Deeper stages are all near night, so green slabs on red differ in hue
-     alone and shimmer at their edges. The old stage dims as they come in: the
-     new section lands as color on dark, not against the other color. Not
-     into work: its stage is night itself, and its slabs would vanish into
-     the dimmed one. */
-  :root.dark.has-tile-wipe:active-view-transition-type(section-forward, section-back):not(:active-view-transition-type(to-work))::view-transition-old(root) {
-    animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-dim;
-  }
-
-  /* Light's stages are all paper at one lightness, a few percent apart in
-     hue: the slabs open from paper onto paper and vanish. The old sheet
-     shades a step as they come in, so each lands as fresh paper on it. */
-  :root.light.has-tile-wipe:active-view-transition-type(section-forward, section-back)::view-transition-old(root) {
-    animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-shade;
-  }
-
-  /* Vivid's fields sit near one lightness too (green, red, graphite all
-     around L 0.4), so their slabs differ mostly in hue, as dark's do. The
-     old field dims halfway to dark's, staying daylight. */
-  :root.vivid.has-tile-wipe:active-view-transition-type(section-forward, section-back)::view-transition-old(root) {
-    animation: calc(var(--tile-transition) * 0.4) var(--ease-out) both vt-dusk;
   }
 }
 

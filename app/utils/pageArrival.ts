@@ -1,4 +1,5 @@
 import { animate, motionValue, type AnimationPlaybackControls } from 'motion-v'
+import { cssTime } from '~/utils/cssTime'
 
 /*
  * How a page comes in, however it was reached: block by block, from the side
@@ -9,7 +10,7 @@ import { animate, motionValue, type AnimationPlaybackControls } from 'motion-v'
  *
  * Within a section the blocks follow one another closely, REACH of the
  * screen away waiting up to WAIT more (s). On a section change they ride the
- * tile front instead (public/worklets/tile-wipe.js): a block opens about when the slabs
+ * tile front instead (utils/tileCover.ts): a block opens about when the slabs
  * over it do, TILE_FRONT of the run per share of the farthest corner.
  */
 const ARRIVE = 0.12
@@ -18,7 +19,6 @@ const AFTER = 0.08
 const REACH = 0.5
 const WAIT = 0.12
 const LAND = 0.45
-const TILE_RUN = 0.95
 const TILE_FRONT = 0.3
 /** The tile front's lead in the direction of travel, and lag behind (mirrors the worklet). */
 const TILE_AHEAD = 0.7
@@ -173,10 +173,12 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
   const dx = way * ARRIVE * innerWidth
   const dy = way ? 0 : LIFT
   const names: string[] = []
+  // The tiles' run in s: longer on a phone (main.css --tile-transition).
+  const tileRun = (cssTime('--tile-transition') || 950) / 1000
 
   arriving = blocksOf(main).flatMap((el) => {
     const far = Math.min((tiles ? frontDistance(el, from, way) : distanceTo(el, from, true)) / farthest, 1)
-    const delay = tiles ? TILE_RUN * TILE_FRONT * far : AFTER + WAIT * far
+    const delay = tiles ? tileRun * TILE_FRONT * far : AFTER + WAIT * far
     if (el.hasAttribute('data-arrives-itself')) {
       replay(el, delay)
       return []
