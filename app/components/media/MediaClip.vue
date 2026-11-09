@@ -9,7 +9,9 @@
  *
  * It plays while it's on screen and rests when it isn't. Under reduced motion
  * (or on a slow connection, see useAutoplay) it never starts on its own: the
- * poster stays until it's asked to play. A
+ * poster stays until it's asked to play, and none of the clip is fetched
+ * before that. Rendered with preload none too, so the server's HTML doesn't
+ * start a fetch before the app knows the connection. A
  * pause control is always there, since a loop never ends by itself. Without
  * JS it's a plain video with the browser's controls. `youtube` links the
  * full, narrated version.
@@ -73,7 +75,7 @@ const source = (url: string) => (url.endsWith('.webm') ? 'video/webm' : 'video/m
   <MediaShell :wide="props.wide" class="media--clip">
     <div class="media__frame">
       <video ref="video" :poster="poster" :width="width" :height="height" :aria-label="label" :controls="!mounted"
-        muted loop playsinline preload="metadata" :class="{ 'media__expandable': expandable && mounted }"
+        muted loop playsinline :preload="mounted && autoplay ? 'metadata' : 'none'" :class="{ 'media__expandable': expandable && mounted }"
         @play="playing = true" @pause="playing = false" @click="expandable && mounted && emit('expand')">
         <source v-if="webm" :src="webm" type="video/webm">
         <source :src="src" :type="source(src)">
