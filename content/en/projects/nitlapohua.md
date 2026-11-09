@@ -7,7 +7,7 @@ pronunciation: "nee-tla-POH-wah"
 
 <!-- TODO(owner): this copy is a placeholder drafted by Claude from the repo's README, not yours. Rewrite it in your own words, in both languages. Add repos/links in content/projects/nitlapohua.yml once the repo or deploy is public. -->
 
-::media-clip{src="/media/nitlapohua/video.mp4" webm="/media/nitlapohua/video.webm" label="Nitlapōhua intro"}
+::media-clip{src="/media/nitlapohua/video.mp4" webm="/media/nitlapohua/video.webm" label="Nitlapōhua intro" width="1920" height="1080"}
 ::
 
 
@@ -24,23 +24,32 @@ The idea is that it automatically calibrates to their level. As they get better 
 ---
 items:
   - src: question-john
-    alt: John's phone at level 2, a single-digit addition over the chalkboard number pad.
+    alt: John's phone at level 2, a single-digit subtraction over the chalkboard number pad.
+    caption: "Everyone gets their own question. John is on level 2, so single-digit operations."
   - src: question-paul
-    alt: Paul's phone at level 8, a one-digit multiplication.
+    alt: "Paul's phone at a higher level, a division: 63 ÷ 7."
+    caption: "In the same round, Paul is on level 8 and gets divisions."
   - src: question-george
-    alt: George's phone at level 14, a two-digit multiplication.
+    alt: "George's phone at an even higher level, a longer division: 295 ÷ 5."
+    caption: "And George, on level 14, slightly longer divisions. Same game, everyone at their own level."
   - src: lobby
     alt: The lobby, with the QR code, the four-letter room code and the three players ready.
+    caption: "Scan the QR code or type the four-letter code to join from your phone."
   - src: calibration
     alt: Ringo's first calibration, answering until he misses two.
+    caption: "The first round finds your level: you keep answering until you miss two."
   - src: stamp
-    alt: A correct answer stamped ¡BUENO!, with the points it earned underneath.
+    alt: A correct answer stamped ¡BIEN!, with the points it earned underneath.
+    caption: "Get it right and it gets stamped ¡BIEN!, with the points you earned."
   - src: streak
     alt: A fifth straight correct answer, showing the ×3 streak chip and the multiplied points.
+    caption: "Keep a streak going and your points start multiplying."
   - src: interlude
     alt: Between bursts, with the standings, a recap of the last burst and the button for the next one.
+    caption: "Between bursts, check the standings and how the last one went."
   - src: results
     alt: Final standings, with each player's score and how their level moved.
+    caption: "At the end, everyone's score and how far their level moved."
 ---
 ::
 

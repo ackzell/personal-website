@@ -16,23 +16,32 @@ Hay dos maneras de jugar:
 ---
 items:
   - src: question-john
-    alt: El teléfono de John en nivel 2, una suma de un dígito sobre el teclado de pizarrón.
+    alt: El teléfono de John en nivel 2, una resta de un dígito sobre el teclado de pizarrón.
+    caption: "Cada quien recibe su propia pregunta. John va en nivel 2, así que le tocan operaciones de un dígito."
   - src: question-paul
-    alt: El teléfono de Paul en nivel 8, una multiplicación de un dígito.
+    alt: "El teléfono de Paul en un nivel más alto, una división: 63 ÷ 7."
+    caption: "En la misma ronda, Paul va en nivel 8 y le tocan divisiones."
   - src: question-george
-    alt: El teléfono de George en nivel 14, una multiplicación de dos dígitos.
+    alt: "El teléfono de George en un nivel todavía mayor, una división más larga: 295 ÷ 5."
+    caption: "Y a George, en nivel 14, divisiones un poco más largas. El mismo juego, cada quien a su nivel."
   - src: lobby
     alt: La sala de espera, con el código QR, el código de cuatro letras y los tres jugadores listos.
+    caption: "Escanea el código QR o escribe el código de cuatro letras para unirte desde tu teléfono."
   - src: calibration
     alt: La calibración inicial de Ringo, respondiendo hasta fallar dos.
+    caption: "La primera ronda encuentra tu nivel: sigues respondiendo hasta fallar dos."
   - src: stamp
-    alt: Una respuesta correcta sellada con ¡BUENO!, y los puntos que ganó debajo.
+    alt: Una respuesta correcta sellada con ¡BIEN!, y los puntos que ganó debajo.
+    caption: "Si aciertas, te la sellan con un ¡BIEN! y los puntos que ganaste."
   - src: streak
     alt: Una quinta respuesta correcta seguida, con la insignia de racha ×3 y los puntos multiplicados.
+    caption: "Mantén una racha y tus puntos empiezan a multiplicarse."
   - src: interlude
     alt: Entre rondas, con la tabla de posiciones, el resumen de la última ronda y el botón para la siguiente.
+    caption: "Entre rondas, revisa las posiciones y cómo te fue en la última."
   - src: results
     alt: Posiciones finales, con el puntaje de cada jugador y cómo se movió su nivel.
+    caption: "Al final, el puntaje de cada quien y cuánto se movió su nivel."
 ---
 ::
 

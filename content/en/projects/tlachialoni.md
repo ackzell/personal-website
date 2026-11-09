@@ -65,14 +65,17 @@ items:
     width: 522
     height: 381
     alt: "Line drawings of Tezcatlipoca and Huitzilopochtli from the Códice Tudela, Códice Magliabechiano and Códice Florentino, each holding a tlachialoni: a staff topped with a disc pierced by a hole."
+    caption: "The same staff turns up across several codices, always in the hands of a god."
   - src: seated-deity
     width: 721
     height: 878
     alt: A painted codex figure seated on a woven throne, holding up a tlachialoni with a red-ringed hole at the centre of its disc.
+    caption: "Held up to the eye: the hole in the disc is what you see through."
   - src: xiuhtecuhtli
     width: 300
     height: 437
     alt: Xiuhtecuhtli painted in a codex page, carrying a serpent-headed shield and a tlachialoni.
+    caption: "Xiuhtecuhtli, the lord of fire, carries one too."
 ---
 ::
 

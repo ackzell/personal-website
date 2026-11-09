@@ -64,14 +64,17 @@ items:
     width: 522
     height: 381
     alt: "Dibujos de línea de Tezcatlipoca y Huitzilopochtli del Códice Tudela, el Códice Magliabechiano y el Códice Florentino, cada uno sosteniendo un tlachialoni: un bastón rematado con un disco atravesado por un agujero."
+    caption: "El mismo bastón aparece en varios códices, siempre en manos de un dios."
   - src: seated-deity
     width: 721
     height: 878
     alt: Una figura pintada de códice, sentada en un trono tejido, que levanta un tlachialoni con un agujero de borde rojo al centro de su disco.
+    caption: "Levantado a la altura de los ojos: el agujero del disco es por donde se mira."
   - src: xiuhtecuhtli
     width: 300
     height: 437
     alt: Xiuhtecuhtli pintado en una página de códice, con un escudo con cabeza de serpiente y un tlachialoni.
+    caption: "Xiuhtecuhtli, el señor del fuego, también lleva uno."
 ---
 ::
 
