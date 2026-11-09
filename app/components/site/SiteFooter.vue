@@ -108,10 +108,9 @@ useEventListener(window, 'blur', reset)
 useEventListener(window, 'pageshow', reset)
 
 /*
- * Each icon is a key with a note of its own; run along them, left to right,
- * and they play C♯ A C♯ D E G♯, the guitar line that opens In My Life (the
- * A a sixth above the first C♯). A finger plays each one it reaches (the
- * same tracking as the wave), a mouse each one it comes over.
+ * Each icon is a key with a note of its own, played left to right. A finger
+ * plays each one it reaches (the same tracking as the wave), a mouse each
+ * one it comes over.
  */
 const NOTES = [277.18, 440, 277.18, 293.66, 329.63, 415.3]
 const strike = (i: number) => soundNote(NOTES[i % NOTES.length]!)
@@ -296,11 +295,13 @@ function landed(event: AnimationEvent, i: number) {
 /*
  * On a first visit (main.css, "First visit") they land as they do crossing
  * the breakpoint (the FLIP above): carried in from the edge, raised, then
- * lowered into the slot, one after another as the footer comes up.
+ * lowered into the slot, one after another as the footer comes up, far
+ * enough apart that each note (landed) is heard: two long steps, then four
+ * short ones of 290ms.
  */
 :root[data-intro='build'] .site-footer__land {
   --land-from: 0, 2.5rem;
-  animation: site-footer-intro 620ms calc(2400ms + var(--i) * 60ms) backwards;
+  animation: site-footer-intro 620ms calc(2400ms + (var(--i) + min(var(--i), 2)) * 290ms) backwards;
 }
 
 /* Built: the everyday landing would otherwise start over once "build" is gone. */

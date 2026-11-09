@@ -4,7 +4,7 @@ import { sound, soundLabels } from './sounds'
 export const INTRO_SEEN = 'intro-seen'
 
 // The last of the build to settle (the scheme switch's light), in main.css.
-const BUILD = 4700
+const BUILD = 6500
 
 /**
  * On a first visit, ms until the header and footer start building (main.css,
