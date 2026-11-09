@@ -5,11 +5,17 @@ meaning: "movimiento"
 pronunciation: "mo-li-NIÁ-ni"
 ---
 
-<!-- TODO(owner): every paragraph, caption and video label on this page (and the "Code theme", "Scrub through the clip" and "Running …" strings in i18n/locales/*.json) is a placeholder drafted by Claude, not yours. Rewrite them in your own words, in both languages, before launch. The code blocks are the real scenes and can stay. -->
+::media-video{src="https://youtu.be/0eijkFnAEXU" title="#VueJS meets #MotionCanvas Introducing the project and its progress so far"}
+Un video algo largo donde explico cómo se veía el proyecto en ese momento. Básicamente recorre lo mismo que ya explica esta página.
+::
 
-Motion Canvas describe un video como código: una escena es un generador que dice qué se mueve, cuánto y por cuánto tiempo, y su editor recorre esa línea de tiempo cuadro por cuadro. Pero todo lo que aparece en pantalla tiene que ser una de sus propias figuras de canvas. Un componente con estilos, un layout que ya construiste, una escena 3D: ninguno puede entrar.
+¿Te acuerdas que ya había mencionado a [aarthificial](https://www.youtube.com/aarthificial) cuando estaba haciendo los [videos](/projects/tlapalli/videos) de Tlapalli? Este es un experimento para construir encima de la librería que usé para esos: [Motion Canvas](https://www.youtube.com/playlist?list=PLh0j6fxciWbIYnyKAW24k_Sr99MeJ-0nk). En lugar de escribir "componentes tipo JSX", pensé que podíamos usar Vue para escribirlos.
 
-Moliniani deja que un componente de Vue se pare en esa línea de tiempo como cualquier otra figura. Sus props se vuelven señales de Motion Canvas, así que `yield* box().width(700, 2)` anima un componente igual que anima un rectángulo, ambos pueden compartir un mismo `all()`, y ambos se recorren hacia adelante y hacia atrás sin desfasarse.
+Cuando empecé con esto, HTML-in-canvas ya estaba disponible, aunque todavía se requería un flag para habilitarlo. Aun así decidí intentarlo: tomar unelemento de Vue y meterlo dentro de un canvas. Así podemos usar lo que ya sabemos de Vue para construir componentes y convertirlos en estos videos que quedan muy bonitos.
+
+La mayor parte de esto lo construí con los modelos gratuitos de OpenCode. Todavía no he regresado al proyecto con los modelos más pesados, y puede que ellos lo resuelvan de otra forma. Aun así, ver componentes de Vue que yo escribí convertidos en video fue un momento muy emocionante para mí.
+
+Aquí van un par de ejemplos de lo que puede hacer ahorita y de dónde va el experimento. ¡Dime qué te parece!
 
 ::media-take{src="/media/moliniani/together.mp4" webm="/media/moliniani/together.webm" poster="/media/moliniani/together.webp" width="1920" height="1080" label="Una caja verde de Vue se ensancha junto a un rectángulo con contorno; luego la caja se vuelve verde azulado mientras el rectángulo se llena de azul, y la etiqueta de la caja cambia."}
 ---
@@ -94,79 +100,12 @@ const props = defineProps<{
 Un componente de Vue y un rectángulo de Motion Canvas, en una misma línea de tiempo. El componente nunca se anima solo: en cada cuadro, sus props toman el valor que la línea de tiempo dice.
 ::
 
-El navegador acomoda el componente como HTML real, y en cada cuadro lo pinta en el canvas del video con la nueva API HTML-in-canvas de Chrome. Nada corre con un reloj; cada cuadro se calcula desde la línea de tiempo, y por eso se puede recorrer.
-::media-take{src="/media/moliniani/typewriter.mp4" webm="/media/moliniani/typewriter.webm" poster="/media/moliniani/typewriter.webp" width="1920" height="1080" label="“Precision in motion.” se escribe letra por letra, da paso a “Write. Pause. Continue.” y luego se desvanece."}
----
-cues:
-  - { at: 0, lines: [19] }
-  - { at: 3, lines: [20] }
-  - { at: 4.7, lines: [21] }
----
-```tsx [scene.tsx]
-import { createMnRef, makeScene } from "@moliniani/core";
-import { AnimatedText } from "@moliniani/components/vue";
-import { createPhraseSwitcher, TYPING_TEXT } from "@moliniani/components";
 
-export default makeScene(function* (view) {
-  const text = createMnRef(AnimatedText);
+Una vez que tuve Vue corriendo dentro de Motion Canvas, me di cuenta de que probablemente también podíamos traer [Tres.js](https://tresjs.org/), la librería para hacer cosas en 3D pero con sabor a Vue.
 
-  view.add(
-    <AnimatedText
-      ref={text}
-      effect={TYPING_TEXT}
-      text=""
-      fontSize={112}
-      color="#ffd166"
-    />,
-  );
+Ya sabíamos cómo renderizar tanto three.js como Vue en Motion Canvas, así que renderizar Tres.js no debería ser tan difícil, ¿verdad?
 
-  const phrases = createPhraseSwitcher(text);
-  yield* phrases.phrase("Precision in motion.");
-  yield* phrases.phrase("Write. Pause. Continue.");
-  yield* text().opacity(0, 0.5);
-});
-```
-
-Uno de unos treinta efectos de texto, todos movidos por una misma especificación: `effect` elige cuál.
-::
-
-::media-take{src="/media/moliniani/background.mp4" webm="/media/moliniani/background.webm" poster="/media/moliniani/background.webp" width="1920" height="1080" label="Un campo de cuadros verde lima se desplaza, acelera y luego se apretuja."}
----
-cues:
-  - { at: 0, lines: [18] }
-  - { at: 2, lines: [19] }
-  - { at: 5, lines: [20] }
----
-```tsx [scene.tsx]
-import { createMnRef, makeScene } from "@moliniani/core";
-import { easeInSine, waitFor } from "@motion-canvas/core";
-import { GroovySquaresBackground } from "@moliniani/components/backgrounds";
-
-export default makeScene(
-  function* (view) {
-    const bg = createMnRef(GroovySquaresBackground);
-
-    view.add(
-      <GroovySquaresBackground
-        ref={bg}
-        color0="#bada55"
-        speed={2}
-        density={5}
-      />,
-    );
-
-    yield* waitFor(2);
-    yield* bg().speed(4, 3, easeInSine);
-    yield* bg().density(8, 3, easeInSine);
-  },
-  { background: false },
-);
-```
-
-Cinco fondos generativos hasta ahora (un campo de flujo, una malla de resortes, vidrio fracturado, curvas de nivel y estos cuadros), con props que se animan como cualquier otra.
-::
-
-Una escena de TresJS toma el otro camino: solo se dibuja cuando la línea de tiempo lo pide, y su cuadro de WebGL se pinta en el mismo canvas. La cámara, la rotación y el color del material son props, así que también son señales.
+Aquí hay un ejemplo del código de Tres.js funcionando. Puedes escribir tu código de tres como siempre y exponer las props. Se convierten en señales y las puedes animar como quieras.
 
 ::media-take{src="/media/moliniani/tres.mp4" webm="/media/moliniani/tres.webm" poster="/media/moliniani/tres.webp" width="1920" height="1080" label="Un cubo magenta, visto mientras la cámara gira a su alrededor; da una vuelta completa y luego se vuelve naranja."}
 ---
@@ -237,6 +176,91 @@ const props = defineProps<{
 
 Sin Three.js imperativo: el movimiento de cámara y el giro son animaciones en la misma línea de tiempo.
 ::
+
+En algún momento pensé: "Bueno, ya podemos animar cosas. Ya hay librerías de animación muy buenas para cosas como texto, así que voy a intentar traer [Anime.js](https://animejs.com/) para la lógica de animación del texto", y estuvo interesante. No me acuerdo si es lo que terminamos usando para todo.
+
+Pero luego también encontré unas [skills](https://pixelpoint.io/skills/animate-text/) publicadas que te ayudan a construir animaciones de texto muy vistosas, así que también las agregué.
+
+Le puse mucha atención a la API, porque de verdad quería que el código se pudiera leer. Deberías poder escribir este código a mano, o entenderlo si lo lees. Creo que eso también es parte de lo que el autor de MC tenía en mente desde el principio. Hay que tomar en cuenta que lo suyo es más que nada trabajo de antes de la IA, y la idea nunca fue construir un motor que cualquier IA pudiera usar para hacer un video. Se trataba de poder hacerlo a mano, con control total de dónde está cada cosa, el momento exacto en que pasa y cómo se ve, para que coincida con lo que te estás imaginando.
+
+::media-take{src="/media/moliniani/typewriter.mp4" webm="/media/moliniani/typewriter.webm" poster="/media/moliniani/typewriter.webp" width="1920" height="1080" label="“Precision in motion.” se escribe letra por letra, da paso a “Write. Pause. Continue.” y luego se desvanece."}
+---
+cues:
+  - { at: 0, lines: [19] }
+  - { at: 3, lines: [20] }
+  - { at: 4.7, lines: [21] }
+---
+```tsx [scene.tsx]
+import { createMnRef, makeScene } from "@moliniani/core";
+import { AnimatedText } from "@moliniani/components/vue";
+import { createPhraseSwitcher, TYPING_TEXT } from "@moliniani/components";
+
+export default makeScene(function* (view) {
+  const text = createMnRef(AnimatedText);
+
+  view.add(
+    <AnimatedText
+      ref={text}
+      effect={TYPING_TEXT}
+      text=""
+      fontSize={112}
+      color="#ffd166"
+    />,
+  );
+
+  const phrases = createPhraseSwitcher(text);
+  yield* phrases.phrase("Precision in motion.");
+  yield* phrases.phrase("Write. Pause. Continue.");
+  yield* text().opacity(0, 0.5);
+});
+```
+
+Uno de unos treinta efectos de texto, todos movidos por una misma especificación: `effect` elige cuál.
+::
+
+Ya con el texto funcionando, decidí traer también [algunos fondos](https://radiant-shaders.com/gallery/all), porque en el video de Tlapalli ya tenía un fondo que había hecho con shaders, y Motion Canvas sí los soporta. Así que la idea ahora era armar una especie de librería de fondos que pudiera usar en distintos videos, y así es como salió esto.
+
+::media-take{src="/media/moliniani/background.mp4" webm="/media/moliniani/background.webm" poster="/media/moliniani/background.webp" width="1920" height="1080" label="Un campo de cuadros verde lima se desplaza, acelera y luego se apretuja."}
+---
+cues:
+  - { at: 0, lines: [18] }
+  - { at: 2, lines: [19] }
+  - { at: 5, lines: [20] }
+---
+```tsx [scene.tsx]
+import { createMnRef, makeScene } from "@moliniani/core";
+import { easeInSine, waitFor } from "@motion-canvas/core";
+import { GroovySquaresBackground } from "@moliniani/components/backgrounds";
+
+export default makeScene(
+  function* (view) {
+    const bg = createMnRef(GroovySquaresBackground);
+
+    view.add(
+      <GroovySquaresBackground
+        ref={bg}
+        color0="#bada55"
+        speed={2}
+        density={5}
+      />,
+    );
+
+    yield* waitFor(2);
+    yield* bg().speed(4, 3, easeInSine);
+    yield* bg().density(8, 3, easeInSine);
+  },
+  { background: false },
+);
+```
+
+Cinco fondos generativos hasta ahora (`FlowFieldBackground`, `KineticGridBackground`, `SugarGlassBackground`, `TopographicBackground` y este, `GroovySquaresBackground`), con props que se animan como cualquier otra.
+::
+
+::media-video{src="https://youtu.be/U7Q3hsBK534" title="Moliniani - new backgrounds"}
+Otro video algo largo que explica un poco más sobre los fondos de Moliniani.
+::
+
+Ahora, para un resumen rápido y bonito de qué es todo esto, dejé que la IA escribiera los siguientes párrafos. ¡Disfrútalos!
 
 Animar una página con CSS o GSAP corre con el reloj: puedes reproducirla, pero no puedes saltar al cuadro 212 y obtener la misma imagen cada vez, que es justo lo que necesita exportar un video. Remotion también hace video con componentes, pero ahí cada cuadro es una función de su número, y cada valor se calcula a partir de él. Aquí conservas la forma de trabajar de Motion Canvas: describes la secuencia (espera, mueve esto, luego desvanece aquello) y la línea de tiempo calcula los cuadros, con sus refs, señales y transiciones mezcladas libremente con Vue.
 
