@@ -90,5 +90,9 @@ useHead({
   /* Three times a section's gap: the timeline ends in open room before what's next. */
   margin-top: calc(var(--gap-section) * 3);
   min-block-size: calc(100svh - var(--currently-room, var(--header-height, 0px) + var(--section-index-height, 0px)));
+  /* Its label and project sit together in the middle of that room. */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 </style>
