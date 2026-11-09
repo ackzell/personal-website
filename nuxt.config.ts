@@ -46,6 +46,11 @@ export default defineNuxtConfig({
     // transition, where rendering is held, so no frame comes and every page
     // change sat out its 100ms fallback on a frozen screen.
     navigationRepaint: false,
+    defaults: {
+      // A link is also fetched as a pointer comes over it or a finger presses
+      // it, and one already fetching is moved up the queue.
+      nuxtLink: { prefetchOn: { visibility: true, interaction: true } },
+    },
   },
 
   app: {
@@ -146,6 +151,12 @@ export default defineNuxtConfig({
 
   // Every page is prerendered, so cards are built once and no renderer ships.
   ogImage: { zeroRuntime: true },
+
+  // Every page is prerendered. Saying so here lets the browser fetch a page's
+  // data straight away, without first fetching the build manifest to ask.
+  routeRules: {
+    '/**': { prerender: true },
+  },
 
   nitro: {
     prerender: {
