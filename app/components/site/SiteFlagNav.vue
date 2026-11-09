@@ -183,22 +183,34 @@ function stopFor(to: RouteLocationNormalized) {
 if (import.meta.client) {
   const router = useRouter()
   const nuxtApp = useNuxtApp()
+  // Only a page still on its way after a beat shows any of it: a quick one
+  // (fetched ahead) would flash the preview and snap it lit.
+  let beat: ReturnType<typeof setTimeout> | undefined
+  const stop = () => {
+    clearTimeout(beat)
+    loading.value = null
+  }
   const offs = [
     router.beforeEach((to, from) => {
-      loading.value = to.path === from.path ? null : { key: stopFor(to), done: false }
+      stop()
+      if (to.path === from.path) return
+      const key = stopFor(to)
+      beat = setTimeout(() => (loading.value = { key, done: false }), 150)
     }),
     router.afterEach((_to, _from, failure) => {
-      if (failure) loading.value = null
+      if (failure) stop()
     }),
-    router.onError(() => (loading.value = null)),
+    router.onError(stop),
     nuxtApp.hook('page:view-transition:start', () => {
       if (loading.value) loading.value.done = true
+      else clearTimeout(beat)
     }),
-    nuxtApp.hook('page:finish', () => {
-      loading.value = null
-    }),
+    nuxtApp.hook('page:finish', stop),
   ]
-  onBeforeUnmount(() => offs.forEach((off) => off()))
+  onBeforeUnmount(() => {
+    stop()
+    offs.forEach((off) => off())
+  })
 }
 
 const loadingAt = (key: string) =>
@@ -329,12 +341,6 @@ onMounted(() => {
   background: var(--line);
 }
 
-[data-open='true'] .flag-nav__field {
-  block-size: calc(var(--field-height) / 3);
-  margin-block-start: 0;
-  background: var(--line);
-}
-
 [data-open='true'] [data-child] .flag-nav__field {
   background: color-mix(in srgb, var(--fg) 12%, var(--bg));
 }
@@ -413,8 +419,8 @@ onMounted(() => {
 }
 
 /*
- * Loading: the stop you're going to keeps its preview, and after a beat (so
- * a quick page never shows it) the band's light (ignite's ::before, below)
+ * Loading: after a beat (so a quick page never shows it; the script waits
+ * it out) the stop you're going to keeps its preview and the band's light (ignite's ::before, below)
  * runs along its field, back and forth, until the page is in. Hover and
  * press never move or light, so this can't read as either. As the page
  * arrives the field comes on whole, steady, and the marker slides into it.
@@ -433,7 +439,7 @@ onMounted(() => {
 .flag-nav .flag-nav__link[data-loading=''] .flag-nav__field::before {
   inset-inline-end: auto;
   inline-size: 30%;
-  animation: flag-nav-run 1.1s 150ms cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
+  animation: flag-nav-run 1.1s cubic-bezier(0.65, 0, 0.35, 1) infinite alternate;
 }
 
 .flag-nav .flag-nav__link[data-loading='done'] .flag-nav__field::before {
