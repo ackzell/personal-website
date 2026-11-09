@@ -580,5 +580,38 @@ watch(showing, (now, before) => {
   .palette__item {
     scroll-snap-align: start;
   }
+
+  /* The list runs sideways here, so the wipe and its line do too: along the
+     row, the way its fill just moved. */
+  [data-dir='forward'] .is-entering {
+    --wipe-from: inset(-3rem 100% -3rem -3rem);
+  }
+
+  [data-dir='back'] .is-entering {
+    --wipe-from: inset(-3rem -3rem -3rem 100%);
+  }
+
+  [data-dir='forward'] .palette__scan {
+    --scan-from: -100% 0;
+  }
+
+  [data-dir='back'] .palette__scan {
+    --scan-from: 100% 0;
+  }
+
+  .palette__scan::before {
+    inset-block: 0;
+    inset-inline: auto;
+    block-size: auto;
+    inline-size: 2px;
+  }
+
+  [data-dir='forward'] .palette__scan::before {
+    inset-inline-end: 0;
+  }
+
+  [data-dir='back'] .palette__scan::before {
+    inset-inline-start: 0;
+  }
 }
 </style>
