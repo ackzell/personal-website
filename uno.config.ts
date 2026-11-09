@@ -13,6 +13,8 @@ export default defineConfig({
       ],
     },
   },
+  // `${id}-ring` mask ids in SiteMarkGlyph read as a negative ring utility, which emits broken CSS.
+  blocklist: ['-ring'],
   presets: [
     // Reset stays off: main.css owns base styles.
     presetWind4({ preflights: { reset: false } }),
