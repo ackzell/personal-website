@@ -33,3 +33,7 @@ node_modules
 # OpenCode
 .opencode/
 opencode.jsonc
+
+# mkcert certs for dev:https
+.cert.pem
+.key.pem
