@@ -102,7 +102,7 @@
   "media": {
     "title": "Contenido",
     "description": "No quiero ser influencer, sólo compartir con los demás",
-    "intro": "",
+    "intro": "Comencé una playlist de YouTube en 2017 con videos acerca de cómo construir una app de escritorio. Desde entonces he estado muy interesado en aprender acerca de software, hardware, técnicas para crear videos, también sobre equipo de audio y cosas así. Aquí está el resultado de todos estos años tratando de crear contenido. No es realmente la idea convertirme en un tech influencer o cosas de esas; solamente quiero compartir con las demás personas.",
     "guide": {
       "legend": {
         "label": "Cómo leer la guía",
@@ -137,7 +137,7 @@
   },
   "videos": {
     "title": "Videos",
-    "intro": "Series de videos en YouTube.",
+    "intro": "Mi canal de YouTube. Los videos realmente comenzaron como una especie de tutoriales para construir software paso a paso, pero ahora hay muchos \"devlogs\" en forma de live streams que agrego ahí. (El contenido es sobre todo en inglés.)",
     "rest": "Tengo más contenido en el canal."
   },
   "podcast": {

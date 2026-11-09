@@ -4,12 +4,11 @@
 # else stays on YouTube and mytypeof.dev. Playlists reach back to their latest
 # 15 videos.
 
-# TODO: the notes below are placeholders, to be replaced with real ones.
 podcast:
   title: My typeof Radio
   note:
-    en: "[Placeholder] What the podcast is, in my own words."
-    es: "[Provisional] Qué es el podcast, en mis palabras."
+    en: "A project that is dear to my heart. A good friend of mine and I started it in 2020. And we had so much fun recording and talking to new people about web dev and their awesome projects. It's currently in a weird stage where I have to decide whether it continues or I sunset it, but still I believe the content is worth listening to for all the web-development-related things that we cover and the awesome Spanish-speaking people in the community that we have had the pleasure of interviewing."
+    es: "Un proyecto al que le tengo mucho cariño. Un gran amigo mío y yo lo comenzamos en 2020. Y nos divertimos mucho grabando y hablando con personas nuevas acerca de webdev y sus proyectos tan geniales. Actualmente se encuentra en una etapa un poco rara donde tengo que decidir si el podcast continúa o lo retiro, pero todavía creo que el contenido merece la pena ser escuchado por todas las cosas relacionadas al webdev que hemos cubierto, y las maravillosas personas que hablan español en la comunidad a las que hemos tenido el placer de entrevistar."
 
 # One row per playlist, newest first; titles are the playlists' own.
 # Playlists with a project keep a link to it.

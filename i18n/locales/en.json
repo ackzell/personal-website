@@ -102,7 +102,7 @@
   "media": {
     "title": "Content",
     "description": "I don't want to be an influencer, just share stuff with you all",
-    "intro": "",
+    "intro": "I started a YT playlist in 2017 with videos about building a desktop application. Ever since, I've been really interested in learning about software, hardware and techniques for creating videos and also the audio gear and stuff like that. So here's the result of all these years of me trying to create content so far. The idea isn't to become a tech influencer or anything like that; I'm just trying to share stuff with people.",
     "guide": {
       "legend": {
         "label": "How to read the guide",
@@ -137,7 +137,7 @@
   },
   "videos": {
     "title": "Videos",
-    "intro": "Video series on YouTube, where I build things piece by piece.",
+    "intro": "My YouTube channel. The videos actually started as sort of tutorials building software step by step. But now there are a lot of \"devlogs\" in the form of livestreams that go in there.",
     "rest": "Everything else is on the channel."
   },
   "podcast": {
