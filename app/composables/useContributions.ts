@@ -16,7 +16,7 @@ const newestFirst = (a: Contribution, b: Contribution) => b.merged.localeCompare
 
 async function fetchContributions(locale: 'en' | 'es'): Promise<ContributedProject[]> {
   const [merged, curation] = await Promise.all([
-    $fetch<Contribution[]>('/api/contributions'),
+    $fetch<Contribution[]>('/api/contributions', { responseType: 'json' }),
     queryCollection('contributions').first(),
   ])
 

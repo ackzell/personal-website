@@ -19,7 +19,7 @@ export function useVideoSeries() {
 
       const playlists = await Promise.all(
         (curation?.series ?? []).map(async (entry): Promise<GuideSeries | undefined> => {
-          const videos = await $fetch<Video[]>(`/api/playlists/${entry.playlist}`).catch(() => [])
+          const videos = await $fetch<Video[]>(`/api/playlists/${entry.playlist}`, { responseType: 'json' }).catch(() => [])
           if (!videos.length) return undefined
           return {
             id: entry.playlist,
@@ -52,7 +52,7 @@ export function usePodcastSeasons() {
     async () => {
       const [curation, episodes] = await Promise.all([
         queryCollection('media').first(),
-        $fetch<Episode[]>('/api/episodes'),
+        $fetch<Episode[]>('/api/episodes', { responseType: 'json' }),
       ])
 
       const seasoned = episodes.filter((episode) => episode.season)

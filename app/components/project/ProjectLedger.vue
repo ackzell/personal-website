@@ -50,7 +50,7 @@ const monthOf = useMonthFormat()
 const releaseRepos = computed(() => props.project.release ? [props.project.release] : props.project.repos)
 const { data: releases } = useAsyncData(
   () => `releases-${releaseRepos.value.join()}`,
-  () => Promise.all(releaseRepos.value.map((repo) => $fetch<Release | null>(`/api/releases/${repo}`))),
+  () => Promise.all(releaseRepos.value.map((repo) => $fetch<Release | null>(`/api/releases/${repo}`, { responseType: 'json' }))),
 )
 
 // The repo name goes before the version only when there's more than one to tell apart.
