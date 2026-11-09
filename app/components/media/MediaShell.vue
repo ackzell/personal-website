@@ -12,7 +12,7 @@ defineProps<{ wide?: boolean }>()
   <!-- mx="0": a figure carries a 40px UA inline margin the reset leaves. -->
   <figure class="media" :class="{ 'track-wide': wide }" grid gap="tight" mx="0">
     <slot />
-    <figcaption v-if="$slots.caption" class="media__caption" max-w="[var(--content-width)]" text="[0.875rem] muted">
+    <figcaption v-if="$slots.caption" class="media__caption" max-w="[var(--content-width)]" text="sm muted">
       <slot name="caption" />
     </figcaption>
   </figure>
