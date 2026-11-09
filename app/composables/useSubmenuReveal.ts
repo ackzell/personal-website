@@ -89,7 +89,7 @@ export function useSubmenuReveal({ submenu, isSectionPage, currentIndex }: Subme
     settled = null
     rippleOrigin.value = 0
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const pageTransition = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--page-transition'))
+    const pageTransition = cssTime('--page-transition')
     revealTimer = setTimeout(() => (reveal.value = true), reduce ? 0 : (pageTransition || 0) / 2)
   }
 

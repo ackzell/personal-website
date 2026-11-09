@@ -86,7 +86,7 @@ export default defineNuxtPlugin((nuxtApp) => {
           root.dataset.intro = ''
           // The landing mark draws itself in again, as for sound switched on (useMarkEntrance).
           setSoundOn(true)
-          buildIntro(Number.parseFloat(getComputedStyle(root).getPropertyValue('--intro-at')))
+          buildIntro(cssTime('--intro-at'))
           return undefined
         }
         try {

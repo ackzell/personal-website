@@ -1,4 +1,5 @@
 import { sound, soundLabels } from './sounds'
+import { cssTime } from './cssTime'
 
 /** Set once a browser has seen the first-visit intro (plugins/intro.client.ts). */
 export const INTRO_SEEN = 'intro-seen'
@@ -13,7 +14,7 @@ const BUILD = 6500
 export function introLeft() {
   const root = document.documentElement
   if (root.dataset.intro !== '') return 0
-  return Math.max(0, Number.parseFloat(getComputedStyle(root).getPropertyValue('--intro-at')) - performance.now())
+  return Math.max(0, cssTime('--intro-at') - performance.now())
 }
 
 // Where an element sits across the screen, -1 (left) to 1 (right), kept off the edges.

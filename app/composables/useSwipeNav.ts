@@ -400,7 +400,7 @@ export function useSwipeNav() {
     const dy = was.top - now.top
     if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return
     el.animate([{ translate: `${dx}px ${dy}px` }, { translate: '0 0' }], {
-      duration: parseFloat(getComputedStyle(root!).getPropertyValue('--page-transition')) || 550,
+      duration: cssTime('--page-transition') || 550,
       easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
     })
   }
