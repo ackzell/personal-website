@@ -169,6 +169,9 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 .section-index__bar {
   position: relative;
   isolation: isolate;
+  /* Keeps the list's negative top margin inside, or the bar rides 12px up
+     and what sticks under it (a clip, a table head) leaves a gap. */
+  display: flow-root;
   /* The text column's width, from 100vw: this nav has none to measure. */
   inline-size: min(var(--content-width), 100vw - var(--gutter) * 2);
   /* Known ahead (main.css), so nothing shifts once the page wakes up. */
