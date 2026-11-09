@@ -10,10 +10,12 @@ const props = defineProps<{
 // Takumi can't read main.css, so the dark colors are repeated here. The mark
 // is a touch fainter than the stage's, to stay almost invisible.
 const fg = '#e4dcca'
-const fields: Record<Section, { bg: string; accent: string; mark: string }> = {
-  about: { bg: '#0b1612', accent: '#4a9273', mark: '#091410' },
-  work: { bg: '#0c0b0a', accent: '#e4dcca', mark: '#100f0e' },
-  media: { bg: '#1e0d0e', accent: '#b84c4c', mark: '#1b0c0c' },
+// hot is main.css's --hot in dark: the accent mixed 45% toward white in oklab.
+// line is --line: fg mixed 20% into the stage, for the fields not lit.
+const fields: Record<Section, { bg: string; accent: string; hot: string; line: string; mark: string }> = {
+  about: { bg: '#0b1612', accent: '#4a9273', hot: '#9dc2b0', line: '#363e37', mark: '#091410' },
+  work: { bg: '#0c0b0a', accent: '#e4dcca', hot: '#f0ece2', line: '#373530', mark: '#100f0e' },
+  media: { bg: '#1e0d0e', accent: '#b84c4c', hot: '#dd9d99', line: '#463634', mark: '#1b0c0c' },
 }
 const order: Section[] = ['about', 'work', 'media']
 const stage = computed(() => fields[props.section])
@@ -27,10 +29,12 @@ const filled = (value?: string) => value && value !== 'TODO'
     <!-- The stage's backdrop, cropped as SiteMarkLayer crops it. -->
     <SiteMarkGlyph
       :style="{ position: 'absolute', left: '683px', top: '-195px', width: '970px', height: '970px', color: stage.mark }" />
-    <!-- The menu's band: hairline fields, the page's own marked. -->
-    <div :style="{ position: 'relative', display: 'flex', alignItems: 'center', gap: '6px', height: '6px' }">
+    <!-- The menu's band: the page's own field lit and glowing (--glow-near), the others the stage's line. -->
+    <div :style="{ position: 'relative', display: 'flex', gap: '6px', height: '6px' }">
       <div v-for="name in order" :key="name"
-        :style="{ flex: 1, height: name === section ? '6px' : '2px', backgroundColor: fields[name].accent }" />
+        :style="name === section
+          ? { flex: 1, backgroundColor: fields[name].hot, boxShadow: `0 0 2px ${fields[name].accent}e6, 0 0 8px ${fields[name].accent}b3, 0 0 20px ${fields[name].accent}73` }
+          : { flex: 1, backgroundColor: stage.line }" />
     </div>
     <div :style="{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }">
       <div v-if="parent" :style="{ fontSize: '44px', opacity: 0.7, marginBottom: '20px' }">{{ parent }}</div>
