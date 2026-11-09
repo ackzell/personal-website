@@ -68,10 +68,13 @@
    * Type: two monospace families, three roles.
    * Recursive is self-hosted pinned to MONO 1 (see nuxt.config.ts), so only
    * CASL and wght vary. Code reuses it with the casual axis off.
+   * 'Recursive Full' is the same face with slnt and CRSV too, twice the size:
+   * it only exists once plugins/full-font has loaded it, after the page is
+   * up, and until then the name is skipped. The lean waits for it.
    */
-  --font-heading: 'Recursive', ui-monospace, monospace;
+  --font-heading: 'Recursive Full', 'Recursive', ui-monospace, monospace;
   --font-body: 'Source Code Pro', ui-monospace, monospace;
-  --font-code: 'Recursive', ui-monospace, monospace;
+  --font-code: 'Recursive Full', 'Recursive', ui-monospace, monospace;
   --heading-weight: 520;
   --heading-casual: 0.65;
   --code-weight: 320;

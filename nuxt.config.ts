@@ -86,11 +86,14 @@ export default defineNuxtConfig({
         // Covers code (320) through headings (520) and a bold step.
         weights: ['300 700'],
         // Pin MONO so Google serves a smaller instance; keep CASL variable.
-        // slnt + CRSV drive the lexicon headword hover (lean into cursive
-        // forms); they roughly double the file (latin ~105 → ~221 KB).
-        variableAxis: { MONO: ['1'], CASL: [['0', '1']], CRSV: [['0', '1']], slnt: [['-15', '0']] },
+        // slnt + CRSV (the hover lean into cursive forms) would roughly
+        // double the file (latin ~105 → ~221 KB), so they come later, as
+        // 'Recursive Full' (public/fonts, plugins/full-font.client.ts).
+        variableAxis: { MONO: ['1'], CASL: [['0', '1']] },
       },
       { name: 'Source Code Pro', provider: 'google', weights: [400, 700], global: true },
+      // Self-hosted and added from JS once the page is up; not a provider's.
+      { name: 'Recursive Full', provider: 'none' },
     ],
   },
 
