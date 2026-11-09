@@ -8,7 +8,8 @@
  *   ::
  *
  * It plays while it's on screen and rests when it isn't. Under reduced motion
- * it never starts on its own: the poster stays until it's asked to play. A
+ * (or on a slow connection, see useAutoplay) it never starts on its own: the
+ * poster stays until it's asked to play. A
  * pause control is always there, since a loop never ends by itself. Without
  * JS it's a plain video with the browser's controls. `youtube` links the
  * full, narrated version.
@@ -36,7 +37,7 @@ const slots = useSlots()
 
 const video = useTemplateRef<HTMLVideoElement>('video')
 const mounted = useMounted()
-const reducedMotion = usePreferredReducedMotion()
+const autoplay = useAutoplay()
 
 // null until the visitor chooses; then their choice wins over the default.
 const wants = ref<boolean | null>(null)
@@ -48,7 +49,7 @@ useIntersectionObserver(video, ([entry]) => {
 }, { threshold: 0.5 })
 
 const shouldPlay = computed(() =>
-  visible.value && !props.inactive && (wants.value ?? reducedMotion.value !== 'reduce'))
+  visible.value && !props.inactive && (wants.value ?? autoplay.value))
 
 watch(shouldPlay, (play) => {
   const el = video.value

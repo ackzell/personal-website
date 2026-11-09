@@ -62,7 +62,7 @@ const props = defineProps<{
 const { t } = useI18n()
 const slots = useSlots()
 const mounted = useMounted()
-const reducedMotion = usePreferredReducedMotion()
+const autoplay = useAutoplay()
 const uid = useId()
 const { gem, pick } = useCodeGem()
 
@@ -140,7 +140,7 @@ useIntersectionObserver(video, ([entry]) => {
   visible.value = entry?.isIntersecting ?? false
 }, { threshold: 0.5 })
 
-const shouldPlay = computed(() => visible.value && (wants.value ?? reducedMotion.value !== 'reduce'))
+const shouldPlay = computed(() => visible.value && (wants.value ?? autoplay.value))
 
 watch(shouldPlay, (play) => {
   const el = video.value
