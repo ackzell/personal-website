@@ -60,7 +60,13 @@ useHead({
 <style scoped>
 /* The last section is at least a screen tall, so its anchor lands it at the
    top with empty room below rather than stopping short at the page's end. */
+/* Proximity, not mandatory: scrolling settles on it only when it comes near,
+   so the long timeline above still scrolls freely. */
+:global(:root:has(#currently)) {
+  scroll-snap-type: y proximity;
+}
 #currently {
+  scroll-snap-align: start;
   min-block-size: calc(100svh - var(--header-height, 0px) - var(--section-index-height, 0px));
 }
 </style>
