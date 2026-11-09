@@ -73,8 +73,22 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
         })
       },
-      // Forgets the first visit (plugins/intro.client.ts) and loads again, so it plays as it first did.
+      /*
+       * With sound on, the mark and the header and footer build again right
+       * here, each piece heard as it lands: a command typed here lets the
+       * page play sound, and a reload would lose that. Otherwise it forgets
+       * the first visit (plugins/intro.client.ts) and loads again, so it
+       * plays as it first did.
+       */
       get intro() {
+        if (soundIsOn() && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          const root = document.documentElement
+          root.dataset.intro = ''
+          // The landing mark draws itself in again, as for sound switched on (useMarkEntrance).
+          setSoundOn(true)
+          buildIntro(Number.parseFloat(getComputedStyle(root).getPropertyValue('--intro-at')))
+          return undefined
+        }
         try {
           localStorage.removeItem(INTRO_SEEN)
         } catch {
