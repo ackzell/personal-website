@@ -8,7 +8,7 @@
  * `ackzell.intro` in the console forgets the visit (plugins/console.client.ts).
  */
 // The last of the build to settle (the scheme switch's light), in main.css.
-const BUILD = 3500
+const BUILD = 4700
 
 export default defineNuxtPlugin(() => {
   const root = document.documentElement

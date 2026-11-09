@@ -1246,6 +1246,11 @@ main:focus {
 :root[data-intro='build'] .site-footer {
   animation: 600ms var(--ease-out) 2300ms backwards intro-fade;
 }
+/* The footer brings the socials; the stops, then the scheme switch, follow
+   once they've landed, so each reads as its own step. */
+:root[data-intro='build'] .site-footer__stops {
+  animation: 600ms var(--ease-out) 3300ms backwards intro-fade;
+}
 :root[data-intro='build'] .attr-switch > * {
   animation: 900ms ease-in-out var(--intro-step) backwards intro-lit;
 }
@@ -1256,7 +1261,7 @@ main:focus {
   --intro-step: 1700ms;
 }
 .site-footer .attr-switch {
-  --intro-step: 2550ms;
+  --intro-step: 3700ms;
 }
 @keyframes intro-wait {
   from,
