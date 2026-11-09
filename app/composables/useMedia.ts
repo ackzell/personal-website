@@ -6,7 +6,7 @@
 
 /**
  * The video side of the guide: one row per playlist in `content/media.yml`,
- * newest series first. A playlist feed that fails to load drops its row
+ * in the order listed there. A playlist feed that fails to load drops its row
  * instead of the page.
  */
 export function useVideoSeries() {
@@ -35,9 +35,7 @@ export function useVideoSeries() {
         }),
       )
 
-      return playlists
-        .filter((series) => series !== undefined)
-        .sort((a, b) => latest(b).localeCompare(latest(a)))
+      return playlists.filter((series) => series !== undefined)
     },
   )
 }
@@ -84,5 +82,3 @@ export function usePodcastSeasons() {
     },
   )
 }
-
-const latest = (series: GuideSeries) => series.releases.reduce((last, { published }) => (published > last ? published : last), '')
