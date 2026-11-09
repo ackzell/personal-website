@@ -52,6 +52,17 @@ export default defineNuxtPlugin((nuxtApp) => {
       .catch(() => {})
   }
 
+  // The root snapshot spans the large viewport (under a phone's retracting
+  // toolbar too); clientHeight is the small one, leaving a strip with no tiles.
+  function largeViewportHeight() {
+    const probe = document.createElement('div')
+    probe.style.cssText = 'position:fixed;top:0;height:100lvh;visibility:hidden;pointer-events:none'
+    document.body.append(probe)
+    const height = probe.offsetHeight || root.clientHeight
+    probe.remove()
+    return height
+  }
+
   function setOffset(name: string) {
     const box = document.querySelector('main')?.getBoundingClientRect()
     root.style.setProperty(`--tile-${name}-x`, String(box?.left ?? 0))
@@ -63,7 +74,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     root.style.setProperty('--tile-size', String(TILE_SIZE))
     for (const [name, value] of Object.entries(TILE_TIMING)) root.style.setProperty(`--tile-${name}`, String(value))
     root.style.setProperty('--tile-vw', String(root.clientWidth))
-    root.style.setProperty('--tile-vh', String(root.clientHeight))
+    root.style.setProperty('--tile-vh', String(largeViewportHeight()))
     root.style.setProperty('--tile-from-x', String(from.x))
     root.style.setProperty('--tile-from-y', String(from.y))
     root.style.setProperty('--tile-way', type === 'section-back' ? '-1' : '1')
