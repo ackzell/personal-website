@@ -1,5 +1,5 @@
 import type { Layer, NoiseLayer, Spec, ToneLayer } from '@foleyjs/core'
-import { cssTime } from '~/utils/cssTime'
+import { cssTime } from './cssTime'
 
 /*
  * The site's sounds, in three sets to choose between by ear (utils/sounds.ts
