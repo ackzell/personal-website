@@ -37,3 +37,6 @@ opencode.jsonc
 # mkcert certs for dev:https
 .cert.pem
 .key.pem
+
+# Local state from wrangler pages dev (preview:static)
+.wrangler
