@@ -140,6 +140,27 @@ function onKeydown(event: KeyboardEvent) {
 const stage = useTemplateRef<HTMLElement>('stage')
 const power = usePowerOn(stage)
 // The lightbox opens out of the window and goes back into it.
+
+// Swiping the window sideways steps through the list, finger to the left
+// going down it, the way the flag band's swipe turns pages; it stops at the
+// ends. Its touch-action (pan-y, below) keeps the page's swipe (useSwipeNav)
+// off it. A swipe that starts on something taking every move for itself (the
+// video's seek bar) is that thing's.
+let ownSwipe = false
+useSwipe(stage, {
+  onSwipeStart(event) {
+    ownSwipe = false
+    for (let el = event.target as Element | null; el && el !== stage.value; el = el.parentElement)
+      if (getComputedStyle(el).touchAction === 'none') ownSwipe = true
+  },
+  onSwipeEnd(_, direction) {
+    if (ownSwipe || (direction !== 'left' && direction !== 'right')) return
+    const next = active.value + (direction === 'left' ? 1 : -1)
+    if (next < 0 || next >= props.items.length) return haptic('edge')
+    haptic('detent')
+    pick(next)
+  },
+})
 const windowFrame = () => stage.value?.querySelector<HTMLElement>('.is-active .media__frame')
 
 const src = (item: PaletteItem, ext: string) => `${props.dir}/${item.id}.${ext}`
@@ -235,6 +256,11 @@ watch(showing, (now, before) => {
   grid-template-columns: minmax(8rem, max-content) 1fr;
   gap: var(--gap-block);
   align-items: start;
+}
+
+/* Sideways on the window switches clips (useSwipe); up and down still scrolls. */
+.palette--live .palette__stage {
+  touch-action: pan-y;
 }
 
 /* Every clip in the same cell: the window is as tall as the tallest of them
