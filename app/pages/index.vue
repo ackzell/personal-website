@@ -11,7 +11,8 @@ const [{ data: projects }, { data: roles }, { data: recognition }] = await Promi
 const featured = computed(() => projects.value?.find((project) => project.featured))
 
 // The running head in the margin names the sections; their own headings are
-// for assistive tech only.
+// for assistive tech only, except the featured project's, which marks where
+// the timeline ends.
 const sections = computed(() => [
   { id: 'about', label: t('home.bio') },
   ...(roles.value?.length ? [{ id: 'experience', label: t('home.timeline') }] : []),
@@ -50,7 +51,7 @@ useHead({
     </section>
 
     <section v-if="featured" id="currently" aria-labelledby="featured-heading">
-      <h2 id="featured-heading" class="sr-only">{{ $t('home.featured') }}</h2>
+      <h2 id="featured-heading" track="wide" class="running-head">{{ $t('home.featured') }}</h2>
       <ProjectLexicon :projects="[featured]" />
     </section>
   </div>

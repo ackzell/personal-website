@@ -330,7 +330,7 @@ function blur(slug: string) {
   <div class="experience">
     <h2 id="timeline-heading" class="sr-only">{{ title }}</h2>
 
-    <div class="experience__body" grid gap="x-block" mb-60>
+    <div class="experience__body" grid gap="x-block">
       <div class="experience__rail" aria-hidden="true" flex="~ col" items="center" gap="tight" typeset="code"
         text="sm muted">
         <span class="tabular-nums">{{ lastYear }}</span>
