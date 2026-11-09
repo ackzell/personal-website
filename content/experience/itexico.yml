@@ -8,12 +8,31 @@ role:
 summary:
   en:
     - I worked with global teams under the eTaaS (extended Team as a Service) model.
-    - My main role was to collaborate in the development of software solutions for iTexico's customers while using the Scrum Agile framework. Migrated a crucial application to AngularJS.
+    - My main role was to collaborate in the development of software solutions for iTexico's customers while using the Scrum Agile framework.
+    - Migrated a crucial application to AngularJS.
     - At a later stage I interviewed candidates to assess fit in my current client’s Front End team.
+    - Also participated during the move toward the implementation of the Scaled Agile Framework (SAFe) within the client company.
     - I mentored an intern at my client company.
   es:
     - Trabajé con equipos globales bajo el modelo eTaaS (extended Team as a Service).
-    - Mi función principal fue colaborar en el desarrollo de soluciones de software para los clientes de iTexico con el marco ágil Scrum. Migré una aplicación crítica a AngularJS.
+    - Mi función principal fue colaborar en el desarrollo de soluciones de software para los clientes de iTexico con el marco ágil Scrum.
+    - Migré una aplicación crítica a AngularJS.
     - Más adelante entrevisté candidatos para evaluar su encaje en el equipo Front End de mi cliente.
+    - También participé durante la adopción del Scaled Agile Framework (SAFe) dentro de la empresa cliente.
     - Fui mentor de un practicante en la empresa cliente.
-stack: [Angular.js (1.0), Angular (2+), JavaScript, TypeScript, Twitter Bootstrap, Sass, Gulp, PyTest + Selenium, GitHub, Jira, Ubuntu, Windows 10, Mac OS X]
+stack:
+  [
+    Angular.js (1.0),
+    Angular (2+),
+    JavaScript,
+    TypeScript,
+    Twitter Bootstrap,
+    Sass,
+    Gulp,
+    PyTest + Selenium,
+    GitHub,
+    Jira,
+    Ubuntu,
+    Windows 10,
+    Mac OS X,
+  ]

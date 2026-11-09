@@ -8,10 +8,12 @@ role:
 summary:
   en:
     - I worked remotely as part of an extended team for a Fintech company as a full stack dev.
-    - Implemented new features for an internal system while on a multidisciplinary squad.
+    - I helped build operational tooling for a revolutionary sub-accounting system.
+    - This was a multidisciplinary squad that worked at a very efficient pace.
   es:
     - Trabajé de forma remota como desarrollador full stack en un equipo extendido para una empresa Fintech.
-    - Implementé nuevas funcionalidades para un sistema interno dentro de un equipo multidisciplinario.
+    - Apoyé en el desarrollo de herramientas operacionales para un sistema revolucionario de sub-accounting.
+    - Formé parte de un equipo multidisciplinario que trabajó a un ritmo muy eficiente.
 stack:
   [
     React,
