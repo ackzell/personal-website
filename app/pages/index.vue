@@ -67,8 +67,8 @@ useHead({
 }
 #currently {
   scroll-snap-align: start;
-  /* Twice a section's gap: the timeline ends in open room before what's next. */
-  margin-top: calc(var(--gap-section) * 2);
+  /* Three times a section's gap: the timeline ends in open room before what's next. */
+  margin-top: calc(var(--gap-section) * 3);
   min-block-size: calc(100svh - var(--header-height, 0px) - var(--section-index-height, 0px));
 }
 </style>
