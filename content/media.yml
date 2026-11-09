@@ -13,31 +13,45 @@ podcast:
 # One row per playlist, newest first; titles are the playlists' own.
 # Playlists with a project keep a link to it.
 series:
+  - playlist: PLmJs3lfUmCdT9MyG60Oo6HM7xAn79vwZ0
+    title: Heartbeat
+    note:
+      en: "This is where it all started. A desktop application. I build it step by step all over again."
+      es: "Aquí comenzó todo. Una aplicación de escritorio que construyo paso a paso de nuevo."
+  - playlist: PLmJs3lfUmCdR-1js29OeqNR_YBm2Qy2r5
+    title: "Camati: Nuxt + Vuetify"
+    note:
+      en: "This might be the first project I used Nahuatl for its name."
+      es: "Creo que este es el primer proyecto que nombré en Nahuatl."
+  - playlist: PLmJs3lfUmCdTcQmLUv2YFX-L0TqkM7PM1
+    title: My Talks
+    note:
+      en: "I might one day try and come back to speaking at a meetup or a conference."
+      es: "Tal vez un día, vuelva a intentar hablar en un meetup o una conferencia."
   - playlist: PLmJs3lfUmCdTQDpZop2BC1EJ5emEpTBPn
     title: Amoxtli Vue - A book about Vue
     project: amoxtli
-    note: &note
-      en: "[Placeholder] One line about this series, in my own words."
-      es: "[Provisional] Una línea sobre esta serie, en mis palabras."
+    note:
+      en: ""
+      es: ""
   - playlist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP
     title: Tlapalli
     project: tlapalli
-    note: *note
-  - playlist: PLmJs3lfUmCdTcQmLUv2YFX-L0TqkM7PM1
-    title: My Talks
-    note: *note
-  - playlist: PLmJs3lfUmCdR-1js29OeqNR_YBm2Qy2r5
-    title: "Camati: Nuxt + Vuetify"
-    note: *note
+    note:
+      en: ""
+      es: ""
   - playlist: PLmJs3lfUmCdS8W27OoWj3uGDP6g4ypNyw
     title: Meteor + Vue
-    note: *note
+    note:
+      en: "I was really interested in learning and working with Meteor for a long time in my career. At one point I finally had a job where I used it."
+      es: "Tuve mucho interés por aprender y trabajar con Meteor por una buena parte de mi carrera. En algún punto finalmente tuve un empleo donde lo utilizaba."
   - playlist: PLmJs3lfUmCdTvQfcaFgdJUP-J5wdm5Owq
     title: "Sass: Custom checkboxes"
-    note: *note
+    note:
+      en: ""
+      es: ""
   - playlist: PLmJs3lfUmCdSuMvPIPhz_OOT1pWm0iLZZ
     title: Introducción a Vue.js
-    note: *note
-  - playlist: PLmJs3lfUmCdT9MyG60Oo6HM7xAn79vwZ0
-    title: Heartbeat
-    note: *note
+    note:
+      en: ""
+      es: ""
