@@ -56,3 +56,11 @@ useHead({
     </section>
   </div>
 </template>
+
+<style scoped>
+/* The last section is at least a screen tall, so its anchor lands it at the
+   top with empty room below rather than stopping short at the page's end. */
+#currently {
+  min-block-size: calc(100svh - var(--header-height, 0px) - var(--section-index-height, 0px));
+}
+</style>
