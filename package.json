@@ -7,6 +7,7 @@
     "build": "nuxt build",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
+    "preview:static": "wrangler pages dev .output/public --port 3004",
     "typecheck": "nuxt typecheck",
     "test": "node --test 'tests/*.test.ts'",
     "postinstall": "nuxt prepare",
@@ -38,6 +39,7 @@
     "subset-font": "^2.9.0",
     "typescript": "^5.9.3",
     "unocss": "^66.12.0",
-    "vue-tsc": "^3.3.14"
+    "vue-tsc": "^3.3.14",
+    "wrangler": "4.158.0"
   }
 }
