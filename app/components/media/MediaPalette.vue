@@ -155,6 +155,7 @@ const larger = computed(() => clips.value.map((i) => props.items[i]!).map((item)
   webm: src(item, 'webm'),
   poster: src(item, 'webp'),
   alt: item.label,
+  caption: item.caption,
   width: props.width,
   height: props.height,
 })))
