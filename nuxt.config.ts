@@ -140,7 +140,8 @@ export default defineNuxtConfig({
   },
 
   i18n: {
-    baseUrl: 'https://ackzell.dev',
+    // Preview deploys point OG images and links at themselves; ackzell.dev only serves main.
+    baseUrl: process.env.CF_PAGES_BRANCH && process.env.CF_PAGES_BRANCH !== 'main' ? process.env.CF_PAGES_URL : 'https://ackzell.dev',
     defaultLocale: 'en',
     strategy: 'prefix_except_default',
     // A static site can't redirect on the server; client-side redirects
