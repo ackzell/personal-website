@@ -186,7 +186,8 @@ const readout = computed(() => {
           <span class="timeline__arrow" aria-hidden="true">→</span>
         </h2>
         <p m="0" text="sm">{{ half.intro }}</p>
-        <p class="timeline__stats" m="0" text="sm muted">{{ half.stats }}</p>
+        <!-- Fades on a language switch: mid-scramble the line runs longer than either language and wraps. -->
+        <p class="timeline__stats" m="0" text="sm muted" data-switch-fade>{{ half.stats }}</p>
       </div>
 
       <!-- The bars are a door to the same page (or, under a mouse, to the
