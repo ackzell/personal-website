@@ -124,6 +124,11 @@ watch(touched, (i) => {
 function enter(event: PointerEvent, i: number) {
   if (event.pointerType === 'mouse') strike(i)
 }
+// Built in (main.css, "First visit"), each icon plays its note as it lands,
+// so the line is heard once: silent unless sound is on (`ackzell.intro`).
+function landed(event: AnimationEvent, i: number) {
+  if (event.animationName.startsWith('site-footer-intro')) strike(i)
+}
 </script>
 
 <template>
@@ -145,7 +150,8 @@ function enter(event: PointerEvent, i: number) {
       <li v-for="(link, i) in socialLinks" :key="link.href" ref="items" :data-touched="touched === i || undefined"
         @pointerenter="enter($event, i)">
         <a :href="link.href" rel="me noopener" :aria-label="link.label" :title="link.label"
-          class="text-[1.125rem] text-fg site-footer__land" data-press="none" :style="{ '--i': i }" inline-flex p="1.5">
+          class="text-[1.125rem] text-fg site-footer__land" data-press="none" :style="{ '--i': i }" inline-flex p="1.5"
+          @animationend="landed($event, i)">
           <span :class="link.icon" aria-hidden="true" />
         </a>
       </li>
