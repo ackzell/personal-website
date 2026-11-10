@@ -52,6 +52,8 @@ const formatLongMonth = useMonthFormat('long')
 
 const podcast = computed(() => props.series.some((row) => row.kind === 'podcast'))
 const hasBars = computed(() => props.series.some((row) => row.releases.some((release) => release.duration)))
+// Some of these are left empty on purpose; the swatches already explain the marks.
+const legendNote = computed(() => t(podcast.value ? 'media.guide.legend.episodes' : hasBars.value ? 'media.guide.legend.bars' : 'media.guide.legend.videos'))
 const hasViews = computed(() => props.series.some((row) => row.kind === 'playlist' && row.releases.some((release) => release.views !== undefined)))
 
 // The line under a strip at rest: its span, or, while a month is lit, how
@@ -395,8 +397,7 @@ const { linked, waiting, order, fit } = useGuideReveal(root, reducedMotion)
             {{ t(hasViews ? 'media.guide.legend.views' : 'media.guide.legend.downloads') }}
           </span>
         </template>
-        <span class="guide__key">{{ t(podcast ? 'media.guide.legend.episodes' : hasBars ? 'media.guide.legend.bars' :
-          'media.guide.legend.videos') }}</span>
+        <span v-if="legendNote" class="guide__key">{{ legendNote }}</span>
       </p>
     </aside>
     <div role="list" :aria-label="t('media.guide.label')">
