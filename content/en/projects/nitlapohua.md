@@ -1,15 +1,12 @@
 ---
 title: "Nitlapohua"
-description: "A couch-multiplayer mental math battle for the family."
+description: "A mental maths game I made for my family."
 meaning: "I count"
 pronunciation: "nee-tla-POH-wah"
 ---
 
-<!-- TODO(owner): this copy is a placeholder drafted by Claude from the repo's README, not yours. Rewrite it in your own words, in both languages. Add repos/links in content/projects/nitlapohua.yml once the repo or deploy is public. -->
-
 ::media-clip{src="/media/nitlapohua/video.mp4" webm="/media/nitlapohua/video.webm" label="Nitlapōhua intro" width="1920" height="1080"}
 ::
-
 
 We could all use some math practice at home, so I built this to help my kids with their quick maths, the mental math kind. The goal is to make it feel like a game we can all play together at the same time, but that they can also play on their own.
 

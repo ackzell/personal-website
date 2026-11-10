@@ -1,6 +1,6 @@
 ---
 title: "Nitlapohua"
-description: "Una batalla de cálculo mental para jugar en familia, desde el sillón."
+description: "Un juego de matemáticas mentales hecho para mi familia."
 meaning: "yo cuento"
 pronunciation: "ni-tla-PÓ-ua"
 ---
