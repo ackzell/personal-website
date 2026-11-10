@@ -164,6 +164,10 @@ export default defineNuxtConfig({
 
   nitro: {
     prerender: {
+      // contributions.html, not contributions/index.html: Cloudflare Pages
+      // 308s a folder index to the trailing-slash URL, and every link,
+      // canonical and sitemap entry here is slashless.
+      autoSubfolderIndex: false,
       crawlLinks: true,
       routes: ['/', '/api/contributions', '/api/episodes', '/api/amoxtli-chapters', ...playlists],
     },
