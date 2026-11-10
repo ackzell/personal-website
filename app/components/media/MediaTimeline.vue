@@ -336,6 +336,11 @@ const readout = computed(() => {
   block-size: var(--half);
 }
 
+/* A long intro makes the videos row taller than the bars; they stay on the axis. */
+.timeline__half--videos .timeline__bars {
+  align-self: end;
+}
+
 .timeline__half--podcast .timeline__bars {
   align-items: start;
 }
