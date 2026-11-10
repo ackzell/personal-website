@@ -54,6 +54,7 @@ const EASE_OUT = 'cubic-bezier(0.16, 1, 0.3, 1)'
 
 export default defineNuxtPlugin((nuxtApp) => {
   const i18n = nuxtApp.$i18n as { locale: Ref<string> }
+  const error = useError()
   const reduceMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
   // Each change in progress, as how to cut it short with the new text in place.
   let running: (() => void)[] = []
@@ -295,7 +296,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     hold()
     // Not a frame later: the re-rendered page would paint in the new
     // language first.
-    nuxtApp.hooks.hookOnce('page:finish', () => morph(before))
+    // An error page switches in place (SiteLocaleSwitch): no page to finish.
+    if (error.value) nextTick(() => morph(before))
+    else nuxtApp.hooks.hookOnce('page:finish', () => morph(before))
   }, { flush: 'pre' })
 
   // Leaving mid-change: every node gets its text back before Vue patches it.
