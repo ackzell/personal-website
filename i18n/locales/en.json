@@ -157,7 +157,7 @@
   "uses": {
     "title": "Uses",
     "description": "My favorite software, hardware setup or libs and frameworks I probably already forgot how to use",
-    "intro": "Inspired by Wes Bos's {usesTech}, here are some of the tools, hardware, and gear that has been or currently is part of my day to day.",
+    "intro": "Inspired by Wes Bos's {usesTech}, here are some of the tools, hardware, and gear that have been or currently are part of my day to day.",
     "tool": "Tool",
     "years": "Years",
     "note": "Note",
