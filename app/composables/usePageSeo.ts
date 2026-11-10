@@ -23,5 +23,7 @@ export function usePageSeo(seo: () => { title?: string; description?: string; en
   })
 
   const { title, entry: { heading, ...entry } = {} } = seo()
-  defineOgImage('Page.takumi', { title: heading ?? title, section: section.value, ...entry }, { height: 630 })
+  // The alt reads out the card's own text, so it never says more than the card shows.
+  const alt = [heading ?? title, entry.parent, 'ackzell.dev'].filter(Boolean).join(' · ')
+  defineOgImage('Page.takumi', { title: heading ?? title, section: section.value, ...entry }, { height: 630, alt })
 }
