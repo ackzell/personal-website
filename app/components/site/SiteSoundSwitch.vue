@@ -9,15 +9,23 @@
 const on = ref(false)
 // Read after mount: the server can't know, so the value stays hidden till then.
 const mounted = useMounted()
-onMounted(() => (on.value = soundIsOn()))
+// The `on` beep as a file (the panel set's, rendered): the press that turns
+// sound on may be what starts the generated audio, which can take a while to
+// play out, but a file plays at once.
+let onBeep: HTMLAudioElement | undefined
+onMounted(() => {
+  on.value = soundIsOn()
+  onBeep = new Audio('/sound-on.mp3')
+})
 
 function toggle() {
   const next = !on.value
-  // On: once the output is playing (the first press starts it), and a beat
-  // after unmuting, so the gain's glide up doesn't eat the beep.
   if (next) {
     setSoundOn(true)
-    soundAwake().then(() => setTimeout(() => sound('on'), 80))
+    if (onBeep) {
+      onBeep.currentTime = 0
+      onBeep.play().catch(() => {})
+    }
   }
   else sound('off')
   // Muted once `off` has played out (two beeps, the last ending by 0.2s).
