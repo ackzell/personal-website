@@ -13,10 +13,11 @@ onMounted(() => (on.value = soundIsOn()))
 
 function toggle() {
   const next = !on.value
-  // On: a beat after unmuting, so the gain's glide up doesn't eat the beep.
+  // On: once the output is playing (the first press starts it), and a beat
+  // after unmuting, so the gain's glide up doesn't eat the beep.
   if (next) {
     setSoundOn(true)
-    setTimeout(() => sound('on'), 80)
+    soundAwake().then(() => setTimeout(() => sound('on'), 80))
   }
   else sound('off')
   // Muted once `off` has played out (two beeps, the last ending by 0.2s).

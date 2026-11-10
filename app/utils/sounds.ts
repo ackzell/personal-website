@@ -102,6 +102,20 @@ export function wakeSound() {
 }
 
 /*
+ * Resolves once the audio clock is moving: a new output stays at 0 until the
+ * device is really playing, and a sound played before that is lost. Gives up
+ * after a second, so a stuck output never holds anything back for good.
+ */
+export function soundAwake() {
+  const context = getAnalyser()?.context
+  const until = performance.now() + 1000
+  return new Promise<void>((done) => {
+    const check = () => !context || context.currentTime > 0 || performance.now() > until ? done() : requestAnimationFrame(check)
+    check()
+  })
+}
+
+/*
  * Switches sound on or off, remembered for the next visit. Switched off, it
  * can wait `after` ms to go quiet, so the sound saying so plays out whole.
  */
