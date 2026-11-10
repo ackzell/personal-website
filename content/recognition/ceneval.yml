@@ -6,6 +6,6 @@ short: Ceneval
 issuer: CENEVAL
 start: 2013-03
 detail:
-  en: EGEL Software Engineering exam, with an outstanding score in every evaluated area.
-  es: EGEL Ingeniería de Software, con desempeño sobresaliente en todas las áreas evaluadas.
+  en: EGEL Software Engineering exam, with an outstanding score in 4/4 evaluated areas.
+  es: EGEL Ingeniería de Software, con desempeño sobresaliente en 4/4 áreas evaluadas.
 score: [4, 4]
