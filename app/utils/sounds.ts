@@ -93,6 +93,15 @@ export function onSoundOn(run: VoidFunction) {
 }
 
 /*
+ * Wakes the audio (still muted) ahead of a press that may switch it on:
+ * outputs take a moment to come up, which would swallow the `on` beep.
+ */
+export function wakeSound() {
+  start()
+  unlock()
+}
+
+/*
  * Switches sound on or off, remembered for the next visit. Switched off, it
  * can wait `after` ms to go quiet, so the sound saying so plays out whole.
  */
