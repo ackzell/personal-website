@@ -43,7 +43,7 @@ function lit({ animationName }: AnimationEvent) {
 /**
  * Hides the header and footer, then builds them in after `wait` ms ("build")
  * and keeps "done" once built, so nothing replays its everyday entrance after
- * the build's own. Any press, key or scroll shows everything at once.
+ * the build's own. It plays through: a press or scroll doesn't cut it short.
  */
 export function buildIntro(wait: number) {
   const root = document.documentElement
@@ -57,9 +57,6 @@ export function buildIntro(wait: number) {
     stop.abort()
     clearTimeout(timer)
     root.dataset.intro = 'done'
-  }
-  for (const type of ['pointerdown', 'keydown', 'wheel', 'touchstart']) {
-    addEventListener(type, end, { signal: stop.signal, passive: true, capture: true })
   }
   addEventListener('animationend', landed, { signal: stop.signal })
   addEventListener('animationstart', lit, { signal: stop.signal })
