@@ -293,6 +293,13 @@ onBeforeUnmount(() => cancelAnimationFrame(pending))
   .home-intro>h1 {
     font-size: 1.375rem;
   }
+
+  /* <main> keeps extra room on the inline end for the footer's rail, which
+     leaves the column off the screen's middle. The same room on the start
+     side centers the mark and its text on the screen itself. */
+  .home-intro {
+    margin-inline-start: max(0px, var(--rail-width) - var(--gutter));
+  }
 }
 
 /* Laid out by script: the mark holds just under the header, and under the
