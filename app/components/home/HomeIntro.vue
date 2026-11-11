@@ -133,6 +133,9 @@ function flow(force = false) {
   const cx = m.offsetLeft + r
   // About 12 characters: narrower and a side holds stray words, not lines.
   const minSide = fontSize * 7
+  // Too narrow for any line (DevTools squeezing the page mid-resize): the
+  // loop below would skip every row forever and hang the tab.
+  if (width < minSide) return
   let y = m.offsetHeight + lead
   const placed: Placed[] = []
   for (const [index, block] of blocks.entries()) {
