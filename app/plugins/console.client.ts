@@ -105,4 +105,6 @@ export default defineNuxtPlugin((nuxtApp) => {
     // A tick later, or the load event's own end isn't timed yet.
     else addEventListener('load', () => setTimeout(greet), { once: true })
   })
+  // The greeting was printed in the old language: say it again in the new one.
+  watch(() => i18n.locale.value, greet)
 })
