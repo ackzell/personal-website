@@ -164,7 +164,11 @@ const playerUrl = (episode: string) => `https://mytypeof.dev/embed/player?image-
 // The stills come from one host; the handshake is done before the first is asked for.
 useHead(() => ({
   link: props.series.some((row) => row.kind === 'playlist') ? [{ rel: 'preconnect', href: 'https://i.ytimg.com' }] : [],
+  // The host's resizer, which fits the player's height to what it shows.
+  script: podcast.value ? [{ src: 'https://assets.beamly.com/app/assets/scripts/iframe-host.js', defer: true }] : [],
 }))
+// It only looks for players once, on page load; the panel's comes later.
+const fitPlayer = (event: Event) => (window as { iFrameResize?: (options: object, el: EventTarget | null) => void }).iFrameResize?.({ checkOrigin: false, log: false }, event.target)
 
 function show(row: Row, cell: Cell, touch: boolean) {
   read(row.id, cell)
@@ -480,7 +484,8 @@ const { linked, waiting, order, fit } = useGuideReveal(root, reducedMotion)
           :src="youtubeWatch(item.video)" :title="item.title"
           :poster="youtubeStill(item.video, 'hqdefault')" />
         <iframe v-else-if="item.episode" :key="item.episode" class="guide__sheet-player"
-          :src="playerUrl(item.episode)" :title="item.title" allow="autoplay; encrypted-media" loading="lazy" />
+          :src="playerUrl(item.episode)" :title="item.title" allow="autoplay; encrypted-media" loading="lazy"
+          @load="fitPlayer" />
         <p v-if="!item.video" m="0">
           <a :href="item.url" class="guide__sheet-out">{{ t('media.guide.openPodcast') }}<span
               class="i-iconoir-arrow-up-right" aria-hidden="true" /></a>
