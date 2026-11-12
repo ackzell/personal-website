@@ -32,8 +32,10 @@
   "home": {
     "bio": "About me",
     "title": "Axel Martínez",
-    "description": "Mexican software artisan. Eternal apprentice of web technologies. Insatiable learner. Father. Beatle fan.",
-    "intro": "Hello there! I'm a Mexican software engineer whose career has been mostly dedicated to the frontend and JS/TS stacks. I've built on the web for more than {years} years (wow, time flies!) and I'm really excited to share with you through this website my professional experience as well as things I create apart from my day job. Please feel free to poke around and reach out as well. Have a good one!",
+    "description": "Mexican software engineer focused on the frontend and JS/TS (Vue, if you give me a choice). Eternal apprentice of web technologies. Father. Beatle fan.",
+    "intro": "Hello there! I'm a Mexican software engineer focused on the frontend and the JS/TS stack, I'd choose Vue over other frameworks any day. I've been building for the web for more than {years} years (wow, time flies!), and here you'll find more about my experience and the things I make on the side. Feel free to poke around, and reach out if you'd like to work together or just say hi. Have a good one!",
+    "contact": "Feel like working together, or just saying hi?",
+    "contactTitle": "Contact",
     "featured": "Currently working on",
     "allProjects": "All projects",
     "timeline": "Experience"

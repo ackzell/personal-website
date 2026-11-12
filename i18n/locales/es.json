@@ -7,7 +7,7 @@
     "message": "Sorry, Esa página no existe, pero ya que estás aquí... ¿Sabes jugar solitario?"
   },
   "console": {
-    "message": "Ya sabía que vendrías a la consola jajaj! Gracias por visitar este website. Saludos!",
+    "message": "Ya sabía que vendrías a la consola! jajaj Gracias por visitar este website. Saludos!",
     "hint": "Ya que estás aquí, puedes escribir:",
     "stack": "Hecho con Nuxt, Vue, Nuxt Content, UnoCSS, Motion, anime.js, Foley (sonidos) y web-haptics. El código:",
     "v1": "Esta es la v2. ¿Conociste la v1?"
@@ -32,8 +32,10 @@
   "home": {
     "bio": "Sobre mí",
     "title": "Axel Martínez",
-    "description": "Artesano mexicano de software. Aprendiz eterno de tecnologías web. Estudiante insaciable. Padre de familia. Beatle fan.",
-    "intro": "¡Hola! Soy un ingeniero de software mexicano dedicado sobre todo al frontend a lo largo de mi carrera. He construido para la web por más de {years} años (ándale! el tiempo vuela) y estoy muy contento de compartir contigo a través de este website mi experiencia profesional, así como las cosas que voy creando fuera de mi empleo. Por favor, siéntete libre de explorar el sitio y también de contactarme. ¡Buen día!",
+    "description": "Ingeniero de software mexicano enfocado en el frontend y JS/TS (Vue, si tuviera que escoger). Aprendiz eterno de tecnologías web. Padre de familia. Beatle fan.",
+    "intro": "¡Hola! Soy un ingeniero de software mexicano enfocado en el frontend y el stack de JS/TS, y si tuviera que escoger un framework usaría Vue (cuál mas?). He construido para la web por más de {years} años (ándale! el tiempo vuela) y aquí encontrarás mi experiencia y las cosas que hago por mi cuenta. Siéntete libre de explorar, y escríbeme si quieres que trabajemos juntos o sólo saludar. Buen día!",
+    "contact": "¿Trabajamos juntos, o sólo quieres saludar?",
+    "contactTitle": "Contacto",
     "featured": "Mi proyecto más activo",
     "allProjects": "Todos los proyectos",
     "timeline": "Trayectoria"

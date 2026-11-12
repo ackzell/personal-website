@@ -17,14 +17,15 @@ const sections = computed(() => [
   { id: 'about', label: t('home.bio') },
   ...(roles.value?.length ? [{ id: 'experience', label: t('home.timeline') }] : []),
   ...(featured.value ? [{ id: 'currently', label: t('home.featured') }] : []),
+  { id: 'contact', label: t('home.contactTitle') },
 ])
 
-// The page ends where the featured project sits at the top: its room is a
+// The page ends where the contact section sits at the top: its room is a
 // screen less the scroll padding above and everything below it (next stop,
 // footer), measured as those change.
-const currently = useTemplateRef<HTMLElement>('currently')
-function fitCurrently() {
-  const el = currently.value
+const last = useTemplateRef<HTMLElement>('last')
+function fitLast() {
+  const el = last.value
   if (!el) return
   const root = document.documentElement
   const below = root.scrollHeight - (el.getBoundingClientRect().bottom + window.scrollY)
@@ -34,10 +35,10 @@ function fitCurrently() {
   // (phones) would flip it a pixel each pass, so small changes are ignored.
   if (Math.abs(room - lastRoom) <= 1) return
   lastRoom = room
-  el.style.setProperty('--currently-room', `${room}px`)
+  el.style.setProperty('--last-room', `${room}px`)
 }
 let lastRoom = -2
-if (import.meta.client) useResizeObserver(document.body, fitCurrently)
+if (import.meta.client) useResizeObserver(document.body, fitLast)
 
 usePageSeo(() => ({ title: t('home.title'), description: t('home.description') }))
 
@@ -70,9 +71,22 @@ useHead({
         :recognition="recognition ?? []" />
     </section>
 
-    <section v-if="featured" id="currently" ref="currently" aria-labelledby="featured-heading">
+    <section v-if="featured" id="currently" aria-labelledby="featured-heading">
       <h2 id="featured-heading" track="wide" class="running-head">{{ $t('home.featured') }}</h2>
       <ProjectLexicon :projects="[featured]" />
+    </section>
+
+    <!-- Set like the featured entry above it: a running head, then the address
+         as the headword and the invitation as its gloss. The page ends on it,
+         a screen of its own, so the section index can land on it. -->
+    <section id="contact" ref="last" aria-labelledby="contact-heading">
+      <h2 id="contact-heading" track="wide" class="running-head">{{ $t('home.contactTitle') }}</h2>
+      <p py="12" m="0">
+        <!-- A step under the project word, so the address doesn't outweigh it. -->
+        <a href="mailto:hello@ackzell.dev" typeset="heading" leading="none"
+          style="font-size: calc(var(--headword-size) * 0.8)">hello@ackzell.dev</a>
+      </p>
+      <p class="gloss" m="0">{{ $t('home.contact') }}</p>
     </section>
   </div>
 </template>
@@ -82,15 +96,17 @@ useHead({
    lands it at the top and the page can't scroll past into empty room. */
 /* Proximity, not mandatory: scrolling settles on it only when it comes near,
    so the long timeline above still scrolls freely. */
-:global(:root:has(#currently)) {
+:global(:root:has(#contact)) {
   scroll-snap-type: y proximity;
 }
+/* Three times a section's gap: the timeline ends in open room before what's next. */
 #currently {
-  scroll-snap-align: start;
-  /* Three times a section's gap: the timeline ends in open room before what's next. */
   margin-top: calc(var(--gap-section) * 3);
-  min-block-size: calc(100svh - var(--currently-room, var(--header-height, 0px) + var(--section-index-height, 0px)));
-  /* Its label and project sit together in the middle of that room. */
+}
+#contact {
+  scroll-snap-align: start;
+  min-block-size: calc(100svh - var(--last-room, var(--header-height, 0px) + var(--section-index-height, 0px)));
+  /* Its label, address and line sit together in the middle of that room. */
   display: flex;
   flex-direction: column;
   justify-content: center;
