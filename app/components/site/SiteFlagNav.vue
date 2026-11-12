@@ -184,7 +184,8 @@ if (import.meta.client) {
   const router = useRouter()
   const nuxtApp = useNuxtApp()
   // Only a page still on its way after a beat shows any of it: a quick one
-  // (fetched ahead) would flash the preview and snap it lit.
+  // (fetched ahead) would flash the preview and snap it lit. 400ms, not less:
+  // an ordinary tap that takes a few hundred ms read as a jarring half-lit bar.
   let beat: ReturnType<typeof setTimeout> | undefined
   const stop = () => {
     clearTimeout(beat)
@@ -195,7 +196,7 @@ if (import.meta.client) {
       stop()
       if (to.path === from.path) return
       const key = stopFor(to)
-      beat = setTimeout(() => (loading.value = { key, done: false }), 150)
+      beat = setTimeout(() => (loading.value = { key, done: false }), 400)
     }),
     router.afterEach((_to, _from, failure) => {
       if (failure) stop()
