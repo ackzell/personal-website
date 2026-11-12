@@ -11,6 +11,7 @@ Incluso después de moverme a Nuxt Content y debido al hecho que hice un fork de
 ::
 
 ## Algunos detalles técnicos (pero no todos)
+
 Tuve que hacer un fork de almost node y modificarlo para hacer que funcionara, pero un día finalmente lo hizo. La idea principal es tener un ambiente muy similar al que tendrías en tu propia computadora corriendo Node con Vite y sirviendo tu ambiente de desarrollo.
 
 La verdad, utilicé inteligencia artificial realmente para todo esto de la migración. Pero al ver los resultados y después de muchos auditorías que le hice al código, creo que está trabajando lo mejor que pude haberlo hecho funcionar así que lo dejé en la plataforma.
