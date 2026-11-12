@@ -102,8 +102,16 @@ watch([current, row], async () => {
   const box = list.value
   const link = links.value?.[props.items.findIndex(({ id }) => id === current.value)]
   if (!box || !link) return
-  const { offsetLeft: left, offsetWidth: width } = link
-  if (left >= box.scrollLeft && left + width <= box.scrollLeft + box.clientWidth) return
+  // Measured against the row itself: offsetLeft counts from the nearest
+  // containing block, and the items' entrance (transform, filter) can make
+  // each item one, reading every link as at 0, always in view.
+  const boxRect = box.getBoundingClientRect()
+  const linkRect = link.getBoundingClientRect()
+  const left = linkRect.left - boxRect.left + box.scrollLeft
+  const width = linkRect.width
+  // A name under the end fade isn't really in view either.
+  const fade = overflowing.value ? Number.parseFloat(getComputedStyle(box).columnGap) || 0 : 0
+  if (left >= box.scrollLeft && left + width <= box.scrollLeft + box.clientWidth - fade) return
   box.scrollTo({ left: left - (box.clientWidth - width) / 2, behavior: reducedMotion.value === 'reduce' ? 'auto' : 'smooth' })
 })
 
