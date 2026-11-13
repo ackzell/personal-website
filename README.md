@@ -2,6 +2,10 @@
 
 Personal site and portfolio. Nuxt 4 + Nuxt Content + @nuxtjs/i18n, prerendered and deployed to Cloudflare Pages.
 
+![The ackzell.dev home page](.github/screenshot.png)
+
+The previous site is tagged [`v1`](https://github.com/ackzell/personal-website/tree/v1).
+
 ```sh
 vp install
 vp run dev        # nuxt dev
