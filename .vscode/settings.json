@@ -1,12 +1,40 @@
 {
-  "editor.fontFamily": "'Source Code Pro'",
-  "editor.fontWeight": "400",
-  "tailwindCSS.includeLanguages": {
-    "vue": "html"
-  },
+  "editor.fontFamily": "Source Code Pro",
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
-  "workbench.colorTheme": "Monochrome Dark",
-  "workbench.iconTheme": "field-lights-monochrome-minimalistic",
-  "editor.renderWhitespace": "all"
+  "editor.allowVariableFonts": false,
+  "workbench.iconTheme": "gruvbox-material-icon-theme",
+  "workbench.experimental.modernUIEditorTabStyle": "pill",
+  "workbench.experimental.modernUIUppercaseViewHeaders": false,
+  "window.autoDetectColorScheme": true,
+  "workbench.preferredLightColorTheme": "Tlapalli l-00: Obsidian Light",
+  "workbench.preferredDarkColorTheme": "Tlapalli 00: Obsidian",
+  "i18n-ally.localesPaths": [
+    "i18n",
+    "i18n/locales"
+  ],
+  "i18n-ally.keystyle": "nested",
+  "yaml.schemas": {
+    "./.vscode/schemas/experience.json": [
+      "content/experience/*.yml"
+    ],
+    "./.vscode/schemas/recognition.json": [
+      "content/recognition/*.yml"
+    ],
+    "./.vscode/schemas/contributions.json": [
+      "content/contributions.yml"
+    ],
+    "./.vscode/schemas/media.json": [
+      "content/media.yml"
+    ],
+    "./.vscode/schemas/uses.json": [
+      "content/uses.yml"
+    ],
+    "./.vscode/schemas/projectsMeta.json": [
+      "content/projects/*.yml"
+    ],
+    "./.vscode/schemas/partsMeta.json": [
+      "content/projects/*/*.yml"
+    ]
+  }
 }

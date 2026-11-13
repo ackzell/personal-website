@@ -1,0 +1,7 @@
+status: experiment
+order: 5
+repos:
+  - ackzell/moliniani
+stack: [vue, motion-canvas, tresjs, vite]
+related: []
+devlogPlaylist: PLSBi6Nwb6uVE

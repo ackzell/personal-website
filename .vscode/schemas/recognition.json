@@ -1,0 +1,81 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "recognition",
+  "type": "object",
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "award",
+        "certification"
+      ]
+    },
+    "title": {
+      "type": "object",
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "es": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "en",
+        "es"
+      ],
+      "additionalProperties": false
+    },
+    "short": {
+      "type": "string"
+    },
+    "issuer": {
+      "type": "string"
+    },
+    "start": {
+      "type": "string",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+    },
+    "end": {
+      "type": "string",
+      "pattern": "^\\d{4}-(0[1-9]|1[0-2])$"
+    },
+    "detail": {
+      "type": "object",
+      "properties": {
+        "en": {
+          "type": "string"
+        },
+        "es": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "en",
+        "es"
+      ],
+      "additionalProperties": false
+    },
+    "score": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "number"
+        }
+      ]
+    }
+  },
+  "required": [
+    "kind",
+    "title",
+    "short",
+    "issuer",
+    "start"
+  ],
+  "additionalProperties": false
+}

@@ -1,0 +1,35 @@
+company: Accelya Group
+url: https://w3.accelya.com/
+start: 2024-01
+end: 2026-06
+role:
+  en: Senior Software Engineer
+  es: Ingeniero de Software Senior
+summary:
+  en:
+    - My first job living in Europe.
+    - Participated in frontend development activities including bug fixes, feature development, and AI-leveraged testing initiatives that added thousands of tests.
+    - Spearheaded Angular-to-Next.js migration (third successful migration project across companies), supporting their Design System initiative.
+    - Developed chatbot UI consuming AWS Bedrock service.
+  es:
+    - Mi primer empleo viviendo en Europa.
+    - Participé en el desarrollo frontend con corrección de errores, nuevas funcionalidades e iniciativas de pruebas apoyadas en IA que sumaron miles de tests.
+    - Migré gran parte de una app desde Angular a Next.js (el tercer proyecto de migración exitoso entre empresas) poniendo en práctica el recién creado Design System.
+    - Desarrollé la interfaz de un chatbot que consume el servicio AWS Bedrock.
+stack:
+  [
+    Angular 10,
+    React,
+    Next.js,
+    TypeScript,
+    TailwindCSS,
+    Jasmine,
+    Karma,
+    Vitest,
+    MSW,
+    Windows,
+    GitLab,
+    Jira,
+    Playwright,
+    AWS Lambdas,
+  ]

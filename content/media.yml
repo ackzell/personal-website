@@ -1,0 +1,57 @@
+# What I add to the series on the media pages. The releases themselves come
+# from their feeds at build time (server/api/playlists/[id].get.ts,
+# server/api/episodes.get.ts); only what's listed here shows, and everything
+# else stays on YouTube and mytypeof.dev. Playlists reach back to their latest
+# 15 videos.
+
+podcast:
+  title: My typeof Radio
+  note:
+    en: "A project that is dear to my heart. A good friend of mine and I started it in 2020. And we had so much fun recording and talking to new people about web dev and their awesome projects. It's currently in a weird stage where I have to decide whether it continues or I sunset it, but still I believe the content is worth listening to for all the web-development-related things that we cover and the awesome Spanish-speaking people in the community that we have had the pleasure of interviewing."
+    es: "Un proyecto al que le tengo mucho cariño. Un gran amigo mío y yo lo comenzamos en 2020. Y nos divertimos mucho grabando y hablando con personas nuevas acerca de webdev y sus proyectos tan geniales. Actualmente se encuentra en una etapa un poco rara donde tengo que decidir si el podcast continúa o lo retiro, pero todavía creo que el contenido merece la pena ser escuchado por todas las cosas relacionadas al webdev que hemos cubierto, y las maravillosas personas que hablan español en la comunidad a las que hemos tenido el placer de entrevistar."
+
+# One row per playlist, shown in this order; titles are the playlists' own.
+# Playlists with a project keep a link to it.
+series:
+  - playlist: PLmJs3lfUmCdT9MyG60Oo6HM7xAn79vwZ0
+    title: Heartbeat
+    note:
+      en: "This is where it all started. A desktop application. I build it step by step all over again."
+      es: "Aquí comenzó todo. Una aplicación de escritorio que construyo paso a paso de nuevo."
+  - playlist: PLmJs3lfUmCdR-1js29OeqNR_YBm2Qy2r5
+    title: "Camati: Nuxt + Vuetify"
+    note:
+      en: "This might be the first project I used Nahuatl for its name."
+      es: "Creo que este es el primer proyecto que nombré en Nahuatl."
+  - playlist: PLmJs3lfUmCdTcQmLUv2YFX-L0TqkM7PM1
+    title: My Talks
+    note:
+      en: "I might one day try and come back to speaking at a meetup or a conference."
+      es: "Tal vez un día, vuelva a intentar hablar en un meetup o una conferencia."
+  - playlist: PLmJs3lfUmCdTQDpZop2BC1EJ5emEpTBPn
+    title: Amoxtli Vue - A book about Vue
+    project: amoxtli
+    note:
+      en: ""
+      es: ""
+  - playlist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP
+    title: Tlapalli
+    project: tlapalli
+    note:
+      en: ""
+      es: ""
+  - playlist: PLmJs3lfUmCdS8W27OoWj3uGDP6g4ypNyw
+    title: Meteor + Vue
+    note:
+      en: "I was really interested in learning and working with Meteor for a long time in my career. At one point I finally had a job where I used it."
+      es: "Tuve mucho interés por aprender y trabajar con Meteor por una buena parte de mi carrera. En algún punto finalmente tuve un empleo donde lo utilizaba."
+  - playlist: PLmJs3lfUmCdTvQfcaFgdJUP-J5wdm5Owq
+    title: "Sass: Custom checkboxes"
+    note:
+      en: ""
+      es: ""
+  - playlist: PLmJs3lfUmCdSuMvPIPhz_OOT1pWm0iLZZ
+    title: Introducción a Vue.js
+    note:
+      en: ""
+      es: ""

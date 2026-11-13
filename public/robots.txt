@@ -1,0 +1,2 @@
+# Bot rules and content signals are prepended by Cloudflare (Bot Preference Sync).
+Sitemap: https://ackzell.dev/sitemap_index.xml

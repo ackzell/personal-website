@@ -1,0 +1,373 @@
+# What I work with, for the uses page, shown there as a table per category:
+# each tool, the year I started using it (`since`), the last year I used it
+# (`until`, left out while I still do), and optionally a `note` (both
+# languages) and a `url` to the product, which the tool name links to. The
+# categories follow what uses.tech suggests a /uses page covers.
+#
+categories:
+  - slug: editor
+    name:
+      en: Editor
+      es: Editor
+    tools:
+      - name: VSCode
+        since: 2015
+        url: https://code.visualstudio.com/
+        note:
+          en: Will 2027 be the year I leave it?
+          es: ¿Será 2027 cuando lo deje de usar?
+      - name: Sublime Text
+        url: https://www.sublimetext.com/
+        since: 2012
+        until: 2015
+        note:
+          en: Super fast
+          es: Súper rápido
+      - name: Aptana Studio
+        url: https://web.archive.org/web/20220728103406/http://www.aptana.com/
+        since: 2006
+        until: 2009
+        note:
+          en: From my early days in PHP + JS
+          es: De mi época de PHP + JS
+      - name: Notepad++
+        url: https://notepad-plus-plus.org/
+        since: 2006
+        until: 2009
+        note:
+          en: For my first projects.
+          es: Para mis primeros proyectos.
+
+  - slug: terminal
+    name:
+      en: Terminal
+      es: Terminal
+    tools:
+      - name: bash
+        since: 2015
+        note:
+          en: on Linux and Mac
+          es: en Linux y Mac
+      - name: zsh
+        since: 2017
+        note:
+          en: Whenever Mac made it default
+          es: Cuando sea que Mac la hizo el default
+      - name: gitbash
+        since: 2015
+        note:
+          en: My goto on Windows
+          es: Para Windows
+      - name: iTerm2
+        url: https://iterm2.com/
+        since: 2014
+        note:
+          en: The one I keep coming back to
+          es: Siempre vuelvo a ella
+      - name: Warp
+        since: 2026
+        url: https://www.warp.dev/terminal
+        note:
+          en: Pretty good since they removed the forced account
+          es: Bastante bien desde que quitaron la cuenta forzosa
+      - name: Terminator
+        since: 2014
+        url: https://gnome-terminator.org/
+      - name: Cmdr
+        since: 2013
+        until: 2014
+        url: https://cmder.app/
+      - name: Windows Terminal
+        since: 2021
+        url: https://apps.microsoft.com/detail/9n0dx20hk701?hl=en-US&gl=ES
+
+  - slug: hardware
+    name:
+      en: Hardware
+      es: Hardware
+    tools:
+      - name: Macbook Pro 16 M1 (2021)
+        since: 2024
+        note:
+          en: Personal machine
+          es: mi máquina personal
+      - name: Sony WH-1000XM4
+        since: 2022
+        note:
+          en: Going strong, but might have to replace the battery now.
+          es: Están casi enteros, sólo creo que debo cambiar la batería pronto.
+      - name: MX Mechanical Mini
+        url: https://www.logitech.com/es-es/shop/p/mx-mechanical-mini
+        since: 2022
+        note:
+          en: Low profile, backlit and ISO in Spanish
+          es: Low profile, retroiluminado y con ISO en español
+      - name: Logitech Lift
+        url: https://www.logitech.com/es-es/shop/p/lift-vertical-ergonomic-mouse
+        since: 2022
+        note:
+          en: good for smaller hands XD
+          es: ideal para manos pequeñas XD
+      - name: Magic Trackpad
+        since: 2022
+        note:
+          en: So useful!
+          es: ¡Muy útil!
+      - name: Seenda Trackpad
+        url: https://www.amazon.com.mx/dp/B0C9DJC715
+        since: 2024
+        note:
+          en: Guess any Chinese equivalent works the same
+          es: Supongo que cualquier equivalente Chino funciona igual
+      - name: Brydge W-Touch
+        since: 2021
+        until: 2021
+        note:
+          en: It worked really well for Windows / Linux. It got stolen :(
+          es: Funcionaba re-bien para Windows / Linux. Me lo robaron :(
+      - name: Samson Q2U
+        since: 2020
+      - name: Podmic USB
+        since: 2024
+      - name: Antlion Modmic USB 2
+        since: 2026
+      - name: MSI Pro Mp165 E6
+        since: 2026
+      - name: Pikatea Macropad GB3
+        since: 2021
+        url: https://kbd.news/Closing-down-Pikatea-A-Farewell-2540.html
+        note:
+          en: I shared the link to a wonderful story. I kind of hope they come back
+          es: El link es acerca de la historia de la compañía. Yo como que espero que regresen a producir
+      - name: Elgato Cam Link
+        since: 2023
+      - name: Elgato Wave Mic Arm LP
+        since: 2022
+        until: 2024
+        note:
+          en: in 2026 I don't have a place to mount it :(
+          es: en 2026 no tengo dónde montarlo :(
+
+  # - slug: tools
+  #   name:
+  # en: Tools, es: Herramientas
+  #   tools:
+  #     - name: TODO tool
+  #       since: 2019
+
+  - slug: frameworks-and-libs
+    name:
+      en: Frameworks & libs
+      es: Frameworks y libs
+    tools:
+      - name: jQuery & jQueryUI
+        url: https://jqueryui.com/
+        since: 2011
+        until: 2016
+        note:
+          en: Maybe a little before that, but I learned jQuery before proper JS
+          es: Tal vez un poco antes, pero aprendí jQuery antes de propiamente JS
+      - name: Smarty Templates
+        url: https://www.smarty.net/
+        since: 2010
+        until: 2012
+      - name: CakePHP
+        url: https://cakephp.org/
+        since: 2010
+        until: 2011
+        note:
+          en: Sort of a part time project
+          es: Algo así como en un proyecto a medio tiempo
+      - name: AngularJS
+        since: 2012
+        until: 2021
+        note:
+          en: Foverver grateful with the OG NG.
+          es: Por siempre estaré agradecido con el NG original.
+      - name: Meteor
+        since: 2013
+        until: 2023
+        note:
+          en: So much potential, weird timing
+          es: Tanto potencial, unos tiempos bien raros
+      - name: Vue.js
+        since: 2017
+        note:
+          en: Immediately hooked after trying it out
+          es: Completamente enganchado desde que lo probé
+      - name: Vuetify
+        url: https://vuetifyjs.com/en/
+        since: 2017
+        until: 2021
+        note:
+          en: "Fun fact: I won a Razer kbd and a t-shirt on their Discord"
+          es: "Dato curioso: me gané un teclado Razer y una playera en su Discord"
+      - name: Element Plus
+        since: 2021
+        until: 2023
+        url: https://element-plus.org/
+        note:
+          en: Saved me during the early days of Vue 3
+          es: Me salvó durante los primeros días de Vue 3
+      - name: React
+        since: 2022
+        note:
+          en: It's all right.
+          es: Ta bien.
+      - name: Angular
+        since: 2024
+        note:
+          en: "Hot take: it should always have had a different name"
+          es: "La opinión que nadie me pidió: siempre debió tener un nombre diferente"
+
+  - slug: software
+    name:
+      en: Software
+      es: Software
+    tools:
+      - name: Windows
+        since: 2001
+        note:
+          en: 3.1, 98, 200, XP, Vista, 8, 10, 11, Server. You name it.
+          es: 3.1, 98, 200, XP, Vista, 8, 10, 11, Server. Usté mande.
+      - name: Linux
+        since: 2003
+        note:
+          en: RedHat (now Fedora), Suse, Manjaro, Ubuntu
+          es: RedHat (ahora Fedora), Suse, Manjaro, Ubuntu
+      - name: MacOS
+        since: 2005
+        note:
+          en: Tiger - Snow Leopard, then not until Sierra - Sequoia
+          es: Tiger - Snow Leopard, y luego nada hasta Sierra - Sequoia
+      - name: Android
+        since: 2013
+        note:
+          en: never held an iPhone for more than a couple minutes lol
+          es: nunca he tenido en mis manos un iPhone por más de algunos minutos jaja
+      - name: Spotify
+        since: 2013
+        until: 2023
+      - name: Tidal
+        since: 2023
+      - name: Storytel
+        since: 2020
+      - name: Inkscape
+        url: https://inkscape.org/
+        since: 2003
+        note:
+          en: learned about it in high school, still my go to
+          es: aprendí a usarlo en la prepa, lo instalo siempre que puedo
+      - name: Audacity
+        url: https://www.audacityteam.org/
+        since: 2019
+      - name: Camtasia
+        url: https://www.techsmith.com/camtasia/
+        since: 2020
+      - name: Meld
+        url: https://meldstudio.co/
+        since: 2026
+      - name: Windows PowerToys
+        url: https://learn.microsoft.com/es-es/windows/powertoys/
+        since: 2015
+        note:
+          en: not exactly sure when I started using them, but highly recommended it!
+          es: no me acuerdo exactamente de cuándo empecé a usarlos, pero lo recomiendo mucho!
+      - name: Vorssaint
+        url: https://vorssaint.com/
+        since: 2026
+        note:
+          en: just like PowerToys, but for Mac
+          es: algo como PowerToys, pero pa Mac
+      - name: Tinycast
+        since: 2026
+        url: https://tinycast.dev/
+        note:
+          en: muscle memory triggers it constantly
+          es: lanzado constantemente por pura memoria muscular
+      - name: Cloudflare
+        since: 2020
+
+  - slug: config
+    name:
+      en: Fonts & themes
+      es: Tipografías y temas
+    tools:
+      - name: Tlapalli
+        url: https://tlapalli.ackzell.dev
+        since: 2025
+        note:
+          en: created by yours trully
+          es: creado por un servidor
+      - name: Night Owl
+        url: https://marketplace.visualstudio.com/items?itemName=sdras.night-owl
+        since: 2019
+        note:
+          en: I'm a fan of sdras
+          es: Soy fan de sdras
+      - name: Material Theme
+        since: 2015
+        until: 2024
+        note:
+          en: Some drama involved and I dropped it.
+          es: Algo dramático pasó y ya mejor dejé de usarlo.
+      - name: Panda Theme
+        url: https://marketplace.visualstudio.com/items?itemName=tinkertrain.theme-panda
+        since: 2024
+      - name: Ayu
+        url: https://ayutheme.com/
+        since: 2021
+      - name: Source Code Pro
+        since: 2014
+        note:
+          en: I don't know when I started using it, but I love it
+          es: No sé cuándo empecé a usarla, pero me encanta.
+      - name: JetBrains Mono
+        url: https://www.jetbrains.com/lp/mono/
+        since: 2021
+      - name: Anonymous Pro
+        url: https://fonts.google.com/specimen/Anonymous+Pro
+        since: 2020
+      - name: Ubuntu Mono
+        url: https://design.ubuntu.com/font
+        since: 2011
+        note:
+          en: this was part of a major rebranding years ago
+          es: parte de un rebranding muy grande hace algunos años
+      - name: Space Mono
+        url: https://fonts.google.com/specimen/Space+Mono?preview.script=Latn
+        since: 2018
+      - name: Victor Mono
+        url: https://rubjo.github.io/victor-mono/
+        since: 2023
+        note:
+          en: lots of variants, lovely cursive
+          es: muchas variantes, la cursiva me encanta
+
+  - slug: ai
+    name:
+      en: AI
+      es: IA
+    tools:
+      - name: OpenCode
+        since: 2026
+        note:
+          en: Big Pickle and DeepSeek yield good results for me
+          es: Big Pickle y DeepSeek me dan buenos resultados
+      - name: Claude
+        since: 2026
+      - name: herdr (TUI)
+        url: https://herdr.dev/
+        since: 2026
+      - name: impeccable skill
+        url: https://impeccable.style/
+        since: 2026
+      - name: grill-me / handoff skills
+        since: 2026
+        url: https://www.aihero.dev
+      - name: speckit
+        url: https://speckit.org/
+        since: 2026
+      - name: Fluidvoice
+        url: https://fluidvoice.com/
+        since: 2026

@@ -1,0 +1,13 @@
+status: shipped
+order: 2
+# Repos, links and stack live with the parts (projects/tlapalli/*.yml).
+stack: []
+related: [tlachialoni]
+logo: /logos/tlapalli.svg
+devlogPlaylist: PLmJs3lfUmCdRq151580A52JEEbX7OQagP
+# The extension's version, beside its install links.
+release: ackzell/tlapalli-vscode-theme
+# Install links show on every part's page too.
+links:
+  openvsx: https://open-vsx.org/extension/ackzell/tlapalli
+  marketplace: https://marketplace.visualstudio.com/items?itemName=ackzell.tlapalli

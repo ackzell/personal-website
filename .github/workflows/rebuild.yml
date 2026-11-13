@@ -1,0 +1,20 @@
+# Contributions, episodes, playlists and Amoxtli's chapters are read when the
+# site is generated, so a daily build keeps them current. Scheduled runs only
+# fire from the default branch. SITE_DEPLOY_HOOK is the Cloudflare Pages deploy
+# hook's URL, kept secret because anyone holding it can trigger a build.
+name: Daily rebuild
+
+on:
+  schedule:
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - run: curl -fsS -X POST "$HOOK"
+        env:
+          HOOK: ${{ secrets.SITE_DEPLOY_HOOK }}

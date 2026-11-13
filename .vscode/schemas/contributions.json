@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "contributions",
+  "type": "object",
+  "properties": {
+    "errata": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "hidden": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "notes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "en": {
+            "type": "string"
+          },
+          "es": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "en",
+          "es"
+        ],
+        "additionalProperties": false
+      },
+      "default": {}
+    }
+  },
+  "additionalProperties": false
+}

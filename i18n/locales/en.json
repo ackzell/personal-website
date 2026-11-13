@@ -1,0 +1,170 @@
+{
+  "solitaire": {
+    "board": "Solitaire",
+    "draw": "Draw a card",
+    "undo": "Undo",
+    "reset": "Start over",
+    "message": "Sorry, that page doesn't exist, but now that you're here, care to play some solitaire?"
+  },
+  "console": {
+    "message": "I knew I'd see you here lol! Thanks for checking out this website. Cheers!",
+    "hint": "While you're here, try typing:",
+    "stack": "Made with Nuxt, Vue, Nuxt Content, UnoCSS, Motion, anime.js, Foley (sounds) and web-haptics. The source:",
+    "v1": "This is v2. Did you ever visit v1?"
+  },
+  "site": {
+    "name": "ackzell.dev",
+    "skipToContent": "Skip to content",
+    "language": "Language",
+    "scheme": "Color scheme",
+    "schemeVivid": "Vivid",
+    "schemeLight": "Light",
+    "schemeDark": "Dark",
+    "sound": "Sound",
+    "sectionIndex": "On this page"
+  },
+  "nav": {
+    "label": "Main",
+    "about": "About",
+    "work": "Projects",
+    "media": "Content"
+  },
+  "home": {
+    "bio": "About me",
+    "title": "Axel Martínez",
+    "description": "Mexican software engineer focused on the frontend and JS/TS (Vue, if you give me a choice). Eternal apprentice of web technologies. Father. Beatle fan.",
+    "intro": "Hello there! I'm a Mexican software engineer focused on the frontend and the JS/TS stack, I'd choose Vue over other frameworks any day. I've been building for the web for more than {years} years (wow, time flies!), and here you'll find more about my experience and the things I make on the side. Feel free to poke around, and reach out if you'd like to work together or just say hi. Have a good one!",
+    "contact": "Feel like working together, or just saying hi?",
+    "contactTitle": "Contact",
+    "featured": "Currently working on",
+    "allProjects": "All projects",
+    "timeline": "Experience"
+  },
+  "projects": {
+    "title": "Projects",
+    "description": "Side projects, custom tools and experiments I work on",
+    "intro": "Side projects, tools and experiments that I've built mostly for myself. Most of them are my attempts to learn new things: techniques, tools, technologies, and things like that. There's a pattern with the names you will see. For a while now I have been giving them names in Nahuatl, an ancient language spoken in Mexico since before colonial times.",
+    "pronunciation": "Pronunciation",
+    "meaning": "Meaning",
+    "related": "Related projects",
+    "parts": "In this project",
+    "alsoIn": "Also in {word}",
+    "index": {
+      "overview": "Overview",
+      "details": "Details",
+      "story": "Story"
+    },
+    "status": {
+      "shipped": "Shipped",
+      "active": "Active",
+      "experiment": "Experiment"
+    },
+    "ledger": {
+      "site": "Site",
+      "install": "Install extension",
+      "source": "Source",
+      "changelog": "Changelog",
+      "stack": "Stack",
+      "devlog": "Devlog",
+      "release": "Release",
+      "video": "Video",
+      "access": "Preview",
+      "requestAccess": "Request access"
+    },
+    "media": {
+      "play": "Play",
+      "pause": "Pause",
+      "youtube": "Full video on YouTube",
+      "tryLive": "Try it here",
+      "openSite": "Open in a new tab",
+      "watch": "Watch on YouTube",
+      "expand": "View larger",
+      "fullscreen": "Full screen",
+      "shrink": "Exit full screen",
+      "seek": "Position in the video",
+      "lessons": "{count} lesson | {count} lessons",
+      "challenge": "Challenge",
+      "lightbox": {
+        "close": "Close",
+        "previous": "Previous",
+        "next": "Next",
+        "zoomIn": "Zoom in",
+        "zoomOut": "Zoom out",
+        "fit": "Fit to screen",
+        "counter": "{index} of {total}"
+      },
+      "take": {
+        "files": "Files",
+        "gem": "Code theme",
+        "scrub": "Scrub through the clip",
+        "running": "Running {file}, line {lines} | Running {file}, lines {lines}"
+      }
+    }
+  },
+  "media": {
+    "title": "Content",
+    "description": "I don't want to be an influencer, just share stuff with you all",
+    "intro": "I started a YT playlist in 2017 with videos about building a desktop application. Ever since, I've been really interested in learning about software, hardware and techniques for creating videos and also the audio gear and stuff like that. So here's the result of all these years of me trying to create content so far. The idea isn't to become a tech influencer or anything like that; I'm just trying to share stuff with people.",
+    "guide": {
+      "legend": {
+        "label": "How to read the guide",
+        "videos": "Each frame is a video, oldest first. A longer row has more videos.",
+        "episodes": "",
+        "length": "Episode length",
+        "downloads": "Downloads",
+        "views": "Views",
+        "bars": "",
+        "videoLength": "Video length"
+      },
+      "label": "Series, by latest release",
+      "videos": "{count} video | {count} videos",
+      "episodes": "{count} episode | {count} episodes",
+      "views": "{count} views",
+      "downloads": "{count} downloads",
+      "thatWeek": "{count} videos that week",
+      "openPlaylist": "Open the playlist",
+      "openPodcast": "Listen on mytypeof.dev",
+      "season": "Season {n}",
+      "playlists": "{count} playlist | {count} playlists",
+      "sort": {
+        "label": "Sort",
+        "order": "Playlist order",
+        "views": "Most viewed",
+        "length": "Longest"
+      },
+      "find": "Find a video",
+      "none": "Nothing matches.",
+      "showAll": "Show all {count}"
+    }
+  },
+  "videos": {
+    "title": "Videos",
+    "intro": "My YouTube channel. The videos actually started as sort of tutorials building software step by step. But now there are a lot of \"devlogs\" in the form of livestreams that go in there. Here's a selection of my playlists.",
+    "rest": "Everything else is on the channel."
+  },
+  "podcast": {
+    "title": "Podcast",
+    "intro": "My typeof Radio is a Spanish-language podcast about web development.",
+    "rest": "Every episode is on mytypeof.dev."
+  },
+  "contributions": {
+    "title": "Contributions",
+    "description": "It ain't much, but it is honest work",
+    "intro": "I do believe in open source software and these are a few things that I've contributed back to different communities. Most of them are little fixes here and there (toggle the errata filter). But everything counts when we talk about OSS IMHO.",
+    "errata": "Errata",
+    "prompt": "Show {count} errata (typos, docs, etc.)?",
+    "yes": "yes",
+    "no": "no"
+  },
+  "uses": {
+    "title": "Uses",
+    "description": "My favorite software, hardware setup or libs and frameworks I probably already forgot how to use",
+    "intro": "Inspired by Wes Bos's {usesTech}, here are some of the tools, hardware, and gear that have been or currently are part of my day to day.",
+    "tool": "Tool",
+    "years": "Years",
+    "note": "Note",
+    "now": "now",
+    "rows": "({n} row) | ({n} rows)"
+  },
+  "placeholder": "Coming soon."
+}

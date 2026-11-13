@@ -1,0 +1,39 @@
+company: IoTIFY
+start: 2021-03
+end: 2023-04
+role:
+  en: Front End Developer
+  es: Desarrollador Front End
+summary:
+  en:
+    - I worked remotely in a global team across five countries.
+    - Architected and maintained frontend codebase for a migration to a more modern stack.
+    - Made strategic decisions on 3rd party library integrations and technical standards.
+    - Contributed to rapid development cycles in the IoT domain.
+  es:
+    - Trabajé de forma remota en un equipo global repartido en cinco países.
+    - Diseñé y mantuve el código frontend durante la migración a un stack más moderno.
+    - Tomé decisiones estratégicas sobre la integración de librerías de terceros y los estándares técnicos.
+    - Contribuí a ciclos de desarrollo rápidos en el dominio de IoT.
+stack:
+  [
+    Vue 2,
+    Vue 3,
+    Vuex,
+    Pinia,
+    Vuetify,
+    Element Plus,
+    Meteor,
+    MongoDB,
+    Sass,
+    Vite,
+    TypeScript,
+    AWS EC2,
+    Bitbucket,
+    Jira,
+    Ubuntu,
+    Windows 11,
+    Cypress,
+    Prettier,
+    ESLint,
+  ]

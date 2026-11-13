@@ -1,8 +1,42 @@
-*.log
+# Nuxt
+.output
+.data
+.nuxt
+.nitro
 .cache
-.DS_Store
-src/.temp
-node_modules
 dist
+
+# Dependencies
+node_modules
+
+# Logs
+*.log
+
+# Misc
+.DS_Store
 .env
 .env.*
+!.env.example
+
+# Local tooling state
+.codegraph/
+.atl/
+.claude/settings.local.json
+.claude/worktrees/
+# Installed third-party skills and agents; reinstall instead of versioning
+.claude/skills/
+.claude/agents/
+# Impeccable: keep the design tokens, ignore sessions, caches and references
+.impeccable/*
+!.impeccable/design.json
+
+# OpenCode
+.opencode/
+opencode.jsonc
+
+# mkcert certs for dev:https
+.cert.pem
+.key.pem
+
+# Local state from wrangler pages dev (preview:static)
+.wrangler

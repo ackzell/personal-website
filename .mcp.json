@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "nuxt": {
+      "type": "http",
+      "url": "https://nuxt.com/mcp"
+    },
+    "motion": {
+      "type": "http",
+      "url": "https://mcp.motion.dev"
+    },
+    "motion-plus": {
+      "type": "http",
+      "url": "https://mcp.motion.dev/plus"
+    }
+  }
+}

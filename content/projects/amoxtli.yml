@@ -1,0 +1,16 @@
+status: active
+featured: true
+order: 1
+repos:
+  - ackzell/amoxtli-vue-2
+  - ackzell/amoxtli-vue
+changelogs:
+  - https://github.com/ackzell/amoxtli-vue-2/blob/HEAD/CHANGELOG.md
+stack: [nuxt, vue, nuxt-content, almostnode, monaco, shiki, twoslash]
+related: [yehyecoa]
+devlogPlaylist: PLmJs3lfUmCdTQDpZop2BC1EJ5emEpTBPn
+logo: /logos/amoxtli-vue.svg
+logoLight: /logos/amoxtli-vue_light.svg
+links:
+  previewAccess: mailto:amoxtli@ackzell.dev?subject=amoxtli%20preview%20access
+

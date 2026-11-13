@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "projectsMeta",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": [
+        "shipped",
+        "active",
+        "experiment"
+      ]
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "order": {
+      "type": "number"
+    },
+    "repos": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "changelogs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uri"
+      },
+      "default": []
+    },
+    "release": {
+      "type": "string"
+    },
+    "links": {
+      "type": "object",
+      "properties": {
+        "site": {
+          "type": "string",
+          "format": "uri"
+        },
+        "video": {
+          "type": "string",
+          "format": "uri"
+        },
+        "marketplace": {
+          "type": "string",
+          "format": "uri"
+        },
+        "openvsx": {
+          "type": "string",
+          "format": "uri"
+        },
+        "previewAccess": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "default": {}
+    },
+    "stack": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "related": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "devlogPlaylist": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "string"
+    },
+    "logoLight": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "status",
+    "order"
+  ],
+  "additionalProperties": false
+}

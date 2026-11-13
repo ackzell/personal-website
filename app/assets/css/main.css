@@ -1,0 +1,1423 @@
+/* Deliberately minimal: structure first, design later. */
+
+/*
+ * Color tokens, in two layers:
+ * 1. Raw palette: named after the color. Nothing outside this block uses them.
+ * 2. Semantic: --bg, --fg, --accent, --muted, --line. They resolve per
+ *    section (data-section on <html>, set by the layout) and per scheme.
+ *
+ * Sections follow the flag: about (green) · work (white) · media (red).
+ * Vivid = "Soft flag": the whole page takes the section color.
+ * Light = the soft flag on paper: every section reads ink on paper, and the
+ *   section's flag color carries the accents (headings, marks, the band).
+ * Dark = "Deeper", near-black tinted toward the section color.
+ */
+:root {
+  /* Follows the system until the footer switch picks one (SiteSchemeSwitch). */
+  color-scheme: light dark;
+
+  /* Soft flag (vivid, and light's accents) */
+  --softflag-green: #00573c;
+  --softflag-paper: #f6f2ea;
+  --softflag-red: #a51e2c;
+  --softflag-ink: #141312;
+  /* Vivid's white field: the flag halfway to night, as dark as its green
+     and red so the three read as one band; silver on graphite. Warm toward
+     red, not yellow: a yellowish gray this dark reads olive beside the green. */
+  --softflag-graphite: #404040;
+  --softflag-silver: #cecdcd;
+
+  /* Deeper (dark) */
+  --deeper-green: #0a2a20;
+  --deeper-paper: #e4dcca;
+  --deeper-red: #3f1216;
+  --deeper-night: #0c0b0a;
+  --deeper-glow-green: #4a9273;
+  --deeper-glow-red: #b84c4c;
+
+  /*
+   * Space: raw steps on a 4px base, then semantic roles. Components use the
+   * roles; the steps exist so the roles stay on one scale.
+   */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+
+  --gap-tight: var(--space-2); /* label ↔ value, word ↔ pronunciation */
+  --gap-group: var(--space-4); /* items inside one group */
+  --gap-block: var(--space-8); /* between blocks of a section */
+  --gap-section: clamp(var(--space-12), 8vw, var(--space-24)); /* between sections */
+
+  /*
+   * Layout: named tracks, full | wide | content | wide | full.
+   * Page children sit in `content` by default and opt out with the
+   * track-wide / track-full utilities (uno/preset-ackzell.ts).
+   */
+  --gutter: clamp(var(--space-4), 4vw, var(--space-8));
+  --content-width: 64ch;
+  --wide-width: 72rem;
+
+  /*
+   * Type: two monospace families, three roles.
+   * Recursive is self-hosted pinned to MONO 1 (see nuxt.config.ts), so only
+   * CASL and wght vary. Code reuses it with the casual axis off.
+   * 'Recursive Full' is the same face with slnt and CRSV too, twice the size:
+   * it only exists once plugins/full-font has loaded it, after the page is
+   * up, and until then the name is skipped. The lean waits for it.
+   */
+  --font-heading: 'Recursive Full', 'Recursive', ui-monospace, monospace;
+  --font-body: 'Source Code Pro', ui-monospace, monospace;
+  --font-code: 'Recursive Full', 'Recursive', ui-monospace, monospace;
+  --heading-weight: 520;
+  --heading-casual: 0.65;
+  --code-weight: 320;
+  --code-casual: 0;
+  /* Project words: lexicon headwords and project headings share one size, so
+     the word morph between them is a pure move. */
+  --headword-size: clamp(2rem, 4.5vw, 3rem);
+  /* Part names: rows in a parts list and part headings, likewise one size. */
+  --subentry-size: clamp(1rem, 2vw, 1.25rem);
+
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+/* Per-section inputs. About is also the default when no section is set. */
+:root,
+:root[data-section='about'] {
+  --light-accent: var(--softflag-green);
+  --vivid-fill: var(--softflag-green);
+  --vivid-text: var(--softflag-paper);
+  /* How far light's paper leans toward the section's flag: under what the
+     eye names as a color, so it reads as paper that belongs to the section. */
+  --paper-tint: 3%;
+  --dark-fill: var(--deeper-green);
+  --dark-accent: var(--deeper-glow-green);
+}
+
+:root[data-section='work'] {
+  --light-accent: var(--softflag-ink);
+  --vivid-fill: var(--softflag-graphite);
+  --vivid-text: var(--softflag-silver);
+  /* The flag's white: plain paper. */
+  --paper-tint: 0%;
+  /* Neutral section: tinting night toward night leaves it plain black. */
+  --dark-fill: var(--deeper-night);
+  --dark-accent: var(--deeper-paper);
+}
+
+:root[data-section='media'] {
+  --light-accent: var(--softflag-red);
+  --vivid-fill: var(--softflag-red);
+  --vivid-text: var(--softflag-paper);
+  --paper-tint: 3%;
+  --dark-fill: var(--deeper-red);
+  --dark-accent: var(--deeper-glow-red);
+}
+
+/*
+ * Flag band fields (SiteFlagNav): one per section, whatever the stage.
+ * Vivid shows the soft flag itself; light the same, its white as ink so it
+ * shows on the paper stage. Dark uses each section's glow, since the deeper fills would all read as
+ * near-black against the night stage.
+ */
+:root {
+  --field-about: var(--softflag-green);
+  --field-work: var(--softflag-ink);
+  --field-media: var(--softflag-red);
+}
+
+/* Scheme classes come from @nuxtjs/color-mode: the system's, or the one picked.
+   Vivid's fields are dark, but it's the flag in daylight: native controls and
+   scrollbars stay light, as they were when it was the light scheme. */
+:root:is(.light, .vivid) {
+  color-scheme: light;
+}
+
+:root.vivid {
+  --field-work: var(--softflag-silver);
+}
+
+/* Vivid's work is a dark stage: dark controls, and the dark variants of
+   code (tlapalli.css), marks and stickers wherever a scheme picks one. */
+:root.vivid[data-section='work'] {
+  color-scheme: dark;
+}
+
+:root.dark {
+  color-scheme: dark;
+  --field-about: var(--deeper-glow-green);
+  --field-work: var(--deeper-paper);
+  --field-media: var(--deeper-glow-red);
+}
+
+/* The 404 solitaire's suits (ErrorSolitaire): paper faces with the flag as the
+   ink on light; on vivid the flag as faces, but for the suit that is the stage's
+   own color (below). --card-*-glow is the suit's color once its pile is won: the
+   flag on light's paper, dark's lit colors on vivid's fields. */
+:root {
+  /* A step under the stage, which is the same paper: the faces would melt into it. */
+  --card-paper: color-mix(in oklab, var(--softflag-paper), var(--softflag-ink) 4%);
+  --card-2xx: var(--card-paper);
+  --card-2xx-ink: var(--softflag-green);
+  --card-2xx-glow: var(--softflag-green);
+  --card-3xx: var(--card-paper);
+  --card-3xx-ink: var(--softflag-ink);
+  --card-3xx-glow: var(--softflag-ink);
+  --card-4xx: var(--card-paper);
+  --card-4xx-ink: var(--softflag-red);
+  --card-4xx-glow: var(--softflag-red);
+  --card-back: color-mix(in srgb, var(--fg) 34%, var(--bg));
+  --card-back-ink: var(--fg);
+  --card-edge: transparent;
+}
+
+:root.vivid {
+  /* Green, red and black faces sit as dark as the fields, and a hue alone goes
+     missing for red-green color blindness: the edge separates them by brightness. */
+  --card-edge: var(--fg);
+  --card-2xx: var(--softflag-green);
+  --card-2xx-ink: var(--softflag-paper);
+  --card-2xx-glow: var(--deeper-glow-green);
+  --card-3xx: var(--softflag-ink);
+  --card-3xx-ink: var(--softflag-paper);
+  --card-3xx-glow: var(--deeper-paper);
+  --card-4xx: var(--softflag-red);
+  --card-4xx-ink: var(--softflag-paper);
+  --card-4xx-glow: var(--deeper-glow-red);
+  /* Light's gray: mixed from the field, it would only be a paler field. */
+  --card-back: color-mix(in srgb, var(--softflag-ink) 34%, var(--softflag-paper));
+  --card-back-ink: var(--softflag-ink);
+}
+
+/* The suit that matches the stage would sink into it, so it takes the stage's
+   text color for its face, and lights in that color too. */
+:root.vivid[data-section='about'] {
+  --card-2xx: var(--fg);
+  --card-2xx-ink: var(--softflag-green);
+  --card-2xx-glow: var(--fg);
+}
+
+:root.vivid[data-section='work'] {
+  --card-3xx: var(--fg);
+  --card-3xx-ink: var(--softflag-ink);
+  --card-3xx-glow: var(--fg);
+}
+
+:root.vivid[data-section='media'] {
+  --card-4xx: var(--fg);
+  --card-4xx-ink: var(--softflag-red);
+  --card-4xx-glow: var(--fg);
+}
+
+:root.dark {
+  --card-2xx: var(--deeper-glow-green);
+  --card-2xx-ink: var(--deeper-night);
+  --card-2xx-glow: var(--card-2xx);
+  --card-3xx: var(--deeper-paper);
+  --card-3xx-ink: var(--deeper-night);
+  --card-3xx-glow: var(--card-3xx);
+  --card-4xx: color-mix(in oklab, var(--deeper-glow-red), white 15%);
+  --card-4xx-ink: var(--deeper-night);
+  --card-4xx-glow: var(--card-4xx);
+}
+
+/* An empty slot's label: as quiet as it can go and still make AA on the slot. */
+:root { --slot-ink: color-mix(in srgb, var(--fg) 62%, var(--bg)); }
+:root.vivid { --slot-ink: color-mix(in srgb, var(--fg) 83%, var(--bg)); }
+:root.dark { --slot-ink: color-mix(in srgb, var(--fg) 57%, var(--bg)); }
+
+/* Semantic tokens. */
+:root {
+  /* Mixed for the hue, then set back to the paper's own lightness (0.962 is
+     --softflag-paper's): a dark flag would otherwise only gray it. */
+  --bg: oklch(from color-mix(in oklab, var(--softflag-paper), var(--light-accent) var(--paper-tint)) 0.962 c h);
+  --fg: var(--softflag-ink);
+  --accent: var(--light-accent);
+  --muted: color-mix(in srgb, var(--fg) 70%, var(--bg));
+  --line: color-mix(in srgb, var(--fg) 20%, var(--bg));
+  /* Headings carry the section's flag on light's paper; running heads the
+     same, a step quieter. */
+  --heading: var(--accent);
+  --heading-muted: color-mix(in srgb, var(--accent) 88%, var(--bg));
+}
+
+:root.dark {
+  --bg: color-mix(in srgb, var(--dark-fill) 35%, var(--deeper-night));
+  --fg: var(--deeper-paper);
+  --accent: var(--dark-accent);
+  /* On the night stage the glow is for what's lit, so headings stay paper. */
+  --heading: var(--fg);
+  --heading-muted: var(--muted);
+}
+
+/* The stage is the flag, so the text is all one paper (silver, on work). */
+:root.vivid {
+  --bg: var(--vivid-fill);
+  --fg: var(--vivid-text);
+  --accent: var(--fg);
+  --heading: var(--fg);
+  --heading-muted: var(--muted);
+}
+
+/*
+ * Glow marks what's lit: the role being read, the page you're on. Glow is
+ * light, so it's built like light: a core hotter than the accent, then halos
+ * of growing radius and falling strength (the bloom falloff), added onto the
+ * stage with plus-lighter (--glow-blend) instead of painted over it.
+ * --glow-near drops the wide halos, for bars inside a clipping box.
+ *
+ * Light adds nothing onto paper, so there lit is ink: the accent itself,
+ * --hotter a step deeper, with a faint bleed instead of a bloom. Vivid's
+ * fields are all dark enough to glow on, as dark does.
+ *
+ * .glows-own resolves all of this again from the element's own --accent,
+ * for something lit in a color other than the page's section.
+ */
+:root,
+.glows-own {
+  --hot: var(--accent);
+  --hotter: color-mix(in oklab, var(--accent), black 25%);
+  --glow-blend: normal;
+  --glow-near: 0 0 1px color-mix(in oklab, var(--accent) 60%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 20%, transparent);
+  --glow: var(--glow-near);
+}
+
+:root:is(.dark, .vivid),
+:root:is(.dark, .vivid) .glows-own {
+  --hot: color-mix(in oklab, var(--accent), white 45%);
+  --hotter: color-mix(in oklab, var(--accent), white 75%);
+  --glow-blend: plus-lighter;
+  --glow-near: 0 0 1px color-mix(in oklab, var(--accent) 90%, transparent),
+    0 0 4px color-mix(in oklab, var(--accent) 70%, transparent),
+    0 0 10px color-mix(in oklab, var(--accent) 45%, transparent);
+  --glow: var(--glow-near),
+    0 0 24px color-mix(in oklab, var(--accent) 25%, transparent),
+    0 0 56px color-mix(in oklab, var(--accent) 12%, transparent);
+}
+
+/* Spacing comes from the flow rules below, not UA margins. */
+:where(h1, h2, h3, h4, p, ul, ol, dl, dd, pre, figure, blockquote) {
+  margin-block: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--heading);
+  font-family: var(--font-heading);
+  font-weight: var(--heading-weight);
+  font-variation-settings: 'CASL' var(--heading-casual);
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+/* <code> carries its own UA `font-family: monospace`; set every code element
+   explicitly so none falls back to the system mono. */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-code);
+  font-weight: var(--code-weight);
+  font-variation-settings: 'CASL' var(--code-casual);
+}
+pre code {
+  font: inherit;
+}
+
+/* Highlighted code in the light scheme a step heavier: the light gems' inks
+   are soft, and a thin stroke thins them further. */
+:root:not(.dark, .vivid[data-section='work']) .shiki {
+  --code-weight: 380;
+}
+
+/* Highlighted code is colored by its tlapalli gem (tlapalli.css), straight
+   on the stage: no panel of its own (The Stage Rule). */
+pre.shiki {
+  overflow-x: auto;
+  color: var(--code-fg);
+}
+
+html {
+  /* Anchored and focused content stays clear of the sticky header and
+     footer (SiteHeader, SiteFooter), and of the section row where a page
+     has one (SiteSectionIndex). */
+  scroll-padding-top: calc(var(--header-height, 0px) + var(--section-index-height, 0px));
+  scroll-padding-bottom: var(--footer-height, 0);
+  /* No browser tap flash; links answer presses with their own :active state. */
+  -webkit-tap-highlight-color: transparent;
+  /* A thin, tinted page scrollbar where the OS draws a classic one
+     (Windows, Linux); overlay scrollbars (macOS, mobile) are left alone.
+     The gutter is reserved so pages don't shift as they start to scroll. */
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--fg) 35%, var(--bg)) transparent;
+  scrollbar-gutter: stable;
+}
+
+.site-header {
+  top: 0;
+}
+
+/*
+ * Small screens can't spare two bars. The header's brand row scrolls away and
+ * only the band sticks (--header-tuck, SiteHeader). The footer leaves the
+ * bottom for a rail of icons on the inline-end edge; <main> keeps a gutter at
+ * least as wide as the rail so nothing reads under it.
+ */
+@media (width < 40rem) {
+  :root {
+    --rail-width: 2.5rem;
+  }
+
+  html {
+    scroll-padding-top: calc(var(--header-height, 0px) - var(--header-tuck, 0px) + var(--section-index-height, 0px));
+    scroll-padding-bottom: var(--scheme-height, 0px);
+  }
+
+  /* Phones read a step smaller; the header keeps its size so the band
+     stays easy to hit. Spacing stays in rem, so text gains room. */
+  :root {
+    --headword-size: 1.5rem;
+  }
+
+  body {
+    font-size: 0.75rem;
+  }
+
+  .site-header {
+    top: calc(-1 * var(--header-tuck, 0px));
+    font-size: 0.875rem;
+  }
+
+  main {
+    padding-inline-end: max(0px, var(--rail-width) - var(--gutter));
+    /* The page's last lines can scroll clear of the scheme switch. */
+    padding-block-end: var(--scheme-height, 0px);
+  }
+
+  footer.site-footer {
+    position: fixed;
+    inset-inline-end: 0;
+    /* Standing on the scheme switch, which keeps the corner (SiteSchemeSwitch). */
+    bottom: var(--scheme-height, 0px);
+    width: var(--rail-width);
+    padding: var(--space-2) 0;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .site-footer ul {
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* The sticky header and footer carry their own copy of the stage color, so
+   they fade with the body. */
+body,
+.site-header,
+.site-footer {
+  /* Fallback where view transitions don't run: fade the whole stage. */
+  transition:
+    background-color 600ms var(--ease-out),
+    color 600ms var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* No movement, but the section change still reads: a short color fade. */
+  body,
+  .site-header,
+  .site-footer {
+    transition-duration: 400ms;
+  }
+}
+
+/*
+ * Page transitions (View Transitions API, see nuxt.config.ts).
+ *
+ * Three layers, each its own transition group:
+ * - root (header, footer, stage color): still within a section; on a section
+ *   change, the flag wipe sweeps the new stage in along the flag
+ *   (about · work · media), from the right going forward, from the left back.
+ * - page (<main>): within a section, the old page fades out and the new one
+ *   rises in once the word is underway. On a section change it rides the wipe.
+ * - word (*.word, see utils/viewTransition.ts): a project's Nahuatl word
+ *   travels between headword and heading. Both render at --headword-size, so
+ *   the move is a pure translation with no raster scaling.
+ *
+ * Plus the band's marker (flag-marker, components/site/SiteFlagNav.vue). The
+ * band itself rides the root: its fields and labels recolor with the stage,
+ * so the wipe carries them. The marker has its own name so it's lifted out of
+ * the wipe and slides to the new page instead, along the same axis and in the
+ * same direction (the band is in flag order too). Within a section it is the
+ * only thing in the chrome that moves: project to project, word to word.
+ */
+/* The word's lean, one registered property per axis so each can be timed on
+   its own (ProjectLexicon, MediaTimeline). */
+@property --slnt {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --casl {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --crsv {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --page-transition: 550ms;
+  --word-transition: 600ms;
+}
+
+main {
+  view-transition-name: page;
+}
+
+/* The wipe is the color change; the body fade would only muddy it. */
+:root:active-view-transition :is(body, .site-header, .site-footer) {
+  transition: none;
+}
+
+::view-transition-group(*) {
+  animation-duration: var(--page-transition);
+  animation-timing-function: var(--ease-out);
+}
+
+/*
+ * Scheme scan (SiteSchemeSwitch): the new scheme rises up the page from the
+ * switch behind a line, the media palette's scan at the page's size. Only the
+ * stage is captured, so the page, its words and the band's marker all go with
+ * it, and nothing else fades while it runs: the live page below the line
+ * would show colors still on their way.
+ */
+:root[data-scheme-scan] {
+  & *:not(.scheme-scan) {
+    view-transition-name: none !important;
+  }
+  & *,
+  & *::before,
+  & *::after {
+    transition: none !important;
+  }
+  &::view-transition-old(root) {
+    animation: none;
+  }
+  &::view-transition-new(root) {
+    animation: 700ms var(--ease-in-out) both scheme-reveal;
+  }
+  &::view-transition-group(scheme-scan) {
+    animation: 700ms var(--ease-in-out) both scheme-scan;
+  }
+  &::view-transition-new(scheme-scan) {
+    animation: none;
+  }
+}
+
+/* The viewport's size, carrying the line on its top edge: pushed down off the
+   page and drawn back up with the reveal. The line's own color always sits
+   close to one side (paper's ink over vivid's dark fields, dark's paper over
+   light's paper), so it is lit from both: a haze of the old scheme's ink
+   thrown ahead onto the old page, the new ink as the core, and behind it the
+   phosphor, the new section's color still glowing where it just passed. */
+.scheme-scan {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  view-transition-name: scheme-scan;
+  border-block-start: 2px solid var(--fg);
+}
+
+.scheme-scan::before,
+.scheme-scan::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+}
+
+.scheme-scan::before {
+  inset-block-end: 100%;
+  margin-block-end: 2px;
+  block-size: 1.5rem;
+  background: linear-gradient(to top, color-mix(in oklab, var(--scan-old) 45%, transparent), transparent);
+}
+
+.scheme-scan::after {
+  inset-block-start: 0;
+  block-size: min(9rem, 18vh);
+  background: linear-gradient(to bottom,
+      color-mix(in oklab, var(--accent) 45%, transparent),
+      color-mix(in oklab, var(--accent) 12%, transparent) 35%,
+      transparent);
+}
+
+@keyframes scheme-reveal {
+  from {
+    clip-path: inset(100% 0 0);
+  }
+
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes scheme-scan {
+  from {
+    translate: 0 100%;
+  }
+
+  85% {
+    opacity: 1;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 0;
+  }
+}
+
+/* The page never travels: as a group it would slide from where the old page
+   was scrolled to the new page's top, so the new page would come down from
+   above. The old one stays where it was read (--page-shift, router.options)
+   while it fades. */
+::view-transition-group(page) {
+  animation: none;
+}
+
+::view-transition-old(page) {
+  translate: 0 var(--page-shift, 0px);
+}
+
+/* While a swipe or an arrival has the page out of place, there's nothing off
+   the side to scroll to. */
+:root:is([data-swiping], [data-landing]) .site {
+  overflow-x: clip;
+}
+
+/* Same section: chrome holds still, the page hands over. The old one steps
+   off the way the pages go (--swipe-way, data-way), or just fades when they
+   go neither way; the new one's snapshot is live and holds still while its
+   blocks come in under it (usePageArrival). */
+:root:active-view-transition-type(section-same) {
+  &::view-transition-old(root),
+  &::view-transition-new(root) {
+    animation: none;
+  }
+  &::view-transition-old(page) {
+    animation: 180ms var(--ease-out) both vt-step-out;
+  }
+  &::view-transition-new(page) {
+    animation: none;
+  }
+
+  /* The page draws above the root, so the header and footer get their own
+     layers on top; otherwise the old page shows what it had scrolled under
+     them while it fades. They swap at once, as the root does. */
+  & .site-header {
+    view-transition-name: site-header;
+  }
+  & .site-footer {
+    view-transition-name: site-footer;
+  }
+  &::view-transition-group(site-header),
+  &::view-transition-group(site-footer) {
+    z-index: 1;
+  }
+  &::view-transition-old(site-header),
+  &::view-transition-new(site-header),
+  &::view-transition-old(site-footer),
+  &::view-transition-new(site-footer) {
+    animation: none;
+  }
+}
+
+/* --swipe-way is the direction the pages move: set for every page change
+   that goes along the band (data-way, usePageArrival), and for a swipe
+   (data-swipe) from the moment it lets go. */
+:root:is([data-way='forward'], [data-swipe='forward']) {
+  --swipe-way: -1;
+}
+:root:is([data-way='back'], [data-swipe='back']) {
+  --swipe-way: 1;
+}
+
+/* Words and plates with no partner come in on their own layer, the way the
+   blocks do and on their block's beat (--arrive-delay, utils/pageArrival). */
+:root[data-way]:active-view-transition-type(section-same) {
+  &::view-transition-new(*.word):only-child,
+  &::view-transition-new(*.plate):only-child {
+    animation: 600ms var(--ease-out) calc(var(--arrive-delay, 80ms) + 20ms) both vt-swipe-arrive;
+  }
+}
+
+/* Swiped: the old page carries on the way the finger sent it, at about its
+   speed (--swipe-out), into the next section too. Its snapshot was taken with
+   its blocks where the finger left them, each its own way along, so it
+   leaves in that shape. */
+:root[data-swipe]:active-view-transition-type(section-same, section-forward, section-back) {
+  &::view-transition-old(page) {
+    animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
+  }
+  /* Words and plates with no partner go with their page. Their snapshot was
+     taken already out to the side too, so they only add the rest of the way. */
+  &::view-transition-old(*.word):only-child,
+  &::view-transition-old(*.plate):only-child {
+    animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-along;
+  }
+}
+
+/* Swiped within a section, by the swipe's own view transition (useSwipeNav):
+   all it changes is hiding the page it leaves, so the old one carries on out
+   at once and the new one renders under it, live. The chrome stays live on
+   top; the words leave inside their page and the band's marker slides by
+   itself, so neither gets a layer of its own. */
+:root[data-swipe-leave] {
+  & main *,
+  & .flag-nav__marker {
+    view-transition-name: none !important;
+  }
+  & .site-header {
+    view-transition-name: site-header;
+  }
+  & .site-footer {
+    view-transition-name: site-footer;
+  }
+  &::view-transition-group(site-header),
+  &::view-transition-group(site-footer) {
+    animation: none;
+    z-index: 1;
+  }
+  &::view-transition-old(root),
+  &::view-transition-new(root),
+  &::view-transition-new(page),
+  &::view-transition-old(site-header),
+  &::view-transition-new(site-header),
+  &::view-transition-old(site-footer),
+  &::view-transition-new(site-footer) {
+    animation: none;
+  }
+  &::view-transition-old(page) {
+    animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
+  }
+}
+
+@keyframes vt-swipe-along {
+  to {
+    opacity: 0;
+    translate: calc(var(--swipe-way) * 33vw) 0;
+  }
+}
+@keyframes vt-swipe-out {
+  to {
+    opacity: 0;
+    translate: calc(var(--swipe-way) * 33vw) var(--page-shift, 0px);
+  }
+}
+@keyframes vt-step-out {
+  to {
+    opacity: 0;
+    translate: calc(var(--swipe-way, 0) * 4vw) var(--page-shift, 0px);
+  }
+}
+@keyframes vt-swipe-arrive {
+  from {
+    opacity: 0;
+    translate: calc(var(--swipe-way) * -12vw) 0;
+  }
+}
+
+/* Until its blocks are measured and on their way in. */
+:root[data-arriving] main > * {
+  opacity: 0;
+}
+
+/* Section change: everything but the word rides the wipe. <main> has no
+   background, so the old page is clipped away behind the same edge;
+   otherwise both pages' text would show at once. The old root needs no clip:
+   the new stage covers it. */
+:root:active-view-transition-type(section-forward, section-back) {
+  &::view-transition-old(root) {
+    animation: none;
+  }
+  &::view-transition-new(root),
+  &::view-transition-new(page) {
+    animation: var(--page-transition) var(--ease-out) both vt-wipe;
+  }
+  &::view-transition-old(page) {
+    animation: var(--page-transition) var(--ease-out) both vt-unwipe;
+  }
+}
+
+/* Words and plates travel only within a section (lexicon ↔ project). Across
+   sections they'd fly to wherever the other page happens to show the same
+   project (About's featured one, say): they ride their page instead. */
+:root:active-view-transition-type(section-forward, section-back) {
+  --travel-name: none;
+}
+
+/* Without the tiles, <main> rides the root on a section change. As its own
+   group it would slide from where the old page was scrolled to the new
+   page's top, reading as the old page scrolling up before the wipe. */
+:root:not(.has-tile-wipe):active-view-transition-type(section-forward, section-back) main {
+  view-transition-name: none;
+}
+
+:root:active-view-transition-type(section-forward) {
+  --wipe-from: inset(0 0 0 100%);
+  --unwipe-to: inset(0 100% 0 0);
+}
+:root:active-view-transition-type(section-back) {
+  --wipe-from: inset(0 100% 0 0);
+  --unwipe-to: inset(0 0 0 100%);
+}
+
+/* Tiled reveal (Chromium, once plugins/section-transition has WebGL and the
+   worklet ready): the new page arrives as square slabs spreading out from the
+   clicked link. The new page lies whole under a canvas (utils/tileCover) that
+   paints the old stage with the slabs cut out of it, on the GPU. The old
+   page, header and footer are named apart as the old state is captured
+   (data-tile-leaving) and ride above the cover, their words cleared from the
+   press just ahead of the slabs by the worklet, from one linear progress.
+   Under forced colors it stays the plain wipe. */
+:root {
+  --tile-transition: 950ms;
+}
+
+/* On a phone the front has a fraction of the ground to cover, so at the
+   desktop's run it races through: it takes longer to keep reading as a sweep
+   across the page. */
+@media (max-width: 640px) {
+  :root {
+    --tile-transition: 1300ms;
+  }
+}
+
+/* Traveling words and the marker stay above the pages and the cover. */
+::view-transition-group(*.word),
+::view-transition-group(*.plate),
+::view-transition-group(flag-marker) {
+  z-index: 3;
+}
+
+@property --wipe-progress {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.tile-cover {
+  display: none;
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  inline-size: 100%;
+  block-size: 100lvh;
+  pointer-events: none;
+}
+
+:root[data-tile-cover] .tile-cover {
+  display: block;
+  view-transition-name: tile-cover;
+}
+
+/* The old state only. No stage of their own: the cover is their stage. */
+:root[data-tile-leaving] {
+  & main {
+    view-transition-name: tile-old-page;
+  }
+  & .site-header {
+    view-transition-name: tile-old-header;
+  }
+  & .site-footer {
+    view-transition-name: tile-old-footer;
+  }
+  & :is(.site-header, .site-footer) {
+    background-color: transparent !important;
+  }
+}
+
+@media (forced-colors: none) {
+  :root.has-tile-wipe:active-view-transition-type(section-forward, section-back) {
+    &::view-transition-new(root),
+    &::view-transition-new(page),
+    &::view-transition-group(tile-cover),
+    &::view-transition-new(tile-cover) {
+      animation: none;
+    }
+    &::view-transition-group(tile-cover) {
+      z-index: 1;
+    }
+    &::view-transition-group(tile-old-page),
+    &::view-transition-group(tile-old-header),
+    &::view-transition-group(tile-old-footer) {
+      animation: none;
+      z-index: 2;
+    }
+    &::view-transition-old(tile-old-page),
+    &::view-transition-old(tile-old-header),
+    &::view-transition-old(tile-old-footer) {
+      animation: var(--tile-transition) linear both vt-tiles;
+      mask-image: paint(tile-wipe);
+    }
+    &::view-transition-old(tile-old-page) {
+      translate: 0 var(--page-shift, 0px);
+      --tile-ox: var(--tile-page-x);
+      --tile-oy: var(--tile-page-y);
+    }
+    &::view-transition-old(tile-old-header) {
+      --tile-ox: var(--tile-header-x);
+      --tile-oy: var(--tile-header-y);
+    }
+    &::view-transition-old(tile-old-footer) {
+      --tile-ox: var(--tile-footer-x);
+      --tile-oy: var(--tile-footer-y);
+    }
+    /* The old chrome dims with the stage under it (the cover's dim, per
+       scheme in the plugin), so the outgoing section sinks as the slabs land. */
+    &::view-transition-old(tile-old-header),
+    &::view-transition-old(tile-old-footer) {
+      animation:
+        var(--tile-transition) linear both vt-tiles,
+        calc(var(--tile-transition) * 0.4) var(--ease-out) both var(--tile-dim, none);
+    }
+    &.dark:not(:active-view-transition-type(to-work)) {
+      --tile-dim: vt-dim;
+    }
+    &.light {
+      --tile-dim: vt-shade;
+    }
+    &.vivid {
+      --tile-dim: vt-dusk;
+    }
+    /* Unless a swipe sent it: it carries on, as within a section. */
+    &[data-swipe]::view-transition-old(tile-old-page) {
+      animation: var(--swipe-out, 240ms) var(--ease-out) both vt-swipe-out;
+      mask-image: none;
+    }
+  }
+}
+
+@keyframes vt-dusk {
+  to {
+    filter: brightness(0.72);
+  }
+}
+
+@keyframes vt-dim {
+  to {
+    filter: brightness(0.4);
+  }
+}
+
+@keyframes vt-shade {
+  to {
+    filter: brightness(0.9);
+  }
+}
+
+@keyframes vt-tiles {
+  from {
+    --wipe-progress: 0;
+  }
+  to {
+    --wipe-progress: 1;
+  }
+}
+
+/* A traveling word accelerates away and settles, rather than jumping. */
+::view-transition-group(*.word) {
+  animation-duration: var(--word-transition);
+  animation-timing-function: var(--ease-in-out);
+}
+/* Same text, same size: show only the arriving word, no ghosting crossfade.
+   (Base rule plus :only-child override; :not(:only-child) isn't supported on
+   these pseudo-elements.) */
+::view-transition-old(*.word) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(*.word) {
+  animation: none;
+}
+/* Words with no partner leave and arrive with their page: on their block's
+   beat (--arrive-delay, utils/pageArrival), or a staggered list's
+   (--rise-delay, ProjectLexicon). */
+::view-transition-old(*.word):only-child {
+  opacity: 1;
+  animation: 180ms var(--ease-out) both vt-fade-out;
+}
+::view-transition-new(*.word):only-child {
+  animation: 500ms var(--ease-out) var(--arrive-delay, var(--rise-delay, 150ms)) both vt-rise;
+}
+
+/*
+ * A project with a light-scheme mark (logoLight) renders both images; only the one for the
+ * current scheme shows. The hidden one is display:none, so a view transition
+ * never captures it and the plate's transition name stays unique.
+ */
+:root:is(.dark, .vivid[data-section='work']) img[data-scheme='light'],
+:root:not(.dark, .vivid[data-section='work']) img[data-scheme='dark'] {
+  display: none;
+}
+
+/*
+ * A project's plate (logo) travels with its word, on the word's timing. It
+ * grows between the lexicon margin and the heading, so unlike the word it
+ * changes size: keep the default crossfade, so the sharp new image takes over
+ * from the scaled old one. A plate hidden in the lexicon (no hover) is a
+ * transparent snapshot: the plate then fades in on its way, or out on its way
+ * back.
+ */
+::view-transition-group(*.plate) {
+  animation-duration: var(--word-transition);
+  animation-timing-function: var(--ease-in-out);
+}
+::view-transition-old(*.plate):only-child {
+  animation: 180ms var(--ease-out) both vt-fade-out;
+}
+::view-transition-new(*.plate):only-child {
+  animation: 500ms var(--ease-out) var(--arrive-delay, var(--rise-delay, 150ms)) both vt-rise;
+}
+
+/* The marker moves on screen, so it eases both ways, like the word. Under
+   reduced motion Nuxt skips view transitions: the marker just appears. */
+::view-transition-group(flag-marker) {
+  animation-timing-function: var(--ease-in-out);
+}
+/* The marker takes its section's accent, so the old one is the previous
+   section's color (red on media, in dark). Show only the arriving marker,
+   like the word: it slides in its new color, without the previous one bleeding
+   through the crossfade. */
+::view-transition-old(flag-marker) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(flag-marker) {
+  animation: none;
+  /* Its own width, not the group's: the group interpolates size as it moves,
+     and from a wide field (about, below sm) the marker would cross the band
+     still that wide and only shrink on landing. This way it slides. */
+  inline-size: auto;
+}
+
+@keyframes vt-wipe {
+  from {
+    clip-path: var(--wipe-from);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes vt-unwipe {
+  from {
+    clip-path: inset(0);
+  }
+  to {
+    clip-path: var(--unwipe-to);
+  }
+}
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--space-6);
+  }
+}
+
+/*
+ * The work section's arrival, a notch livelier than vt-rise: the block
+ * develops out of a slight blur as it fades in, and its lift lands on a
+ * spring, a touch past its place and back. Two animations, so the fade can
+ * be quick while the lift settles: `vt-develop` with ease-out, `vt-lift`
+ * with --ease-arrive over --arrive-duration. --lift-from sets where it comes
+ * from. Springs are Motion's, sampled into linear() (bounce 0.3 over a
+ * perceived 0.55s; 0.3 over 0.35s for --ease-pop); the duration includes the
+ * settle, so time siblings off the perceived one.
+ */
+:root {
+  --ease-arrive: linear(0, 0.043, 0.148, 0.284, 0.429, 0.568, 0.692, 0.796, 0.88, 0.943, 0.988, 1.018, 1.036, 1.044, 1.046, 1.043, 1.038, 1.032, 1.025, 1.019, 1.013, 1.009, 1.005, 1.002, 1, 0.999, 0.998, 1);
+  --arrive-duration: 920ms;
+  --ease-pop: linear(0, 0.098, 0.305, 0.53, 0.724, 0.869, 0.964, 1.018, 1.041, 1.046, 1.04, 1.03, 1.02, 1.011, 1.005, 1.001, 0.999, 0.998, 1);
+  --pop-duration: 600ms;
+}
+
+@keyframes vt-develop {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+  }
+}
+@keyframes vt-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes vt-lift {
+  from {
+    translate: var(--lift-from, 0 var(--space-8));
+  }
+}
+
+/* A drawn line growing down from its top (the parts tree, ProjectParts.vue). */
+@keyframes tree-grow {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+/* A drawn line growing out sideways from its start (the tree's branches). */
+@keyframes branch-grow {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+a {
+  color: var(--accent);
+}
+
+/*
+ * Selection turns the section inside out: in light, the flag's text becomes
+ * the field (paper on green reads green on paper); in dark, the section's
+ * glow becomes the field with the stage as ink. Glow drops while selected,
+ * or the halo smears the inverted letters. Highlighted code is left to its
+ * gem (tlapalli.css), which keeps each token's color.
+ */
+:not(.shiki, .shiki *)::selection {
+  background-color: var(--accent);
+  color: var(--bg);
+  text-shadow: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/*
+ * Press: everything you can press answers the moment it's pressed, with no
+ * easing in, and eases back over a quarter second as it's let go. Three
+ * weights, set with data-press on the element:
+ *   (none)  words: they dim.
+ *   key     small controls, an icon or a word in a box: they dim and give
+ *           a little under the finger.
+ *   sink    pictures (thumbnails): they sink and darken, as a print would.
+ *   cover   a link stretched over its row by an absolute ::after: dims
+ *           with opacity, as a filter (or scale) on the link would make it
+ *           the ::after's box, shrinking the target to the words under
+ *           the press, and the release would land outside it, no click.
+ *   none    has its own answer (the flag nav's marker, the stills' lean).
+ * filter: opacity() rather than opacity, so a control already resting
+ * dimmed (the switches, the section index) dims from where it is, and no
+ * component's own opacity is overwritten. All in :where(), at zero
+ * specificity, so any component rule wins.
+ */
+:where(a, button, summary, [role='button'], [role='tab']):where(:not([data-press='none'])) {
+  transition: filter 0.25s var(--ease-out), scale 0.25s var(--ease-out), opacity 0.25s var(--ease-out);
+}
+
+:where(a, button, summary, [role='button'], [role='tab']):where(:active:not([data-press='none'], :disabled, [aria-disabled='true'])) {
+  filter: opacity(0.55);
+  transition-duration: 0s;
+}
+
+:where([data-press='key']):where(:active:not(:disabled)) {
+  filter: opacity(0.6);
+  scale: 0.92;
+}
+
+:where([data-press='cover']):where(:active) {
+  filter: none;
+  opacity: 0.55;
+}
+
+:where([data-press='sink']):where(:active:not(:disabled)) {
+  filter: brightness(0.8);
+  scale: 0.97;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where([data-press]):where(:active) {
+    scale: none;
+  }
+}
+
+.site {
+  display: flex;
+  flex-direction: column;
+  /* svh, not vh: on mobile, 100vh is the viewport with the address bar
+     hidden, so a short page overflowed by the bar's height. That scrolled
+     just far enough to collapse the bar, the overflow vanished, and the
+     browser snapped back to the top. */
+  min-height: 100svh;
+}
+
+@media (width < 40rem) {
+  /* Mobile tucks the brand row away on scroll. Leave room to scroll it out
+     even at the tallest viewport (address bar collapsed), so pages barely
+     taller than the screen don't lose their scroll room and snap back. */
+  .site {
+    min-height: calc(100lvh + var(--header-tuck, 0px));
+  }
+}
+
+main {
+  flex: 1;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+}
+.skip-link:focus {
+  left: var(--gutter);
+  top: var(--gutter);
+  background: var(--bg);
+  padding: var(--space-2) var(--space-4);
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Layout grid */
+
+.page {
+  display: grid;
+  grid-template-columns:
+    [full-start] minmax(var(--gutter), 1fr)
+    [wide-start] minmax(0, calc((var(--wide-width) - var(--content-width)) / 2))
+    [content-start] min(var(--content-width), 100% - var(--gutter) * 2)
+    [content-end] minmax(0, calc((var(--wide-width) - var(--content-width)) / 2))
+    [wide-end] minmax(var(--gutter), 1fr) [full-end];
+  align-content: start;
+  padding-block: var(--gap-block) var(--gap-section);
+}
+
+/* A page with its section index as a row starts lower by the row, which sits
+   in that room right under the band (SiteSectionIndex). The row's height is
+   set here, not measured, so anchors, the experience rail and the landing
+   mark clear it from the first paint; in the margin it takes none. */
+:root:has(.section-index) {
+  /* Its line (the names' text-[0.60rem] leading-[1.4]), and room under it:
+     above, the header's own padding is the gap, as between the band's rows. */
+  --section-index-height: calc(0.6rem * 1.4 + var(--gap-group));
+}
+@media (width >= 60rem) {
+  :root:has(.section-index--auto) {
+    --section-index-height: 0px;
+  }
+}
+.page:has(> .section-index) {
+  padding-block-start: calc(var(--gap-block) + var(--section-index-height, 0px));
+}
+
+/* A section's child page (Videos, Podcast, Contributions): its blocks rise
+   one after another on every visit, as a project's entry does (ProjectPage).
+   A block that brings its own entrance (the guide, the log) opts out with
+   data-own-entrance. The heading's word travels as its own snapshot, which
+   the rise doesn't reach. */
+@media (prefers-reduced-motion: no-preference) {
+  .page-enter > :not([data-own-entrance]) {
+    animation: 500ms var(--ease-out) calc(150ms + var(--enter-step, 3) * 80ms) backwards vt-rise;
+  }
+  .page-enter > :nth-child(1) {
+    --enter-step: 0;
+  }
+  .page-enter > :nth-child(2) {
+    --enter-step: 1;
+  }
+  .page-enter > :nth-child(3) {
+    --enter-step: 2;
+  }
+}
+
+/*
+ * First visit: the page comes in alone, then the header and footer build
+ * around it, so the eye goes to each in turn (plugins/intro.client.ts). The
+ * brand drops in, the band draws in field by field (its light runs along
+ * behind, SiteFlagNav), the footer fades up and each setting lights up as it
+ * arrives, then settles to its resting dim. The landing page waits out most
+ * of the mark's drawing. If the script never builds it, it all shows anyway.
+ */
+:root[data-intro] {
+  --intro-at: 1100ms;
+}
+:root[data-intro]:has(.home-intro) {
+  --intro-at: 2600ms;
+}
+:root[data-intro=''] :is(.site-header > a, .flag-nav, .attr-switch, .site-footer) {
+  animation: intro-wait 6s;
+}
+:root[data-intro='build'] .site-header > a {
+  animation: 500ms var(--ease-out) backwards intro-drop;
+}
+/* Field by field, about · work · media: each bar draws in from its left, as
+   the hover preview fills, and its label comes up once it's under way. */
+:root[data-intro='build'] .flag-nav__field {
+  transform-origin: left;
+  animation: 700ms var(--ease-in-out) calc(300ms + var(--intro-field, 0) * 200ms) backwards intro-draw;
+}
+:root[data-intro='build'] .flag-nav__link > :not(.flag-nav__field) {
+  animation: 400ms var(--ease-out) calc(600ms + var(--intro-field, 0) * 200ms) backwards intro-fade;
+}
+.flag-nav__segment:nth-child(2) {
+  --intro-field: 1;
+}
+.flag-nav__segment:nth-child(3) {
+  --intro-field: 2;
+}
+:root[data-intro='build'] .site-footer {
+  animation: 600ms var(--ease-out) 2300ms backwards intro-fade;
+}
+/* The footer brings the socials; the stops, then the scheme switch, follow
+   once they've landed, so each reads as its own step. */
+:root[data-intro='build'] .site-footer__stops {
+  animation: 600ms var(--ease-out) 5130ms backwards intro-fade;
+}
+:root[data-intro='build'] .attr-switch > * {
+  animation: 900ms ease-in-out var(--intro-step) backwards intro-lit;
+}
+.site-header .attr-switch:first-child {
+  --intro-step: 1400ms;
+}
+.site-header .attr-switch:last-child {
+  --intro-step: 1700ms;
+}
+.site-footer .attr-switch {
+  --intro-step: 5530ms;
+}
+@keyframes intro-wait {
+  from,
+  to {
+    opacity: 0;
+  }
+}
+@keyframes intro-drop {
+  from {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--space-2));
+  }
+}
+@keyframes intro-draw {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+/* No end frame: it settles back to the switch's own resting dim. */
+@keyframes intro-lit {
+  from {
+    opacity: 0;
+  }
+  35%,
+  65% {
+    opacity: 1;
+    text-decoration-color: currentColor;
+  }
+}
+
+/* Defaults use :where() so any utility overrides them without a fight. */
+:where(.page) > * {
+  grid-column: content;
+}
+
+/* Flow: tight inside groups, generous between sections, and more space above
+   a heading than below it. Grid items don't collapse margins, so these add up
+   predictably. */
+:where(.page) > * + * {
+  margin-top: var(--gap-group);
+}
+:where(.page) > :is(section, .prose) {
+  margin-top: var(--gap-section);
+}
+:where(section, .prose) > * + * {
+  margin-top: var(--gap-group);
+}
+:where(section, .prose) > :is(h2, h3) + * {
+  margin-top: var(--gap-tight);
+}
+.prose > :is(h2, h3) {
+  margin-top: var(--gap-block);
+}
+
+/*
+ * A case study's body (pages/projects/[slug].vue) sits on the page's own
+ * tracks, so its media can step out of the text column onto the wide one
+ * (track-wide) while the prose keeps its measure.
+ */
+.story {
+  grid-column: full;
+  display: grid;
+  grid-template-columns: subgrid;
+}
+
+:where(.story) > * {
+  grid-column: content;
+}
+
+/* Case study media (components/media/*.vue): more room around them
+   than between paragraphs, so a figure reads as its own stop. */
+:where(.prose) > .media,
+:where(.prose) > .media + * {
+  margin-top: var(--gap-block);
+}
+
+/*
+ * Image placeholders: until an image is in (plugins/image-placeholders), its
+ * reserved box holds a faint tint of the ink that breathes slowly, so a page
+ * that arrives before its images shows where they are coming. Taken away on
+ * load so transparent images don't keep it. SVGs (the project logos and
+ * stickers) never get it: they're tiny, and a box behind a die-cut shape
+ * reads as a border.
+ */
+img:not([data-loaded], [src$='.svg']) {
+  background-color: color-mix(in srgb, var(--fg) 8%, transparent);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  img:not([data-loaded], [src$='.svg']) {
+    animation: image-waiting 1.6s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes image-waiting {
+  to {
+    background-color: color-mix(in srgb, var(--fg) 16%, transparent);
+  }
+}

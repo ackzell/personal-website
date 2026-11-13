@@ -1,0 +1,170 @@
+{
+  "solitaire": {
+    "board": "Solitaire",
+    "draw": "Draw a card",
+    "undo": "Deshacer",
+    "reset": "Empezar de nuevo",
+    "message": "Sorry, Esa página no existe, pero ya que estás aquí... ¿Sabes jugar solitario?"
+  },
+  "console": {
+    "message": "Ya sabía que vendrías a la consola! jajaj Gracias por visitar este website. Saludos!",
+    "hint": "Ya que estás aquí, puedes escribir:",
+    "stack": "Hecho con Nuxt, Vue, Nuxt Content, UnoCSS, Motion, anime.js, Foley (sonidos) y web-haptics. El código:",
+    "v1": "Esta es la v2. ¿Conociste la v1?"
+  },
+  "site": {
+    "name": "ackzell.dev",
+    "skipToContent": "Saltar al contenido",
+    "language": "Idioma",
+    "scheme": "Esquema de color",
+    "schemeVivid": "Vívido",
+    "schemeLight": "Claro",
+    "schemeDark": "Oscuro",
+    "sound": "Sonido",
+    "sectionIndex": "En esta página"
+  },
+  "nav": {
+    "label": "Principal",
+    "about": "Acerca de",
+    "work": "Proyectos",
+    "media": "Contenido"
+  },
+  "home": {
+    "bio": "Sobre mí",
+    "title": "Axel Martínez",
+    "description": "Ingeniero de software mexicano enfocado en el frontend y JS/TS (Vue, si tuviera que escoger). Aprendiz eterno de tecnologías web. Padre de familia. Beatle fan.",
+    "intro": "¡Hola! Soy un ingeniero de software mexicano enfocado en el frontend y el stack de JS/TS, y si tuviera que escoger un framework usaría Vue (cuál mas?). He construido para la web por más de {years} años (ándale! el tiempo vuela) y aquí encontrarás mi experiencia y las cosas que hago por mi cuenta. Siéntete libre de explorar, y escríbeme si quieres que trabajemos juntos o sólo saludar. Buen día!",
+    "contact": "¿Trabajamos juntos, o sólo quieres saludar?",
+    "contactTitle": "Contacto",
+    "featured": "Mi proyecto más activo",
+    "allProjects": "Todos los proyectos",
+    "timeline": "Trayectoria"
+  },
+  "projects": {
+    "title": "Proyectos",
+    "description": "Proyectos personales, herramientas y experimentos en los que trabajo",
+    "intro": "Proyectos, herramientas y experimentos que he construido sobre todo para mí mismo. La mayoría son mis intentos por aprender cosas nuevas: técnicas, herramientas, tecnologías y cosas así. Hay un patrón que verás con los nombres y es que de un tiempo para acá todos tienen nombres en náhuatl. Este es un idioma antiguo que se habla en México desde antes de la época colonial.",
+    "pronunciation": "Pronunciación",
+    "meaning": "Significado",
+    "related": "Proyectos relacionados",
+    "parts": "En este proyecto",
+    "alsoIn": "También en {word}",
+    "index": {
+      "overview": "Resumen",
+      "details": "Detalles",
+      "story": "Historia"
+    },
+    "status": {
+      "shipped": "Publicado",
+      "active": "En desarrollo",
+      "experiment": "Experimento"
+    },
+    "ledger": {
+      "site": "Sitio",
+      "install": "Instalar extensión",
+      "source": "Código",
+      "changelog": "Changelog",
+      "stack": "Stack",
+      "devlog": "Devlog",
+      "release": "Versión",
+      "video": "Video",
+      "access": "Vista previa",
+      "requestAccess": "Solicitar acceso"
+    },
+    "media": {
+      "play": "Reproducir",
+      "pause": "Pausar",
+      "youtube": "Video completo en YouTube",
+      "tryLive": "Carga el sitio aquí",
+      "openSite": "Abrir en una pestaña nueva",
+      "watch": "Ver en YouTube",
+      "expand": "Expandir",
+      "fullscreen": "Pantalla completa",
+      "shrink": "Salir de pantalla completa",
+      "seek": "Posición en el video",
+      "lessons": "{count} lección | {count} lecciones",
+      "challenge": "Reto",
+      "lightbox": {
+        "close": "Cerrar",
+        "previous": "Anterior",
+        "next": "Siguiente",
+        "zoomIn": "Zoom In",
+        "zoomOut": "Zoom Out",
+        "fit": "Fit",
+        "counter": "{index} / {total}"
+      },
+      "take": {
+        "files": "Archivos",
+        "gem": "Tema Visual",
+        "scrub": "Recorre el clip",
+        "running": "Corre {file}, línea {lines} | Corre {file}, líneas {lines}"
+      }
+    }
+  },
+  "media": {
+    "title": "Contenido",
+    "description": "No quiero ser influencer, sólo compartir con los demás",
+    "intro": "Comencé una playlist de YouTube en 2017 con videos acerca de cómo construir una app de escritorio. Desde entonces he estado muy interesado en aprender acerca de software, hardware, técnicas para crear videos, también sobre equipo de audio y cosas así. Aquí está el resultado de todos estos años tratando de crear contenido. No es realmente la idea convertirme en un tech influencer o cosas de esas; solamente quiero compartir con las demás personas.",
+    "guide": {
+      "legend": {
+        "label": "Cómo leer la guía",
+        "videos": "Cada cuadro es un video, del más antiguo al más nuevo. Una fila más larga tiene más videos.",
+        "episodes": "",
+        "length": "Duración",
+        "downloads": "Descargas",
+        "views": "Vistas",
+        "bars": "",
+        "videoLength": "Duración"
+      },
+      "label": "Series, por último lanzamiento",
+      "videos": "{count} video | {count} videos",
+      "episodes": "{count} episodio | {count} episodios",
+      "views": "{count} vistas",
+      "downloads": "{count} descargas",
+      "thatWeek": "{count} videos esa semana",
+      "openPlaylist": "Abrir la lista",
+      "openPodcast": "Escuchar en mytypeof.dev",
+      "season": "Temporada {n}",
+      "playlists": "{count} lista | {count} listas",
+      "sort": {
+        "label": "Ordenar",
+        "order": "Orden de la lista",
+        "views": "Más vistos",
+        "length": "Más largos"
+      },
+      "find": "Buscar un video",
+      "none": "Nada coincide.",
+      "showAll": "Ver los {count}"
+    }
+  },
+  "videos": {
+    "title": "Videos",
+    "intro": "Mi canal de YouTube. Los videos realmente comenzaron como una especie de tutoriales para construir software paso a paso, pero ahora hay muchos \"devlogs\" en forma de live streams que agrego ahí. (El contenido es sobre todo en inglés.) Aquí hay una selección de mis playlists.",
+    "rest": "Tengo más contenido en el canal."
+  },
+  "podcast": {
+    "title": "Podcast",
+    "intro": "My typeof Radio es un podcast de desarrollo web en español.",
+    "rest": "Encuentra todos los episodios en mytypeof.dev."
+  },
+  "contributions": {
+    "title": "Contribuciones",
+    "description": "No es mucho, pero es trabajo honesto",
+    "intro": "Realmente creo en el software de código abierto y estas son algunas de las cosas con las que he contribuido a distintas comunidades. La mayoría son pequeños fixes aquí y allá (activa el filtro de erratas). Pero, según yo, cuando hablamos de OSS todo cuenta.",
+    "errata": "Errata",
+    "prompt": "¿Mostrar {count} erratas (typos, docs, etc.)?",
+    "yes": "sí",
+    "no": "no"
+  },
+  "uses": {
+    "title": "Uses",
+    "description": "Mi software favorito, el setup de hardware o libs y frameworks que probablemente ya olvidé cómo usar",
+    "intro": "Inspirado por el sitio {usesTech} de Wes Bos. Aquí hay algunas de las herramientas, hardware y dispositivos que han sido o que son parte de mi día a día.",
+    "tool": "Herramienta",
+    "years": "Años",
+    "note": "Nota",
+    "now": "hoy",
+    "rows": "({n} fila) | ({n} filas)"
+  },
+  "placeholder": "Próximamente."
+}

@@ -1,0 +1,8 @@
+order: 2
+repos:
+  - ackzell/tlapalli-website
+changelogs:
+  - https://github.com/ackzell/tlapalli-website/blob/HEAD/CHANGELOG.md
+links:
+  site: https://tlapalli.ackzell.dev
+stack: [typescript, vue, nuxt, unocss]

@@ -1,0 +1,34 @@
+# Curation for the contributions page. The pull requests themselves come from
+# GitHub at build time (server/api/contributions.get.ts); refer to them here
+# as `owner/repo#number`. A new merge shows on the graph until it's listed
+# under errata or hidden.
+
+# Typos, link additions and other small fixes: listed to the side.
+errata:
+  - twoslashes/twoslash#78
+  - vuejs/awesome-vue#4268
+  - posva/pinia-colada#303
+  - harryadel/awesome-meteor-jobs#2
+  - stackblitz/ilovecodeflow.com#64
+  - vuejs/awesome-vue#3897
+  - vuejs/pinia#599
+  - vuejs/rfcs#365
+  - devzcommunity/community#28
+  - dobromir-hristov/vuecommunity#88
+  - dobromir-hristov/vuecommunity#86
+  - vuejs/awesome-vue#2438
+  - aspittel/learn-code-from-us#2
+  - auth0/docs#5968
+  - vuetifyjs/awesome#1
+  - TequilaJS/marksheet#2
+  - cult-of-coders/meteor-tuts#15
+  - tjvantoll/articles#1
+
+# Left out entirely.
+hidden: []
+
+# A line under a merge on the graph, in both languages:
+#   zed-industries/extensions#6536:
+#     en: ...
+#     es: ...
+notes: {}
