@@ -29,6 +29,8 @@ test('the sitemaps list exactly the generated pages', { skip: !built }, () => {
   const listed = globSync('__sitemap__/*.xml', { cwd: root })
     .flatMap((file) => [...readFileSync(join(root, file), 'utf8').matchAll(/<loc>https:\/\/ackzell\.dev([^<]*)<\/loc>/g)])
     .map(([, path]) => path || '/')
-  const pages = globSync('**/index.html', { cwd: root }).map((file) => `/${file.replace(/\/?index\.html$/, '')}`)
+  // Pages build as name.html (autoSubfolderIndex: false); 200/404 are fallbacks, not pages.
+  const pages = globSync('**/*.html', { cwd: root, exclude: ['200.html', '404.html'] })
+    .map((file) => `/${file.replace(/(^|\/)index\.html$/, '').replace(/\.html$/, '')}`)
   assert.deepEqual([...new Set(listed)].sort(), pages.sort())
 })
