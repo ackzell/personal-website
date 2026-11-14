@@ -10,7 +10,8 @@
     "message": "Ya sabía que vendrías a la consola! jajaj Gracias por visitar este website. Saludos!",
     "hint": "Ya que estás aquí, puedes escribir:",
     "stack": "Hecho con Nuxt, Vue, Nuxt Content, UnoCSS, Motion, anime.js, Foley (sonidos) y web-haptics. El código:",
-    "v1": "Esta es la v2. ¿Conociste la v1?"
+    "v1": "Esta es la v2. ¿Conociste la v1?",
+    "lost": "Por cierto... no todas las páginas de este sitio existen, pero las que no, no están vacías 😉"
   },
   "site": {
     "name": "ackzell.dev",

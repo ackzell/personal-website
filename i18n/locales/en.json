@@ -10,7 +10,8 @@
     "message": "I knew I'd see you here lol! Thanks for checking out this website. Cheers!",
     "hint": "While you're here, try typing:",
     "stack": "Made with Nuxt, Vue, Nuxt Content, UnoCSS, Motion, anime.js, Foley (sounds) and web-haptics. The source:",
-    "v1": "This is v2. Did you ever visit v1?"
+    "v1": "This is v2. Did you ever visit v1?",
+    "lost": "BTW not every page in this website exists, but the ones that don't aren't empty 😉"
   },
   "site": {
     "name": "ackzell.dev",
