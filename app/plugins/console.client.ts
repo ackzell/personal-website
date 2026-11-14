@@ -55,6 +55,8 @@ export default defineNuxtPlugin((nuxtApp) => {
     console.log(commit ? `${SOURCE}/tree/${commit}` : SOURCE)
 
     console.log(`${i18n.t('console.v1')} https://v1.ackzell.dev`)
+
+    console.log(i18n.t('console.lost'))
   }
 
   Object.assign(window, {
