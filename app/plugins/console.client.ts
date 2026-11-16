@@ -49,7 +49,9 @@ export default defineNuxtPlugin((nuxtApp) => {
     })
 
     const command = 'font-family: monospace; font-weight: bold;'
-    console.log(`${i18n.t('console.hint')} %cackzell.projects%c, %cackzell.uses%c, %cackzell.intro`, command, '', command, '', command)
+    // Only browsers that can use the WebMCP tools (plugins/webmcp.client.ts) hear about them, on the same line.
+    const webmcp = 'modelContext' in document || 'modelContext' in navigator ? ` ${i18n.t('console.webmcp')}` : ''
+    console.log(`${i18n.t('console.hint')} %cackzell.projects%c, %cackzell.uses%c, %cackzell.intro%c${webmcp}`, command, '', command, '', command, '')
 
     console.log(i18n.t('console.stack'))
     console.log(commit ? `${SOURCE}/tree/${commit}` : SOURCE)

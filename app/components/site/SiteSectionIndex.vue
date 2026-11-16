@@ -290,7 +290,8 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 
   .section-index--auto .section-index__list {
     display: grid;
-    gap: var(--gap-tight);
+    /* The links' padding is the spacing, so their targets meet with no dead gap. */
+    gap: 0;
     block-size: auto;
     overflow: visible;
     margin: 0;
@@ -303,7 +304,8 @@ useEventListener(list, 'scroll', readOverflow, { passive: true })
 
   .section-index--auto .section-index__link {
     white-space: normal;
-    padding-block: 0;
+    /* Makes a one-line label 25px tall, over the 24px touch target WCAG 2.2 asks for. */
+    padding-block: calc(var(--space-3) / 2);
     margin-block: 0;
   }
 

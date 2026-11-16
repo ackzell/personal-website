@@ -594,6 +594,8 @@ function blur(slug: string) {
   position: relative;
   z-index: 1;
   text-decoration: none;
+  /* Inline, so this grows the target to 25px without moving the lines. */
+  padding-block: var(--space-1);
 }
 
 /*

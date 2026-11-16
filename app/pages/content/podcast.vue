@@ -9,7 +9,9 @@ usePageSeo(() => ({ title: t('podcast.title'), description: t('podcast.intro') }
   <div class="page page-enter">
     <h1 class="text-headword" typeset="heading" m="0"><span :style="mediaTransition('podcast')">{{ $t('podcast.title') }}</span></h1>
     <p>{{ $t('podcast.intro') }}</p>
-    <p v-if="podcast?.note">{{ podcast.note }}</p>
+    <p v-if="podcast?.note">
+      <template v-for="(part, i) in podcast.note.split('{syntaxfm}')" :key="i"><a v-if="i" href="https://syntax.fm">Syntax</a>{{ part }}</template>
+    </p>
 
     <GuideSeries data-own-entrance v-if="podcast?.seasons.length" :series="podcast.seasons" track="wide" mt="section" />
     <p v-else>{{ $t('placeholder') }}</p>
