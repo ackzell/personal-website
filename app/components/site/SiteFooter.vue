@@ -203,7 +203,7 @@ function landed(event: AnimationEvent, i: number) {
   }
 }
 
-@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+@media (hover: hover) {
 
   /* Dimmed at rest; hover brings them back (a drag does on touch, below). */
   .site-footer__links span {
@@ -221,20 +221,36 @@ function landed(event: AnimationEvent, i: number) {
   }
 
   li:is(:hover, :focus-within) span {
-    --wave: 1.5;
     --opacity: 1;
   }
 
   li:is(:hover, :focus-within)+li span,
   li:has(+ li:is(:hover, :focus-within)) span {
-    --wave: 1.25;
     --opacity: 0.50;
   }
 
   li:is(:hover, :focus-within)+li+li span,
   li:has(+ li + li:is(:hover, :focus-within)) span {
-    --wave: 1.1;
     --opacity: 0.25;
+  }
+
+}
+
+/* The wave grows only with motion; under reduced motion it stays light alone. */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+
+  li:is(:hover, :focus-within) span {
+    --wave: 1.5;
+  }
+
+  li:is(:hover, :focus-within)+li span,
+  li:has(+ li:is(:hover, :focus-within)) span {
+    --wave: 1.25;
+  }
+
+  li:is(:hover, :focus-within)+li+li span,
+  li:has(+ li + li:is(:hover, :focus-within)) span {
+    --wave: 1.1;
   }
 
 }
