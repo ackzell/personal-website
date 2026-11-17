@@ -243,6 +243,8 @@ let stopArriving: (() => void) | undefined
 onMounted(async () => {
   // Measured where the page will be read, not where the last one was left.
   await pageScrolled()
+  // Without motion every row is simply there, scrolled to or not.
+  if (reducedMotion.value === 'reduce') return
   const below = (items.value ?? []).filter((el) => el.getBoundingClientRect().top > window.innerHeight)
   if (!below.length) return
   waiting.value = new Set(below.map((el) => el.dataset.key!))
@@ -280,9 +282,11 @@ useMotionValueEvent(headY, 'change', (now) => frame.value?.style.setProperty('--
 // The last row printed in this run, top down. Without the printing (reduced
 // motion), every row is there at once.
 const printedTo = ref(-1)
-onMounted(() => {
-  if (reducedMotion.value === 'reduce') printedTo.value = Infinity
-})
+// Watched, not read in onMounted: vueuse only learns the preference a tick
+// after mount, and with no print animations nothing else would set it.
+watch(reducedMotion, (now) => {
+  if (now === 'reduce') printedTo.value = Infinity
+}, { immediate: true })
 
 function printed(event: AnimationEvent) {
   // Keyframe names carry the scoped suffix.
@@ -359,7 +363,8 @@ const name = (repo: string) => repo.split('/')[1]
     </div>
 
     <div ref="frame" class="log-frame" @animationend="printed">
-    <Transition mode="out-in" :css="reducedMotion !== 'reduce'">
+    <!-- Always css: out-in with css off and no JS hooks never renders the new log. -->
+    <Transition mode="out-in">
       <ol ref="log" :key="runs" class="log" :class="{ 'log--printing': runs > 0 }" m="0" px="0" pt="0" list="none">
         <li v-for="(row, i) in rows" ref="items" :key="row.key" class="log__row"
           :class="[`log__row--${row.kind}`, { 'is-lit': row.repo && lit === row.repo }]"
@@ -784,19 +789,12 @@ const name = (repo: string) => repo.split('/')[1]
   [data-booting] .key,
   [data-booting] .errata-switch__flag::after,
   [data-booting] .errata-switch__prompt,
-  [data-booting] .log>.log__row {
+  [data-booting] .log:not(.log--printing)>.log__row {
     animation: none;
   }
 
-  /* Rows still arrive in order, as a fade in place. */
-  .log__row[data-state='pending'] {
-    translate: none;
-    filter: none;
-  }
-
-  .log__row {
-    transition: opacity 300ms var(--ease-out);
-    transition-delay: calc(var(--batch, 0) * 40ms);
+  .log.v-leave-active {
+    transition: none;
   }
 
   .log__head-text {
