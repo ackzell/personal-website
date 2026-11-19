@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { layout, layoutNextLine, prepareWithSegments } from '@chenglou/pretext'
 import type { LayoutCursor, PreparedTextWithSegments } from '@chenglou/pretext'
+import { animate, type AnimationPlaybackControls } from 'motion-v'
 import { localeSwitching } from '~/utils/localeSwitch'
 
 /*
@@ -18,7 +19,8 @@ import { localeSwitching } from '~/utils/localeSwitch'
  * name, paragraph. The real heading and paragraph always stay in the
  * document; the laid-out lines are a visual copy.
  */
-const props = defineProps<{ title: string, text: string }>()
+/** `yearsAt`: where `years` starts in `text`. */
+const props = defineProps<{ title: string, text: string, years: number, yearsAt: number }>()
 
 const root = useTemplateRef<HTMLElement>('root')
 const mark = useTemplateRef<HTMLElement>('mark')
@@ -51,6 +53,14 @@ let pending = 0
 let parted = false
 let lastParting = Number.NEGATIVE_INFINITY
 const PARTING_GAP = 300
+
+/* The years in the paragraph count up once their line scrolls into view.
+   Lines are laid out with the final number; only the painted copy counts. */
+let count = 0
+let counter: AnimationPlaybackControls | undefined
+let numbered: { el: Element, text: string, at: number } | undefined
+const withCount = (text: string, at: number) =>
+  text.slice(0, at) + count + text.slice(at + String(props.years).length)
 
 type Placed = {
   block: Block
@@ -183,6 +193,7 @@ function flow(force = false) {
   }
   layer.classList.toggle('is-centered', split)
 
+  let textAt = 0
   for (const [i, p] of placed.entries()) {
     // Each line sits in a holder of no height that takes its place, so a
     // page arrival or a swipe, which move blocks on their own transform and
@@ -195,7 +206,22 @@ function flow(force = false) {
       pool[i] = span
     }
     const line = span.firstElementChild!
-    if (line.textContent !== p.text) line.textContent = p.text
+    // Lines are consecutive pieces of the paragraph: find where this one starts
+    // to tell whether the years slot falls inside it.
+    let at = -1
+    if (!p.block.heading) {
+      const start = props.text.indexOf(p.text, textAt)
+      if (start >= 0) {
+        textAt = start + p.text.length
+        if (props.yearsAt >= start && props.yearsAt < textAt) at = props.yearsAt - start
+      }
+    }
+    const text = at >= 0 ? withCount(p.text, at) : p.text
+    if (line.textContent !== text) line.textContent = text
+    if (at >= 0) {
+      numbered = { el: line, text: p.text, at }
+      if (!counter && box.getBoundingClientRect().top + p.y < window.innerHeight * 0.85) countUp()
+    }
     Object.assign(span.style, p.block.style)
     span.toggleAttribute('data-heading', p.block.heading)
     span.style.lineHeight = `${p.block.lineHeight}px`
@@ -204,6 +230,19 @@ function flow(force = false) {
     span.style.transform = `translateY(${p.y}px)`
   }
   for (const extra of pool.splice(placed.length)) extra.remove()
+}
+
+function countUp() {
+  counter = animate(0, props.years, {
+    duration: 1.8,
+    ease: [0.16, 1, 0.3, 1],
+    onUpdate: (v) => {
+      const next = Math.round(v)
+      if (next === count || !numbered) return
+      count = next
+      numbered.el.textContent = withCount(numbered.text, numbered.at)
+    },
+  })
 }
 
 function schedule() {
@@ -237,7 +276,10 @@ onMounted(async () => {
   relayout()
 })
 
-onBeforeUnmount(() => cancelAnimationFrame(pending))
+onBeforeUnmount(() => {
+  cancelAnimationFrame(pending)
+  counter?.stop()
+})
 </script>
 
 <template>

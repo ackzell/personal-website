@@ -2,6 +2,12 @@
 import { socialLinks } from '~/config/nav'
 
 const { t } = useI18n()
+const years = new Date().getFullYear() - 2012
+// The text around the {years} slot, so the intro knows where the number sits and counts it up.
+const intro = computed(() => {
+  const [before = '', after = ''] = t('home.intro', { years: '\u0000' }).split('\u0000')
+  return { text: before + years + after, yearsAt: before.length }
+})
 const [{ data: projects }, { data: roles }, { data: recognition }] = await Promise.all([
   useProjects(),
   useExperience(),
@@ -63,7 +69,7 @@ useHead({
 
     <!-- The name already heads this one, set its own way, so its label is for assistive tech only. -->
     <section id="about" :aria-label="$t('home.bio')">
-      <HomeIntro :title="$t('home.title')" :text="$t('home.intro', { years: new Date().getFullYear() - 2012 })" />
+      <HomeIntro :title="$t('home.title')" :text="intro.text" :years="years" :years-at="intro.yearsAt" />
     </section>
 
     <section id="experience" aria-labelledby="timeline-heading">
