@@ -35,7 +35,7 @@
     "bio": "Sobre mí",
     "title": "Axel Martínez",
     "description": "Ingeniero de software mexicano enfocado en el frontend y JS/TS (Vue, si tuviera que escoger). Aprendiz eterno de tecnologías web. Padre de familia. Beatle fan.",
-    "intro": "¡Hola! Soy un ingeniero de software mexicano enfocado en el frontend y el stack de JS/TS, y si tuviera que escoger un framework usaría Vue (cuál mas?). He construido para la web por más de {years} años (ándale! el tiempo vuela) y aquí encontrarás mi experiencia y las cosas que hago por mi cuenta. Siéntete libre de explorar, y escríbeme si quieres que trabajemos juntos o sólo saludar. Buen día!",
+    "intro": "¡Hola! Soy un ingeniero de software mexicano (por ahora viviendo en España) enfocado sobre todo en el frontend y el stack de JS/TS, y si tuviera que escoger un framework usaría Vue (cuál mas?). He construido para la web por más de... {years} años (ándale! el tiempo vuela) y aquí encontrarás mi experiencia y las cosas que hago por mi cuenta. Siéntete libre de explorar, y escríbeme si quieres que trabajemos juntos o sólo saludar. Buen día!",
     "contact": "¿Trabajamos juntos, o sólo quieres saludar?",
     "contactTitle": "Contacto",
     "featured": "Mi proyecto más activo",
