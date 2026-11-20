@@ -886,12 +886,18 @@ main {
       animation: var(--tile-transition) linear both vt-tiles;
       /* Cleared in a soft oval from the press (wipeOval in the plugin): one
          gradient each side of it, each stretched its own way, soft over the
-         last 0.08 of the reach. */
+         last 0.08 of the reach. On top, cut out of both, the slabs that open
+         already landed (PRESSED in utils/tileCover) are clear from the start. */
       --front: calc(var(--wipe-progress) * var(--tile-pace) + 0.1);
       --soft: calc(var(--front) - 0.08);
       --x: calc((var(--tile-from-x) - var(--tile-ox)) * 1px);
       --y: calc((var(--tile-from-y) - var(--tile-oy)) * 1px);
       mask-image:
+        radial-gradient(
+          circle calc(var(--tile-pressed) * 1px) at var(--x) var(--y),
+          transparent calc(var(--tile-pressed) * 1px - 1px),
+          black calc(var(--tile-pressed) * 1px)
+        ),
         radial-gradient(
           calc(var(--front) * var(--tile-rx-l) * 1px) calc(var(--front) * var(--tile-ry) * 1px) at 100% var(--y),
           transparent calc(var(--soft) * var(--tile-rx-l) * 1px),
@@ -903,12 +909,15 @@ main {
           black calc(var(--front) * var(--tile-rx-r) * 1px)
         );
       mask-size:
+        100% 100%,
         max(var(--x), 0px) 100%,
         max(100% - var(--x), 0px) 100%;
       mask-position:
         0 0,
+        0 0,
         max(var(--x), 0px) 0;
       mask-repeat: no-repeat;
+      mask-composite: intersect, add;
     }
     &::view-transition-old(tile-old-page) {
       translate: 0 var(--page-shift, 0px);

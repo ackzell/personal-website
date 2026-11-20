@@ -3,7 +3,7 @@ import { cssTime } from '~/utils/cssTime'
 import { TILE_SIZE } from '~/utils/markRipple'
 import { changeOrigin } from '~/utils/pageArrival'
 import { sound, soundSlide } from '~/utils/sounds'
-import { AHEAD, BEHIND, createTileCover, TILE_TIMING, type TileField } from '~/utils/tileCover'
+import { AHEAD, BEHIND, createTileCover, PRESSED, TILE_TIMING, type TileField } from '~/utils/tileCover'
 
 /**
  * Tags each page view transition with where it travels along the flag:
@@ -124,7 +124,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       way: type === 'section-back' ? -1 : 1,
     }
     const color = getComputedStyle(document.body).backgroundColor
-    const values = [['from-x', from.x], ['from-y', from.y], ...wipeOval(field), ...offsets()] as const
+    const values = [['from-x', from.x], ['from-y', from.y], ['pressed', field.tile * (PRESSED + 0.75)], ...wipeOval(field), ...offsets()] as const
     for (const [name, value] of values) root.style.setProperty(`--tile-${name}`, String(value))
     // Dark's stage is near black already: its shadows need more to read.
     const shadow = root.classList.contains('dark') ? 0.75 : 0.4
