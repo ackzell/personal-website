@@ -7,7 +7,7 @@
  *
  * Every slab's timing is worked out once per change; a frame is one uniform
  * and one instanced draw, so nothing is repainted on the main thread. The old
- * page's words above clear just ahead of the slabs (public/worklets/tile-wipe.js).
+ * page's words above clear just ahead of the slabs (a gradient mask in main.css).
  *
  * Decorative: the canvas is aria-hidden and takes no pointer events.
  */
@@ -25,13 +25,13 @@ export type TileField = {
 /**
  * Shares of the linear progress: SPREAD is how scattered the starts are, FLIP
  * a tile's run, LAND the part of it spent flying in. BOUNCE is the spring a
- * tile lands on. The worklet reads spread and flip to keep its clearing ahead.
+ * tile lands on. The plugin's wipeOval reads spread and flip to keep its clearing ahead.
  */
 export const TILE_TIMING = { spread: 0.45, flip: 0.32, land: 0.7, bounce: 0.25 }
 
-/** How much sooner the front reaches what lies in the direction of travel than what's behind (mirrored in the worklet and utils/pageArrival). */
-const AHEAD = 0.7
-const BEHIND = 1.3
+/** How much sooner the front reaches what lies in the direction of travel than what's behind (mirrored in utils/pageArrival). */
+export const AHEAD = 0.7
+export const BEHIND = 1.3
 
 function hash(x: number, y: number, z: number) {
   let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(z, 1442695041)) | 0

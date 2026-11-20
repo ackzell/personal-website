@@ -20,7 +20,7 @@ const REACH = 0.5
 const WAIT = 0.12
 const LAND = 0.45
 const TILE_FRONT = 0.3
-/** The tile front's lead in the direction of travel, and lag behind (mirrors the worklet). */
+/** The tile front's lead in the direction of travel, and lag behind (mirrors utils/tileCover). */
 const TILE_AHEAD = 0.7
 const TILE_BEHIND = 1.3
 /** A block is anything on screen up to TALL of it high; taller ones split into what they're made of. */
@@ -80,7 +80,7 @@ export function distanceTo(el: Element, { x, y }: Point, levelOnly = false) {
   return Math.hypot(dx, dy)
 }
 
-/** How far the tile front has to go to a block: x stretched on each side of the press, as in the worklet. */
+/** How far the tile front has to go to a block: x stretched on each side of the press, as in the old words' wipe (wipeOval). */
 function frontDistance(el: Element, from: Point, way: number) {
   const box = el.getBoundingClientRect()
   const dx = from.x - Math.min(Math.max(from.x, box.left), box.right)

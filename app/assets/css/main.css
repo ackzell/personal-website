@@ -798,13 +798,13 @@ main {
   --unwipe-to: inset(0 0 0 100%);
 }
 
-/* Tiled reveal (Chromium, once plugins/section-transition has WebGL and the
-   worklet ready): the new page arrives as square slabs spreading out from the
+/* Tiled reveal (Chromium, Safari 18.2+: plugins/section-transition, once WebGL2 and
+   view transition types run): the new page arrives as square slabs spreading out from the
    clicked link. The new page lies whole under a canvas (utils/tileCover) that
    paints the old stage with the slabs cut out of it, on the GPU. The old
    page, header and footer are named apart as the old state is captured
    (data-tile-leaving) and ride above the cover, their words cleared from the
-   press just ahead of the slabs by the worklet, from one linear progress.
+   press just ahead of the slabs by a gradient mask, from one linear progress.
    Under forced colors it stays the plain wipe. */
 :root {
   --tile-transition: 950ms;
@@ -884,7 +884,31 @@ main {
     &::view-transition-old(tile-old-header),
     &::view-transition-old(tile-old-footer) {
       animation: var(--tile-transition) linear both vt-tiles;
-      mask-image: paint(tile-wipe);
+      /* Cleared in a soft oval from the press (wipeOval in the plugin): one
+         gradient each side of it, each stretched its own way, soft over the
+         last 0.08 of the reach. */
+      --front: calc(var(--wipe-progress) * var(--tile-pace) + 0.1);
+      --soft: calc(var(--front) - 0.08);
+      --x: calc((var(--tile-from-x) - var(--tile-ox)) * 1px);
+      --y: calc((var(--tile-from-y) - var(--tile-oy)) * 1px);
+      mask-image:
+        radial-gradient(
+          calc(var(--front) * var(--tile-rx-l) * 1px) calc(var(--front) * var(--tile-ry) * 1px) at 100% var(--y),
+          transparent calc(var(--soft) * var(--tile-rx-l) * 1px),
+          black calc(var(--front) * var(--tile-rx-l) * 1px)
+        ),
+        radial-gradient(
+          calc(var(--front) * var(--tile-rx-r) * 1px) calc(var(--front) * var(--tile-ry) * 1px) at 0 var(--y),
+          transparent calc(var(--soft) * var(--tile-rx-r) * 1px),
+          black calc(var(--front) * var(--tile-rx-r) * 1px)
+        );
+      mask-size:
+        max(var(--x), 0px) 100%,
+        max(100% - var(--x), 0px) 100%;
+      mask-position:
+        0 0,
+        max(var(--x), 0px) 0;
+      mask-repeat: no-repeat;
     }
     &::view-transition-old(tile-old-page) {
       translate: 0 var(--page-shift, 0px);
