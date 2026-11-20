@@ -568,6 +568,16 @@ onBeforeUnmount(() => {
   animation-play-state: running;
 }
 
+/* Drawn: let the filled animations go. Their end states match the rest
+   styles, and held filter/clip animations keep every cell on its own layer
+   in WebKit, which repaints them blurred and streaked on hover. */
+.is-armed .is-settled :deep(.box__rule),
+.is-armed .is-settled .box__bar,
+.is-armed .is-settled .box__cell,
+.is-armed .is-settled .query__count {
+  animation: none;
+}
+
 @keyframes uses-caret {
 
   from,

@@ -1,4 +1,3 @@
-import { animate, motionValue, type AnimationPlaybackControls } from 'motion-v'
 import { cssTime } from '~/utils/cssTime'
 
 /*
@@ -20,7 +19,7 @@ const REACH = 0.5
 const WAIT = 0.12
 const LAND = 0.45
 const TILE_FRONT = 0.3
-/** The tile front's lead in the direction of travel, and lag behind (mirrors the worklet). */
+/** The tile front's lead in the direction of travel, and lag behind (mirrors utils/tileCover). */
 const TILE_AHEAD = 0.7
 const TILE_BEHIND = 1.3
 /** A block is anything on screen up to TALL of it high; taller ones split into what they're made of. */
@@ -80,7 +79,7 @@ export function distanceTo(el: Element, { x, y }: Point, levelOnly = false) {
   return Math.hypot(dx, dy)
 }
 
-/** How far the tile front has to go to a block: x stretched on each side of the press, as in the worklet. */
+/** How far the tile front has to go to a block: x stretched on each side of the press, as in the old words' wipe (wipeOval). */
 function frontDistance(el: Element, from: Point, way: number) {
   const box = el.getBoundingClientRect()
   const dx = from.x - Math.min(Math.max(from.x, box.left), box.right)
@@ -136,15 +135,34 @@ export function startChange(section: string): Point {
 /** Where the page change in progress started. */
 export const changeOrigin = () => origin
 
-let arriving: { el: HTMLElement; controls: AnimationPlaybackControls }[] = []
+let arriving: Animation[] = []
 const wordDelays = import.meta.client ? document.createElement('style') : undefined
+
+/*
+ * The landing as browser animations, so the compositor runs them and no
+ * script touches the blocks each frame. The curve is a critically damped
+ * spring (Motion's bounce 0), sampled into linear(): its shape is the same
+ * for every visualDuration, which only stretches it. SETTLE is how many
+ * visualDurations it takes to come within 0.5% of rest.
+ */
+const SETTLE = 1.42
+function springEasing(shape: (progress: number) => number) {
+  // Motion's stiffness for a visualDuration v is (2π / 1.2v)², so ω·t at the end is SETTLE · 2π / 1.2.
+  const end = (SETTLE * 2 * Math.PI) / 1.2
+  const points = Array.from({ length: 41 }, (_, i) => {
+    const x = (i / 40) * end
+    return shape(1 - (1 + x) * Math.exp(-x)).toFixed(4)
+  })
+  points[40] = '1'
+  return `linear(${points.join(', ')})`
+}
+const MOVE = springEasing((progress) => progress)
+// Fully opaque once 1/1.6 of the way in, as before.
+const FADE = springEasing((progress) => Math.min(progress * 1.6, 1))
 
 /** Every arriving block where it belongs, at once. */
 export function land() {
-  for (const { el, controls } of arriving) {
-    controls.stop()
-    el.style.transform = el.style.opacity = ''
-  }
+  for (const animation of arriving) animation.cancel()
   arriving = []
 }
 
@@ -191,16 +209,12 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
       const name = getComputedStyle(named).viewTransitionName
       if (name && name !== 'none') names.push(`::view-transition-new(${name}){--arrive-delay:${Math.round(delay * 1000)}ms}`)
     }
-    const p = motionValue(0)
-    const place = (now: number) => {
-      el.style.transform = now < 1 ? `translate(${(1 - now) * dx}px, ${(1 - now) * dy}px)` : ''
-      el.style.opacity = now < 1 ? String(Math.min(now * 1.6, 1)) : ''
-    }
-    p.on('change', place)
-    // Out of sight from the start, not only once its delay is up: a value
-    // already at 0 doesn't change, so the listener alone wouldn't place it.
-    place(0)
-    return [{ el, controls: animate(p, 1, { type: 'spring', bounce: 0, visualDuration: LAND + 0.15 * far, delay }) }]
+    // Out of sight from the start, not only once its delay is up (fill: backwards).
+    const timing = { duration: (LAND + 0.15 * far) * SETTLE * 1000, delay: delay * 1000, fill: 'backwards' } as const
+    return [
+      el.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] }, { ...timing, easing: MOVE }),
+      el.animate({ opacity: [0, 1] }, { ...timing, easing: FADE }),
+    ]
   })
 
   if (wordDelays) {
@@ -209,7 +223,8 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
   }
 
   const landing = arriving
-  return Promise.all(landing.map(({ controls }) => controls)).then(() => {
+  // A cancelled one (land) rejects: it counts as landed, and the check below sees the run is over.
+  return Promise.all(landing.map((animation) => animation.finished.catch(() => {}))).then(() => {
     if (arriving !== landing) return
     arriving = []
     if (wordDelays) wordDelays.textContent = ''

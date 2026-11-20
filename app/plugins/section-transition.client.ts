@@ -3,7 +3,7 @@ import { cssTime } from '~/utils/cssTime'
 import { TILE_SIZE } from '~/utils/markRipple'
 import { changeOrigin } from '~/utils/pageArrival'
 import { sound, soundSlide } from '~/utils/sounds'
-import { createTileCover, TILE_TIMING, type TileField } from '~/utils/tileCover'
+import { AHEAD, BEHIND, createTileCover, PRESSED, TILE_TIMING, type TileField } from '~/utils/tileCover'
 
 /**
  * Tags each page view transition with where it travels along the flag:
@@ -12,13 +12,13 @@ import { createTileCover, TILE_TIMING, type TileField } from '~/utils/tileCover'
  * picks the animation from the types.
  * Nuxt already skips view transitions under prefers-reduced-motion.
  *
- * Section changes get the tiled reveal where WebGL2 and the CSS Paint API
- * both run (Chromium). A canvas over the new page (utils/tileCover) paints
- * the old stage with the slabs cut out of it, on the GPU, spreading from
- * where the change started (utils/pageArrival: the press, else the band). The
- * old page, header and footer ride above it, cleared from the press outward
- * just ahead of the slabs by public/worklets/tile-wipe.js. The
- * `has-tile-wipe` class turns it on once both are ready; anywhere else, or
+ * Section changes get the tiled reveal where WebGL2 and view transition
+ * types both run (Chromium, Safari 18.2+). A canvas over the new page
+ * (utils/tileCover) paints the old stage with the slabs cut out of it, on the
+ * GPU, spreading from where the change started (utils/pageArrival: the press,
+ * else the band). The old page, header and footer ride above it, cleared from
+ * the press outward just ahead of the slabs by a gradient mask (main.css,
+ * fed by wipeOval). The `has-tile-wipe` class turns it on; anywhere else, or
  * under forced colors, the straight clip-path wipe stays.
  */
 export default defineNuxtPlugin((nuxtApp) => {
@@ -45,15 +45,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   const canvas = document.createElement('canvas')
   canvas.className = 'tile-cover'
   canvas.setAttribute('aria-hidden', 'true')
-  const cover = 'paintWorklet' in CSS ? createTileCover(canvas) : null
+  const cover = CSS.supports('selector(:active-view-transition-type(a))') ? createTileCover(canvas) : null
   if (cover) {
     document.body.append(canvas)
     canvas.addEventListener('webglcontextlost', () => root.classList.remove('has-tile-wipe'))
-    const worklet = (CSS as unknown as { paintWorklet: { addModule: (url: string) => Promise<void> } }).paintWorklet
-    worklet
-      .addModule(`${useRuntimeConfig().app.baseURL}worklets/tile-wipe.js`)
-      .then(() => root.classList.add('has-tile-wipe'))
-      .catch(() => {})
+    root.classList.add('has-tile-wipe')
   }
 
   // The root snapshot spans the large viewport (under a phone's retracting
@@ -67,13 +63,32 @@ export default defineNuxtPlugin((nuxtApp) => {
     return height
   }
 
-  /** Where each part that clears above the cover was read, for the worklet. */
-  function setOffsets() {
-    for (const [name, selector] of [['page', 'main'], ['header', '.site-header'], ['footer', '.site-footer']] as const) {
-      const box = document.querySelector(selector)?.getBoundingClientRect()
-      root.style.setProperty(`--tile-${name}-x`, String(box?.left ?? 0))
-      root.style.setProperty(`--tile-${name}-y`, String(box?.top ?? 0))
+  /**
+   * The old words' clearing, for main.css: a soft oval growing from the press
+   * just ahead of the slabs, so the two pages' words never mix within a
+   * slab's edge. Stretched along the direction of travel as the slabs' front
+   * is: x radius `front * rx-l|rx-r` on each side, y radius `front * ry`, with
+   * `front = progress * pace + 0.1` (no slab at share u of the way starts
+   * before (1 - spread) of u across the run; 0.1 keeps it that far ahead).
+   */
+  function wipeOval(field: TileField) {
+    const stretch = (dx: number) => (dx * field.way < 0 ? AHEAD : BEHIND)
+    const distance = (x: number, y: number) => {
+      const dx = x - field.originX
+      return Math.hypot(dx * stretch(dx), y - field.originY)
     }
+    const { width: w, height: h } = field
+    const reach = Math.max(distance(0, 0), distance(w, 0), distance(0, h), distance(w, h)) || 1
+    const pace = 1 / ((1 - TILE_TIMING.spread) * (1 - TILE_TIMING.flip * 1.3))
+    return [['rx-l', reach / stretch(-1)], ['rx-r', reach / stretch(1)], ['ry', reach], ['pace', pace]] as const
+  }
+
+  /** Where each part that clears above the cover is, for its mask. */
+  function offsets() {
+    return ([['page', 'main'], ['header', '.site-header'], ['footer', '.site-footer']] as const).flatMap(([name, selector]) => {
+      const box = document.querySelector(selector)?.getBoundingClientRect()
+      return [[`${name}-x`, box?.left ?? 0], [`${name}-y`, box?.top ?? 0]] as const
+    })
   }
 
   /**
@@ -97,6 +112,8 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Before the old state is captured: the page, header and footer get names
   // of their own (main.css, data-tile-leaving) to ride above the cover.
   function revealTiles(transition: ViewTransition) {
+    // Every read before any write: a property set on the root restyles the
+    // whole page, and each read after one forced that restyle again.
     const from = changeOrigin()
     const field: TileField = {
       width: root.clientWidth,
@@ -106,16 +123,12 @@ export default defineNuxtPlugin((nuxtApp) => {
       originY: from.y,
       way: type === 'section-back' ? -1 : 1,
     }
-    for (const [name, value] of Object.entries(TILE_TIMING)) root.style.setProperty(`--tile-${name}`, String(value))
-    root.style.setProperty('--tile-vw', String(field.width))
-    root.style.setProperty('--tile-vh', String(field.height))
-    root.style.setProperty('--tile-from-x', String(from.x))
-    root.style.setProperty('--tile-from-y', String(from.y))
-    root.style.setProperty('--tile-way', String(field.way))
-    setOffsets()
+    const color = getComputedStyle(document.body).backgroundColor
+    const values = [['from-x', from.x], ['from-y', from.y], ['pressed', field.tile * (PRESSED + 0.75)], ...wipeOval(field), ...offsets()] as const
+    for (const [name, value] of values) root.style.setProperty(`--tile-${name}`, String(value))
     // Dark's stage is near black already: its shadows need more to read.
     const shadow = root.classList.contains('dark') ? 0.75 : 0.4
-    const run = { field, color: getComputedStyle(document.body).backgroundColor, dim: dim(), shadow }
+    const run = { field, color, dim: dim(), shadow }
     tiles = pending = run
     root.dataset.tileLeaving = ''
     transition.finished.finally(() => {
@@ -129,7 +142,7 @@ export default defineNuxtPlugin((nuxtApp) => {
 
   // Navigation carries on once the old state is captured: the cover goes in
   // for the new state with its first frame drawn, and runs once the
-  // transition does, in step with the worklet's linear progress.
+  // transition does, in step with the mask's linear progress.
   router.afterEach(() => {
     const run = pending
     pending = undefined

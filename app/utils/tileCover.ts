@@ -7,7 +7,7 @@
  *
  * Every slab's timing is worked out once per change; a frame is one uniform
  * and one instanced draw, so nothing is repainted on the main thread. The old
- * page's words above clear just ahead of the slabs (public/worklets/tile-wipe.js).
+ * page's words above clear just ahead of the slabs (a gradient mask in main.css).
  *
  * Decorative: the canvas is aria-hidden and takes no pointer events.
  */
@@ -25,13 +25,16 @@ export type TileField = {
 /**
  * Shares of the linear progress: SPREAD is how scattered the starts are, FLIP
  * a tile's run, LAND the part of it spent flying in. BOUNCE is the spring a
- * tile lands on. The worklet reads spread and flip to keep its clearing ahead.
+ * tile lands on. The plugin's wipeOval reads spread and flip to keep its clearing ahead.
  */
 export const TILE_TIMING = { spread: 0.45, flip: 0.32, land: 0.7, bounce: 0.25 }
 
-/** How much sooner the front reaches what lies in the direction of travel than what's behind (mirrored in the worklet and utils/pageArrival). */
-const AHEAD = 0.7
-const BEHIND = 1.3
+/** How much sooner the front reaches what lies in the direction of travel than what's behind (mirrored in utils/pageArrival). */
+export const AHEAD = 0.7
+export const BEHIND = 1.3
+
+/** How far from the press, in tiles, the slabs open already landed. Their corners stay within PRESSED + 0.75 tiles, cleared of old words from the start (plugin, main.css). */
+export const PRESSED = 2
 
 function hash(x: number, y: number, z: number) {
   let h = (Math.imul(x, 374761393) + Math.imul(y, 668265263) + Math.imul(z, 1442695041)) | 0
@@ -58,9 +61,14 @@ function slabs(field: TileField) {
       const u = Math.min(distance((i + 0.5) * tile, (j + 0.5) * tile, field) / farthest, 1)
       // Scattered only as the front moves out: at the press the page opens at
       // once, so the change answers it.
-      const start = (u * (1 - spread) + hash(i, j, 0) * spread * Math.min(u * 4, 1)) * (1 - flip * 1.3)
+      const run = flip * (0.7 + 0.6 * hash(i, j, 1))
+      // The slabs right under the press have already landed on the first
+      // frame, so the click is answered at once instead of by specks far off.
+      const pressed = Math.hypot((i + 0.5) * tile - field.originX, (j + 0.5) * tile - field.originY) < tile * PRESSED
+      const start = pressed ? -run * TILE_TIMING.land
+        : (u * (1 - spread) + hash(i, j, 0) * spread * Math.min(u * 4, 1)) * (1 - flip * 1.3)
       // Own depth per slab (share of the focal length), odd rows a step back.
-      data.set([i, j, start, flip * (0.7 + 0.6 * hash(i, j, 1)), -0.8 + 1.1 * hash(i, j, 3) - (j & 1) * 0.15], n)
+      data.set([i, j, start, run, -0.8 + 1.1 * hash(i, j, 3) - (j & 1) * 0.15], n)
       n += 5
     }
   }

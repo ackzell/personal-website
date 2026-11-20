@@ -46,6 +46,7 @@ let blocks: Block[] = []
 let fontSize = 16
 let gap = 0
 let lead = 0
+let markSize = 0
 let pool: HTMLSpanElement[] = []
 let lastTop = Number.NaN
 let lastWidth = Number.NaN
@@ -115,6 +116,7 @@ function measure() {
   if (!blocks.length || !box || !m) return
   const width = box.clientWidth
   const text = blocks.reduce((sum, block) => sum + block.before + layout(block.prepared, width, block.lineHeight).height, 0)
+  markSize = m.offsetHeight
   height.value = Math.ceil(m.offsetHeight * 2 + lead * 2 + text)
   flow(true)
 }
@@ -263,6 +265,12 @@ const { live } = useMarkEntrance(mark)
 
 useEventListener(window, 'scroll', schedule, { passive: true })
 useResizeObserver(root, relayout)
+// The block's height is pinned, so a window getting shorter only shows as a
+// smaller mark or lead (svh); a phone's toolbar resizing changes neither.
+useEventListener(window, 'resize', () => {
+  const m = mark.value
+  if (m && root.value && (m.offsetHeight !== markSize || parseFloat(getComputedStyle(root.value).rowGap) !== lead)) relayout()
+}, { passive: true })
 // A language switch fades the painted lines out still in the old language
 // (plugins/locale-scramble.client.ts): relayout holds off until it's over.
 watch(() => [props.title, props.text, localeSwitching.value], relayout)
@@ -295,17 +303,48 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped>
+/* The room between the band and the mark, at the page's top and once the mark
+   holds: the usual block gap, tighter on short screens (half at 600px tall).
+   The first section's own gap above it (and the margin index's, level with
+   it) shrinks too, to nothing on a screen about 320px tall. */
+:global(.page:has(> section > .home-intro, > .home-intro)) {
+  --mark-top: clamp(var(--gap-group), 8svh - var(--gap-block), var(--gap-block));
+  --intro-top: clamp(0px, 20svh - 4rem, var(--gap-section));
+  padding-block-start: calc(var(--mark-top) + var(--section-index-height, 0px));
+}
+:global(.page:has(> section > .home-intro) > section:has(> .home-intro)) {
+  margin-block-start: var(--intro-top);
+}
+/* As a row under the band, the index lifts back up through the page's top
+   space, which is --mark-top here (SiteSectionIndex). */
+:global(.page:has(> section > .home-intro) > .section-index) {
+  margin-block-start: calc(-1 * (var(--mark-top) + var(--section-index-height, 0px)));
+}
+@media (width >= 60rem) {
+  :global(.page:has(> section > .home-intro) > .section-index--auto) {
+    margin-block-start: var(--intro-top);
+  }
+}
+
 .home-intro {
   position: relative;
+  /* Capped by height too, so a short window still reaches the name. */
+  --mark-size: min(clamp(5rem, 25vw, 14rem), 28svh);
   /* Space between the mark and the name. Read by the script too; a margin on
-     the sticky mark would also hold that space below it at the end. */
-  row-gap: 10rem;
+     the sticky mark would also hold that space below it at the end. On a
+     short screen it brings the name up so it and the paragraph's first line
+     show above the footer, the rest cut: a screen less what sits above the
+     name and the footer, less about those two lines (5rem). */
+  --lead: clamp(var(--gap-block),
+      100svh - var(--header-height, 0px) - var(--section-index-height, 0px) - var(--mark-top, 0px) - var(--intro-top, 0px) - var(--mark-size) - var(--footer-height, 0px) - 5rem,
+      10rem);
+  row-gap: var(--lead);
 }
 
 .home-intro__mark {
   /* Small enough on a phone to leave a readable column on each side. */
-  inline-size: clamp(5rem, 25vw, 14rem);
-  block-size: clamp(5rem, 25vw, 14rem);
+  inline-size: var(--mark-size);
+  block-size: var(--mark-size);
   margin-inline: auto;
   /* Holds the tiles' canvas (utils/markTiles) before it turns sticky. */
   position: relative;
@@ -322,7 +361,7 @@ onBeforeUnmount(() => {
 
 /* The plain stack (no JS, reduced motion). */
 .home-intro:not(.is-flowing)>h1 {
-  margin-block-start: 10rem;
+  margin-block-start: var(--lead);
 }
 
 .home-intro>p {
@@ -348,7 +387,7 @@ onBeforeUnmount(() => {
    section row where it shows (SiteSectionIndex). */
 .is-flowing .home-intro__mark {
   position: sticky;
-  inset-block-start: calc(var(--header-height, 0px) + var(--section-index-height, 0px) + var(--gap-block));
+  inset-block-start: calc(var(--header-height, 0px) + var(--section-index-height, 0px) + var(--mark-top));
 }
 
 .home-intro__lines {
