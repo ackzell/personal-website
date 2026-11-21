@@ -204,6 +204,12 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
     for (const animation of el.getAnimations({ subtree: true })) {
       if (animation instanceof CSSAnimation && ENTRANCES.has(animation.animationName)) animation.finish()
     }
+    // A fade of the block's own still to come (the contributions log printing)
+    // keeps it out of sight: ours would override it and show the block first.
+    // Only its own: a part's fade multiplies with ours and doesn't clash.
+    const fadesItself = el.getAnimations().some((animation) => animation instanceof CSSAnimation
+      && animation.playState !== 'finished'
+      && (animation.effect as KeyframeEffect | null)?.getKeyframes().some((frame) => 'opacity' in frame))
     // Its words and plates are layers of their own: they come in on the same beat (main.css).
     for (const named of el.querySelectorAll<HTMLElement>('[style*="view-transition-name"]')) {
       const name = getComputedStyle(named).viewTransitionName
@@ -211,10 +217,8 @@ export function arrive({ way, from, tiles }: { way: number; from: Point; tiles: 
     }
     // Out of sight from the start, not only once its delay is up (fill: backwards).
     const timing = { duration: (LAND + 0.15 * far) * SETTLE * 1000, delay: delay * 1000, fill: 'backwards' } as const
-    return [
-      el.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] }, { ...timing, easing: MOVE }),
-      el.animate({ opacity: [0, 1] }, { ...timing, easing: FADE }),
-    ]
+    const move = el.animate({ transform: [`translate(${dx}px, ${dy}px)`, 'none'] }, { ...timing, easing: MOVE })
+    return fadesItself ? [move] : [move, el.animate({ opacity: [0, 1] }, { ...timing, easing: FADE })]
   })
 
   if (wordDelays) {
